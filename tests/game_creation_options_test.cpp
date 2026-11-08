@@ -7,16 +7,27 @@
 
 namespace
 {
+/**
+ * @brief The remembered settings a test hands to fromSettings.
+ *
+ * The fake cannot itself be an aggregate (it derives from a polymorphic interface), so the
+ * remembered values live in a GameCreationOptions member and the getters read them from
+ * there. That keeps the test data in one designated initializer.
+ */
 class FakeGameSettings : public IGameSettingsProvider
 {
 public:
+    explicit FakeGameSettings(const GameCreationOptions &_options = {}) : options(_options)
+    {
+    }
+
     [[nodiscard]] QString getGameDescription() const override
     {
-        return description;
+        return options.description;
     }
     [[nodiscard]] int getMaxPlayers() const override
     {
-        return maxPlayers;
+        return options.maxPlayers;
     }
     [[nodiscard]] QString getGameTypes() const override
     {
@@ -24,43 +35,43 @@ public:
     }
     [[nodiscard]] bool getOnlyBuddies() const override
     {
-        return onlyBuddies;
+        return options.onlyBuddies;
     }
     [[nodiscard]] bool getOnlyRegistered() const override
     {
-        return onlyRegistered;
+        return options.onlyRegistered;
     }
     [[nodiscard]] bool getSpectatorsAllowed() const override
     {
-        return spectatorsAllowed;
+        return options.spectatorsAllowed;
     }
     [[nodiscard]] bool getSpectatorsNeedPassword() const override
     {
-        return spectatorsNeedPassword;
+        return options.spectatorsNeedPassword;
     }
     [[nodiscard]] bool getSpectatorsCanTalk() const override
     {
-        return spectatorsCanTalk;
+        return options.spectatorsCanTalk;
     }
     [[nodiscard]] bool getSpectatorsCanSeeEverything() const override
     {
-        return spectatorsCanSeeEverything;
+        return options.spectatorsSeeEverything;
     }
     [[nodiscard]] bool getCreateGameAsSpectator() const override
     {
-        return createGameAsSpectator;
+        return options.joinAsSpectator;
     }
     [[nodiscard]] int getDefaultStartingLifeTotal() const override
     {
-        return defaultStartingLifeTotal;
+        return options.startingLifeTotal;
     }
     [[nodiscard]] bool getShareDecklistsOnLoad() const override
     {
-        return shareDecklistsOnLoad;
+        return options.shareDecklistsOnLoad;
     }
     [[nodiscard]] bool getShufflePlayers() const override
     {
-        return shufflePlayers;
+        return options.shufflePlayers;
     }
     [[nodiscard]] bool getRememberGameSettings() const override
     {
@@ -79,19 +90,9 @@ public:
         return 0;
     }
 
-    QString description;
-    int maxPlayers = 2;
+    GameCreationOptions options;
+    /// The legacy "Name, " list; it has no GameCreationOptions counterpart.
     QString gameTypes;
-    bool onlyBuddies = false;
-    bool onlyRegistered = false;
-    bool spectatorsAllowed = true;
-    bool spectatorsNeedPassword = false;
-    bool spectatorsCanTalk = false;
-    bool spectatorsCanSeeEverything = false;
-    bool createGameAsSpectator = false;
-    int defaultStartingLifeTotal = 20;
-    bool shareDecklistsOnLoad = false;
-    bool shufflePlayers = false;
 };
 } // namespace
 
@@ -186,19 +187,21 @@ TEST(GameCreationOptions, DescriptionWhitespaceIsSimplified)
 
 TEST(GameCreationOptions, FromSettingsCopiesEveryRememberedField)
 {
-    FakeGameSettings settings;
-    settings.description = "Remembered game";
-    settings.maxPlayers = 6;
-    settings.onlyBuddies = true;
-    settings.onlyRegistered = true;
-    settings.spectatorsAllowed = false;
-    settings.spectatorsNeedPassword = true;
-    settings.spectatorsCanTalk = true;
-    settings.spectatorsCanSeeEverything = true;
-    settings.createGameAsSpectator = true;
-    settings.defaultStartingLifeTotal = 40;
-    settings.shareDecklistsOnLoad = true;
-    settings.shufflePlayers = true;
+    const FakeGameSettings settings{GameCreationOptions{.description = "Remembered game",
+                                                        .password = {},
+                                                        .maxPlayers = 6,
+                                                        .onlyBuddies = true,
+                                                        .onlyRegistered = true,
+                                                        .spectatorsAllowed = false,
+                                                        .spectatorsNeedPassword = true,
+                                                        .spectatorsCanTalk = true,
+                                                        .spectatorsSeeEverything = true,
+                                                        .joinAsJudge = false,
+                                                        .joinAsSpectator = true,
+                                                        .startingLifeTotal = 40,
+                                                        .shareDecklistsOnLoad = true,
+                                                        .shufflePlayers = true,
+                                                        .gameTypeIds = {}}};
 
     const GameCreationOptions options = GameCreationOptions::fromSettings(settings, {}, true);
 
@@ -219,8 +222,8 @@ TEST(GameCreationOptions, FromSettingsCopiesEveryRememberedField)
 TEST(GameCreationOptions, FromSettingsDropsJoinRestrictionsForUnregisteredHosts)
 {
     FakeGameSettings settings;
-    settings.onlyBuddies = true;
-    settings.onlyRegistered = true;
+    settings.options.onlyBuddies = true;
+    settings.options.onlyRegistered = true;
 
     const GameCreationOptions options = GameCreationOptions::fromSettings(settings, {}, false);
 

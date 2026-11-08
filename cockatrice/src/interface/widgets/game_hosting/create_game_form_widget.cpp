@@ -200,26 +200,13 @@ QString CreateGameFormWidget::selectedGameTypesSettingString() const
 
 void CreateGameFormWidget::resetToDefaults()
 {
-    descriptionEdit->setText("");
-    maxPlayersEdit->setValue(2);
+    GameCreationOptions defaults;
+    defaults.onlyRegistered = registeredUser;
+    setOptions(defaults);
 
-    passwordEdit->setText("");
-    onlyBuddiesCheckBox->setChecked(false);
-    onlyRegisteredCheckBox->setChecked(registeredUser);
-
-    spectatorsAllowedCheckBox->setChecked(true);
-    spectatorsNeedPasswordCheckBox->setChecked(false);
-    spectatorsCanTalkCheckBox->setChecked(false);
-    spectatorsSeeEverythingCheckBox->setChecked(false);
-    createGameAsSpectatorCheckBox->setChecked(false);
-
-    startingLifeTotalEdit->setValue(20);
-    shareDecklistsOnLoadCheckBox->setChecked(false);
-    shufflePlayersCheckBox->setChecked(false);
-    createGameAsJudgeCheckBox->setChecked(false);
-
+    // An exclusive button group refuses to uncheck its selected button, which setOptions
+    // cannot do, so clear the exclusive flag while resetting the game type selection.
     for (auto *gameTypeCheckBox : gameTypeCheckBoxes) {
-        // must set auto exclusive to false to be able to set the check to false
         gameTypeCheckBox->setAutoExclusive(false);
         gameTypeCheckBox->setChecked(false);
         gameTypeCheckBox->setAutoExclusive(true);

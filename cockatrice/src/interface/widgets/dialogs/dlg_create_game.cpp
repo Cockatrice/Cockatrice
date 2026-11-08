@@ -23,9 +23,11 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
     const bool judge = room && (room->getUserInfo()->user_level() & ServerInfo_User::IsJudge);
 
     form = new CreateGameFormWidget(_gameTypes, registered, judge, this);
-    form->setRememberSettingsChecked(SettingsCache::instance().game().getRememberGameSettings());
-    form->setOptions(GameCreationOptions::fromSettings(SettingsCache::instance().game(), _gameTypes, registered));
-    if (!form->isRememberSettingsChecked()) {
+    const bool rememberSettings = SettingsCache::instance().game().getRememberGameSettings();
+    form->setRememberSettingsChecked(rememberSettings);
+    if (rememberSettings) {
+        form->setOptions(GameCreationOptions::fromSettings(SettingsCache::instance().game(), _gameTypes, registered));
+    } else {
         form->resetToDefaults();
     }
     form->focusDescription();
