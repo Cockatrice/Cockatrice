@@ -460,10 +460,11 @@ void DeckSyncManager::classify(const QMap<int, ServerFile> &serverFiles)
         }
         const DeckSyncRecord baseRecord = sidecar.get(it.key());
         const bool localChanged = baseRecord.baseHash.isEmpty() || baseRecord.baseHash != it.value().hash;
-        // A server row without a hash predates sync: treat it as unknown rather than changed,
-        // otherwise every sync re-downloads the deck.
+        // A server row without a hash predates sync: with a base, treat it as unknown
+        // rather than changed (otherwise every sync re-downloads the deck). Without a
+        // base nothing says the server copy is unchanged, so it must not lose silently.
         const bool serverChanged =
-            !server.hash.isEmpty() && (baseRecord.baseHash.isEmpty() || baseRecord.baseHash != server.hash);
+            baseRecord.baseHash.isEmpty() || (!server.hash.isEmpty() && baseRecord.baseHash != server.hash);
         if (localChanged && !serverChanged) {
             if (syncMode == DeckSyncMode::DownloadOnly) {
                 continue;
