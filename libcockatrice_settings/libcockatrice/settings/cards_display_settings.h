@@ -23,7 +23,7 @@ public:
         HoverPanelTriggerRightClick = 1,
         HoverPanelTriggerWheel = 2,
         HoverPanelTriggerShortcut = 3,
-        /// Never fires. The hover zoom and panel are opt-in, so this is their default.
+        /// Never fires when selected; lets the user turn the hover zoom and panel off.
         HoverPanelTriggerOff = 4
     };
 

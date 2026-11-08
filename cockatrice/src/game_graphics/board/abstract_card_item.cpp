@@ -48,8 +48,8 @@ class QSizeF;
 // Width the hovered card smooth-zooms to: exactly the hover panel picture size, so
 // all four corners coincide when the panel swaps in over it.
 static constexpr qreal HOVER_ZOOM_WIDTH = 270.0;
-// The pre-panel hover enlargement. The smooth zoom is opt-in, so this stays the hover
-// behavior whenever no zoom trigger is configured (see setHoverHighlighted).
+// The pre-panel hover enlargement. This stays the hover behavior when the smooth zoom is
+// turned off (see setHoverHighlighted).
 static constexpr qreal LEGACY_HOVER_SCALE = 1.1;
 static constexpr int HOVER_ZOOM_IN_MS = 220;
 static constexpr int HOVER_ZOOM_OUT_MS = 140;
@@ -356,11 +356,9 @@ void AbstractCardItem::setHoverHighlighted(bool highlighted)
         setZValue(ZValues::HOVERED_CARD);
     }
 
-    // Fallback to the historical hover scale: the smooth hover zoom is opt-in and its
-    // trigger defaults to Off, so when hovering drives neither the zoom nor the panel
-    // (zoom trigger Off, panel not on hover) contact alone must still enlarge the card
-    // to the old 1.1x while scaleCards is on. Otherwise every existing user silently
-    // loses the hover enlargement on upgrade.
+    // Fallback to the historical hover scale when the smooth hover zoom is turned off and
+    // the panel is not driven by hover: contact alone must still enlarge the card to the
+    // old 1.1x while scaleCards is on.
     auto &display = SettingsCache::instance().cardsDisplay();
     const bool legacyHoverScale = display.getScaleCards() &&
                                   display.getHoverZoomTrigger() == CardsDisplaySettings::HoverPanelTriggerOff &&
