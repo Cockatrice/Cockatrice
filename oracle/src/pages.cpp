@@ -39,6 +39,7 @@
 #include <QScrollBar>
 #include <QSettings>
 #include <QSharedPointer>
+#include <QSizePolicy>
 #include <QTextEdit>
 #include <QTextStream>
 #include <QTimer>
@@ -770,10 +771,15 @@ TagsPage::TagsPage(QWidget *parent) : OracleWizardPage(parent)
     // so it reads as an explanation of the option rather than a caption glued
     // to the controls around it.
     parentsExplainer->setContentsMargins(24, 4, 0, 10);
+    // A word-wrapped label reports a one-line sizeHint, so a short page squeezes
+    // it and clips the text top and bottom. Pinning the vertical policy makes
+    // the wrapped height part of the page's minimum size.
+    parentsExplainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
     statusLabel = new QLabel(this);
     statusLabel->setWordWrap(true);
     statusLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    statusLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
     progressLabel = new QLabel(this);
     progressBar = new QProgressBar(this);
