@@ -300,6 +300,7 @@ cockatrice_add_test(
   NAME
   server_card_counter_test
   SOURCES
+  ${VERSION_STRING_CPP}
   server_card_counter_test.cpp
   LIBS
   libcockatrice_network
@@ -310,6 +311,7 @@ cockatrice_add_test(
   NAME
   server_dump_zone_test
   SOURCES
+  ${VERSION_STRING_CPP}
   server_dump_zone_test.cpp
   LIBS
   libcockatrice_rng
@@ -321,6 +323,7 @@ cockatrice_add_test(
   NAME
   server_counter_test
   SOURCES
+  ${VERSION_STRING_CPP}
   server_counter_test.cpp
   LIBS
   libcockatrice_network
@@ -332,6 +335,7 @@ cockatrice_add_test(
   server_developer_role_test
   NO_SANITIZE
   SOURCES
+  ${VERSION_STRING_CPP}
   server_developer_role_test.cpp
   LIBS
   libcockatrice_network
@@ -344,6 +348,7 @@ cockatrice_add_test(
   server_moderator_role_test
   NO_SANITIZE
   SOURCES
+  ${VERSION_STRING_CPP}
   server_moderator_role_test.cpp
   LIBS
   libcockatrice_network
@@ -390,6 +395,7 @@ cockatrice_add_test(
   NAME
   local_client_lifetime_test
   SOURCES
+  ${VERSION_STRING_CPP}
   local_client_lifetime_test.cpp
   LIBS
   libcockatrice_network
@@ -411,6 +417,7 @@ cockatrice_add_test(
   NAME
   latency_tracker_test
   SOURCES
+  ${VERSION_STRING_CPP}
   latency_tracker_test.cpp
   LIBS
   libcockatrice_network
