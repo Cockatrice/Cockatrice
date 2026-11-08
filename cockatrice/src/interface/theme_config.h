@@ -63,11 +63,13 @@ Q_ENUM_NS(Role)
  *
  * Accent roles and the neutral Icon family return an invalid QColor because
  * ThemeManager derives them from the palette: the accent from the highlight,
- * the icon ink from the neutral text color plus the highlight. Semantic roles
+ * the icon ink from the live WindowText held to the label floor. Semantic roles
  * return an opaque default that suits the scheme, so themes written before the
- * role existed still render it. A theme with no authored icon family keeps
- * deriving its icon ink from the platform palette instead of pinning one
- * scheme's colors.
+ * role existed still render it. The System theme deliberately leaves the
+ * neutral family unauthored: the palette file it picks cannot know the platform
+ * scheme, so a fixed ladder would be invisible on the other one. It derives
+ * neutral ink from the live platform palette instead of pinning one scheme's
+ * colors.
  */
 QColor defaultAppColor(AppColor::Role role, bool dark);
 

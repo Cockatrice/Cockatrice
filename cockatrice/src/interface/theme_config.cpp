@@ -458,17 +458,18 @@ QColor defaultAppColor(AppColor::Role role, bool dark)
     switch (role) {
         case AppColor::AccentStrong:
         case AppColor::AccentSoft:
-        // The neutral icon family is palette-derived like the accent, so a
-        // theme without an authored icon family keeps following the platform
-        // instead of pinning one scheme's ink.
+        // The neutral icon family is palette-derived like the accent: a theme
+        // that leaves it unauthored (System, and every theme written before the
+        // roles existed) keeps the live platform palette's WindowText instead
+        // of pinning one scheme's ink.
         case AppColor::Icon:
         case AppColor::IconStrong:
         case AppColor::IconSoft:
             return {};
         // The semantic family follows the same chroma ladder as the authored
-        // themes. A theme without stored values (System) has no per-surface
-        // palette to measure against, so these are authored against the
-        // representative platform surfaces the System theme runs on.
+        // themes. A theme that authors none of it has no per-surface palette to
+        // measure against, so these are authored against the representative
+        // platform surfaces the System theme runs on.
         case AppColor::Positive:
             return QColor(dark ? QStringLiteral("#6dd58c") : QStringLiteral("#1a7d3a"));
         case AppColor::PositiveStrong:

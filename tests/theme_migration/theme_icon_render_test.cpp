@@ -80,16 +80,18 @@ int countOpaquePixels(const QPixmap &pixmap, const QColor &expected)
 /**
  * @brief The ink the engine resolves a neutral glyph to, for @p palette.
  *
- * Neutral glyphs are not painted with WindowText verbatim: theme_icon_ink
- * borrows accent chroma and holds the result to a contrast floor. Tests that
- * pin the rendered color ask the rule instead of restating it.
+ * Neutral glyphs are not painted with WindowText verbatim: theme_icon_ink holds
+ * the platform text color to a contrast floor. Tests that pin the rendered color
+ * ask the rule instead of restating it. No accent chroma is borrowed: this is
+ * the fallback an unauthored neutral family takes, so it works whatever scheme
+ * the platform palette actually is.
  */
 QColor expectedNeutralInk(const QPalette &palette)
 {
     const QColor text = palette.color(QPalette::Active, QPalette::WindowText);
     const QColor surface = ThemeIconInk::harderSurface(palette.color(QPalette::Active, QPalette::Window),
                                                        palette.color(QPalette::Active, QPalette::Button), text);
-    return ThemeIconInk::glyphInk(text, surface, palette.color(QPalette::Active, QPalette::Highlight));
+    return ThemeIconInk::glyphInk(text, surface, palette.color(QPalette::Active, QPalette::Highlight), 0.0);
 }
 
 /**
@@ -327,10 +329,16 @@ TEST_F(ThemeIconRenderTest, SelectedPaletteTintUsesHighlightedText)
     qApp->setPalette(palette);
 
     const IconTint tint(QPalette::WindowText);
-    // The normal ink is derived from the active text color, but it is icon ink
-    // rather than the text color itself.
-    EXPECT_NE(tint.resolve(QIcon::Normal), activeText);
-    EXPECT_EQ(tint.resolve(QIcon::Normal), expectedNeutralInk(qApp->palette()));
+    // The normal ink is the accent-free neutral fallback: the platform text
+    // color held to the label floor. A text color that already clears the floor
+    // is the ink verbatim, so this pins the rule and the floor, not a shift.
+    const QColor normal = tint.resolve(QIcon::Normal);
+    EXPECT_EQ(normal, expectedNeutralInk(qApp->palette()));
+    const QPalette resolved = qApp->palette();
+    const QColor surface = ThemeIconInk::harderSurface(resolved.color(QPalette::Active, QPalette::Window),
+                                                       resolved.color(QPalette::Active, QPalette::Button),
+                                                       resolved.color(QPalette::Active, QPalette::WindowText));
+    EXPECT_GE(ThemeIconInk::contrastRatio(normal, surface), ThemeIconInk::labelContrastFloor());
     // A selected row paints on the highlight, so the ink is the palette's
     // highlighted text rather than the icon ink.
     EXPECT_EQ(tint.resolve(QIcon::Selected), selectedText);
@@ -1194,9 +1202,9 @@ InkPalette shippedPalette(const QString &theme, bool dark)
     // A theme may author only [AppColors] (System does), so appColors alone do
     // not mean it ships a palette: the keys have to be present. The authored
     // neutral-family assertions therefore cover only themes with a palette;
-    // System's authored neutral family is checked for authorship and ordering
-    // by ShippedPalettesAuthorTheEmphasisLadder, and its semantic fallbacks
-    // against representative platform surfaces by
+    // System deliberately leaves its neutral family unauthored, which
+    // ShippedPalettesAuthorTheEmphasisLadder pins, and its semantic fallbacks
+    // are measured against representative platform surfaces by
     // DefaultSemanticFamilyMeetsTheLadderOnPlatformSurfaces.
     if (config.colors.isEmpty()) {
         return {};
@@ -1211,9 +1219,9 @@ InkPalette shippedPalette(const QString &theme, bool dark)
 /**
  * @brief The [AppColors] a shipped theme authors, even when it ships no palette.
  *
- * System deliberately has no palette of its own, but it still authors every
- * app-color role, including the neutral icon family that used to be derived
- * from the platform palette.
+ * System deliberately has no palette of its own, but it still authors its
+ * semantic roles. The neutral icon family stays unauthored there so it follows
+ * the live platform palette; see ShippedPalettesAuthorTheEmphasisLadder.
  */
 QMap<AppColor::Role, QColor> shippedAppColors(const QString &theme, bool dark)
 {
@@ -1255,6 +1263,29 @@ TEST(IconInk, ContrastFloorPicksThePoleItCanReach)
 
     const QColor solved = ThemeIconInk::reachContrast(QColor(QStringLiteral("#d0d0d0")), background, 4.5);
     EXPECT_GE(ThemeIconInk::contrastRatio(solved, background), 4.5);
+}
+
+/**
+ * @brief Primary stays louder than secondary on a light surface.
+ *
+ * A saturated blue or violet at full value is already dark enough to clear the
+ * label floor on a light surface. When solveValue() read the target as a
+ * minimum in both directions it rejected that tone, walked the whole saturation
+ * ladder and fell back to the unchanged secondary, so primary was never
+ * distinguishable. #5a3ee2 on #efeff4 is the shipped Plasma accent's shape.
+ */
+TEST(IconInk, PrimaryRaisesAChromaticToneOnALightSurface)
+{
+    const QColor surface(QStringLiteral("#efeff4"));
+    const QColor violet(QStringLiteral("#5a3ee2"));
+    ASSERT_GE(ThemeIconInk::contrastRatio(violet, surface), ThemeIconInk::labelContrastFloor())
+        << "the fixture must already be legible, so the fallback would be a no-op";
+
+    const QColor primary = ThemeIconInk::forEmphasis(violet, surface, IconEmphasis::Primary);
+    ASSERT_TRUE(primary.isValid());
+    EXPECT_GE(ThemeIconInk::contrastRatio(primary, surface), ThemeIconInk::labelContrastFloor());
+    EXPECT_GT(primary.hsvSaturation(), violet.hsvSaturation()) << "primary fell back to the unchanged secondary";
+    EXPECT_NEAR(primary.hue(), violet.hue(), 2);
 }
 
 /**
@@ -1675,30 +1706,17 @@ TEST(IconInk, ShippedPalettesAuthorTheEmphasisLadder)
     EXPECT_GT(checked, 0) << "no shipped palette was loadable";
 
     // The System theme ships no palette of its own, so its families have no
-    // authored surfaces to measure against. It still authors the neutral family
-    // instead of deriving it: deriving picked up the platform accent's chroma,
-    // which painted neutral chrome blue on a default Linux scheme.
+    // authored surfaces to measure against. It nevertheless authors the
+    // semantic family, while the neutral family stays unauthored on purpose:
+    // the palette file is chosen from the theme's scheme, which is always light
+    // on Qt < 6.5 and can be unknown on newer Qt, so one fixed ladder would be
+    // invisible against a platform palette of the other scheme.
     for (const bool dark : {false, true}) {
         const QMap<AppColor::Role, QColor> system = shippedAppColors(QStringLiteral("System"), dark);
         EXPECT_TRUE(system.contains(AppColor::PositiveStrong));
         EXPECT_TRUE(system.contains(AppColor::NegativeSoft));
         for (const AppColor::Role role : {AppColor::Icon, AppColor::IconStrong, AppColor::IconSoft}) {
-            ASSERT_TRUE(system.contains(role)) << (dark ? "dark" : "light") << static_cast<int>(role);
-            EXPECT_EQ(system.value(role).hsvSaturation(), 0) << (dark ? "dark" : "light") << static_cast<int>(role);
-        }
-
-        // Strong is the loudest level a neutral family can reach: the darkest
-        // tone on the light scheme, the palest on the dark one. Quiet recedes
-        // toward the surface on both.
-        const double secondary = ThemeIconInk::relativeLuminance(system.value(AppColor::Icon));
-        const double primary = ThemeIconInk::relativeLuminance(system.value(AppColor::IconStrong));
-        const double quiet = ThemeIconInk::relativeLuminance(system.value(AppColor::IconSoft));
-        if (dark) {
-            EXPECT_GT(primary, secondary) << "dark";
-            EXPECT_GT(secondary, quiet) << "dark";
-        } else {
-            EXPECT_LT(primary, secondary) << "light";
-            EXPECT_LT(secondary, quiet) << "light";
+            EXPECT_FALSE(system.contains(role)) << (dark ? "dark" : "light") << static_cast<int>(role);
         }
     }
 }

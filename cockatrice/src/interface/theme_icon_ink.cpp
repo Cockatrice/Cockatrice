@@ -177,26 +177,50 @@ double targetLuminance(const QColor &surface, double ratio)
  *
  * Luminance is monotone in HSV value at a fixed hue and saturation, so a
  * bisection finds the boundary: the closest tone to the surface that still
- * clears the floor, on either scheme. Returns an invalid color when even full
- * value cannot reach the floor at that saturation.
+ * clears the floor, on either scheme. The direction depends on the surface:
+ * toward black (a light surface) the floor is a luminance ceiling, so the
+ * search keeps the highest passing value; toward white (a dark surface) it is a
+ * floor, so the search keeps the lowest passing value. Returns an invalid color
+ * when the tone cannot reach the floor at that saturation at all.
  */
 QColor solveValue(int hue, int saturation, const QColor &surface, double floor)
 {
+    const bool towardBlack = darkerPoleWins(surface);
     const double target = targetLuminance(surface, floor + CONTRAST_ROUNDING_MARGIN);
-    if (ThemeIconInk::relativeLuminance(QColor::fromHsv(hue, saturation, 255)) < target) {
+    // Toward black a tone is legible at or below the target luminance, toward
+    // white at or above it. Testing the wrong side is what let a saturated
+    // violet at full value look "too dark" on a light surface and fall back to
+    // the unchanged secondary.
+    const auto passes = [hue, saturation, target, towardBlack](int value) {
+        const double luminance = ThemeIconInk::relativeLuminance(QColor::fromHsv(hue, saturation, value));
+        return towardBlack ? luminance <= target : luminance >= target;
+    };
+
+    if (passes(255)) {
+        // Toward black, full value is the palest tone: if even that clears the
+        // floor, the whole ramp does and the surface wants the authored tone.
+        // Toward white it is the palest tone but also the most legible one, so
+        // the search still starts from the failing end.
+        if (towardBlack) {
+            return QColor::fromHsv(hue, saturation, 255).toRgb();
+        }
+    } else if (!towardBlack) {
+        // Toward white the floor needs the palest tone; no darker value can
+        // reach it at this saturation.
         return {};
     }
-    int low = 0;
-    int high = 255;
+
+    int passing = towardBlack ? 0 : 255;
+    int failing = towardBlack ? 255 : 0;
     for (int search = 0; search < CONTRAST_SEARCH_STEPS; ++search) {
-        const int middle = (low + high) / 2;
-        if (ThemeIconInk::relativeLuminance(QColor::fromHsv(hue, saturation, middle)) >= target) {
-            high = middle;
+        const int middle = (passing + failing) / 2;
+        if (passes(middle)) {
+            passing = middle;
         } else {
-            low = middle;
+            failing = middle;
         }
     }
-    return QColor::fromHsv(hue, saturation, high).toRgb();
+    return QColor::fromHsv(hue, saturation, passing).toRgb();
 }
 
 /**

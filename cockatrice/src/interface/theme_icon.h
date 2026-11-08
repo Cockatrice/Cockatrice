@@ -104,11 +104,11 @@ public:
      * hue and saturation stay the author's.
      *
      * Neutral label roles (WindowText, Text) resolve to icon ink rather than the
-     * raw palette color: ThemeIconInk::glyphInk derives it from the accent and
-     * holds the glyph to a contrast floor, because a 2px glyph in body-text ink
-     * reads thinner than the text beside it. A theme that authors the neutral
-     * icon roles overrides that derivation. Semantic roles keep the hue the call
-     * site asked for.
+     * raw palette color: an unauthored neutral family derives it from the live
+     * WindowText and holds the glyph to a contrast floor, because a 2px glyph in
+     * body-text ink reads thinner than the text beside it. A theme that authors
+     * the neutral icon roles overrides that derivation. Semantic roles keep the
+     * hue the call site asked for.
      *
      * Emphasis selects the family's authored variant, so the palette editor's
      * rows are the whole source of truth. A caller that names a variant

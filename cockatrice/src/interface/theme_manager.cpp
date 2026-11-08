@@ -656,14 +656,17 @@ QColor ThemeManager::appColor(AppColor::Role role) const
         case AppColor::IconStrong:
         case AppColor::IconSoft: {
             // Legacy fallback for a theme written before the icon roles
-            // existed, or one with no authored icon family. The three levels
-            // are the ink rule this series shipped, applied once here so
-            // authored roles never get recomputed at paint time.
+            // existed, or one that deliberately leaves the neutral family
+            // unauthored (System). No accent chroma is borrowed here: the
+            // palette file that would carry it cannot know the platform scheme,
+            // so neutral ink is the live WindowText held to the label floor.
+            // The three levels are the ink rule this series shipped, applied
+            // once here so authored roles never get recomputed at paint time.
             const QPalette &palette = qApp->palette();
             const QColor text = palette.color(QPalette::Active, QPalette::WindowText);
             const QColor surface = ThemeIconInk::harderSurface(palette.color(QPalette::Active, QPalette::Window),
                                                                palette.color(QPalette::Active, QPalette::Button), text);
-            const QColor ink = ThemeIconInk::glyphInk(text, surface, accent);
+            const QColor ink = ThemeIconInk::glyphInk(text, surface, accent, 0.0);
             switch (role) {
                 case AppColor::IconStrong:
                     return ThemeIconInk::forEmphasis(ink, surface, IconEmphasis::Primary);

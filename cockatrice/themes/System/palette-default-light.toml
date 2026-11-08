@@ -1,18 +1,16 @@
 # The System theme derives all of its colors from the platform palette
 # (e.g. qt6ct's custom color scheme on Linux), so it must NOT ship palette
-# overrides. Only the identity, neutral-ink and semantic app colors are
-# provided here, so buttons keep their classic greens while the actual palette
-# stays native to the OS.
-# The neutral icon family is authored instead of derived: deriving it from the
-# platform palette picked up the scheme's accent chroma, which painted neutral
-# chrome blue. Neutral ink stays neutral here, black on the light scheme and
-# white on the dark one, regardless of what the platform's accent carries.
+# overrides. Only the identity and semantic app colors are provided here, so
+# buttons keep their classic greens while the actual palette stays native to
+# the OS.
+# The neutral icon family is deliberately not authored: the palette file is
+# picked from the theme's scheme, which on Qt < 6.5 is always light and on newer
+# Qt can be unknown, so a fixed black-or-white ladder would be invisible on a
+# platform palette of the other scheme. Neutral ink derives from the live
+# WindowText instead.
 [AppColors]
 AccentStrong         = #ff148c3c
 AccentSoft           = #ff78c850
-Icon                 = #ff1a1a1a
-IconStrong           = #ff000000
-IconSoft             = #ff5f5f5f
 Positive             = #ff1a7d3a
 PositiveStrong       = #ff007e28
 PositiveSoft         = #ff4c7659

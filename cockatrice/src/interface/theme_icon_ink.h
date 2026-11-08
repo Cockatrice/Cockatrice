@@ -24,7 +24,9 @@
  * on. The chroma is what makes it read as an icon rather than as leftover text;
  * the floor keeps a theme with a weak text color from producing a glyph that is
  * not legible. Neither step invents a color: both are derived from the palette
- * the theme already ships.
+ * the theme already ships. An unauthored neutral family stops at the floor: the
+ * live platform palette is the only source that knows the actual scheme, so a
+ * chroma pinned in a palette file could belong to the other one.
  *
  * The rule only applies to the neutral label roles. A semantic tint
  * (`AppColor::Positive`, `QPalette::Highlight`, `QPalette::Link`) is a hue the
@@ -104,7 +106,9 @@ double defaultAccentMix();
  * @param accent The theme accent, normally `QPalette::Highlight`.
  * @param accentMix How much of the accent color to borrow. Defaults to
  *                  defaultAccentMix(); previews and tests sweep it to compare
- *                  strengths, production callers do not pass it.
+ *                  strengths. Production passes 0 for an unauthored neutral
+ *                  family, where the live platform palette is the only source
+ *                  that knows the actual scheme.
  * @return The ink to resolve `currentColor` to, as an RGB color.
  */
 QColor glyphInk(const QColor &text, const QColor &surface, const QColor &accent, double accentMix = defaultAccentMix());

@@ -64,10 +64,19 @@ AppColor::Role emphasisRole(AppColor::Role role, IconEmphasis emphasis)
  *
  * The fill needs the surface scheme to choose the badge glyph ink, and it cannot
  * read it from the tone: an authored quiet level is a dark color on the dark
- * scheme too.
+ * scheme too. The theme's resolved scheme is the same source the palette file
+ * and the default app colors are chosen from, so the fill follows it instead of
+ * re-deriving the scheme from the live Window lightness, which can disagree
+ * when a theme pins a scheme the platform palette does not match.
  */
 ThemeIconFill::Scheme activeScheme()
 {
+    if (themeManager != nullptr) {
+        return themeManager->isDarkModeActive() ? ThemeIconFill::Scheme::Dark : ThemeIconFill::Scheme::Light;
+    }
+
+    // No manager (test binaries link the icon engine without the app): fall
+    // back to the live palette, which is the only scheme signal left.
     const QPalette &palette = qApp->palette();
     return palette.color(QPalette::Active, QPalette::Window).lightness() < 128 ? ThemeIconFill::Scheme::Dark
                                                                                : ThemeIconFill::Scheme::Light;
