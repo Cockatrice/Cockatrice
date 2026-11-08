@@ -81,6 +81,8 @@ protected:
 signals:
     void hoverEntered();
     void hoverLeft();
+    /** @brief Asks the scene to dismiss the panel before a modal dialog opens. */
+    void dismissRequested();
 
 private slots:
     void onCardChanged();
@@ -166,6 +168,16 @@ private:
     void createContentStack();
     QWidget *makeStackPage(QVBoxLayout *&layout);
     void showPage(int index);
+
+    /**
+     * @brief Dismisses the panel, then runs an action that opens a modal dialog.
+     *
+     * A Qt::ToolTip window is always on top and holds the input grab, so a modal
+     * dialog opened from inside the panel lands behind it and cannot be
+     * activated. Hide the panel synchronously, then defer the action so the grab
+     * is released before the dialog's event loop starts.
+     */
+    void runModalAction(const std::function<void()> &action);
 
     QLabel *createSectionHeader(const QString &text, QWidget *parent);
     QLabel *createNoteLabel(const QString &text, QWidget *parent);

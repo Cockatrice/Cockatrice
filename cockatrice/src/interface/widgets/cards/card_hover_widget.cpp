@@ -407,10 +407,12 @@ void CardHoverWidget::createPTOverlay()
             a->actIncT(cardList());
         }
     });
-    btnSetPT = createOverlayButton("SET", tr("Set power/toughness..."), [getActions, cardList]() {
-        if (auto *a = getActions()) {
-            a->actRequestSetPTDialog(cardList());
-        }
+    btnSetPT = createOverlayButton("SET", tr("Set power/toughness..."), [this, getActions, cardList]() {
+        runModalAction([getActions, cardList]() {
+            if (auto *a = getActions()) {
+                a->actRequestSetPTDialog(cardList());
+            }
+        });
     });
     btnResetPT = createOverlayButton("RST", tr("Reset power/toughness"), [getActions, cardList]() {
         if (auto *a = getActions()) {
@@ -885,7 +887,10 @@ void CardHoverWidget::buildMainTab(const QList<CardState *> &cardList, const QSt
                                         mainPage));
         grid.addButton(createGridButton(
             tr("Set annotation..."), semanticActionIcon(QStringLiteral("icons/pencil"), AppColor::Marked),
-            [actions, cardList]() { actions->actRequestSetAnnotationDialog(cardList); }, mainPage));
+            [this, actions, cardList]() {
+                runModalAction([actions, cardList]() { actions->actRequestSetAnnotationDialog(cardList); });
+            },
+            mainPage));
         grid.addButton(createGridButton(tr("Turn Over"),
                                         semanticActionIcon(QStringLiteral("icons/swap"), AppColor::Hidden),
                                         invoke(cmFlip), mainPage));
@@ -1041,7 +1046,10 @@ void CardHoverWidget::buildCounterTab(const QList<CardState *> &cardList, const 
 
     layout->addWidget(createSectionHeader(tr("Power / Toughness"), counterPage));
     layout->addWidget(createSmallButton(
-        tr("Set power and toughness..."), [actions, cardList]() { actions->actRequestSetPTDialog(cardList); },
+        tr("Set power and toughness..."),
+        [this, actions, cardList]() {
+            runModalAction([actions, cardList]() { actions->actRequestSetPTDialog(cardList); });
+        },
         counterPage));
     layout->addWidget(createSmallButton(
         tr("Reset power and toughness"), [actions, cardList]() { actions->actResetPT(cardList); }, counterPage));
@@ -1065,7 +1073,10 @@ void CardHoverWidget::buildCounterTab(const QList<CardState *> &cardList, const 
                 tr("Remove"), [actions, cardList, i]() { actions->actRemoveCardCounter(cardList, i); }, counterPage));
         }
         row->addWidget(createSmallButton(
-            tr("Set..."), [actions, cardList, i]() { actions->actRequestSetCardCounterDialog(cardList, i); },
+            tr("Set..."),
+            [this, actions, cardList, i]() {
+                runModalAction([actions, cardList, i]() { actions->actRequestSetCardCounterDialog(cardList, i); });
+            },
             counterPage));
         layout->addLayout(row);
     }
@@ -1108,14 +1119,19 @@ void CardHoverWidget::buildTokenTab(CardItem *card, bool canModify)
             CardItem *source = card;
             layout->addWidget(createSmallButton(
                 tr("Token: ") + relatedName,
-                [actions, source, captured]() {
-                    actions->actRequestCreateRelatedFromRelationDialog(source->getState(), captured);
+                [this, actions, source, captured]() {
+                    runModalAction([actions, source, captured]() {
+                        actions->actRequestCreateRelatedFromRelationDialog(source->getState(), captured);
+                    });
                 },
                 tokenPage));
         }
         if (hasMulti && known > 0) {
             layout->addWidget(createSmallButton(
-                tr("All tokens"), [actions, card]() { actions->actCreateAllRelatedCards(card->getState()); },
+                tr("All tokens"),
+                [this, actions, card]() {
+                    runModalAction([actions, card]() { actions->actCreateAllRelatedCards(card->getState()); });
+                },
                 tokenPage));
         }
         anyToken = known > 0;
@@ -1611,6 +1627,23 @@ void CardHoverWidget::hideAnimated()
 bool CardHoverWidget::isClosing() const
 {
     return fadeOut->state() == QAbstractAnimation::Running;
+}
+
+void CardHoverWidget::runModalAction(const std::function<void()> &action)
+{
+    // The panel is a Qt::ToolTip (Qt::Popup | Qt::Sheet): it is always on top and
+    // holds an input grab. A modal dialog opened while it is still up lands behind
+    // it and cannot be activated. Ask the scene to dismiss the panel so its hover
+    // timers stop and the covered card fades back in, then drop the window
+    // synchronously to release the grab.
+    emit dismissRequested();
+    fadeIn->stop();
+    fadeOut->stop();
+    hide();
+
+    // Defer the dialog to the next event-loop turn: the popup grab is not fully
+    // released until after the current mouse event returns.
+    QTimer::singleShot(0, this, action);
 }
 
 // ---------- Event filter ----------

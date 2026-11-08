@@ -1040,6 +1040,7 @@ void GameScene::showCardHoverPopup(CardItem *card)
         cardHoverWidget = new CardHoverWidget(viewport);
         connect(cardHoverWidget, &CardHoverWidget::hoverEntered, this, &GameScene::onHoverWidgetEntered);
         connect(cardHoverWidget, &CardHoverWidget::hoverLeft, this, &GameScene::onHoverWidgetLeft);
+        connect(cardHoverWidget, &CardHoverWidget::dismissRequested, this, &GameScene::hideCardHoverPopup);
 
         // Keep the popup anchored to its card while the view scrolls, zooms, or resizes
         if (!views().isEmpty()) {
