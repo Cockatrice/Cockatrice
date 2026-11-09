@@ -24,6 +24,7 @@
 #include <QString>
 #include <QStringLiteral>
 #include <QStyle>
+#include <QStyleOption>
 #include <QSvgRenderer>
 #include <QtGlobal>
 #include <utility>
@@ -318,7 +319,11 @@ private:
             }
         }
         if (mode == QIcon::Disabled && !pixmap.isNull()) {
-            pixmap = QApplication::style()->generatedIconPixmap(QIcon::Disabled, pixmap, nullptr);
+            // QCommonStyle reads the disabled colors from the option's palette
+            // without a null check, so a null option crashes in QPalette::brush.
+            QStyleOption option;
+            option.palette = qApp->palette();
+            pixmap = QApplication::style()->generatedIconPixmap(QIcon::Disabled, pixmap, &option);
         }
         return pixmap;
     }
