@@ -2,7 +2,9 @@
 #define SERVER_DATABASE_INTERFACE_H
 
 #include "libcockatrice/protocol/pb/serverinfo_ban.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_chat_message.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_moderator_login.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_private_chat_message.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_user_alt.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_user_session.pb.h"
@@ -127,6 +129,33 @@ public:
     virtual QList<ServerInfo_ModeratorLogin> getModeratorLastLogins()
     {
         return {};
+    }
+    virtual QList<ServerInfo_ChatMessage> getMessageLogHistory(const QString & /* user */,
+                                                               const QString & /* ipaddress */,
+                                                               const QString & /* gamename */,
+                                                               const QString & /* gameid */,
+                                                               const QString & /* message */,
+                                                               bool & /* chat */,
+                                                               bool & /* game */,
+                                                               bool & /* room */,
+                                                               int & /* range */,
+                                                               int & /* maxresults */,
+                                                               int /* offset */ = 0,
+                                                               const QString & /* beforeTime */ = QString(),
+                                                               bool * /* hasMore */ = nullptr)
+    {
+        return {};
+    }
+    virtual bool getPrivateChatHistory(int /* callerId */,
+                                       const QString & /* callerName */,
+                                       int /* peerId */,
+                                       const QString & /* peerName */,
+                                       quint64 /* before */,
+                                       int /* limit */,
+                                       QList<ServerInfo_PrivateChatMessage> & /* messages */,
+                                       bool & /* hasMore */)
+    {
+        return false;
     }
     /**
      * @brief Whether the backing store is reachable, reconnecting when it is not.
