@@ -2,11 +2,16 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../deck_loader/deck_loader.h"
+#include "../../deck_sync/deck_sync_conflict.h"
 #include "../../deck_sync/deck_sync_manager.h"
+#include "../../deck_sync/deck_sync_profile.h"
+#include "../../deck_sync/deck_sync_sidecar.h"
 #include "../../theme_icon.h"
 #include "../cards/additional_info/deck_color_identity.h"
 #include "../deck_share/deck_share_utils.h"
 #include "../deck_share/share_bar_widget.h"
+#include "../dialogs/dlg_sync_conflict.h"
+#include "../dialogs/dlg_sync_onboarding.h"
 #include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
 #include "abstract_client.h"
@@ -63,6 +68,7 @@
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_upload.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/deck_sync_settings.h>
 #include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
@@ -238,6 +244,9 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     aSyncNow = new QAction(this);
     aSyncNow->setIcon(qApp->style()->standardIcon(QStyle::SP_BrowserReload));
     connect(aSyncNow, &QAction::triggered, this, &TabDeckStorage::actSyncNow);
+    aSyncReset = new QAction(this);
+    aSyncReset->setIcon(qApp->style()->standardIcon(QStyle::SP_DialogResetButton));
+    connect(aSyncReset, &QAction::triggered, this, &TabDeckStorage::actResetSyncDirection);
 
     // Add actions to toolbars
     leftToolBar->addAction(aOpenLocalDeck);
@@ -251,6 +260,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     rightToolBar->addAction(aOpenRemoteDeck);
     rightToolBar->addAction(aDownload);
     rightToolBar->addAction(aSyncNow);
+    rightToolBar->addAction(aSyncReset);
     rightToolBar->addAction(aShareDecks);
     rightToolBar->addAction(aPublishDeck);
     rightToolBar->addAction(aNewFolder);
@@ -258,8 +268,13 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
 
     syncManager = new DeckSyncManager(
         client, [](const DeckList &deck) { return getDeckColorIdentity(deck, CardDatabaseManager::query()); }, this);
+    syncManager->setConflictDefault(SettingsCache::instance().deckSync().getConflictDefault());
+    connect(&SettingsCache::instance().deckSync(), &DeckSyncSettings::conflictDefaultChanged, syncManager,
+            &DeckSyncManager::setConflictDefault);
     connect(syncManager, &DeckSyncManager::statusMessage, this, &TabDeckStorage::onSyncStatusMessage);
     connect(syncManager, &DeckSyncManager::syncFinished, this, &TabDeckStorage::onSyncFinished);
+    connect(syncManager, &DeckSyncManager::firstSyncDetected, this, &TabDeckStorage::onFirstSyncDetected);
+    connect(syncManager, &DeckSyncManager::conflictRequest, this, &TabDeckStorage::onConflictRequest);
     if (currentUserInfo != nullptr) {
         syncUsername = QString::fromStdString(currentUserInfo->name());
     }
@@ -293,6 +308,7 @@ void TabDeckStorage::retranslateUi()
     aPublishDeck->setText(tr("Publish/unpublish deck"));
     aOpenDecksFolder->setText(tr("Open decks folder"));
     aSyncNow->setText(tr("Sync now"));
+    aSyncReset->setText(tr("Reset sync direction"));
     renderSyncStatus();
     shareBar->retranslateUi();
     if (shareBar->isVisible()) {
@@ -348,6 +364,7 @@ void TabDeckStorage::setRemoteEnabled(bool enabled)
     aNewFolder->setEnabled(enabled);
     aDeleteRemoteDeck->setEnabled(enabled);
     aSyncNow->setEnabled(enabled && !syncManager->isSyncing());
+    aSyncReset->setEnabled(enabled && !syncManager->isSyncing());
 
     if (enabled) {
         serverDirView->refreshTree();
@@ -557,7 +574,68 @@ void TabDeckStorage::actSyncNow()
     syncManager->setProfile(profile);
     syncManager->setDeckPath(SettingsCache::instance().paths().getDeckPath());
     aSyncNow->setEnabled(false);
+    aSyncReset->setEnabled(false);
     syncManager->syncNow();
+}
+
+void TabDeckStorage::actResetSyncDirection()
+{
+    const DeckSyncProfile profile(client->serverName(), client->serverPort(), syncUsername);
+    if (!profile.isValid()) {
+        return;
+    }
+    const QString deckPath = SettingsCache::instance().paths().getDeckPath();
+    DeckSyncSidecar sidecar(DeckSyncSidecar::pathForDeckPath(deckPath, profile.key()));
+    if (!sidecar.load()) {
+        QMessageBox::warning(this, tr("Deck sync"), tr("Could not read the sync state for this server."));
+        return;
+    }
+    if (sidecar.mode == DeckSyncSidecar::MODE_LINKED) {
+        QMessageBox::information(this, tr("Deck sync"), tr("This server already syncs decks both ways."));
+        return;
+    }
+    if (QMessageBox::question(this, tr("Deck sync"),
+                              tr("Switch this server back to two-way deck sync? The next sync merges the local and "
+                                 "server decks."),
+                              QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) {
+        return;
+    }
+    sidecar.mode = DeckSyncSidecar::MODE_LINKED;
+    if (!sidecar.save()) {
+        QMessageBox::warning(this, tr("Deck sync"), tr("Could not save the sync direction."));
+        return;
+    }
+    QMessageBox::information(this, tr("Deck sync"),
+                             tr("Deck sync is set to two-way. Run Sync now to merge the decks."));
+}
+
+void TabDeckStorage::onFirstSyncDetected(int localCount, int serverCount)
+{
+    DlgSyncOnboarding dialog(localCount, serverCount, this);
+    if (dialog.exec() == QDialog::Accepted) {
+        syncManager->continueFirstSync(dialog.selectedMode());
+    } else {
+        syncManager->cancelFirstSync();
+    }
+}
+
+void TabDeckStorage::onConflictRequest(const DeckSyncConflict &conflict)
+{
+    DlgSyncConflict dialog(conflict, this);
+    if (dialog.exec() != QDialog::Accepted) {
+        DeckSyncResolution skip;
+        skip.action = DeckSyncResolutionAction::SkipConflict;
+        syncManager->resolveConflict(skip);
+        return;
+    }
+    const DeckSyncResolution resolution = dialog.resolution();
+    if (resolution.rememberAlways && (resolution.action == DeckSyncResolutionAction::KeepMine ||
+                                      resolution.action == DeckSyncResolutionAction::KeepServer)) {
+        SettingsCache::instance().deckSync().setConflictDefault(resolution.action == DeckSyncResolutionAction::KeepMine
+                                                                    ? DeckSyncConflictKeepMine
+                                                                    : DeckSyncConflictKeepServer);
+    }
+    syncManager->resolveConflict(resolution);
 }
 
 void TabDeckStorage::onSyncStatusMessage(const QString &message)

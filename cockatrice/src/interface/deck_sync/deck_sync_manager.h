@@ -6,6 +6,7 @@
 #ifndef DECK_SYNC_MANAGER_H
 #define DECK_SYNC_MANAGER_H
 
+#include "deck_sync_conflict.h"
 #include "deck_sync_profile.h"
 
 #include <QDateTime>
@@ -16,6 +17,7 @@
 #include <QString>
 #include <QVariant>
 #include <functional>
+#include <libcockatrice/settings/deck_sync_settings.h>
 
 class AbstractClient;
 class CommandContainer;
@@ -29,15 +31,19 @@ class ServerInfo_DeckStorage_Folder;
  *
  * Each syncNow() run loads the profile sidecar, scans the deck folder, fetches
  * the server tree and mirrors both sides: unknown local decks upload, unknown
- * server decks download, and decks changed on both sides resolve newer-wins
- * (ties go to the server). A local file is matched to its server row by the
- * sidecar's row id, then guid, then the server path, and finally by content, so
- * renaming either side does not duplicate a deck. Before a download overwrites a
- * locally modified file, the local content is copied to a .sync-backup file next
- * to it.
+ * server decks download, and a deck changed on both sides pauses for a verdict,
+ * so nothing is overwritten silently. A local file is matched to its server row
+ * by the sidecar's row id, then guid, then the server path, and finally by
+ * content, so renaming either side does not duplicate a deck. Before a download
+ * overwrites a locally modified file, the local content is copied to a
+ * .sync-backup file next to it.
  *
  * Ownership: fire-and-forget per run, driven by PendingCommand round trips.
- * No watcher, no auto triggers, no conflict UI — those arrive in later layers.
+ * Both-sides-changed decks pause the queue for a verdict via conflictRequest /
+ * resolveConflict (or the conflict default setting); the first sync of an
+ * unknown profile pauses for an onboarding verdict via firstSyncDetected /
+ * continueFirstSync, and that verdict is stored in the sidecar so later runs keep
+ * the chosen direction. No watcher and no auto triggers — those arrive later.
  *
  * Deletes are tombstones, never silent: a locally deleted deck is pushed with
  * Command_DeckDel, a server-side delete is applied locally only after copying
@@ -69,15 +75,26 @@ public:
 
     void setProfile(const DeckSyncProfile &_profile);
     void setDeckPath(const QString &path);
+    void setConflictDefault(int conflictDefault);
     [[nodiscard]] bool isSyncing() const;
 
 public slots:
     void syncNow();
+    /** @brief Continues a paused first sync after the onboarding verdict. */
+    void continueFirstSync(DeckSyncMode mode);
+    /** @brief Aborts a paused first sync without writing any verdict. */
+    void cancelFirstSync();
+    /** @brief Applies the dialog verdict for the active conflict and resumes. */
+    void resolveConflict(const DeckSyncResolution &resolution);
 
 signals:
     void syncStarted();
     void statusMessage(const QString &message);
     void syncFinished(const SyncSummary &summary, const QString &error);
+    /** @brief First sync with content on both sides: the tab must ask how to proceed. */
+    void firstSyncDetected(int localCount, int serverCount);
+    /** @brief A both-sides-changed deck needs a verdict; the queue pauses until resolveConflict. */
+    void conflictRequest(const DeckSyncConflict &conflict);
 
 private slots:
     void onListFinished(const Response &response, const CommandContainer &commandContainer);
@@ -123,6 +140,25 @@ private:
         QString hash;
         qint64 lastModifiedSecs = 0;
     };
+    struct ActiveConflict
+    {
+        bool active = false;
+        QString relativePath;
+        QString serverPath;
+        int deckId = -1;
+        QString serverGuid;
+        QString serverHash;
+        qint64 serverLastModifiedSecs = 0;
+        QString serverDeckString;
+    };
+    struct ConflictDownload
+    {
+        QString serverPath;
+        int deckId = -1;
+        QString guid;
+        QString hash;
+        qint64 lastModifiedSecs = 0;
+    };
 
     void failSync(const QString &error);
     void finishSync();
@@ -138,6 +174,28 @@ private:
     void sendDownload(const DownloadOp &op);
     void sendDelete(const QString &relativePath, int deckId);
     void snapshotLocalFile(const QString &relativePath, const QString &guid);
+    QString readBaseSnapshot(const QString &guid) const;
+    void classify(const QMap<int, ServerFile> &serverFiles);
+    void queueConflict(const QString &relativePath,
+                       const QString &serverPath,
+                       int deckId,
+                       const QString &serverGuid,
+                       const QString &serverHash,
+                       qint64 serverLastModifiedSecs);
+    void handleConflictDownload(const QString &relativePath, const QString &serverDeckString);
+    void applyDownloadedDeck(const QString &relativePath,
+                             int deckId,
+                             const QString &deckString,
+                             const QString &guid,
+                             const QString &hash,
+                             qint64 lastModifiedSecs,
+                             bool hasLastModified);
+    void applyUpload(const QString &relativePath, const QString &serverPath, int deckId, const QString &guid);
+    void applyDownload(const QString &relativePath,
+                       int deckId,
+                       const QString &guid,
+                       const QString &hash,
+                       qint64 lastModifiedSecs);
     static QString parentDir(const QString &path);
     QString uniqueLocalPath(const QString &relativePath) const;
 
@@ -155,6 +213,14 @@ private:
     QList<DownloadOp> pendingDownloads;
     QList<QString> pendingDeletes;
     QString syncNote;
+    QSet<QString> conflictPaths;
+    QMap<QString, ConflictDownload> pendingConflicts;
+    QMap<int, ServerFile> stashedServerFiles;
+    ActiveConflict activeConflict;
+    DeckSyncMode syncMode = DeckSyncMode::TwoWay; ///< This run's direction, loaded from the sidecar.
+    int conflictDefault = DeckSyncConflictAsk;
+    int sessionDefault = -1;
+    bool firstSyncRun = false;
     int uploadedCount = 0;
     int downloadedCount = 0;
     int removedCount = 0;

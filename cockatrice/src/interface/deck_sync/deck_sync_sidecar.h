@@ -30,9 +30,21 @@ struct DeckSyncRecord
 class DeckSyncSidecar
 {
 public:
+    static constexpr const char *MODE_LINKED = "linked";
+    static constexpr const char *MODE_SEPARATE = "separate";
+    static constexpr const char *MODE_UPLOAD_ONLY = "uploadOnly";
+    static constexpr const char *MODE_DOWNLOAD_ONLY = "downloadOnly";
+
     QString filePath; ///< Full path of the sidecar JSON file.
+    /// How this profile syncs: linked is the default two-way mode, separate
+    /// keeps it out of sync, and the first-sync verdicts narrow it to one
+    /// direction. An unrecognised value falls back to the two-way sync.
+    QString mode = MODE_LINKED;
 
     explicit DeckSyncSidecar(const QString &_filePath);
+
+    /** @brief Sidecar file path for a deck folder and profile key. */
+    static QString pathForDeckPath(const QString &deckPath, const QString &profileKey);
 
     /** @brief Loads records; a missing file loads as empty and returns true. */
     bool load();

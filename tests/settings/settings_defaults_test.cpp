@@ -13,6 +13,7 @@
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
+#include <libcockatrice/settings/deck_sync_settings.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/game_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
@@ -584,6 +585,25 @@ TEST_F(SettingsDefaultsTest, DeckEditor_VdeStartupTab_SetAndGet)
     ASSERT_EQ(s.getVdeStartupTab(), VdeStartupTabDatabaseDisplay);
     s.setVdeStartupTab(VdeStartupTabContext);
     ASSERT_EQ(s.getVdeStartupTab(), VdeStartupTabContext);
+}
+
+// --- DeckSyncSettings ---
+
+TEST_F(SettingsDefaultsTest, DeckSync_ConflictDefault_Default)
+{
+    DeckSyncSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getConflictDefault(), DeckSyncConflictAsk);
+}
+
+TEST_F(SettingsDefaultsTest, DeckSync_ConflictDefault_SetAndGet)
+{
+    DeckSyncSettings s(settingsPath, nullptr);
+    s.setConflictDefault(DeckSyncConflictKeepNewer);
+    ASSERT_EQ(s.getConflictDefault(), DeckSyncConflictKeepNewer);
+    s.setConflictDefault(DeckSyncConflictKeepMine);
+    ASSERT_EQ(s.getConflictDefault(), DeckSyncConflictKeepMine);
+    s.setConflictDefault(DeckSyncConflictAsk);
+    ASSERT_EQ(s.getConflictDefault(), DeckSyncConflictAsk);
 }
 
 // --- NetworkSettings ---
