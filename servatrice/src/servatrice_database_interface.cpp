@@ -991,6 +991,86 @@ bool Servatrice_DatabaseInterface::isInIgnoreList(const QString &whoseList, cons
     return query->next();
 }
 
+int Servatrice_DatabaseInterface::getDeckPathIdAt(int basePathId, QStringList path, int userId)
+{
+    if (path.isEmpty()) {
+        return 0;
+    }
+    if (path[0].isEmpty()) {
+        return 0;
+    }
+
+    QSqlQuery *query = prepareQuery("select id from {prefix}_decklist_folders where id_parent = "
+                                    ":id_parent and name = :name and id_user = :id_user");
+    query->bindValue(":id_parent", basePathId);
+    query->bindValue(":name", path.takeFirst());
+    query->bindValue(":id_user", userId);
+    if (!execSqlQuery(query)) {
+        return -1;
+    }
+    if (!query->next()) {
+        return -1;
+    }
+    int id = query->value(0).toInt();
+    if (path.isEmpty()) {
+        return id;
+    }
+    return getDeckPathIdAt(id, path, userId);
+}
+
+int Servatrice_DatabaseInterface::getDeckPathId(const QString &path, int userId)
+{
+    return getDeckPathIdAt(0, path.split("/"), userId);
+}
+
+int Servatrice_DatabaseInterface::getDeckOwnerId(int deckId)
+{
+    QSqlQuery *query = prepareQuery("select id_user from {prefix}_decklist_files where id = :id");
+    query->bindValue(":id", deckId);
+    if (!execSqlQuery(query)) {
+        return -1;
+    }
+    if (!query->next()) {
+        return -1;
+    }
+    return query->value(0).toInt();
+}
+
+bool Servatrice_DatabaseInterface::isDeckEffectivelyPublic(int deckId)
+{
+    QSqlQuery *query = prepareQuery("select is_public, id_folder from {prefix}_decklist_files where id = :id");
+    query->bindValue(":id", deckId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+    if (!query->next()) {
+        return false;
+    }
+    if (query->value(0).toBool()) {
+        return true;
+    }
+
+    int folderId = query->value(1).toInt();
+    int guard = 0;
+    while (folderId != 0 && guard < 100) {
+        QSqlQuery *folderQuery =
+            prepareQuery("select is_public, id_parent from {prefix}_decklist_folders where id = :id");
+        folderQuery->bindValue(":id", folderId);
+        if (!execSqlQuery(folderQuery)) {
+            return false;
+        }
+        if (!folderQuery->next()) {
+            return false;
+        }
+        if (folderQuery->value(0).toBool()) {
+            return true;
+        }
+        folderId = folderQuery->value(1).toInt();
+        ++guard;
+    }
+    return false;
+}
+
 int Servatrice_DatabaseInterface::getUserId(const QString &name)
 {
     return getUserIdInDB(name);

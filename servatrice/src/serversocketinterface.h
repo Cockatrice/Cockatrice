@@ -144,15 +144,11 @@ private:
     Response::ResponseCode cmdAddToList(const Command_AddToList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdGetPrivateChatHistory(const Command_GetPrivateChatHistory &cmd, ResponseContainer &rc);
-    int getDeckPathId(int basePathId, QStringList path);
-    int getDeckPathId(const QString &path);
     bool deckListHelper(int folderId,
                         ServerInfo_DeckStorage_Folder *folder,
                         int userId,
                         bool inheritedPublic,
                         bool publicOnly);
-    int getDeckOwnerId(int deckId);
-    bool isDeckEffectivelyPublic(int deckId);
     Response::ResponseCode cmdDeckList(const Command_DeckList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckListOtherUser(const Command_DeckListOtherUser &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckSetVisibility(const Command_DeckSetVisibility &cmd, ResponseContainer &rc);

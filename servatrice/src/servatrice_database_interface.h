@@ -67,6 +67,7 @@ private:
      *  backup key is unset or the sealed value does not fit the column. */
     QString sealLegacyBackup(const QString &storedName, const QString &credential);
     bool isStrictModeEnabled(bool &ok) const;
+    int getDeckPathIdAt(int basePathId, QStringList path, int userId);
     bool addToList(const QString &table, int userId, int targetId);
     bool removeFromList(const QString &table, int userId, int targetId);
 
@@ -120,6 +121,9 @@ public:
     bool removeFromBuddyList(int userId, int targetId) override;
     bool addToIgnoreList(int userId, int targetId) override;
     bool removeFromIgnoreList(int userId, int targetId) override;
+    int getDeckPathId(const QString &path, int userId) override;
+    int getDeckOwnerId(int deckId) override;
+    bool isDeckEffectivelyPublic(int deckId) override;
     QMap<QString, ServerInfo_User> getBuddyList(const QString &name) override;
     QMap<QString, ServerInfo_User> getIgnoreList(const QString &name) override;
     bool isInBuddyList(const QString &whoseList, const QString &who) override;

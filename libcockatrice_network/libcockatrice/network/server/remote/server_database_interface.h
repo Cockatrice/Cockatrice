@@ -180,6 +180,21 @@ public:
     {
         return 0;
     }
+    /** @brief Id of the folder at a "/"-separated path for one user, 0 for the root, -1 when absent. */
+    virtual int getDeckPathId(const QString & /* path */, int /* userId */)
+    {
+        return -1;
+    }
+    /** @brief Owner of a deck file, or -1 when the deck does not exist. */
+    virtual int getDeckOwnerId(int /* deckId */)
+    {
+        return -1;
+    }
+    /** @brief Whether a deck is public itself or sits in a public folder. */
+    virtual bool isDeckEffectivelyPublic(int /* deckId */)
+    {
+        return false;
+    }
     virtual bool removeForgotPassword(const QString & /* user */)
     {
         return false;

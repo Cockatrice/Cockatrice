@@ -634,39 +634,6 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveFromList(const Co
     return Response::RespOk;
 }
 
-int AbstractServerSocketInterface::getDeckPathId(int basePathId, QStringList path)
-{
-    if (path.isEmpty()) {
-        return 0;
-    }
-    if (path[0].isEmpty()) {
-        return 0;
-    }
-
-    QSqlQuery *query = sqlInterface->prepareQuery("select id from {prefix}_decklist_folders where id_parent = "
-                                                  ":id_parent and name = :name and id_user = :id_user");
-    query->bindValue(":id_parent", basePathId);
-    query->bindValue(":name", path.takeFirst());
-    query->bindValue(":id_user", userInfo->id());
-    if (!sqlInterface->execSqlQuery(query)) {
-        return -1;
-    }
-    if (!query->next()) {
-        return -1;
-    }
-    int id = query->value(0).toInt();
-    if (path.isEmpty()) {
-        return id;
-    } else {
-        return getDeckPathId(id, path);
-    }
-}
-
-int AbstractServerSocketInterface::getDeckPathId(const QString &path)
-{
-    return getDeckPathId(0, path.split("/"));
-}
-
 bool AbstractServerSocketInterface::deckListHelper(int folderId,
                                                    ServerInfo_DeckStorage_Folder *folder,
                                                    int userId,
@@ -788,55 +755,6 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckListOtherUser(const
     return Response::RespOk;
 }
 
-int AbstractServerSocketInterface::getDeckOwnerId(int deckId)
-{
-    QSqlQuery *query = sqlInterface->prepareQuery("select id_user from {prefix}_decklist_files where id = :id");
-    query->bindValue(":id", deckId);
-    if (!sqlInterface->execSqlQuery(query)) {
-        return -1;
-    }
-    if (!query->next()) {
-        return -1;
-    }
-    return query->value(0).toInt();
-}
-
-bool AbstractServerSocketInterface::isDeckEffectivelyPublic(int deckId)
-{
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("select is_public, id_folder from {prefix}_decklist_files where id = :id");
-    query->bindValue(":id", deckId);
-    if (!sqlInterface->execSqlQuery(query)) {
-        return false;
-    }
-    if (!query->next()) {
-        return false;
-    }
-    if (query->value(0).toBool()) {
-        return true;
-    }
-
-    int folderId = query->value(1).toInt();
-    int guard = 0;
-    while (folderId != 0 && guard < 100) {
-        QSqlQuery *folderQuery =
-            sqlInterface->prepareQuery("select is_public, id_parent from {prefix}_decklist_folders where id = :id");
-        folderQuery->bindValue(":id", folderId);
-        if (!sqlInterface->execSqlQuery(folderQuery)) {
-            return false;
-        }
-        if (!folderQuery->next()) {
-            return false;
-        }
-        if (folderQuery->value(0).toBool()) {
-            return true;
-        }
-        folderId = folderQuery->value(1).toInt();
-        ++guard;
-    }
-    return false;
-}
-
 Response::ResponseCode AbstractServerSocketInterface::cmdDeckSetVisibility(const Command_DeckSetVisibility &cmd,
                                                                            ResponseContainer & /*rc*/)
 {
@@ -865,7 +783,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckSetVisibility(const
             return Response::RespContextError;
         }
     } else if (cmd.has_folder_path()) {
-        const int folderId = getDeckPathId(nameFromStdString(cmd.folder_path()));
+        const int folderId = databaseInterface->getDeckPathId(nameFromStdString(cmd.folder_path()), userInfo->id());
         if (folderId == -1 || folderId == 0) {
             return Response::RespNameNotFound;
         }
@@ -896,8 +814,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDownloadPublic(cons
     sqlInterface->checkSql();
 
     const int deckId = cmd.deck_id();
-    const int ownerId = getDeckOwnerId(deckId);
-    if (ownerId == -1 || !isDeckEffectivelyPublic(deckId)) {
+    const int ownerId = databaseInterface->getDeckOwnerId(deckId);
+    if (ownerId == -1 || !databaseInterface->isDeckEffectivelyPublic(deckId)) {
         return Response::RespNameNotFound;
     }
 
@@ -926,7 +844,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckNewDir(const Comman
     sqlInterface->checkSql();
 
     QString path = nameFromStdString(cmd.path());
-    int folderId = getDeckPathId(path);
+    int folderId = databaseInterface->getDeckPathId(path, userInfo->id());
     if (folderId == -1) {
         return Response::RespNameNotFound;
     }
@@ -993,7 +911,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDelDir(const Comman
 
     sqlInterface->checkSql();
 
-    int basePathId = getDeckPathId(nameFromStdString(cmd.path()));
+    int basePathId = databaseInterface->getDeckPathId(nameFromStdString(cmd.path()), userInfo->id());
     if ((basePathId == -1) || (basePathId == 0)) {
         return Response::RespNameNotFound;
     }
@@ -1077,7 +995,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
     const QString colorIdentity = sanitizeColorIdentity(nameFromStdString(cmd.color_identity()));
 
     if (cmd.has_path()) {
-        int folderId = getDeckPathId(nameFromStdString(cmd.path()));
+        int folderId = databaseInterface->getDeckPathId(nameFromStdString(cmd.path()), userInfo->id());
         if (folderId == -1) {
             return Response::RespNameNotFound;
         }
@@ -1262,7 +1180,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const C
             }
         }
     } else if (cmd.has_folder_path()) {
-        const int folderId = getDeckPathId(nameFromStdString(cmd.folder_path()));
+        const int folderId = databaseInterface->getDeckPathId(nameFromStdString(cmd.folder_path()), userInfo->id());
         if (folderId == -1) {
             return Response::RespNameNotFound;
         }
