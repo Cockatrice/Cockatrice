@@ -1093,6 +1093,97 @@ void Servatrice_DatabaseInterface::deleteDeckFolderTree(int basePathId)
     execSqlQuery(query);
 }
 
+Servatrice_DatabaseInterface::DeckFileWriteResult
+Servatrice_DatabaseInterface::createDeckFile(int folderId, int userId, const DeckFileData &data)
+{
+    QSqlQuery *query = prepareQuery(
+        "insert into {prefix}_decklist_files (id_folder, id_user, name, upload_time, content, is_public, "
+        "banner_card_name, banner_card_provider, color_identity, tags) values(:id_folder, :id_user, :name, NOW(), "
+        ":content, :is_public, :banner_card_name, :banner_card_provider, :color_identity, :tags)");
+    query->bindValue(":id_folder", folderId);
+    query->bindValue(":id_user", userId);
+    query->bindValue(":name", data.name);
+    query->bindValue(":content", data.content);
+    query->bindValue(":is_public", data.isPublic ? 1 : 0);
+    query->bindValue(":banner_card_name", data.bannerCardName);
+    query->bindValue(":banner_card_provider", data.bannerCardProvider);
+    query->bindValue(":color_identity", data.colorIdentity);
+    query->bindValue(":tags", data.tagsJson);
+
+    DeckFileWriteResult result;
+    if (!execSqlQuery(query)) {
+        return result;
+    }
+    result.result = DeckStorageResult::Ok;
+    result.deckId = query->lastInsertId().toInt();
+    result.isPublic = data.isPublic;
+    return result;
+}
+
+Servatrice_DatabaseInterface::DeckFileWriteResult
+Servatrice_DatabaseInterface::updateDeckFile(int deckId, int userId, const DeckFileData &data, bool updateVisibility)
+{
+    QString updateQuery = "update {prefix}_decklist_files set name=:name, upload_time=NOW(), content=:content, "
+                          "banner_card_name=:banner_card_name, banner_card_provider=:banner_card_provider, "
+                          "color_identity=:color_identity, tags=:tags";
+    if (updateVisibility) {
+        updateQuery += ", is_public=:is_public";
+    }
+    updateQuery += " where id = :id_deck and id_user = :id_user";
+
+    QSqlQuery *query = prepareQuery(updateQuery);
+    query->bindValue(":id_deck", deckId);
+    query->bindValue(":id_user", userId);
+    query->bindValue(":name", data.name);
+    query->bindValue(":content", data.content);
+    query->bindValue(":banner_card_name", data.bannerCardName);
+    query->bindValue(":banner_card_provider", data.bannerCardProvider);
+    query->bindValue(":color_identity", data.colorIdentity);
+    query->bindValue(":tags", data.tagsJson);
+    if (updateVisibility) {
+        query->bindValue(":is_public", data.isPublic ? 1 : 0);
+    }
+
+    DeckFileWriteResult result;
+    if (!execSqlQuery(query)) {
+        return result;
+    }
+    if (query->numRowsAffected() == 0) {
+        result.result = DeckStorageResult::NotFound;
+        return result;
+    }
+
+    QSqlQuery *visibilityQuery =
+        prepareQuery("select is_public from {prefix}_decklist_files where id = :id and id_user = :id_user");
+    visibilityQuery->bindValue(":id", deckId);
+    visibilityQuery->bindValue(":id_user", userId);
+    if (!execSqlQuery(visibilityQuery)) {
+        return result;
+    }
+
+    result.result = DeckStorageResult::Ok;
+    result.deckId = deckId;
+    result.isPublic = visibilityQuery->next() && visibilityQuery->value(0).toBool();
+    return result;
+}
+
+Servatrice_DatabaseInterface::DeckStorageResult Servatrice_DatabaseInterface::deleteDeckFile(int deckId, int userId)
+{
+    QSqlQuery *query = prepareQuery("select id from {prefix}_decklist_files where id = :id and id_user = :id_user");
+    query->bindValue(":id", deckId);
+    query->bindValue(":id_user", userId);
+    execSqlQuery(query);
+    if (!query->next()) {
+        return DeckStorageResult::NotFound;
+    }
+
+    query = prepareQuery("delete from {prefix}_decklist_files where id = :id");
+    query->bindValue(":id", deckId);
+    execSqlQuery(query);
+
+    return DeckStorageResult::Ok;
+}
+
 void Servatrice_DatabaseInterface::deleteDeckFolder(int folderId)
 {
     deleteDeckFolderTree(folderId);

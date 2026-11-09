@@ -129,6 +129,10 @@ public:
     DeckStorageResult setDeckFolderVisibility(int folderId, int userId, bool isPublic) override;
     DeckStorageResult createDeckFolder(int parentId, int userId, const QString &name) override;
     void deleteDeckFolder(int folderId) override;
+    DeckFileWriteResult createDeckFile(int folderId, int userId, const DeckFileData &data) override;
+    DeckFileWriteResult
+    updateDeckFile(int deckId, int userId, const DeckFileData &data, bool updateVisibility) override;
+    DeckStorageResult deleteDeckFile(int deckId, int userId) override;
     QMap<QString, ServerInfo_User> getBuddyList(const QString &name) override;
     QMap<QString, ServerInfo_User> getIgnoreList(const QString &name) override;
     bool isInBuddyList(const QString &whoseList, const QString &who) override;
