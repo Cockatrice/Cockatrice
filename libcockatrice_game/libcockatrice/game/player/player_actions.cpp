@@ -951,7 +951,7 @@ void PlayerActions::actCreateToken(TokenInfo tokenToCreate)
         lastTokenInfo.name = correctedCard.getName();
         int tableRow = lastTokenInfo.faceDown ? 2 : correctedCard.getInfo().getUiAttributes().tableRow;
         lastTokenTableRow = TableZoneLogic::tableRowToGridY(tableRow);
-        if (lastTokenInfo.pt.isEmpty()) {
+        if (!lastTokenInfo.faceDown && lastTokenInfo.pt.isEmpty()) {
             lastTokenInfo.pt = correctedCard.getInfo().getPowTough();
         }
     }
@@ -1753,17 +1753,6 @@ void PlayerActions::actRevealRandomHandCard(int revealToPlayerId)
     cmd.set_zone_name(ZoneNames::HAND);
     cmd.add_card_id(RANDOM_CARD_FROM_ZONE);
 
-    sendGameCommand(cmd);
-}
-
-void PlayerActions::actRevealRandomHandCards(int revealToPlayerId, int amount)
-{
-    Command_RevealRandomCards cmd;
-    if (revealToPlayerId != -1) {
-        cmd.set_player_id(revealToPlayerId);
-    }
-    cmd.set_zone_name(ZoneNames::HAND);
-    cmd.set_number_of_cards(amount);
     sendGameCommand(cmd);
 }
 

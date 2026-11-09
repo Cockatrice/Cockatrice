@@ -4,6 +4,7 @@
 #include <QString>
 #include <libcockatrice/game/player/player_actions.h>
 #include <libcockatrice/game/zones/table_zone_logic.h>
+#include <libcockatrice/protocol/pb/command_create_token.pb.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <string>
@@ -116,4 +117,65 @@ TEST(PlayerActionsTest, PlayCiptCreatureSendsTapped)
     EXPECT_EQ(card.pt(), "2/2");
     EXPECT_TRUE(card.has_tapped());
     EXPECT_TRUE(card.tapped());
+}
+
+// These three #7737 command cases use the current shared game harness.
+TEST(TokenCommandTest, FaceDownKnownTokenDoesNotRestoreDatabasePowerToughness)
+{
+    GameHarness harness;
+    harness.client()->sent.clear();
+    TokenInfo token;
+    token.name = QStringLiteral("Kitten");
+    token.color = QString(QChar());
+    token.faceDown = true;
+    harness.player()->getPlayerActions()->actCreateToken(token);
+    ASSERT_EQ(harness.client()->sent.size(), 1);
+    ASSERT_EQ(harness.lastCommand().game_command_size(), 1);
+    const auto &gameCommand = harness.lastCommand().game_command(0);
+    ASSERT_TRUE(gameCommand.HasExtension(Command_CreateToken::ext));
+    const auto &command = gameCommand.GetExtension(Command_CreateToken::ext);
+    EXPECT_EQ(command.card_name(), "Kitten");
+    EXPECT_TRUE(command.face_down());
+    EXPECT_TRUE(command.pt().empty());
+    harness.player()->getPlayerActions()->actCreateAnotherToken();
+    ASSERT_EQ(harness.client()->sent.size(), 2);
+    const auto &repeat = harness.lastCommand().game_command(0).GetExtension(Command_CreateToken::ext);
+    EXPECT_TRUE(repeat.face_down());
+    EXPECT_TRUE(repeat.pt().empty());
+}
+
+TEST(TokenCommandTest, FaceUpKnownAliasKeepsCanonicalNameAndDefaultPowerToughness)
+{
+    GameHarness harness;
+    harness.client()->sent.clear();
+    TokenInfo token;
+    token.name = QStringLiteral("kitten");
+    harness.player()->getPlayerActions()->actCreateToken(token);
+    ASSERT_EQ(harness.client()->sent.size(), 1);
+    ASSERT_EQ(harness.lastCommand().game_command_size(), 1);
+    const auto &gameCommand = harness.lastCommand().game_command(0);
+    ASSERT_TRUE(gameCommand.HasExtension(Command_CreateToken::ext));
+    const auto &command = gameCommand.GetExtension(Command_CreateToken::ext);
+    EXPECT_EQ(command.card_name(), "Kitten");
+    EXPECT_FALSE(command.face_down());
+    EXPECT_EQ(command.pt(), "1/1");
+}
+
+TEST(TokenCommandTest, FaceUpKnownTokenPreservesExplicitPowerToughness)
+{
+    GameHarness harness;
+    harness.client()->sent.clear();
+    TokenInfo token;
+    token.name = QStringLiteral("Kitten");
+    token.pt = QStringLiteral("7/9");
+    token.annotation = QStringLiteral("Flying");
+    harness.player()->getPlayerActions()->actCreateToken(token);
+    ASSERT_EQ(harness.client()->sent.size(), 1);
+    ASSERT_EQ(harness.lastCommand().game_command_size(), 1);
+    const auto &gameCommand = harness.lastCommand().game_command(0);
+    ASSERT_TRUE(gameCommand.HasExtension(Command_CreateToken::ext));
+    const auto &command = gameCommand.GetExtension(Command_CreateToken::ext);
+    EXPECT_FALSE(command.face_down());
+    EXPECT_EQ(command.pt(), "7/9");
+    EXPECT_EQ(command.annotation(), "Flying");
 }
