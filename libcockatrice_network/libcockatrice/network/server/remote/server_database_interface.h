@@ -248,6 +248,15 @@ public:
     {
         return DeckStorageResult::Failed;
     }
+    /** @brief Append a moderator/admin action to the server audit log. */
+    virtual void addAuditRecord(const QString & /* user */,
+                                const QString & /* ipaddress */,
+                                const QString & /* clientid */,
+                                const QString & /* action */,
+                                const QString & /* details */,
+                                bool /* results */)
+    {
+    }
     virtual bool removeForgotPassword(const QString & /* user */)
     {
         return false;

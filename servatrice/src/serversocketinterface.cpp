@@ -2083,10 +2083,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportResolve(const Com
         return Response::RespInvalidData;
     }
 
-    sqlInterface->addAuditRecord(QString::number(reportId), this->getAddress(),
-                                 QString::fromStdString(userInfo->clientid()),
-                                 dismissed ? "REPORT_DISMISSED" : "REPORT_RESOLVED",
-                                 QString("Report #%1 %2").arg(reportId).arg(newStatus), true);
+    databaseInterface->addAuditRecord(QString::number(reportId), this->getAddress(),
+                                      QString::fromStdString(userInfo->clientid()),
+                                      dismissed ? "REPORT_DISMISSED" : "REPORT_RESOLVED",
+                                      QString("Report #%1 %2").arg(reportId).arg(newStatus), true);
 
     // Notifying the reporter is best-effort: the resolve already succeeded. If any of the lookup
     // queries below fail, the report is simply left with notified = 0 and the notification is
@@ -2538,8 +2538,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdResetUserPassword(const
     }
     sqlInterface->setForcePasswordChange(userName, true);
 
-    sqlInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
-                                 "PASSWORD_RESET", "Admin password reset", true);
+    databaseInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
+                                      "PASSWORD_RESET", "Admin password reset", true);
 
     // Notify the affected user if they are currently online.
     QReadLocker clientsLocker(&servatrice->clientsLock);
@@ -2580,8 +2580,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserAvatar(const 
         return Response::RespInternalError;
     }
 
-    sqlInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
-                                 "REMOVE_USER_AVATAR", "Moderator removed user avatar", true);
+    databaseInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
+                                      "REMOVE_USER_AVATAR", "Moderator removed user avatar", true);
 
     Response_RemoveUserAvatar *re = new Response_RemoveUserAvatar;
     re->set_user_name(userName.toStdString());
@@ -2616,8 +2616,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserBanner(const 
     }
 
     if (hadBanner) {
-        sqlInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
-                                     "REMOVE_USER_BANNER", "Moderator removed user banner card", true);
+        databaseInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
+                                          "REMOVE_USER_BANNER", "Moderator removed user banner card", true);
     }
 
     Response_RemoveUserBanner *re = new Response_RemoveUserBanner;
@@ -2640,9 +2640,9 @@ AbstractServerSocketInterface::cmdClearBlacklistedBanners(const Command_ClearBla
         return Response::RespInternalError;
     }
 
-    sqlInterface->addAuditRecord(QString::fromStdString(userInfo->name()), this->getAddress(),
-                                 QString::fromStdString(userInfo->clientid()), "CLEAR_BLACKLISTED_BANNERS",
-                                 QString("Moderator cleared %1 blacklisted banner(s)").arg(cleared), true);
+    databaseInterface->addAuditRecord(QString::fromStdString(userInfo->name()), this->getAddress(),
+                                      QString::fromStdString(userInfo->clientid()), "CLEAR_BLACKLISTED_BANNERS",
+                                      QString("Moderator cleared %1 blacklisted banner(s)").arg(cleared), true);
 
     Response_ClearBlacklistedBanners *re = new Response_ClearBlacklistedBanners;
     re->set_cleared_count(static_cast<unsigned int>(cleared));
@@ -2837,8 +2837,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportReopen(const Comm
     if (!note.isEmpty()) {
         auditDetails += QString(". Reason: %1").arg(note.left(200));
     }
-    sqlInterface->addAuditRecord(QString::number(reportId), this->getAddress(),
-                                 QString::fromStdString(userInfo->clientid()), "REPORT_REOPENED", auditDetails, true);
+    databaseInterface->addAuditRecord(QString::number(reportId), this->getAddress(),
+                                      QString::fromStdString(userInfo->clientid()), "REPORT_REOPENED", auditDetails,
+                                      true);
 
     return Response::RespOk;
 }
@@ -3127,8 +3128,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
     if (!registrationEnabled) {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Server functionality disabled", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "Server functionality disabled", false);
         }
 
         return Response::RespRegistrationDisabled;
@@ -3150,8 +3151,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     // If a whitelist exists, ensure the email address domain IS in the whitelist
     if (!emailWhiteListFilters.isEmpty() && !emailWhiteListFilters.contains(emailDomain, Qt::CaseInsensitive)) {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Email used is not whitelisted", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "Email used is not whitelisted", false);
         }
         auto *re = new Response_Register;
         re->set_denied_reason_str(
@@ -3163,8 +3164,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     // If a blacklist exists, ensure the email address domain is NOT in the blacklist
     if (!emailBlackListFilters.isEmpty() && emailBlackListFilters.contains(emailDomain, Qt::CaseInsensitive)) {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Email used is blacklisted", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "Email used is blacklisted", false);
         }
 
         return Response::RespEmailBlackListed;
@@ -3174,8 +3175,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     QString errorString;
     if (!sqlInterface->usernameIsValid(userName, errorString)) {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Username is invalid", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "Username is invalid", false);
         }
 
         Response_Register *re = new Response_Register;
@@ -3186,8 +3187,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     if (userName.toLower().simplified() == "servatrice") {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Username is invalid", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "Username is invalid", false);
         }
 
         return Response::RespUsernameInvalid;
@@ -3195,8 +3196,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     if (sqlInterface->userExists(userName)) {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Username already exists", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "Username already exists", false);
         }
 
         return Response::RespUserAlreadyExists;
@@ -3206,9 +3207,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     if (servatrice->getMaxAccountsPerEmail() > 0 &&
         sqlInterface->checkNumberOfUserAccounts(parsedEmailAddress) >= servatrice->getMaxAccountsPerEmail()) {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Too many usernames registered with this email address",
-                                         false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT",
+                                              "Too many usernames registered with this email address", false);
         }
 
         return Response::RespTooManyRequests;
@@ -3218,8 +3219,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     int banSecondsRemaining;
     if (sqlInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banSecondsRemaining)) {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "User is banned", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "User is banned", false);
         }
 
         Response_Register *re = new Response_Register;
@@ -3233,9 +3234,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     if (tooManyRegistrationAttempts(this->getAddress())) {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Too many registration attempts from this ip address",
-                                         false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "Too many registration attempts from this ip address",
+                                              false);
         }
 
         Response_Register *re = new Response_Register;
@@ -3262,8 +3263,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         passwordNeedsHash = true;
         if (!isPasswordLongEnough(password.length())) {
             if (servatrice->getEnableRegistrationAudit()) {
-                sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                             "REGISTER_ACCOUNT", "Password is too short", false);
+                databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                                  "REGISTER_ACCOUNT", "Password is too short", false);
             }
             return Response::RespPasswordTooShort;
         }
@@ -3293,24 +3294,24 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
             }
 
             if (servatrice->getEnableRegistrationAudit()) {
-                sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                             "REGISTER_ACCOUNT", "", true);
+                databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                                  "REGISTER_ACCOUNT", "", true);
             }
 
             return Response::RespRegistrationAcceptedNeedsActivation;
         } else {
 
             if (servatrice->getEnableRegistrationAudit()) {
-                sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                             "REGISTER_ACCOUNT", "", true);
+                databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                                  "REGISTER_ACCOUNT", "", true);
             }
 
             return Response::RespRegistrationAccepted;
         }
     } else {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Unknown reason for failure", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "Unknown reason for failure", false);
         }
 
         return Response::RespRegistrationFailed;
@@ -3361,8 +3362,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdActivateAccount(const C
         qCDebug(AbstractServerSocketInterfaceLog) << "Accepted activation for user" << userName;
 
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "ACTIVATE_ACCOUNT", "", true);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "ACTIVATE_ACCOUNT", "", true);
         }
 
         return Response::RespActivationAccepted;
@@ -3370,9 +3371,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdActivateAccount(const C
         qCDebug(AbstractServerSocketInterfaceLog) << "Failed activation for user" << userName;
 
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "ACTIVATE_ACCOUNT", "Failed to activate account, incorrect activation token",
-                                         false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "ACTIVATE_ACCOUNT",
+                                              "Failed to activate account, incorrect activation token", false);
         }
 
         return Response::RespActivationFailed;
@@ -3688,8 +3689,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
 
     if (servatrice->recordForgotPasswordAttempt(this->getAddress())) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_REQUEST", "Too many requests from this ip address", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_REQUEST", "Too many requests from this ip address",
+                                              false);
         }
 
         return Response::RespTooManyRequests;
@@ -3697,8 +3699,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
 
     if (!servatrice->getEnableForgotPassword()) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_REQUEST", "Server functionality disabled", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_REQUEST", "Server functionality disabled", false);
         }
 
         return Response::RespFunctionNotAllowed;
@@ -3713,8 +3715,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
 
     if (!sqlInterface->userExists(userName)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_REQUEST", "User does not exist", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_REQUEST", "User does not exist", false);
         }
 
         return Response::RespFunctionNotAllowed;
@@ -3731,8 +3733,8 @@ Response::ResponseCode AbstractServerSocketInterface::continuePasswordRequest(co
     if (sqlInterface->doesForgotPasswordExist(userName)) {
 
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_REQUEST", "Request already exists", true);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_REQUEST", "Request already exists", true);
         }
 
         Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
@@ -3745,8 +3747,8 @@ Response::ResponseCode AbstractServerSocketInterface::continuePasswordRequest(co
     int banTimeRemaining;
     if (sqlInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banTimeRemaining)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_REQUEST", "User is banned", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_REQUEST", "User is banned", false);
         }
 
         return Response::RespFunctionNotAllowed;
@@ -3754,8 +3756,8 @@ Response::ResponseCode AbstractServerSocketInterface::continuePasswordRequest(co
 
     if (!sqlInterface->addForgotPassword(userName)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_REQUEST", "Failed to create password reset", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_REQUEST", "Failed to create password reset", false);
         }
         return Response::RespFunctionNotAllowed;
     }
@@ -3763,8 +3765,8 @@ Response::ResponseCode AbstractServerSocketInterface::continuePasswordRequest(co
     if (servatrice->getEnableForgotPasswordAudit()) {
         QString details =
             challenged ? "Request does not exist, challenge passed" : "Request does not exist, challenge not requested";
-        sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                     "PASSWORD_RESET_REQUEST", details, true);
+        databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                          "PASSWORD_RESET_REQUEST", details, true);
     }
 
     Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
@@ -3783,8 +3785,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
 
     if (!sqlInterface->doesForgotPasswordExist(userName)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET", "Request does not exist for user", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET", "Request does not exist for user", false);
         }
 
         return Response::RespFunctionNotAllowed;
@@ -3793,8 +3795,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
     if (!sqlInterface->validateTableColumnStringData("{prefix}_users", "token", userName,
                                                      nameFromStdString(cmd.token()))) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), userName.simplified(),
-                                         "PASSWORD_RESET", "Failed token validation", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), userName.simplified(),
+                                              "PASSWORD_RESET", "Failed token validation", false);
         }
 
         return Response::RespFunctionNotAllowed;
@@ -3821,8 +3823,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
 
     if (sqlInterface->changeUserPassword(nameFromStdString(cmd.user_name()), password, passwordNeedsHash)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET", "", true);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET", "", true);
         }
 
         sqlInterface->setForcePasswordChange(nameFromStdString(cmd.user_name()), false);
@@ -3844,24 +3846,25 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
 
     if (servatrice->recordForgotPasswordAttempt(this->getAddress())) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_CHALLENGE", "Too many requests from this ip address", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_CHALLENGE", "Too many requests from this ip address",
+                                              false);
         }
         return Response::RespTooManyRequests;
     }
 
     if (!servatrice->getEnableForgotPasswordChallenge()) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_CHALLENGE", "Feature not enabled", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_CHALLENGE", "Feature not enabled", false);
         }
         return Response::RespFunctionNotAllowed;
     }
 
     if (!sqlInterface->userExists(userName)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_CHALLENGE", "User does not exist", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_CHALLENGE", "User does not exist", false);
         }
         return Response::RespFunctionNotAllowed;
     }
@@ -3869,16 +3872,16 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
     const auto parsedEmailAddress = EmailParser::getParsedEmailAddress(nameFromStdString(cmd.email()));
     if (!sqlInterface->validateTableColumnStringData("{prefix}_users", "email", userName, parsedEmailAddress)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_CHALLENGE", "Failed to answer email challenge question",
-                                         false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_CHALLENGE", "Failed to answer email challenge question",
+                                              false);
         }
         return Response::RespFunctionNotAllowed;
     }
 
     if (servatrice->getEnableForgotPasswordAudit()) {
-        sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                     "PASSWORD_RESET_CHALLENGE", "", true);
+        databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                          "PASSWORD_RESET_CHALLENGE", "", true);
     }
     return continuePasswordRequest(userName, clientId, rc, true);
 }
@@ -4259,8 +4262,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForceActivateUser(const
 
     // Add audit log that Moderator activated account on behalf of user
     const auto &msg = QString("Attempt Force Activation by %1").arg(QString::fromStdString(cmd.moderator_name()));
-    sqlInterface->addAuditRecord(QString::fromStdString(cmd.username_to_activate()), this->getAddress(), "UNKNOWN",
-                                 "ACTIVATE_ACCOUNT", msg, true);
+    databaseInterface->addAuditRecord(QString::fromStdString(cmd.username_to_activate()), this->getAddress(), "UNKNOWN",
+                                      "ACTIVATE_ACCOUNT", msg, true);
 
     // Build up activation request
     Command_Activate cmdActivate;

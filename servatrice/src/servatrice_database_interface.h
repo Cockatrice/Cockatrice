@@ -302,7 +302,7 @@ public:
                         const QString &clientid,
                         const QString &action,
                         const QString &details,
-                        const bool &results);
+                        bool results) override;
 };
 
 #endif
