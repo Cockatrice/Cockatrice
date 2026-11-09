@@ -3,15 +3,19 @@
 #include "../deck_loader/deck_loader.h"
 #include "deck_sync_sidecar.h"
 
+#include <QDebug>
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
+#include <QLoggingCategory>
+#include <QSaveFile>
 #include <QStringList>
 #include <QUuid>
 #include <libcockatrice/deck_list/deck_file_format.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <libcockatrice/protocol/pb/command_deck_del.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_download.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_list.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_new_dir.pb.h>
@@ -23,6 +27,8 @@
 #include <libcockatrice/protocol/pb/serverinfo_deckstorage.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/string_limits.h>
+
+inline Q_LOGGING_CATEGORY(DeckSyncLog, "deck_sync");
 
 namespace
 {
@@ -112,10 +118,13 @@ void DeckSyncManager::syncNow()
     syncing = true;
     uploadedCount = 0;
     downloadedCount = 0;
+    removedCount = 0;
     unchangedCount = 0;
     skippedCount = 0;
+    syncNote.clear();
     pendingUploads.clear();
     pendingDownloads.clear();
+    pendingDeletes.clear();
     plannedLocalPaths.clear();
     ensuredDirs.clear();
     ensuredDirs.insert(QString());
@@ -208,6 +217,22 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
     DeckSyncSidecar sidecar(sidecarPath);
     sidecar.load();
     const qint64 nowSecs = QDateTime::currentDateTime().toSecsSinceEpoch();
+    // A listing that comes back empty while the sidecar still remembers rows that
+    // were uploaded means the server lost its deck data (a purge, or an account
+    // that was re-created), not that every deck was just deleted. Obeying that
+    // listing would remove the whole collection, so removals are held back.
+    bool sidecarHasRemoteRows = false;
+    // The records as they were before this run starts mutating them; only used to
+    // judge whether an empty listing is credible.
+    const QMap<QString, DeckSyncRecord> sidecarAtStart = sidecar.records();
+    for (auto rit = sidecarAtStart.begin(); rit != sidecarAtStart.end(); ++rit) {
+        if (rit.value().remoteId != -1) {
+            sidecarHasRemoteRows = true;
+            break;
+        }
+    }
+    const bool remoteStateLost = serverFiles.isEmpty() && sidecarHasRemoteRows;
+    bool heldBackRemovals = false;
     // Reuse the sidecar's guid so the server keeps recognizing the row, and mint
     // one only for a deck that has never been synced.
     auto guidFor = [&sidecar](const QString &relativePath) {
@@ -275,8 +300,36 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
                 }
             }
         }
-
         if (serverId == -1) {
+            const DeckSyncRecord sidecarRecord = sidecar.get(it.key());
+            // The sidecar knows a server row that the listing no longer has: it was
+            // deleted elsewhere. Only mirror that delete when the local file is
+            // still exactly what was synced - an edit made after the remote delete
+            // is newer than the delete and gets uploaded again.
+            const bool knownToServer = sidecarRecord.remoteId != -1 || !sidecarRecord.guid.isEmpty();
+            const bool unchangedSinceSync =
+                !sidecarRecord.baseHash.isEmpty() && it.value().hash == sidecarRecord.baseHash;
+            if (knownToServer && unchangedSinceSync) {
+                if (remoteStateLost) {
+                    // The listing is empty although this deck was uploaded, so the
+                    // row is not known to be deleted, only missing. Keep the file
+                    // and the record; re-uploading it blind could duplicate the
+                    // deck once the real listing returns.
+                    heldBackRemovals = true;
+                    ++skippedCount;
+                    continue;
+                }
+                const QString absolutePath = deckPath + "/" + it.key();
+                const QString backupPath =
+                    absolutePath + BACKUP_SUFFIX + QString::number(QDateTime::currentDateTime().toSecsSinceEpoch());
+                if (!QFile::copy(absolutePath, backupPath) || !QFile::remove(absolutePath)) {
+                    ++skippedCount;
+                    continue;
+                }
+                sidecar.remove(it.key());
+                ++removedCount;
+                continue;
+            }
             const QString serverPath = serverPathFor(it.key());
             pendingUploads.append(UploadOp{.relativePath = it.key(),
                                            .serverPath = serverPath,
@@ -298,6 +351,7 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
             record.lastSyncSecs = nowSecs;
             record.deleted = false;
             sidecar.set(it.key(), record);
+            snapshotLocalFile(it.key(), record.guid);
             ++unchangedCount;
             continue;
         }
@@ -337,6 +391,39 @@ void DeckSyncManager::onListFinished(const Response &response, const CommandCont
                                            .lastModifiedSecs = it.value().lastModifiedSecs});
     }
 
+    const QMap<QString, DeckSyncRecord> knownRecords = sidecar.records();
+    for (auto it = knownRecords.begin(); it != knownRecords.end(); ++it) {
+        if (localFiles.contains(it.key())) {
+            continue;
+        }
+        if (QFileInfo::exists(deckPath + "/" + it.key())) {
+            continue;
+        }
+        if (it.value().remoteId == -1) {
+            // Never uploaded, so there is no server row to remove.
+            sidecar.remove(it.key());
+            continue;
+        }
+        if (matchedServerIds.contains(it.value().remoteId)) {
+            // Another local file (a rename or a copy) now owns this row: drop the
+            // stale record, but never tombstone the row it took over.
+            sidecar.remove(it.key());
+            continue;
+        }
+        if (remoteStateLost) {
+            // The whole listing is missing, not this one deck: pushing the delete
+            // would purge rows that are probably still there.
+            heldBackRemovals = true;
+            continue;
+        }
+        pendingDeletes.append(it.key());
+    }
+
+    if (heldBackRemovals) {
+        syncNote = tr("The server listed no decks although this collection was synced before. "
+                      "No deletions were applied this run; the decks were kept.");
+    }
+
     sidecar.save();
     processNext();
 }
@@ -352,7 +439,12 @@ void DeckSyncManager::processNext()
     if (!syncing) {
         return;
     }
-    if (!pendingUploads.isEmpty()) {
+    if (!pendingDeletes.isEmpty()) {
+        const QString relativePath = pendingDeletes.first();
+        DeckSyncSidecar sidecar(sidecarPath);
+        sidecar.load();
+        sendDelete(relativePath, sidecar.get(relativePath).remoteId);
+    } else if (!pendingUploads.isEmpty()) {
         processNextUpload();
     } else if (!pendingDownloads.isEmpty()) {
         sendDownload(pendingDownloads.first());
@@ -453,7 +545,12 @@ void DeckSyncManager::sendUpload(const UploadOp &op)
         cmd.set_color_identity(colorIdentityProvider(loaded->deckList).toStdString());
     }
     PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
-    pend->setExtraData(op.relativePath);
+    QVariantMap context;
+    context.insert("path", op.relativePath);
+    context.insert("serverPath", op.serverPath);
+    context.insert("deckId", op.deckId);
+    context.insert("guid", op.guid);
+    pend->setExtraData(context);
     connect(pend, &PendingCommand::finished, this, &DeckSyncManager::onUploadFinished);
     client->sendCommand(pend);
 }
@@ -469,8 +566,22 @@ void DeckSyncManager::onUploadFinished(const Response &response,
         failSync(tr("Server connection lost."));
         return;
     }
-    const QString relativePath = extraData.toString();
+    const QVariantMap context = extraData.toMap();
+    const QString relativePath = context.value("path").toString();
+    const int deckId = context.value("deckId", -1).toInt();
     if (response.response_code() != Response::RespOk) {
+        if (response.response_code() == Response::RespNameNotFound && deckId != -1) {
+            // The server row is gone (purged tombstone or removed elsewhere):
+            // upload the deck as new instead of updating a dead id.
+            const UploadOp retry{.relativePath = relativePath,
+                                 .serverPath = context.value("serverPath").toString(),
+                                 .serverDir = parentDir(context.value("serverPath").toString()),
+                                 .deckId = -1,
+                                 .guid = context.value("guid").toString()};
+            pendingUploads.prepend(retry);
+            processNext();
+            return;
+        }
         ++skippedCount;
         processNext();
         return;
@@ -501,6 +612,7 @@ void DeckSyncManager::onUploadFinished(const Response &response,
     record.deleted = false;
     sidecar.set(relativePath, record);
     sidecar.save();
+    snapshotLocalFile(relativePath, record.guid);
     ++uploadedCount;
     processNext();
 }
@@ -615,8 +727,78 @@ void DeckSyncManager::onDownloadFinished(const Response &response,
     record.deleted = false;
     sidecar.set(relativePath, record);
     sidecar.save();
+    snapshotLocalFile(relativePath, record.guid);
     ++downloadedCount;
     processNext();
+}
+
+void DeckSyncManager::sendDelete(const QString &relativePath, int deckId)
+{
+    emit statusMessage(tr("Deleting %1 from server...").arg(relativePath));
+    Command_DeckDel cmd;
+    cmd.set_deck_id(deckId);
+    PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
+    pend->setExtraData(relativePath);
+    connect(pend, &PendingCommand::finished, this, &DeckSyncManager::onDeleteFinished);
+    client->sendCommand(pend);
+}
+
+void DeckSyncManager::onDeleteFinished(const Response &response,
+                                       const CommandContainer & /*commandContainer*/,
+                                       const QVariant &extraData)
+{
+    if (!syncing) {
+        return;
+    }
+    const QString relativePath = extraData.toString();
+    for (int i = 0; i < pendingDeletes.size(); ++i) {
+        if (pendingDeletes.at(i) == relativePath) {
+            pendingDeletes.removeAt(i);
+            break;
+        }
+    }
+    // Both outcomes converge the record: pushed deletes and server-side
+    // deletes (already tombstoned, answering NameNotFound) are done.
+    if (response.response_code() == Response::RespOk || response.response_code() == Response::RespNameNotFound) {
+        DeckSyncSidecar sidecar(sidecarPath);
+        sidecar.load();
+        const int deletedDeckId = sidecar.get(relativePath).remoteId;
+        sidecar.remove(relativePath);
+        sidecar.save();
+        if (deletedDeckId != -1) {
+            // The unmatched-server-rows pass queued a download for this row before
+            // the delete ran. The delete won, so drop the download instead of
+            // letting it fail with NameNotFound and count as a skipped deck. A
+            // failed delete leaves the download in place as the fallback.
+            pendingDownloads.removeIf([deletedDeckId](const DownloadOp &op) { return op.deckId == deletedDeckId; });
+        }
+        ++removedCount;
+    } else {
+        ++skippedCount;
+    }
+    processNext();
+}
+
+void DeckSyncManager::snapshotLocalFile(const QString &relativePath, const QString &guid)
+{
+    if (guid.isEmpty()) {
+        return;
+    }
+    QFile source(deckPath + "/" + relativePath);
+    if (!source.open(QIODevice::ReadOnly)) {
+        return;
+    }
+    QDir().mkpath(deckPath + "/" + SYNC_META_DIR + "/bases");
+    // QSaveFile: a crash or a full disk must not leave a truncated base behind,
+    // because DeckDiff::merge() against a partial base re-adds or drops cards.
+    QSaveFile snapshot(deckPath + "/" + SYNC_META_DIR + "/bases/" + guid + ".cod");
+    if (!snapshot.open(QIODevice::WriteOnly)) {
+        return;
+    }
+    snapshot.write(source.readAll());
+    if (!snapshot.commit()) {
+        qCWarning(DeckSyncLog) << "DeckSync: could not write the base snapshot for" << relativePath;
+    }
 }
 
 void DeckSyncManager::failSync(const QString &error)
@@ -629,11 +811,16 @@ void DeckSyncManager::finishSync()
 {
     syncing = false;
     const SyncSummary summary = currentSummary();
-    emit statusMessage(tr("Sync complete: %1 uploaded, %2 downloaded, %3 unchanged, %4 skipped.")
-                           .arg(summary.uploaded)
-                           .arg(summary.downloaded)
-                           .arg(summary.unchanged)
-                           .arg(summary.skipped));
+    QString message = tr("Sync complete: %1 uploaded, %2 downloaded, %3 removed, %4 unchanged, %5 skipped.")
+                          .arg(summary.uploaded)
+                          .arg(summary.downloaded)
+                          .arg(summary.removed)
+                          .arg(summary.unchanged)
+                          .arg(summary.skipped);
+    if (!summary.note.isEmpty()) {
+        message += QStringLiteral(" ") + summary.note;
+    }
+    emit statusMessage(message);
     emit syncFinished(summary, QString());
 }
 
@@ -642,7 +829,9 @@ DeckSyncManager::SyncSummary DeckSyncManager::currentSummary() const
     return SyncSummary{
         .uploaded = uploadedCount,
         .downloaded = downloadedCount,
+        .removed = removedCount,
         .unchanged = unchangedCount,
         .skipped = skippedCount,
+        .note = syncNote,
     };
 }

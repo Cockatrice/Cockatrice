@@ -38,6 +38,13 @@ class ServerInfo_DeckStorage_Folder;
  *
  * Ownership: fire-and-forget per run, driven by PendingCommand round trips.
  * No watcher, no auto triggers, no conflict UI — those arrive in later layers.
+ *
+ * Deletes are tombstones, never silent: a locally deleted deck is pushed with
+ * Command_DeckDel, a server-side delete is applied locally only after copying
+ * the file to a .sync-backup, and resurrection reuses the stored deck id. A
+ * listing that comes back empty while the sidecar still remembers uploaded rows
+ * is treated as lost server state rather than a collection-wide delete, so that
+ * run applies no removals and says so in its summary.
  */
 class DeckSyncManager : public QObject
 {
@@ -51,8 +58,10 @@ public:
     {
         int uploaded = 0;
         int downloaded = 0;
+        int removed = 0; ///< Decks deleted on the server, or locally to mirror a server delete.
         int unchanged = 0;
         int skipped = 0;
+        QString note; ///< Non-error caveat about this run, empty when there is none.
     };
 
     explicit DeckSyncManager(QObject *parent = nullptr);
@@ -78,6 +87,8 @@ private slots:
     onUploadFinished(const Response &response, const CommandContainer &commandContainer, const QVariant &extraData);
     void
     onDownloadFinished(const Response &response, const CommandContainer &commandContainer, const QVariant &extraData);
+    void
+    onDeleteFinished(const Response &response, const CommandContainer &commandContainer, const QVariant &extraData);
 
 private:
     struct ServerFile
@@ -125,6 +136,8 @@ private:
     void sendMkDirFor(const QString &dir);
     void sendUpload(const UploadOp &op);
     void sendDownload(const DownloadOp &op);
+    void sendDelete(const QString &relativePath, int deckId);
+    void snapshotLocalFile(const QString &relativePath, const QString &guid);
     static QString parentDir(const QString &path);
     QString uniqueLocalPath(const QString &relativePath) const;
 
@@ -140,8 +153,11 @@ private:
     QSet<QString> plannedLocalPaths; ///< Download targets reserved during this run, not yet on disk.
     QList<UploadOp> pendingUploads;
     QList<DownloadOp> pendingDownloads;
+    QList<QString> pendingDeletes;
+    QString syncNote;
     int uploadedCount = 0;
     int downloadedCount = 0;
+    int removedCount = 0;
     int unchangedCount = 0;
     int skippedCount = 0;
 };
