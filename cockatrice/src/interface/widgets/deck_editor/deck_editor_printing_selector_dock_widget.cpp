@@ -4,6 +4,7 @@
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../printing_selector/printing_selector.h"
 #include "deck_editor_deck_dock_widget.h"
+#include "deck_editor_printing_selector_host.h"
 #include "printing_disabled_info_widget.h"
 
 #include <QFlags>
@@ -32,9 +33,12 @@ DeckEditorPrintingSelectorDockWidget::DeckEditorPrintingSelectorDockWidget(Abstr
     retranslateUi();
 }
 
+DeckEditorPrintingSelectorDockWidget::~DeckEditorPrintingSelectorDockWidget() = default;
+
 void DeckEditorPrintingSelectorDockWidget::createPrintingSelectorDock()
 {
-    printingSelector = new PrintingSelector(this, deckEditor);
+    printingSelectorHost = std::make_unique<DeckEditorPrintingSelectorHost>(deckEditor);
+    printingSelector = new PrintingSelector(this, printingSelectorHost.get());
     printingSelector->setObjectName("printingSelector");
     auto *printingSelectorFrame = new QVBoxLayout;
     printingSelectorFrame->setObjectName("printingSelectorFrame");

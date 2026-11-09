@@ -17,9 +17,8 @@
 #include <QWidget>
 #include <qtmetamacros.h>
 
-class AbstractTabDeckEditor;
-class DeckStateManager;
 class PrintingSelectorCardOverlayWidget;
+class PrintingSelectorHost;
 class QSlider;
 class QString;
 class QVBoxLayout;
@@ -33,10 +32,12 @@ class PrintingSelectorCardDisplayWidget : public QWidget
 
 public:
     PrintingSelectorCardDisplayWidget(QWidget *parent,
-                                      AbstractTabDeckEditor *deckEditor,
-                                      DeckStateManager *deckStateManager,
+                                      PrintingSelectorHost *host,
                                       QSlider *cardSizeSlider,
                                       const ExactCard &rootCard);
+
+    void setSelected(bool selected);
+    [[nodiscard]] QString getProviderId() const;
 
 public slots:
     void clampSetNameToPicture();
@@ -46,9 +47,11 @@ public slots:
 
 signals:
     void cardPreferenceChanged();
+    void printingSelected(const ExactCard &card);
 
 private:
     ExactCard rootCard;
+    bool selectionOnly;
     QVBoxLayout *layout;
     SetNameAndCollectorsNumberDisplayWidget *setNameAndCollectorsNumberDisplayWidget;
     PrintingSelectorCardOverlayWidget *overlayWidget;

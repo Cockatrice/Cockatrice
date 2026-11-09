@@ -7,12 +7,18 @@
 #ifndef PRINTING_SELECTOR_H
 #define PRINTING_SELECTOR_H
 
+#include "printing_selector_host.h"
+
+#include <QList>
 #include <QWidget>
 #include <libcockatrice/card/card_info.h>
+#include <libcockatrice/card/printing/exact_card.h>
 #include <qtmetamacros.h>
 
 class CardSizeWidget;
+class DeckStateManager;
 class FlowWidget;
+class PrintingSelectorCardDisplayWidget;
 class PrintingSelectorPlaceholderWidget;
 class QCheckBox;
 class QHBoxLayout;
@@ -33,20 +39,20 @@ struct ZoneCounts
     int tokensboard = 0;
 };
 
-class DeckStateManager;
 class PrintingSelectorCardSearchWidget;
 class PrintingSelectorCardSelectionWidget;
 class PrintingSelectorCardSortingWidget;
-class AbstractTabDeckEditor;
 
 class PrintingSelector : public QWidget
 {
     Q_OBJECT
 
 public:
-    PrintingSelector(QWidget *parent, AbstractTabDeckEditor *deckEditor);
+    PrintingSelector(QWidget *parent, PrintingSelectorHost *host);
 
     void setCard(const CardInfoPtr &newCard);
+    void setSelectedProviderId(const QString &providerId);
+    void setPlaceholderText(const QString &text);
     void getAllSetsForCurrentCard();
 
 protected:
@@ -78,25 +84,36 @@ signals:
      */
     void cardAmountsChanged(const QMap<QString, ZoneCounts> &uuidToAmounts);
 
+    /**
+     * A printing was picked while the selector runs in selection-only mode.
+     * @param card The picked card and printing.
+     */
+    void printingSelected(const ExactCard &card);
+
 private:
     QVBoxLayout *layout;
     SettingsButtonWidget *displayOptionsWidget;
     QWidget *sortAndOptionsContainer;
     QHBoxLayout *sortAndOptionsLayout;
-    QCheckBox *navigationCheckBox;
+    QCheckBox *navigationCheckBox = nullptr;
     PrintingSelectorCardSortingWidget *sortToolBar;
     PrintingSelectorCardSearchWidget *searchBar;
     PrintingSelectorPlaceholderWidget *placeholderWidget;
     FlowWidget *flowWidget;
     CardSizeWidget *cardSizeWidget;
-    PrintingSelectorCardSelectionWidget *cardSelectionBar;
-    AbstractTabDeckEditor *deckEditor;
+    PrintingSelectorCardSelectionWidget *cardSelectionBar = nullptr;
+    PrintingSelectorHost *host;
     DeckStateManager *deckStateManager;
+    QList<PrintingSelectorCardDisplayWidget *> cardDisplayWidgets;
     CardInfoPtr selectedCard;
+    QString selectedProviderId;
+    QString placeholderText;
     QTimer *widgetLoadingBufferTimer;
     QTimer *deckChangeTimer;
     bool displayDirty = false;
     int currentIndex = 0;
+
+    void updateSelectedCardWidgets() const;
 };
 
 #endif // PRINTING_SELECTOR_H

@@ -218,6 +218,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_filter_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_printing_selector_dock_widget.cpp
+    src/interface/widgets/deck_editor/deck_editor_printing_selector_host.cpp
     src/interface/widgets/deck_editor/deck_list_style_proxy.cpp
     src/interface/widgets/deck_editor/deck_state_manager.cpp
     src/interface/widgets/deck_editor/deck_zone_dialog.cpp
