@@ -1,0 +1,23 @@
+<events>
+    <!--
+        Screenshot and widget-tree capture.
+
+        The runner sets COCKATRICE_SCREENSHOT_DIR (build/screenshots by default),
+        so the images and the dump land in an ignored directory. Use the dump to
+        find the paths other tests can address.
+    -->
+    <event widget="MainWindow" command="resize" arguments="1280x800" />
+    <event widget="MainWindow" command="process_events" arguments="500" />
+    <event widget="MainWindow" command="screenshot" arguments="$COCKATRICE_SCREENSHOT_DIR/main-window.png" />
+
+    <event widget="MainWindow/menubar" command="activate" arguments="cockatriceMenu" />
+    <event widget="MainWindow/menubar/cockatriceMenu" command="activate" arguments="actionSettings" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/settingsDialog/settingsView/pagesContainer/pagesWidget" command="expectProperty" arguments="currentIndex,0" />
+
+    <!-- Taken while the dialog is open, so the dump covers its widgets too. -->
+    <event widget="MainWindow" command="dumpTree" arguments="$COCKATRICE_SCREENSHOT_DIR/widget-tree.txt" />
+    <event widget="MainWindow/settingsDialog/settingsView" command="screenshot" arguments="$COCKATRICE_SCREENSHOT_DIR/settings.png" />
+
+    <event widget="MainWindow/settingsDialog/settingsOkButton" command="activate" arguments="" />
+</events>

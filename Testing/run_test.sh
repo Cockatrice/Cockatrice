@@ -12,6 +12,10 @@
 # Environment:
 #   COCKATRICE_BIN   Path to the client binary (default: build/debug/cockatrice/cockatrice,
 #                    or the .app bundle binary on macOS).
+#   COCKATRICE_SCREENSHOT_DIR
+#                    Directory the tests write screenshots and widget dumps to
+#                    (default: build/screenshots). Tests address it as
+#                    $COCKATRICE_SCREENSHOT_DIR/name.png.
 #   TEST_TIMEOUT     Seconds a single test may run before it is killed (default: 180).
 #                    Uses timeout, or gtimeout from coreutils on macOS.
 #
@@ -31,6 +35,12 @@ else
 fi
 TEST_DIR="$REPO_ROOT/Testing"
 TEST_TIMEOUT="${TEST_TIMEOUT:-180}"
+
+# Tests that capture the UI address this as $COCKATRICE_SCREENSHOT_DIR/name.png.
+# It lives under the ignored build/ tree, so a run does not leave untracked files.
+SCREENSHOT_DIR="${COCKATRICE_SCREENSHOT_DIR:-$REPO_ROOT/build/screenshots}"
+mkdir -p "$SCREENSHOT_DIR"
+export COCKATRICE_SCREENSHOT_DIR="$SCREENSHOT_DIR"
 
 # Stock macOS has no `timeout`; coreutils provides `gtimeout`. Without either the
 # runner still works, but a hung test is not killed.
