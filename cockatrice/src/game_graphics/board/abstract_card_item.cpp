@@ -48,8 +48,7 @@ class QSizeF;
 // Width the hovered card smooth-zooms to: exactly the hover panel picture size, so
 // all four corners coincide when the panel swaps in over it.
 static constexpr qreal HOVER_ZOOM_WIDTH = 270.0;
-// The pre-panel hover enlargement. This stays the hover behavior when the smooth zoom is
-// turned off (see setHoverHighlighted).
+// The pre-panel hover enlargement, used for scaleCards
 static constexpr qreal LEGACY_HOVER_SCALE = 1.1;
 static constexpr int HOVER_ZOOM_IN_MS = 220;
 static constexpr int HOVER_ZOOM_OUT_MS = 140;
@@ -324,7 +323,7 @@ void AbstractCardItem::setHoverZoomed(bool _hoverZoomed)
     // The target is constant ON-SCREEN pixels: divide out the board view zoom so
     // fullscreen (or zoomed) boards don't overshoot while the fixed-size panel matches.
     qreal target = 1.0;
-    if (_hoverZoomed && SettingsCache::instance().cardsDisplay().getScaleCards()) {
+    if (_hoverZoomed) {
         const qreal w = boundingRect().width();
         qreal viewScale = 1.0;
         if (scene() && !scene()->views().isEmpty()) {
@@ -360,22 +359,14 @@ void AbstractCardItem::setHovered(bool _hovered)
         setZValue(ZValues::HOVERED_CARD);
     }
 
-    // Fallback to the historical hover scale when the smooth hover zoom is turned off and
-    // the panel is not driven by hover: contact alone must still enlarge the card to the
-    // old 1.1x while scaleCards is on.
-    auto &display = SettingsCache::instance().cardsDisplay();
-    const bool legacyHoverScale = display.getScaleCards() &&
-                                  display.getHoverZoomTrigger() == CardsDisplaySettings::HoverPanelTriggerOff &&
-                                  display.getHoverPanelTrigger() != CardsDisplaySettings::HoverPanelTriggerHover;
-    if (legacyHoverScale) {
+    // contact alone must snap the card to 1.1x while scaleCards is on.
+    if (SettingsCache::instance().cardsDisplay().getScaleCards()) {
         // Centered like the smooth zoom, so growing and shrinking never drift.
         setTransformOriginPoint(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F);
-        hoverZoom->stop();
-        hoverZoom->setStartValue(scale());
-        hoverZoom->setEndValue(_hovered ? LEGACY_HOVER_SCALE : 1.0);
-        hoverZoom->setDuration(_hovered ? HOVER_ZOOM_IN_MS : HOVER_ZOOM_OUT_MS);
-        hoverZoom->start();
-    } else if (!_hovered && !isHoverZoomed && hoverZoom->state() != QAbstractAnimation::Running) {
+        setScale(_hovered ? LEGACY_HOVER_SCALE : 1.0);
+    }
+
+    if (!_hovered && !isHoverZoomed && hoverZoom->state() != QAbstractAnimation::Running) {
         // A zoomed card keeps its raised z until the shrink-out finishes (its finished
         // handler restores it); a highlight-only card has nothing to unwind.
         setZValue(realZValue);
