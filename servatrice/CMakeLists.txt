@@ -10,6 +10,7 @@ set(servatrice_SOURCES
     src/forwarded_address.cpp
     src/main.cpp
     src/metrics_registry.cpp
+    src/private_chat_paging.cpp
     src/ratelimiter.cpp
     src/servatrice.cpp
     src/servatrice_connection_pool.cpp

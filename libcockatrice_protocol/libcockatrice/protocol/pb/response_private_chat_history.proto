@@ -1,0 +1,16 @@
+syntax = "proto2";
+import "response.proto";
+import "serverinfo_private_chat_message.proto";
+
+/**
+ * Private conversation messages, oldest first, without account IDs or IP addresses.
+ * When has_more is true, use the oldest returned time as before on the next request.
+ * Seconds are never split across pages; ordering within a second is unspecified.
+ */
+message Response_PrivateChatHistory {
+    extend Response {
+        optional Response_PrivateChatHistory ext = 1020;
+    }
+    repeated ServerInfo_PrivateChatMessage messages = 1;
+    optional bool has_more = 2;
+}

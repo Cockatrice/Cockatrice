@@ -12,6 +12,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_ban.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_moderator_login.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_private_chat_message.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user_alt.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user_session.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_warning.pb.h>
@@ -224,6 +225,14 @@ public:
                                                        const QString &beforeTime = QString(),
                                                        bool *hasMore = nullptr);
     QList<ServerInfo_UserSession> getUserSessions(const QString &userName, int limit);
+    bool getPrivateChatHistory(int callerId,
+                               const QString &callerName,
+                               int peerId,
+                               const QString &peerName,
+                               quint64 before,
+                               int limit,
+                               QList<ServerInfo_PrivateChatMessage> &messages,
+                               bool &hasMore);
     QList<ServerInfo_UserAlt> getUserAlts(const QString &userName,
                                           int depth = 1,
                                           bool useEmail = true,

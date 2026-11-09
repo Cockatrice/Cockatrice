@@ -8,6 +8,7 @@
 #include "libcockatrice/protocol/pb/serverinfo_user_alt.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_user_session.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_warning.pb.h"
+#include "private_chat_paging.h"
 #include "servatrice.h"
 #include "server.h"
 #include "server_protocolhandler.h"
@@ -2636,6 +2637,92 @@ int Servatrice_DatabaseInterface::clearBlacklistedBanners()
         cleared += clearQuery->numRowsAffected();
     }
     return cleared;
+}
+
+bool Servatrice_DatabaseInterface::getPrivateChatHistory(int callerId,
+                                                         const QString &callerName,
+                                                         int peerId,
+                                                         const QString &peerName,
+                                                         quint64 before,
+                                                         int limit,
+                                                         QList<ServerInfo_PrivateChatMessage> &messages,
+                                                         bool &hasMore)
+{
+    messages.clear();
+    hasMore = false;
+    if (callerId < 1 || peerId < 1 || callerName.isEmpty() || peerName.isEmpty() || !checkSql()) {
+        return false;
+    }
+
+    // Match both participants by account id, and verify their names as well.
+    // Names can be reused (guests, re-registration), so ids are what separate
+    // earlier holders; names are what reject a federated user's remote id that
+    // happens to collide with a local one in the shared log table.
+    const QString conversationFilter = " FROM {prefix}_log WHERE target_type = 'chat'"
+                                       " AND ((sender_id = :caller_sender_id AND sender_name = :caller_name"
+                                       " AND target_id = :peer_target_id AND target_name = :peer_name)"
+                                       " OR (target_id = :caller_target_id AND target_name = :caller_name"
+                                       " AND sender_id = :peer_sender_id AND sender_name = :peer_name))";
+    const QString selectMessages = "SELECT UNIX_TIMESTAMP(log_time), sender_name, log_message";
+    const auto bindParticipants = [&](QSqlQuery *query) {
+        query->bindValue(":caller_sender_id", callerId);
+        query->bindValue(":caller_name", callerName);
+        query->bindValue(":peer_target_id", peerId);
+        query->bindValue(":peer_name", peerName);
+        query->bindValue(":peer_sender_id", peerId);
+        query->bindValue(":caller_target_id", callerId);
+    };
+    const auto readMessages = [&](QSqlQuery *query, QList<ServerInfo_PrivateChatMessage> &out) {
+        while (query->next()) {
+            ServerInfo_PrivateChatMessage message;
+            message.set_time(query->value(0).toULongLong());
+            message.set_sender_name(query->value(1).toString().toStdString());
+            message.set_message(query->value(2).toString().toStdString());
+            out.append(message);
+        }
+    };
+
+    QString queryString = selectMessages + conversationFilter;
+    if (before) {
+        queryString.append(" AND log_time < FROM_UNIXTIME(:before)");
+    }
+    queryString.append(" ORDER BY log_time DESC LIMIT :limit_size");
+    QSqlQuery *query = prepareQuery(queryString);
+    bindParticipants(query);
+    if (before) {
+        query->bindValue(":before", before);
+    }
+    query->bindValue(":limit_size", limit + 1);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    QList<ServerInfo_PrivateChatMessage> newestFirst;
+    readMessages(query, newestFirst);
+    PrivateChatPage page = assemblePrivateChatPage(newestFirst, limit);
+
+    if (page.needsWholeSecond) {
+        query = prepareQuery(selectMessages + conversationFilter + " AND log_time = FROM_UNIXTIME(:second)");
+        bindParticipants(query);
+        query->bindValue(":second", page.boundarySecond);
+        if (!execSqlQuery(query)) {
+            return false;
+        }
+        readMessages(query, page.messages);
+        std::reverse(page.messages.begin(), page.messages.end());
+
+        query = prepareQuery("SELECT 1" + conversationFilter + " AND log_time < FROM_UNIXTIME(:before) LIMIT 1");
+        bindParticipants(query);
+        query->bindValue(":before", page.boundarySecond);
+        if (!execSqlQuery(query)) {
+            return false;
+        }
+        page.hasMore = query->next();
+    }
+
+    messages = page.messages;
+    hasMore = page.hasMore;
+    return true;
 }
 
 QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory(const QString &user,

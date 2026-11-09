@@ -804,10 +804,13 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
     userInterface->sendProtocolItem(*se);
     rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, se);
 
-    databaseInterface->logMessage(userInfo->id(), QString::fromStdString(userInfo->name()),
-                                  QString::fromStdString(userInfo->address()), QString::fromStdString(cmd.message()),
-                                  Server_DatabaseInterface::MessageTargetChat, userInterface->getUserInfo()->id(),
-                                  receiver);
+    databaseInterface->logMessage(
+        userInfo->id(), QString::fromStdString(userInfo->name()), QString::fromStdString(userInfo->address()),
+        QString::fromStdString(cmd.message()), Server_DatabaseInterface::MessageTargetChat,
+        // A federated user's id belongs to the remote server's
+        // database, not ours. Logging it would collide with a
+        // local id and corrupt local history lookups.
+        userInterface->getUserInfo()->server_id() == -1 ? userInterface->getUserInfo()->id() : 0, receiver);
     resetIdleTimer();
     return Response::RespOk;
 }

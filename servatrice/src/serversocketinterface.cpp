@@ -98,6 +98,7 @@
 #include <libcockatrice/protocol/pb/command_deck_share_list_mine.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_share_remove.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
+#include <libcockatrice/protocol/pb/command_get_private_chat_history.pb.h>
 #include <libcockatrice/protocol/pb/command_get_server_stats.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_delete_match.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_download.pb.h>
@@ -139,6 +140,7 @@
 #include <libcockatrice/protocol/pb/response_get_server_stats.pb.h>
 #include <libcockatrice/protocol/pb/response_moderator_last_logins.pb.h>
 #include <libcockatrice/protocol/pb/response_password_salt.pb.h>
+#include <libcockatrice/protocol/pb/response_private_chat_history.pb.h>
 #include <libcockatrice/protocol/pb/response_register.pb.h>
 #include <libcockatrice/protocol/pb/response_remove_user_avatar.pb.h>
 #include <libcockatrice/protocol/pb/response_remove_user_banner.pb.h>
@@ -414,6 +416,8 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
             return cmdDeckShareRemove(cmd.GetExtension(Command_DeckShareRemove::ext), rc);
         case SessionCommand::DECK_SHARE_DOWNLOAD:
             return cmdDeckShareDownload(cmd.GetExtension(Command_DeckShareDownload::ext), rc);
+        case SessionCommand::GET_PRIVATE_CHAT_HISTORY:
+            return cmdGetPrivateChatHistory(cmd.GetExtension(Command_GetPrivateChatHistory::ext), rc);
         case SessionCommand::ACCOUNT_PASSWORD:
             return cmdAccountPassword(cmd.GetExtension(Command_AccountPassword::ext), rc);
         case SessionCommand::REQUEST_PASSWORD_SALT:
@@ -1699,6 +1703,49 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const 
     sendProtocolItem(*se);
     delete se;
 
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdGetPrivateChatHistory(const Command_GetPrivateChatHistory &cmd,
+                                                                               ResponseContainer &rc)
+{
+    if (authState != PasswordRight) {
+        return Response::RespFunctionNotAllowed;
+    }
+    if (!userInfo || !(userInfo->user_level() & ServerInfo_User::IsRegistered)) {
+        return Response::RespFunctionNotAllowed;
+    }
+    if (!settingsCache->value("logging/log_user_msg_chat", false).toBool() ||
+        !settingsCache->value("logging/allow_user_chat_history", false).toBool()) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    const QString peer = nameFromStdString(cmd.user_name());
+    if (peer.isEmpty()) {
+        return Response::RespInvalidData;
+    }
+
+    // Resolve the peer to an account id. Matching by name alone would merge the
+    // conversations of everyone who has ever used that name.
+    const int peerId = sqlInterface->getUserIdInDB(peer);
+    if (peerId < 1) {
+        return Response::RespNameNotFound;
+    }
+
+    const int limit = qBound<quint32>(1, cmd.limit(), 200);
+    QList<ServerInfo_PrivateChatMessage> messages;
+    bool hasMore = false;
+    if (!sqlInterface->getPrivateChatHistory(userInfo->id(), QString::fromStdString(userInfo->name()), peerId, peer,
+                                             cmd.before(), limit, messages, hasMore)) {
+        return Response::RespInternalError;
+    }
+
+    Response_PrivateChatHistory *re = new Response_PrivateChatHistory;
+    for (const auto &message : messages) {
+        re->add_messages()->CopyFrom(message);
+    }
+    re->set_has_more(hasMore);
+    rc.setResponseExtension(re);
     return Response::RespOk;
 }
 
