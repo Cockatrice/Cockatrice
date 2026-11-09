@@ -195,6 +195,29 @@ public:
     {
         return false;
     }
+    /** @brief Outcome of a deck-storage write, so callers can map it to a response code. */
+    enum class DeckStorageResult
+    {
+        Ok,
+        NotFound,
+        Failed
+    };
+    virtual DeckStorageResult setDeckVisibility(int /* deckId */, int /* userId */, bool /* isPublic */)
+    {
+        return DeckStorageResult::Failed;
+    }
+    virtual DeckStorageResult setDeckFolderVisibility(int /* folderId */, int /* userId */, bool /* isPublic */)
+    {
+        return DeckStorageResult::Failed;
+    }
+    virtual DeckStorageResult createDeckFolder(int /* parentId */, int /* userId */, const QString & /* name */)
+    {
+        return DeckStorageResult::Failed;
+    }
+    /** @brief Delete a folder, its deck files, and every nested folder. */
+    virtual void deleteDeckFolder(int /* folderId */)
+    {
+    }
     virtual bool removeForgotPassword(const QString & /* user */)
     {
         return false;
