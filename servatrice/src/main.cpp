@@ -38,6 +38,7 @@
 #include <QObject>
 #include <QSharedPointer>
 #include <QString>
+#include <QStringList>
 #include <QThread>
 #include <QVariant>
 #include <QVector>
@@ -127,6 +128,37 @@ void myMessageOutput2(QtMsgType /*type*/, const QMessageLogContext &, const QStr
     std::cerr << msg.toStdString() << std::endl;
 }
 
+namespace
+{
+void printEffectiveConfig(const SettingsCache &settings)
+{
+    for (const QString &key : settings.effectiveKeys()) {
+        const QString rendered =
+            SettingsCache::isSecretKey(key) ? QStringLiteral("<redacted>") : settings.value(key).toString();
+        std::cout << key.toStdString() << '=' << rendered.toStdString() << '\n';
+    }
+}
+
+bool applyConfigOverrides(SettingsCache &settings, const QStringList &values)
+{
+    for (const QString &entry : values) {
+        QString key;
+        QVariant value;
+        if (!SettingsCache::parseOverride(entry, key, value)) {
+            qCritical() << "Invalid --set value; expected a scalar key=value:" << entry;
+            return false;
+        }
+
+        settings.setOverride(key, value);
+    }
+
+    if (!values.isEmpty()) {
+        settings.rebuildDisallowedRegExps();
+    }
+    return true;
+}
+} // namespace
+
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
@@ -150,6 +182,17 @@ int main(int argc, char *argv[])
     QCommandLineOption configPathOpt("config", "Read server configuration from <file>", "file", "");
     parser.addOption(configPathOpt);
 
+    QCommandLineOption setConfigOpt(
+        "set",
+        "Override a section-qualified scalar configuration value for this run (key=value), such as "
+        "server/port. May be repeated; bare keys and array keys such as rooms/roomlist/1/name are "
+        "rejected; never writes the config file.",
+        "key=value");
+    parser.addOption(setConfigOpt);
+
+    QCommandLineOption printConfigOpt("print-config", "Print the effective configuration and exit");
+    parser.addOption(printConfigOpt);
+
     parser.process(app);
 
     bool testRandom = parser.isSet(testRandomOpt);
@@ -167,6 +210,15 @@ int main(int argc, char *argv[])
     }
     qWarning() << "Using configuration file: " << configPath;
     settingsCache = new SettingsCache(configPath);
+
+    if (!applyConfigOverrides(*settingsCache, parser.values(setConfigOpt))) {
+        return EXIT_FAILURE;
+    }
+
+    if (parser.isSet(printConfigOpt)) {
+        printEffectiveConfig(*settingsCache);
+        return EXIT_SUCCESS;
+    }
 
     loggerThread = new QThread;
     loggerThread->setObjectName("logger");

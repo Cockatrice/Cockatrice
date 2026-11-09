@@ -14,3 +14,15 @@ cockatrice_add_test(
 )
 
 cockatrice_add_test(NAME settings_migration_test SOURCES settings_migration_test.cpp LIBS libcockatrice_settings)
+
+cockatrice_add_test(
+  NAME
+  servatrice_settings_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/servatrice/src/settingscache.cpp
+  servatrice_settings_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/servatrice/src
+  LABELS
+  server
+)
