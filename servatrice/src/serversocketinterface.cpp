@@ -3100,7 +3100,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     //! \todo Move this method outside of the db interface.
     QString errorString;
-    if (!sqlInterface->usernameIsValid(userName, errorString)) {
+    if (!databaseInterface->usernameIsValid(userName, errorString)) {
         if (servatrice->getEnableRegistrationAudit()) {
             databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
                                               "REGISTER_ACCOUNT", "Username is invalid", false);
@@ -3121,7 +3121,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         return Response::RespUsernameInvalid;
     }
 
-    if (sqlInterface->userExists(userName)) {
+    if (databaseInterface->userExists(userName)) {
         if (servatrice->getEnableRegistrationAudit()) {
             databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
                                               "REGISTER_ACCOUNT", "Username already exists", false);
@@ -3132,7 +3132,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     const auto parsedEmailAddress = EmailParser::getParsedEmailAddress(parsedEmailParts);
     if (servatrice->getMaxAccountsPerEmail() > 0 &&
-        sqlInterface->checkNumberOfUserAccounts(parsedEmailAddress) >= servatrice->getMaxAccountsPerEmail()) {
+        databaseInterface->checkNumberOfUserAccounts(parsedEmailAddress) >= servatrice->getMaxAccountsPerEmail()) {
         if (servatrice->getEnableRegistrationAudit()) {
             databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
                                               "REGISTER_ACCOUNT",
@@ -3144,7 +3144,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     QString banReason;
     int banSecondsRemaining;
-    if (sqlInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banSecondsRemaining)) {
+    if (databaseInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banSecondsRemaining)) {
         if (servatrice->getEnableRegistrationAudit()) {
             databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
                                               "REGISTER_ACCOUNT", "User is banned", false);
@@ -3207,16 +3207,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     }
 
     bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
-    bool regSucceeded = sqlInterface->registerUser(userName, realName, password, passwordNeedsHash, parsedEmailAddress,
-                                                   country, !requireEmailActivation);
+    bool regSucceeded = databaseInterface->registerUser(userName, realName, password, passwordNeedsHash,
+                                                        parsedEmailAddress, country, !requireEmailActivation);
 
     if (regSucceeded) {
         qCDebug(AbstractServerSocketInterfaceLog) << "Accepted register command for user:" << userName;
         if (requireEmailActivation) {
-            QSqlQuery *query =
-                sqlInterface->prepareQuery("insert into {prefix}_activation_emails (name) values(:name)");
-            query->bindValue(":name", userName);
-            if (!sqlInterface->execSqlQuery(query)) {
+            if (!databaseInterface->addActivationEmail(userName)) {
                 return Response::RespRegistrationFailed;
             }
 
@@ -3285,7 +3282,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdActivateAccount(const C
         clientId = "UNKNOWN";
     }
 
-    if (sqlInterface->activateUser(userName, token)) {
+    if (databaseInterface->activateUser(userName, token)) {
         qCDebug(AbstractServerSocketInterfaceLog) << "Accepted activation for user" << userName;
 
         if (servatrice->getEnableRegistrationAudit()) {

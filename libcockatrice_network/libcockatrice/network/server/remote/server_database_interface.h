@@ -475,6 +475,11 @@ public:
     {
         return false;
     }
+    /** @brief Queues the activation email lookup row for a freshly registered user. */
+    virtual bool addActivationEmail(const QString & /* userName */)
+    {
+        return false;
+    }
     virtual void updateUsersClientID(const QString & /* userName */, const QString & /* userClientID */)
     {
     }
