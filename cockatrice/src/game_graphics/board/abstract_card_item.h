@@ -190,6 +190,13 @@ public:
 
 protected:
     void transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle);
+    /**
+     * @brief Whether the card name is painted over its artwork.
+     *
+     * Follows the "Display card names on cards having a picture" setting. Views
+     * that already show the name elsewhere, such as the token preview, turn it off.
+     */
+    [[nodiscard]] virtual bool shouldPaintNameOverPicture() const;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;

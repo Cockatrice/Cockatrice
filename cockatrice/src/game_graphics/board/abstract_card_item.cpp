@@ -181,6 +181,11 @@ QSizeF AbstractCardItem::getTranslatedSize(QPainter *painter) const
                   painter->combinedTransform().map(QLineF(0, 0, 0, boundingRect().height())).length());
 }
 
+bool AbstractCardItem::shouldPaintNameOverPicture() const
+{
+    return SettingsCache::instance().cardsDisplay().getDisplayCardNames();
+}
+
 void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle)
 {
     const int MAX_FONT_SIZE = SettingsCache::instance().appearance().getMaxFontSize();
@@ -233,8 +238,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
         painter->drawPath(shape());
     }
 
-    if (translatedPixmap.isNull() || SettingsCache::instance().cardsDisplay().getDisplayCardNames() ||
-        state->getFaceDown()) {
+    if (translatedPixmap.isNull() || state->getFaceDown() || shouldPaintNameOverPicture()) {
         painter->save();
         transformPainter(painter, translatedSize, angle);
         painter->setPen(Qt::white);

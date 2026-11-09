@@ -951,7 +951,7 @@ void PlayerActions::actCreateToken(TokenInfo tokenToCreate)
         lastTokenInfo.name = correctedCard.getName();
         int tableRow = lastTokenInfo.faceDown ? 2 : correctedCard.getInfo().getUiAttributes().tableRow;
         lastTokenTableRow = TableZoneLogic::tableRowToGridY(tableRow);
-        if (lastTokenInfo.pt.isEmpty()) {
+        if (!lastTokenInfo.faceDown && lastTokenInfo.pt.isEmpty()) {
             lastTokenInfo.pt = correctedCard.getInfo().getPowTough();
         }
     }
