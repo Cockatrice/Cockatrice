@@ -563,7 +563,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAddToList(const Command
     }
 
     int id1 = userInfo->id();
-    int id2 = sqlInterface->getUserIdInDB(user);
+    int id2 = databaseInterface->getUserId(user);
     if (id2 < 0) {
         return Response::RespNameNotFound;
     }
@@ -571,11 +571,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAddToList(const Command
         return Response::RespContextError;
     }
 
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("insert into {prefix}_" + list + "list (id_user1, id_user2) values(:id1, :id2)");
-    query->bindValue(":id1", id1);
-    query->bindValue(":id2", id2);
-    if (!sqlInterface->execSqlQuery(query)) {
+    const bool stored =
+        list == "buddy" ? databaseInterface->addToBuddyList(id1, id2) : databaseInterface->addToIgnoreList(id1, id2);
+    if (!stored) {
         return Response::RespInternalError;
     }
 
@@ -617,16 +615,14 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveFromList(const Co
     }
 
     int id1 = userInfo->id();
-    int id2 = sqlInterface->getUserIdInDB(user);
+    int id2 = databaseInterface->getUserId(user);
     if (id2 < 0) {
         return Response::RespNameNotFound;
     }
 
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("delete from {prefix}_" + list + "list where id_user1 = :id1 and id_user2 = :id2");
-    query->bindValue(":id1", id1);
-    query->bindValue(":id2", id2);
-    if (!sqlInterface->execSqlQuery(query)) {
+    const bool removed = list == "buddy" ? databaseInterface->removeFromBuddyList(id1, id2)
+                                         : databaseInterface->removeFromIgnoreList(id1, id2);
+    if (!removed) {
         return Response::RespInternalError;
     }
 

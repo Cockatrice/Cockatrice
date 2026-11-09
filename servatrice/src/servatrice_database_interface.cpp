@@ -991,6 +991,47 @@ bool Servatrice_DatabaseInterface::isInIgnoreList(const QString &whoseList, cons
     return query->next();
 }
 
+int Servatrice_DatabaseInterface::getUserId(const QString &name)
+{
+    return getUserIdInDB(name);
+}
+
+bool Servatrice_DatabaseInterface::addToBuddyList(int userId, int targetId)
+{
+    return addToList("buddylist", userId, targetId);
+}
+
+bool Servatrice_DatabaseInterface::removeFromBuddyList(int userId, int targetId)
+{
+    return removeFromList("buddylist", userId, targetId);
+}
+
+bool Servatrice_DatabaseInterface::addToIgnoreList(int userId, int targetId)
+{
+    return addToList("ignorelist", userId, targetId);
+}
+
+bool Servatrice_DatabaseInterface::removeFromIgnoreList(int userId, int targetId)
+{
+    return removeFromList("ignorelist", userId, targetId);
+}
+
+bool Servatrice_DatabaseInterface::addToList(const QString &table, int userId, int targetId)
+{
+    QSqlQuery *query = prepareQuery("insert into {prefix}_" + table + " (id_user1, id_user2) values(:id1, :id2)");
+    query->bindValue(":id1", userId);
+    query->bindValue(":id2", targetId);
+    return execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::removeFromList(const QString &table, int userId, int targetId)
+{
+    QSqlQuery *query = prepareQuery("delete from {prefix}_" + table + " where id_user1 = :id1 and id_user2 = :id2");
+    query->bindValue(":id1", userId);
+    query->bindValue(":id2", targetId);
+    return execSqlQuery(query);
+}
+
 ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuery *query, bool complete, bool withId)
 {
     ServerInfo_User result;
