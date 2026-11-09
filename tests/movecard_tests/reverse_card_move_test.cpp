@@ -7,7 +7,7 @@
 #include "libcockatrice/protocol/pb/serverinfo_zone.pb.h"
 #include "server_response_containers.h"
 #include "server_room.h"
-#include "server_test_helpers.h"
+#include "support/server_test_fixture.h"
 
 #include <QList>
 #include <QString>

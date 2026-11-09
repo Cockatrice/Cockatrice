@@ -6,6 +6,9 @@ cockatrice_add_test(
   LIBS
   libcockatrice_network_server_remote
   libcockatrice_rng
+  testsupport_server
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/tests
   LABELS
   server
 )
@@ -18,6 +21,9 @@ cockatrice_add_test(
   LIBS
   libcockatrice_network_server_remote
   libcockatrice_rng
+  testsupport_server
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/tests
   LABELS
   server
 )

@@ -5,7 +5,7 @@
 #include "server_abstractuserinterface.h"
 #include "server_response_containers.h"
 #include "server_room.h"
-#include "server_test_helpers.h"
+#include "support/server_test_fixture.h"
 
 #include <gtest/gtest.h>
 #include <libcockatrice/protocol/pb/game_event_container.pb.h>

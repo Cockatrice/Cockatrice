@@ -5,10 +5,9 @@
 
 #include "libcockatrice/protocol/pb/response.pb.h"
 #include "libcockatrice/protocol/pb/server_message.pb.h"
-#include "server.h"
-#include "server_database_interface.h"
 #include "server_protocolhandler.h"
 #include "server_room.h"
+#include "support/server_test_fixture.h"
 
 #include <QList>
 #include <QObject>
@@ -32,73 +31,6 @@ RNG_Abstract *rng = nullptr; // referenced by the server_remote library
 
 namespace
 {
-
-class MockDatabaseInterface : public Server_DatabaseInterface
-{
-public:
-    struct LogEntry
-    {
-        QString senderName;
-        QString message;
-        LogMessage_TargetType targetType;
-        int targetId;
-        QString targetName;
-        QString channel;
-    };
-    QList<LogEntry> logEntries;
-
-    void logMessage(const int /* senderId */,
-                    const QString &senderName,
-                    const QString & /* senderIp */,
-                    const QString &message,
-                    LogMessage_TargetType targetType,
-                    const int targetId,
-                    const QString &targetName,
-                    const QString &channel = QString()) override
-    {
-        logEntries.append({senderName, message, targetType, targetId, targetName, channel});
-    }
-
-    AuthenticationResult checkUserPassword(Server_ProtocolHandler *,
-                                           const QString &,
-                                           const QString &,
-                                           const QString &,
-                                           QString &,
-                                           int &,
-                                           bool) override
-    {
-        return NotLoggedIn;
-    }
-    int getNextReplayId() override
-    {
-        return 1;
-    }
-    int getNextGameId() override
-    {
-        return 1;
-    }
-    int getActiveUserCount(QString) override
-    {
-        return 0;
-    }
-    ServerInfo_User getUserData(const QString &, bool) override
-    {
-        return ServerInfo_User();
-    }
-};
-
-class FakeServer : public Server
-{
-public:
-    explicit FakeServer(Server_DatabaseInterface *db) : Server()
-    {
-        setDatabaseInterface(db);
-    }
-    void insertRoom(Server_Room *newRoom)
-    {
-        addRoom(newRoom);
-    }
-};
 
 class TestRoomHandler : public Server_ProtocolHandler
 {
@@ -149,8 +81,8 @@ protected:
 class RoomChannelTest : public ::testing::Test
 {
 protected:
-    MockDatabaseInterface db;
-    FakeServer server{&db};
+    FakeServer server;
+    InMemoryServer_DatabaseInterface &db{*server.database()};
     QList<ServerInfo_RoomChannel> catalog;
     Server_Room *room = nullptr;
     TestRoomHandler mod{&server, &db};
@@ -360,7 +292,7 @@ TEST_F(RoomChannelTest, UserBelowRequiredLevelCannotSendToChannel)
     EXPECT_TRUE(channelSayEvents(mod).isEmpty());
     EXPECT_TRUE(channelSayEvents(user).isEmpty());
     bool loggedAsChannel = false;
-    for (const MockDatabaseInterface::LogEntry &entry : db.logEntries) {
+    for (const InMemoryServer_DatabaseInterface::LogEntry &entry : db.logEntries) {
         loggedAsChannel |= entry.targetType == Server_DatabaseInterface::MessageTargetRoomChannel;
     }
     EXPECT_FALSE(loggedAsChannel);
