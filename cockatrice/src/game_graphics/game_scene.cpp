@@ -773,7 +773,7 @@ void GameScene::onCardViewRefreshRequested(CardState *card, bool zoneChanged, Pl
     item->deleteDragItem();
     if (zoneChanged) {
         item->setBeingPointedAt(false);
-        item->setHovered(false);
+        item->setHoverZoomed(false);
     }
     if (newOwner) {
         item->setOwner(newOwner);
@@ -797,9 +797,9 @@ void GameScene::clearArrowsForPlayerLocally(int playerId)
 }
 // ---------- Hover Handling ----------
 
-CardItem *GameScene::getHoveredCard() const
+CardItem *GameScene::getHoverZoomedCard() const
 {
-    return hoveredCard;
+    return hoverZoomedCard;
 }
 
 void GameScene::updateHover(const QPointF &scenePos)
@@ -812,14 +812,14 @@ CardItem *GameScene::pickCardAt(const QPointF &scenePos)
     auto itemList = items(scenePos, Qt::IntersectsItemBoundingRect, Qt::DescendingOrder, getViewTransform());
     CardZone *zone = findTopmostZone(itemList);
     CardItem *topCard = zone ? findTopmostCardInZone(itemList, zone) : nullptr;
-    if (!topCard && hoveredCard) {
-        const QRectF guard = hoveredCard->sceneBoundingRect().adjusted(-8, -8, 8, 8);
+    if (!topCard && hoverZoomedCard) {
+        const QRectF guard = hoverZoomedCard->sceneBoundingRect().adjusted(-8, -8, 8, 8);
         if (guard.contains(scenePos)) {
             // The zoomed card overflows onto neighboring zones, where naive topmost-zone
             // picking attributes the cursor to the zone underneath. While the cursor is
             // still over the zoomed footprint (with hysteresis for edge jiggle), keep it.
             // A genuinely different topmost card still takes over.
-            return hoveredCard;
+            return hoverZoomedCard;
         }
     }
     return topCard;
@@ -833,27 +833,27 @@ void GameScene::updateHoveredCard(CardItem *newCard)
     }
     // The hovered card may have been destroyed without ending the hover: its QPointer
     // nulled itself, but the ancestor lift is still outstanding. Restore it now.
-    if (!hoveredCard && !hoverLiftedAncestors.isEmpty()) {
+    if (!hoverZoomedCard && !hoverLiftedAncestors.isEmpty()) {
         restoreHoverLift();
     }
 
     // Hovering alone never starts anything anymore: the trigger (dwell, click, wheel,
     // shortcut) resolves first, then the zoom follows. This keeps the feature calm.
-    bool wasHoveringCard = (hoveredCard != nullptr);
-    if (hoveredCard && (newCard != hoveredCard)) {
-        endCardHover(hoveredCard);
-        hoveredCard = nullptr;
+    bool wasHoveringCard = (hoverZoomedCard != nullptr);
+    if (hoverZoomedCard && (newCard != hoverZoomedCard)) {
+        endHoverZoom(hoverZoomedCard);
+        hoverZoomedCard = nullptr;
     }
 
     // The hover outline and the card info follow the cursor on contact: only the board
     // zoom and the panel wait for their trigger. A highlight-only card has no zoom to
     // unwind, so it is dropped directly instead of through endCardHover().
-    if (hoverHighlightCard && hoverHighlightCard != newCard) {
-        hoverHighlightCard->setHoverHighlighted(false);
+    if (hoveredCard && hoveredCard != newCard) {
+        hoveredCard->setHovered(false);
     }
-    hoverHighlightCard = newCard;
+    hoveredCard = newCard;
     if (newCard) {
-        newCard->setHoverHighlighted(true);
+        newCard->setHovered(true);
     }
 
     auto &display = SettingsCache::instance().cardsDisplay();
@@ -866,7 +866,7 @@ void GameScene::updateHoveredCard(CardItem *newCard)
         hoverGracePending = false;
         hoverGraceTimer->stop();
 
-        if (newCard == hoveredCard) {
+        if (newCard == hoverZoomedCard) {
             // Steady state: zoom already up. Refresh an open panel, otherwise nothing —
             // in particular this must not re-fire an armed double-confirm.
             if (cardHoverWidget && cardHoverWidget->isVisible() && cardHoverWidget->getCardItem() == newCard) {
@@ -877,8 +877,8 @@ void GameScene::updateHoveredCard(CardItem *newCard)
         if (cardHoverWidget && cardHoverWidget->isVisible() && !cardHoverWidget->isClosing() &&
             cardHoverWidget->getCardItem() == newCard) {
             // Panel open but zoom dropped (e.g. survived a Leave) — zoom back and refresh.
-            beginCardHover(newCard);
-            hoveredCard = newCard;
+            beginHoverZoom(newCard);
+            hoverZoomedCard = newCard;
             cardHoverWidget->refreshDisplay();
             return;
         }
@@ -896,8 +896,8 @@ void GameScene::updateHoveredCard(CardItem *newCard)
         }
         if (doubleConfirm && confirmArmedCard == newCard) {
             // Repeat hover on an armed card: zoom and show at once, no second dwell.
-            beginCardHover(newCard);
-            hoveredCard = newCard;
+            beginHoverZoom(newCard);
+            hoverZoomedCard = newCard;
             confirmArmedCard.clear();
             showCardHoverPopup(newCard);
             return;
@@ -928,9 +928,9 @@ void GameScene::updateHoveredCard(CardItem *newCard)
     }
 }
 
-void GameScene::beginCardHover(CardItem *card)
+void GameScene::beginHoverZoom(CardItem *card)
 {
-    card->setHovered(true);
+    card->setHoverZoomed(true);
     if (auto *zone = SelectZone::findOwningSelectZone(card)) {
         zone->escapeClipForHover(card);
     }
@@ -953,21 +953,21 @@ void GameScene::beginCardHover(CardItem *card)
         ancestor = ancestor->parentItem();
     }
     liftOwner = card;
-    connect(card, &AbstractCardItem::hoverShrinkFinished, this, &GameScene::onHoverShrinkFinished,
+    connect(card, &AbstractCardItem::hoverShrinkFinished, this, &GameScene::onHoverZoomShrinkFinished,
             Qt::UniqueConnection);
-    connect(card, &AbstractCardItem::hoverFootprintChanged, this, &GameScene::onHoverFootprintChanged,
+    connect(card, &AbstractCardItem::hoverFootprintChanged, this, &GameScene::onHoverZoomFootprintChanged,
             Qt::UniqueConnection);
 }
 
-void GameScene::endCardHover(CardItem *card)
+void GameScene::endHoverZoom(CardItem *card)
 {
     // Only the zoom-out starts here: the z-value, the clip escape and the ancestor
     // lift stay put until the shrink finishes (onHoverShrinkFinished), so siblings and
     // the clip container cannot cut through the still-enlarged card.
-    card->setHovered(false);
+    card->setHoverZoomed(false);
 }
 
-void GameScene::onHoverShrinkFinished(AbstractCardItem *card)
+void GameScene::onHoverZoomShrinkFinished(AbstractCardItem *card)
 {
     auto *cardItem = qobject_cast<CardItem *>(card);
     if (!cardItem) {
@@ -984,7 +984,7 @@ void GameScene::onHoverShrinkFinished(AbstractCardItem *card)
     restoreHoverLift();
 }
 
-void GameScene::onHoverFootprintChanged(const QRectF &oldFootprint, const QRectF &newFootprint)
+void GameScene::onHoverZoomFootprintChanged(const QRectF &oldFootprint, const QRectF &newFootprint)
 {
     const QRectF dirty = oldFootprint.united(newFootprint);
     if (dirty.isEmpty()) {
@@ -1126,13 +1126,13 @@ void GameScene::onHoverActivateTimeout()
     const bool panelPhase = display.getHoverPanelTrigger() == CardsDisplaySettings::HoverPanelTriggerHover;
     const bool effectiveDouble =
         display.getHoverPanelDoubleConfirm() && display.getHoverZoomTrigger() == display.getHoverPanelTrigger();
-    if (hoveredCard && hoveredCard != target) {
-        endCardHover(hoveredCard);
+    if (hoverZoomedCard && hoverZoomedCard != target) {
+        endHoverZoom(hoverZoomedCard);
     }
     if (zoomPhase) {
-        if (hoveredCard != target) {
-            beginCardHover(target);
-            hoveredCard = target;
+        if (hoverZoomedCard != target) {
+            beginHoverZoom(target);
+            hoverZoomedCard = target;
         }
         if (effectiveDouble) {
             confirmArmedCard = target;
@@ -1158,7 +1158,7 @@ void GameScene::onHoverPanelTimeout()
     if (!target->sceneBoundingRect().contains(cursorScene)) {
         return;
     }
-    ensureZoomed(target);
+    ensureHoverZoomed(target);
     showCardHoverPopup(target);
 }
 
@@ -1186,14 +1186,14 @@ void GameScene::summonHoverPanel()
     }
 }
 
-void GameScene::ensureZoomed(CardItem *card)
+void GameScene::ensureHoverZoomed(CardItem *card)
 {
-    if (hoveredCard != card) {
-        if (hoveredCard) {
-            endCardHover(hoveredCard);
+    if (hoverZoomedCard != card) {
+        if (hoverZoomedCard) {
+            endHoverZoom(hoverZoomedCard);
         }
-        beginCardHover(card);
-        hoveredCard = card;
+        beginHoverZoom(card);
+        hoverZoomedCard = card;
     }
 }
 
@@ -1225,23 +1225,23 @@ void GameScene::fireTriggers(CardItem *card, bool zoomFired, bool panelFired)
         if (effectiveDouble) {
             if (confirmArmedCard == card) {
                 confirmArmedCard.clear();
-                ensureZoomed(card);
+                ensureHoverZoomed(card);
                 showCardHoverPopup(card);
             } else {
                 confirmArmedCard = card;
-                ensureZoomed(card);
+                ensureHoverZoomed(card);
             }
         } else {
-            ensureZoomed(card);
+            ensureHoverZoomed(card);
             showCardHoverPopup(card);
         }
         return;
     }
     if (zoomFired) {
-        ensureZoomed(card);
+        ensureHoverZoomed(card);
     }
     if (panelFired) {
-        ensureZoomed(card);
+        ensureHoverZoomed(card);
         showCardHoverPopup(card);
     }
 }
@@ -1254,7 +1254,7 @@ void GameScene::onHoverWidgetEntered()
 
 void GameScene::onHoverWidgetLeft()
 {
-    if (!hoveredCard && cardHoverWidget && cardHoverWidget->isVisible() && !hoverGracePending) {
+    if (!hoverZoomedCard && cardHoverWidget && cardHoverWidget->isVisible() && !hoverGracePending) {
         hoverGracePending = true;
         hoverGraceTimer->start();
     }
@@ -1440,14 +1440,14 @@ bool GameScene::event(QEvent *event)
                                     ? wheelEvent->pixelDelta().y()
                                     : (wheelEvent->orientation() == Qt::Vertical ? wheelEvent->delta() : 0);
             if (wheelUp > 0) {
-                if ((cardHoverWidget && cardHoverWidget->isVisible()) || hoveredCard) {
+                if ((cardHoverWidget && cardHoverWidget->isVisible()) || hoverZoomedCard) {
                     hoverPopupTarget = nullptr;
                     hoverPanelTarget = nullptr;
                     confirmArmedCard.clear();
                     hideCardHoverPopup();
-                    if (hoveredCard) {
-                        endCardHover(hoveredCard);
-                        hoveredCard = nullptr;
+                    if (hoverZoomedCard) {
+                        endHoverZoom(hoverZoomedCard);
+                        hoverZoomedCard = nullptr;
                     }
                     event->accept();
                     return true;

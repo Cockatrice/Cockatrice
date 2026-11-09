@@ -460,7 +460,7 @@ void CardHoverWidget::createPTOverlay()
     ptPillLabel->clear();
     ptOverlay->resize(ptCompactSize);
 
-    // The whole subtree feeds the hover state: moving onto a button must not read as a leave.
+    // The whole subtree feeds the hover zoom state: moving onto a button must not read as a leave.
     ptOverlay->installEventFilter(this);
     const QList<QWidget *> ptChildren = ptOverlay->findChildren<QWidget *>();
     for (QWidget *child : ptChildren) {

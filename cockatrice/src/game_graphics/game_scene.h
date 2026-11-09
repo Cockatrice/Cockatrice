@@ -78,11 +78,9 @@ private:
     ArrowRegistry arrowRegistry;                        ///< ID registry for arrow graphics items
     QList<ZoneViewWidget *> zoneViews;                  ///< Active zone view widgets
     QSize viewSize;                                     ///< Current view size
-    QPointer<CardItem> hoveredCard;                     ///< Currently hovered card (zoomed)
-    /// Card the cursor is resting on. It carries the hover outline and the card-info
-    /// update immediately, independently of the zoom/panel triggers.
-    QPointer<CardItem> hoverHighlightCard;
-    QPointer<CardItem> activeCard; ///< Card the currently open context menu targets
+    QPointer<CardItem> hoveredCard;                     ///< Card the cursor is resting on
+    QPointer<CardItem> hoverZoomedCard;                 ///< Card that is currently being hover zoomed
+    QPointer<CardItem> activeCard;                      ///< Card the currently open context menu targets
     /// Card armed for double-confirm panel summon (first trigger zooms, repeat shows).
     QPointer<CardItem> confirmArmedCard;
     /// Ancestor chain of the hovered card with pre-hover Z-values. Lifted while hovering
@@ -120,16 +118,16 @@ private:
     void updateHover(const QPointF &scenePos);
 
     /**
-     * @brief Activates hover state and escapes the card from its clip container
+     * @brief Activates hover zoom state and escapes the card from its clip container
      * so hover scaling is visible beyond zone bounds.
      */
-    void beginCardHover(CardItem *card);
-    /** @brief Deactivates hover state and restores the card to its clip container. */
-    void endCardHover(CardItem *card);
+    void beginHoverZoom(CardItem *card);
+    /** @brief Deactivates hover zoom state and restores the card to its clip container. */
+    void endHoverZoom(CardItem *card);
     /** @brief Restores every lifted ancestor to its pre-hover Z-value and drops the chain. */
     void restoreHoverLift();
     /** @brief Settles a finished shrink-out: clip container and ancestor lift restore. */
-    void onHoverShrinkFinished(AbstractCardItem *card);
+    void onHoverZoomShrinkFinished(AbstractCardItem *card);
     /**
      * @brief Repaints the zones that dodge the zoomed card when its footprint moves.
      *
@@ -137,7 +135,7 @@ private:
      * item's geometry change does not dirty them, so without this the previous hole stays
      * transparent in the cache and a black rectangle shows under the zoom.
      */
-    void onHoverFootprintChanged(const QRectF &oldFootprint, const QRectF &newFootprint);
+    void onHoverZoomFootprintChanged(const QRectF &oldFootprint, const QRectF &newFootprint);
 
     // Card hover popup methods
     void showCardHoverPopup(CardItem *card);
@@ -284,10 +282,10 @@ public:
     void fireTriggers(CardItem *card, bool zoomFired, bool panelFired);
 
     /** @brief Starts the hover zoom for a card without touching panel state. */
-    void ensureZoomed(CardItem *card);
+    void ensureHoverZoomed(CardItem *card);
 
-    /** @brief The currently hovered card, if any (used by zones to dodge it while painting). */
-    CardItem *getHoveredCard() const;
+    /** @brief The currently hover zoomed card, if any (used by zones to dodge it while painting). */
+    CardItem *getHoverZoomedCard() const;
 
     /**
      * @brief Registers an item for animation updates with the shared scene timer.
