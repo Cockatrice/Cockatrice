@@ -33,6 +33,7 @@
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/layouts_settings.h>
+#include <libcockatrice/utility/card_ref.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <qnamespace.h>
 
@@ -285,7 +286,8 @@ TokenInfo DlgCreateToken::tokenDraft() const
 
     // Match the normalization applied when the player creates the token, so
     // manually typed aliases and the default P/T preview the actual result.
-    const ExactCard correctedCard = CardDatabaseManager::query()->guessCard({token.name, token.providerId});
+    const ExactCard correctedCard =
+        CardDatabaseManager::query()->guessCard(CardRef{.name = token.name, .providerId = token.providerId});
     if (correctedCard) {
         token.name = correctedCard.getName();
         if (token.pt.isEmpty()) {
