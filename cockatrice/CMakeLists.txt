@@ -599,9 +599,12 @@ target_link_libraries(
 cockatrice_target_enable_crash_reporting(cockatrice)
 
 if(WITH_GUI_TEST)
-  # These two translate between XML test files and the QtTesting event pipeline;
-  # they need the QtTesting headers, so they only exist with the harness.
-  target_sources(cockatrice PRIVATE src/game_graphics/pq_cockatrice_event_player.cpp src/interface/recording.cpp)
+  # QtTesting integration and the Cockatrice-specific playback commands. They
+  # need the QtTesting headers, so they only exist with the harness.
+  target_sources(
+    cockatrice PRIVATE src/game_graphics/pq_cockatrice_event_player.cpp src/interface/pq_widget_test_event_player.cpp
+                       src/interface/recording.cpp
+  )
   target_link_libraries(cockatrice PRIVATE QtTesting)
   target_compile_definitions(cockatrice PRIVATE WITH_GUI_TEST)
 endif()

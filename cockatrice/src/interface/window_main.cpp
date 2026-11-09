@@ -62,6 +62,7 @@
 #include "pqEventSource.h"
 #include "pqEventTypes.h"
 #include "pqTestUtility.h"
+#include "pq_widget_test_event_player.h"
 #include "recording.h"
 #endif
 
@@ -692,6 +693,7 @@ MainWindow::MainWindow(QWidget *parent)
     testUtility->addEventObserver("xml", new XMLEventObserver(this));
     testUtility->addEventSource("xml", new XMLEventSource(this));
     testUtility->eventPlayer()->addWidgetEventPlayer(new pqCockatriceEventPlayer(this));
+    testUtility->eventPlayer()->addWidgetEventPlayer(new pqWidgetTestEventPlayer(this));
 #endif
 }
 
