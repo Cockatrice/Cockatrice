@@ -171,6 +171,11 @@ endfunction()
 
 # --- Unit tests ------------------------------------------------------------------
 
+# Test-only server double and fixture, shared by the server tests. Built, never installed.
+add_library(testsupport_server STATIC support/server_test_fixture.cpp)
+target_link_libraries(testsupport_server PUBLIC libcockatrice_network_server_remote)
+target_include_directories(testsupport_server PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 cockatrice_add_test(NAME image_request_queue_test SOURCES image_request_queue_test.cpp)
 cockatrice_add_test(NAME image_redirect_chain_test SOURCES image_redirect_chain_test.cpp)
 cockatrice_add_test(NAME expression_test SOURCES expression_test.cpp LIBS libcockatrice_utility)
@@ -377,6 +382,9 @@ cockatrice_add_test(
   LIBS
   libcockatrice_network_server_remote
   libcockatrice_rng
+  testsupport_server
+  INCLUDE_DIRS
+  ${CMAKE_CURRENT_SOURCE_DIR}
   LABELS
   server
 )
