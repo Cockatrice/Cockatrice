@@ -428,6 +428,19 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  private_chat_paging_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/servatrice/src/private_chat_paging.cpp
+  private_chat_paging_test.cpp
+  LIBS
+  libcockatrice_protocol
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/servatrice/src
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
   latency_tracker_test
   SOURCES
   ${VERSION_STRING_CPP}

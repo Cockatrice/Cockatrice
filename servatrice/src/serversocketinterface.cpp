@@ -1735,7 +1735,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetPrivateChatHistory(c
     const int limit = qBound<quint32>(1, cmd.limit(), 200);
     QList<ServerInfo_PrivateChatMessage> messages;
     bool hasMore = false;
-    if (!sqlInterface->getPrivateChatHistory(userInfo->id(), peerId, cmd.before(), limit, messages, hasMore)) {
+    if (!sqlInterface->getPrivateChatHistory(userInfo->id(), QString::fromStdString(userInfo->name()), peerId, peer,
+                                             cmd.before(), limit, messages, hasMore)) {
         return Response::RespInternalError;
     }
 

@@ -226,7 +226,9 @@ public:
                                                        bool *hasMore = nullptr);
     QList<ServerInfo_UserSession> getUserSessions(const QString &userName, int limit);
     bool getPrivateChatHistory(int callerId,
+                               const QString &callerName,
                                int peerId,
+                               const QString &peerName,
                                quint64 before,
                                int limit,
                                QList<ServerInfo_PrivateChatMessage> &messages,
