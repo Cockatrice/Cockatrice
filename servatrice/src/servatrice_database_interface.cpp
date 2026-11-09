@@ -1896,7 +1896,7 @@ void Servatrice_DatabaseInterface::updateUsersLastLoginData(const QString &userN
     }
 }
 
-QList<ServerInfo_Ban> Servatrice_DatabaseInterface::getUserBanHistory(const QString userName)
+QList<ServerInfo_Ban> Servatrice_DatabaseInterface::getUserBanHistory(const QString &userName)
 {
     QList<ServerInfo_Ban> results;
     ServerInfo_Ban banDetails;
@@ -1954,7 +1954,7 @@ bool Servatrice_DatabaseInterface::addWarning(const QString userName,
     return true;
 }
 
-QList<ServerInfo_Warning> Servatrice_DatabaseInterface::getUserWarnHistory(const QString userName)
+QList<ServerInfo_Warning> Servatrice_DatabaseInterface::getUserWarnHistory(const QString &userName)
 {
     QList<ServerInfo_Warning> results;
     ServerInfo_Warning warnDetails;

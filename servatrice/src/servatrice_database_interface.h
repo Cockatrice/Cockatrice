@@ -91,7 +91,7 @@ public:
                       const QString &userName,
                       const QString &password);
     bool openDatabase();
-    bool checkSql();
+    bool checkSql() override;
     QSqlQuery *prepareQuery(const QString &queryText);
     bool execSqlQuery(QSqlQuery *query);
     const QSqlDatabase &getDatabase()
@@ -214,10 +214,10 @@ public:
                             const QString &newPassword,
                             bool newPasswordNeedsHash) override;
     void setForcePasswordChange(const QString &user, bool force) override;
-    QList<ServerInfo_Ban> getUserBanHistory(const QString userName);
+    QList<ServerInfo_Ban> getUserBanHistory(const QString &userName) override;
     bool
     addWarning(const QString userName, const QString adminName, const QString warningReason, const QString clientID);
-    QList<ServerInfo_Warning> getUserWarnHistory(const QString userName);
+    QList<ServerInfo_Warning> getUserWarnHistory(const QString &userName) override;
     QList<ServerInfo_ChatMessage> getMessageLogHistory(const QString &user,
                                                        const QString &ipaddress,
                                                        const QString &gamename,
@@ -231,7 +231,7 @@ public:
                                                        int offset = 0,
                                                        const QString &beforeTime = QString(),
                                                        bool *hasMore = nullptr);
-    QList<ServerInfo_UserSession> getUserSessions(const QString &userName, int limit);
+    QList<ServerInfo_UserSession> getUserSessions(const QString &userName, int limit) override;
     bool getPrivateChatHistory(int callerId,
                                const QString &callerName,
                                int peerId,
@@ -245,8 +245,8 @@ public:
                                           bool useEmail = true,
                                           bool useClientId = true,
                                           bool useIp = true,
-                                          int sessionMonths = 6);
-    QList<ServerInfo_ModeratorLogin> getModeratorLastLogins();
+                                          int sessionMonths = 6) override;
+    QList<ServerInfo_ModeratorLogin> getModeratorLastLogins() override;
 
     // Uptime snapshot as recorded by Servatrice::statusUpdate() into the
     // {prefix}_uptime table. valid is false when no snapshot exists yet.

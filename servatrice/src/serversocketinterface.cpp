@@ -1857,7 +1857,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetBanHistory(const Com
     QString userName = nameFromStdString(cmd.user_name());
 
     Response_BanHistory *re = new Response_BanHistory;
-    QListIterator<ServerInfo_Ban> banIterator(sqlInterface->getUserBanHistory(userName));
+    QListIterator<ServerInfo_Ban> banIterator(databaseInterface->getUserBanHistory(userName));
     while (banIterator.hasNext()) {
         re->add_ban_list()->CopyFrom(banIterator.next());
     }
@@ -1889,7 +1889,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetWarnHistory(const Co
     QString userName = nameFromStdString(cmd.user_name());
 
     Response_WarnHistory *re = new Response_WarnHistory;
-    QListIterator<ServerInfo_Warning> warnIterator(sqlInterface->getUserWarnHistory(userName));
+    QListIterator<ServerInfo_Warning> warnIterator(databaseInterface->getUserWarnHistory(userName));
     while (warnIterator.hasNext()) {
         re->add_warn_list()->CopyFrom(warnIterator.next());
     }
@@ -2605,7 +2605,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportStats(const Comma
 Response::ResponseCode AbstractServerSocketInterface::cmdGetUserSessions(const Command_GetUserSessions &cmd,
                                                                          ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
@@ -2616,7 +2616,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetUserSessions(const C
 
     Response_UserSessions *re = new Response_UserSessions;
     const int limit = qMin(static_cast<int>(cmd.limit()), 500);
-    const QList<ServerInfo_UserSession> sessions = sqlInterface->getUserSessions(userName, limit);
+    const QList<ServerInfo_UserSession> sessions = databaseInterface->getUserSessions(userName, limit);
     for (const ServerInfo_UserSession &session : sessions) {
         re->add_sessions()->CopyFrom(session);
     }
@@ -2627,7 +2627,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetUserSessions(const C
 Response::ResponseCode AbstractServerSocketInterface::cmdGetUserAlts(const Command_GetUserAlts &cmd,
                                                                      ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
@@ -2639,7 +2639,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetUserAlts(const Comma
     Response_UserAlts *re = new Response_UserAlts;
     const int depth = cmd.has_depth() ? static_cast<int>(cmd.depth()) : 1;
     const int sessionMonths = cmd.has_session_months() ? static_cast<int>(cmd.session_months()) : 6;
-    const QList<ServerInfo_UserAlt> alts = sqlInterface->getUserAlts(
+    const QList<ServerInfo_UserAlt> alts = databaseInterface->getUserAlts(
         userName, depth, cmd.include_email(), cmd.include_clientid(), cmd.include_ip(), sessionMonths);
     for (const ServerInfo_UserAlt &alt : alts) {
         re->add_alts()->CopyFrom(alt);
@@ -2651,12 +2651,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetUserAlts(const Comma
 Response::ResponseCode AbstractServerSocketInterface::cmdGetModeratorLastLogins(const Command_GetModeratorLastLogins &,
                                                                                 ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
     Response_ModeratorLastLogins *re = new Response_ModeratorLastLogins;
-    const QList<ServerInfo_ModeratorLogin> logins = sqlInterface->getModeratorLastLogins();
+    const QList<ServerInfo_ModeratorLogin> logins = databaseInterface->getModeratorLastLogins();
     for (const ServerInfo_ModeratorLogin &login : logins) {
         re->add_logins()->CopyFrom(login);
     }
