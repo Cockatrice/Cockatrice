@@ -1,0 +1,19 @@
+syntax = "proto2";
+import "response.proto";
+
+message DeckVersionInfo {
+    optional uint32 version_no = 1;
+    optional uint64 created_at = 2;
+    optional string created_by_clientid = 3;
+    optional string hash = 4;
+    // Full deck content in native format, so the client can diff and
+    // restore without further round trips.
+    optional string content = 5;
+}
+
+message Response_DeckHistoryList {
+    extend Response {
+        optional Response_DeckHistoryList ext = 1108;
+    }
+    repeated DeckVersionInfo versions = 1;
+}
