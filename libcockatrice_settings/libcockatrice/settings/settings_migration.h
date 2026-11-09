@@ -19,6 +19,15 @@ public:
     static bool migrateGameFiltersToCamelCase(const QString &settingsPath);
 
     /**
+     * Moves a non-default appearance/maxFontSize value into each user-writable theme
+     * directory lacking an explicit CardText max (creating/merging fonts.toml, never
+     * overwriting an explicit max), then deletes the legacy key. Default (12) or absent
+     * values only delete the key and create no files, since the ThemeManager fallback
+     * already covers them. Idempotent, safe to run on every startup.
+     */
+    static bool migrateAppearanceMaxFontSizeToTheme(const QString &settingsPath);
+
+    /**
      * Returns true when at least one of the two migrations would still do work, i.e. when a
      * backup of the settings directory is worth taking before they run.
      */

@@ -24,8 +24,6 @@ public:
     void setThemeName(const QString &_themeName);
     [[nodiscard]] bool getStyleUserList() const;
     void setStyleUserList(bool _styleUserList);
-    [[nodiscard]] int getMaxFontSize() const;
-    void setMaxFontSize(int _max);
     [[nodiscard]] QString getHomeTabBackgroundSource() const;
     void setHomeTabBackgroundSource(const QString &_backgroundSource);
     [[nodiscard]] int getHomeTabBackgroundShuffleFrequency() const;

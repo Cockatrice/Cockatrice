@@ -53,6 +53,10 @@ static const QColor PLAYERZONE_BG_DEFAULT = QColor(200, 200, 200);
 static const QColor STACKZONE_BG_DEFAULT = QColor(113, 43, 43);
 static const QStringList DEFAULT_RESOURCE_PATHS = {":/resources"};
 
+// Defined below; forward-declared because isDarkMode() resolves the shipped
+// theme directory needed for the theme.cfg fallback.
+static QString systemThemesBasePath();
+
 struct PaletteColorInfo
 {
     QPalette::ColorGroup group;
@@ -236,7 +240,15 @@ void ThemeManager::ensureThemeDirectoryExists()
 
 bool ThemeManager::isDarkMode(const QString &themeDirPath) const
 {
-    ThemeConfig themeConfig = ThemeConfig::fromThemeDir(themeDirPath);
+    // The theme directory is always named after the theme, so the shipped
+    // fallback for a user directory that carries no theme.cfg is the same-named
+    // directory under the system themes base path — mirroring the font and
+    // palette fallbacks. A resolved directory that does not exist yet is a stock
+    // theme (getAvailableThemes() maps System/Fusion to a user path that
+    // writableThemeDir() only creates on save), so it keeps following the OS
+    // instead of inheriting a shipped ColorScheme such as Dark.
+    const QString systemThemeDir = QDir(systemThemesBasePath()).absoluteFilePath(QFileInfo(themeDirPath).fileName());
+    const ThemeConfig themeConfig = loadColorSchemeConfig(themeDirPath, systemThemeDir);
     if (themeConfig.colorScheme.compare("Dark", Qt::CaseInsensitive) == 0) {
         return true;
     } else if (themeConfig.colorScheme.compare("Light", Qt::CaseInsensitive) == 0) {
@@ -402,6 +414,60 @@ bool ThemeManager::saveGlobalConfig(const QString &themeDirPath, const ThemeConf
     return cfg.save(themeDirPath);
 }
 
+ThemeConfig ThemeManager::loadDefaultThemeConfig(const QString &themeDirPath, const QString &systemThemeDirPath)
+{
+    if (themeDirPath.isEmpty()) {
+        return {};
+    }
+
+    // The shipped theme.cfg may live in the system theme directory rather than
+    // the resolved (user) directory. A user directory that only holds a seeded
+    // fonts.toml (or a saved palette) must still inherit the shipped style and
+    // colour scheme instead of shadowing them with an empty config.
+    if (QFileInfo::exists(QDir(themeDirPath).absoluteFilePath("theme.cfg"))) {
+        return ThemeConfig::fromThemeDir(themeDirPath);
+    }
+    return ThemeConfig::fromThemeDir(systemThemeDirPath);
+}
+
+ThemeConfig ThemeManager::loadColorSchemeConfig(const QString &themeDirPath, const QString &systemThemeDirPath)
+{
+    // Only an existing user directory is layered on the shipped theme: it can
+    // hold seeded files (fonts.toml, a saved palette) without a theme.cfg of its
+    // own, so it inherits the shipped style and colour scheme. A directory that
+    // does not exist yet means the user has never customised this theme, and
+    // inheriting a shipped Dark scheme there would override the OS preference on
+    // a fresh profile.
+    if (themeDirPath.isEmpty() || !QFileInfo(themeDirPath).isDir()) {
+        return {};
+    }
+    return loadDefaultThemeConfig(themeDirPath, systemThemeDirPath);
+}
+
+QString ThemeManager::themeStyleSheetPath(const QString &themeDirPath, const QString &systemThemeDirPath, bool dark)
+{
+    const QString schemeCss = QFileInfo(QStringLiteral(STYLE_CSS_NAME)).completeBaseName() + QLatin1Char('-') +
+                              (dark ? QStringLiteral("dark") : QStringLiteral("light")) + QStringLiteral(".css");
+
+    // Scheme-qualified stylesheet first, plain style.css as the super fallback,
+    // both inside the resolved (user) directory before the shipped one. A user
+    // directory holding only fonts.toml therefore keeps the shipped styling.
+    const QStringList candidateDirs = {themeDirPath, systemThemeDirPath};
+    const QStringList candidateNames = {schemeCss, QString(STYLE_CSS_NAME)};
+    for (const QString &dirPath : candidateDirs) {
+        if (dirPath.isEmpty()) {
+            continue;
+        }
+        for (const QString &name : candidateNames) {
+            const QString path = QDir(dirPath).absoluteFilePath(name);
+            if (QFileInfo::exists(path)) {
+                return path;
+            }
+        }
+    }
+    return {};
+}
+
 PaletteConfig ThemeManager::loadPaletteConfig(const QString &themeDirPath, const QString &colorScheme)
 {
     if (themeDirPath.isEmpty()) {
@@ -528,7 +594,10 @@ void ThemeManager::previewPalette(const PaletteConfig &cfg, const QString &schem
 {
     const QString themeName = SettingsCache::instance().getThemeName();
     const QString dirPath = getAvailableThemes().value(themeName);
-    const ThemeConfig themeCfg = ThemeConfig::fromThemeDir(dirPath);
+    // Same shipped fallback as themeChangedSlot(): a user directory that only
+    // holds seeded files must not preview the theme with its style reset.
+    const QString sysPath = QDir(systemThemesBasePath()).absoluteFilePath(themeName);
+    const ThemeConfig themeCfg = loadDefaultThemeConfig(dirPath, sysPath);
     applyStyleAndPalette(themeName, themeCfg, cfg, scheme);
 }
 
@@ -732,6 +801,7 @@ QFont ThemeManager::cardTextFont() const
     }
     QFont serifFont(QStringLiteral("Serif"));
     serifFont.setStyleHint(QFont::Serif);
+    serifFont.setPointSize(12);
     return serifFont;
 }
 
@@ -753,37 +823,44 @@ QFont ThemeManager::defaultAppFont(AppFont::Role /*role*/) const
     return defaultFont;
 }
 
+int ThemeManager::cardTextMaxSize() const
+{
+    // Resolved through FontConfig so the board and the font editor share one
+    // representable range: a stored size the editor cannot show (e.g. a migrated
+    // appearance/maxFontSize of 100) renders at the editor's maximum instead of
+    // at a size the next save would silently rewrite.
+    return currentFonts.resolvedCardTextMaxSize();
+}
+
+int ThemeManager::cardTextMinSize() const
+{
+    return currentFonts.resolvedCardTextMinSize();
+}
+
 void ThemeManager::themeChangedSlot()
 {
     QString themeName = SettingsCache::instance().getThemeName();
     QString dirPath = getAvailableThemes().value(themeName);
     currentThemePath = dirPath;
     QDir dir(dirPath);
+    const QString sysPath = QDir(systemThemesBasePath()).absoluteFilePath(themeName);
 
     // CSS — prefer the scheme-qualified stylesheet (style-dark.css /
     // style-light.css) when present, else the plain style.css as fallback.
-    if (!dirPath.isEmpty()) {
-        const QString scheme = isDarkMode(dirPath) ? QStringLiteral("dark") : QStringLiteral("light");
-        const QString schemeCss = QFileInfo(QStringLiteral(STYLE_CSS_NAME)).completeBaseName() + QLatin1Char('-') +
-                                  scheme + QStringLiteral(".css");
-        if (dir.exists(schemeCss)) {
-            qApp->setStyleSheet("file:///" + dir.absoluteFilePath(schemeCss));
-        } else if (dir.exists(STYLE_CSS_NAME)) {
-            qApp->setStyleSheet("file:///" + dir.absoluteFilePath(STYLE_CSS_NAME));
-        } else {
-            qApp->setStyleSheet("");
-        }
-    } else {
-        qApp->setStyleSheet("");
-    }
+    // A user theme directory that only carries seeded files falls back to the
+    // shipped stylesheet of the same theme.
+    const bool darkMode = isDarkMode(dirPath);
+    const QString styleSheetPath = themeStyleSheetPath(dirPath, sysPath, darkMode);
+    qApp->setStyleSheet(styleSheetPath.isEmpty() ? QString() : "file:///" + styleSheetPath);
 
-    // load theme.cfg for style + scheme preference
-    ThemeConfig themeCfg = ThemeConfig::fromThemeDir(dirPath);
+    // load theme.cfg for style + scheme preference, falling back to the shipped
+    // theme directory when the user copy does not carry one
+    ThemeConfig themeCfg = loadDefaultThemeConfig(dirPath, sysPath);
 
     // Resolve active scheme:
     // theme.cfg says Dark/Light → use that
     // theme.cfg says System or is absent → follow the OS
-    QString activeScheme = isDarkMode(dirPath) ? "Dark" : "Light";
+    QString activeScheme = darkMode ? "Dark" : "Light";
 
     // ── Load palette: custom first, then theme default ────────────────────
     PaletteConfig palette = PaletteConfig::fromScheme(dirPath, activeScheme);
@@ -826,7 +903,6 @@ void ThemeManager::themeChangedSlot()
     // include the system theme dir as a fallback so shipped assets like
     // zones/*.png and style.css still resolve for themes that ship only
     // those files (e.g. Leather, Plasma, Fabric, VelvetMarble).
-    const QString sysPath = QDir(systemThemesBasePath()).absoluteFilePath(themeName);
     if (sysPath != dirPath && QDir(sysPath).exists()) {
         resources << sysPath;
     }

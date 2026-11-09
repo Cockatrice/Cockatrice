@@ -11,6 +11,7 @@
 #include <QPair>
 #include <QStringLiteral>
 #include <QTextStream>
+#include <algorithm>
 #include <qnamespace.h>
 #include <utility>
 
@@ -309,7 +310,28 @@ QPalette PaletteConfig::apply(QPalette base) const
 
 bool FontConfig::hasFonts() const
 {
-    return !fonts.isEmpty();
+    return !fonts.isEmpty() || cardTextMinSize != CARD_TEXT_MIN_SIZE || cardTextMaxSize > 0;
+}
+
+int FontConfig::resolvedCardTextMinSize() const
+{
+    const int size = cardTextMinSize > 0 ? cardTextMinSize : CARD_TEXT_MIN_SIZE;
+    return std::clamp(size, CARD_TEXT_MIN_SIZE, MAX_FONT_SIZE);
+}
+
+int FontConfig::resolvedCardTextMaxSize() const
+{
+    int size = cardTextMaxSize;
+    if (size <= 0) {
+        const auto it = fonts.constFind(AppFont::CardText);
+        size = it != fonts.constEnd() ? it.value().pointSize() : 0;
+    }
+    if (size <= 0) {
+        size = DEFAULT_CARD_TEXT_SIZE;
+    }
+    // Mirror the editor's resolution: clamp the max into its control range, then
+    // raise it to the (already clamped) min so the pair stays consistent.
+    return std::max(resolvedCardTextMinSize(), std::clamp(size, MIN_FONT_SIZE, MAX_FONT_SIZE));
 }
 
 QString FontConfig::toToml() const
@@ -333,6 +355,14 @@ QString FontConfig::toToml() const
         }
 
         entries += QString("%1 = \"%2, %3\"\n").arg(QString(roleName), -20).arg(family).arg(pointSize);
+    }
+
+    if (cardTextMinSize != CARD_TEXT_MIN_SIZE) {
+        entries += QString("%1 = %2\n").arg(QStringLiteral("CardTextMinSize"), -20).arg(cardTextMinSize);
+    }
+
+    if (cardTextMaxSize > 0) {
+        entries += QString("%1 = %2\n").arg(QStringLiteral("CardTextMaxSize"), -20).arg(cardTextMaxSize);
     }
 
     if (entries.isEmpty()) {
@@ -400,6 +430,31 @@ FontConfig FontConfig::fromFile(const QString &filePath)
         if (value.size() >= 2 &&
             ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith('\'') && value.endsWith('\'')))) {
             value = value.mid(1, value.size() - 2).trimmed();
+        }
+
+        // CardText size bounds: bare integers, e.g. CardTextMinSize = 2.
+        // Tolerate quoting like the family entries; skip invalid lines.
+        QString sizeKey = key;
+        if (sizeKey.startsWith("AppFont::")) {
+            sizeKey = sizeKey.mid(QStringLiteral("AppFont::").size());
+        }
+        if (sizeKey.compare("CardTextMinSize", Qt::CaseInsensitive) == 0) {
+            bool ok = false;
+            int minSize = value.trimmed().toInt(&ok);
+            if (!ok || minSize <= 0) {
+                continue;
+            }
+            cfg.cardTextMinSize = minSize;
+            continue;
+        }
+        if (sizeKey.compare("CardTextMaxSize", Qt::CaseInsensitive) == 0) {
+            bool ok = false;
+            int maxSize = value.trimmed().toInt(&ok);
+            if (!ok || maxSize <= 0) {
+                continue;
+            }
+            cfg.cardTextMaxSize = maxSize;
+            continue;
         }
 
         int comma = value.lastIndexOf(',');

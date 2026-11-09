@@ -128,15 +128,41 @@ struct PaletteConfig
  * @code
  * [Fonts]
  * InterfaceDefault = "Inter, 10"
+ * CardText = "Noto Serif, 12"
+ * CardTextMinSize = 1
  * @endcode
+ * CardText stores family + MAX size; cardTextMinSize stores the overlay
+ * shrink-to-fit floor (omitted from TOML when 1).
  */
 struct FontConfig
 {
+    /// Point-size range the theme font editor can represent. CardText is
+    /// resolved through the same bounds where it is rendered, so the board never
+    /// draws a size the editor cannot show and would clamp away on save.
+    static constexpr int MIN_FONT_SIZE = 6;
+    static constexpr int MAX_FONT_SIZE = 72;
+    /// CardText shrink-to-fit floor, editable below the general font floor.
+    static constexpr int CARD_TEXT_MIN_SIZE = 1;
+    /// CardText size when neither CardTextMaxSize nor a CardText family is set.
+    static constexpr int DEFAULT_CARD_TEXT_SIZE = 12;
+
     QMap<AppFont::Role, QFont> fonts;
+    int cardTextMinSize = CARD_TEXT_MIN_SIZE;
+    /// Optional size-only maximum for CardText, used by the retired maxFontSize
+    /// migration so seeding it does not have to pin a family.
+    int cardTextMaxSize = 0;
+
+    /// CardText min/max resolved to what the font editor shows and a save would
+    /// write: the stored values (max falling back to the CardText point size,
+    /// then the default) clamped into the representable range. A seeded legacy
+    /// size above the editor's maximum therefore renders at that maximum instead
+    /// of at a size the editor would silently rewrite.
+    int resolvedCardTextMinSize() const;
+    int resolvedCardTextMaxSize() const;
 
     bool operator==(const FontConfig &rhs) const
     {
-        return fonts == rhs.fonts;
+        return fonts == rhs.fonts && cardTextMinSize == rhs.cardTextMinSize && cardTextMaxSize == rhs.cardTextMaxSize;
     }
     bool operator!=(const FontConfig &rhs) const
     {
