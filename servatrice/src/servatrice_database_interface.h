@@ -162,6 +162,12 @@ public:
     ReplayAccessResult getReplayData(int replayId, int userId, QByteArray &data) override;
     ReplayWriteResult setReplayDoNotHide(int gameId, int userId, bool doNotHide) override;
     ReplayWriteResult deleteReplayAccess(int gameId, int userId) override;
+    ReplayAccessResult checkReplayAccess(int gameId, int userId) override;
+    ReplayAccessResult getReplayName(int gameId, QString &replayName) override;
+    bool getReplayHashSource(int gameId, QByteArray &source) override;
+    bool addReplayAccess(int gameId, int userId, const QString &replayName) override;
+    ReplayAccessResult getLatestReplayForGame(int gameId, int &replayId, QByteArray &data) override;
+    ReplayWriteResult grantReplayAccessByName(int gameId, const QString &userName) override;
     /** @brief Deletes all expired share bundles (cascades to their items). */
     void cleanupExpiredDeckShares();
 

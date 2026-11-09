@@ -361,6 +361,36 @@ public:
     {
         return ReplayWriteResult::Failed;
     }
+    /** @brief Checks whether a user has an access row for a match's replays. */
+    virtual ReplayAccessResult checkReplayAccess(int /* gameId */, int /* userId */)
+    {
+        return ReplayAccessResult::Failed;
+    }
+    /** @brief Reads the stored name of a match's replay access row. */
+    virtual ReplayAccessResult getReplayName(int /* gameId */, QString & /* replayName */)
+    {
+        return ReplayAccessResult::Failed;
+    }
+    /** @brief Copies the leading bytes of a match's replay files, the input of its share code. */
+    virtual bool getReplayHashSource(int /* gameId */, QByteArray & /* source */)
+    {
+        return false;
+    }
+    /** @brief Grants one user access to a match's replays. */
+    virtual bool addReplayAccess(int /* gameId */, int /* userId */, const QString & /* replayName */)
+    {
+        return false;
+    }
+    /** @brief Fetches the newest replay file of a game for a download-by-game request. */
+    virtual ReplayAccessResult getLatestReplayForGame(int /* gameId */, int & /* replayId */, QByteArray & /* data */)
+    {
+        return ReplayAccessResult::Failed;
+    }
+    /** @brief Grants a user, resolved by name, access to an existing match's replays. */
+    virtual ReplayWriteResult grantReplayAccessByName(int /* gameId */, const QString & /* userName */)
+    {
+        return ReplayWriteResult::Failed;
+    }
     /** @brief Append a moderator/admin action to the server audit log. */
     virtual void addAuditRecord(const QString & /* user */,
                                 const QString & /* ipaddress */,

@@ -1939,6 +1939,105 @@ Server_DatabaseInterface::ReplayWriteResult Servatrice_DatabaseInterface::delete
     return query->numRowsAffected() > 0 ? ReplayWriteResult::Ok : ReplayWriteResult::NotFound;
 }
 
+Server_DatabaseInterface::ReplayAccessResult Servatrice_DatabaseInterface::checkReplayAccess(int gameId, int userId)
+{
+    QSqlQuery *query =
+        prepareQuery("select 1 from {prefix}_replays_access where id_game = :id_game and id_player = :id_player");
+    query->bindValue(":id_game", gameId);
+    query->bindValue(":id_player", userId);
+    if (!execSqlQuery(query)) {
+        return ReplayAccessResult::Failed;
+    }
+    if (!query->next()) {
+        return ReplayAccessResult::AccessDenied;
+    }
+    return ReplayAccessResult::Ok;
+}
+
+Server_DatabaseInterface::ReplayAccessResult Servatrice_DatabaseInterface::getReplayName(int gameId,
+                                                                                         QString &replayName)
+{
+    QSqlQuery *query = prepareQuery("select replay_name from {prefix}_replays_access where id_game = :id_game limit 1");
+    query->bindValue(":id_game", gameId);
+    if (!execSqlQuery(query)) {
+        return ReplayAccessResult::Failed;
+    }
+    if (!query->next()) {
+        return ReplayAccessResult::NotFound;
+    }
+    replayName = query->value(0).toString();
+    return ReplayAccessResult::Ok;
+}
+
+bool Servatrice_DatabaseInterface::getReplayHashSource(int gameId, QByteArray &source)
+{
+    QSqlQuery *query = prepareQuery("select replay from {prefix}_replays where id_game = :id_game limit 3");
+    query->bindValue(":id_game", gameId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        QByteArray replay = query->value(0).toByteArray();
+        replay.truncate(128);
+        source.append(replay);
+    }
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::addReplayAccess(int gameId, int userId, const QString &replayName)
+{
+    QSqlQuery *query =
+        prepareQuery("insert into {prefix}_replays_access (id_game, id_player, replay_name, do_not_hide) "
+                     "values(:idgame, :idplayer, :replayname, 0)");
+    query->bindValue(":idgame", gameId);
+    query->bindValue(":idplayer", userId);
+    query->bindValue(":replayname", replayName);
+
+    return execSqlQuery(query);
+}
+
+Server_DatabaseInterface::ReplayAccessResult
+Servatrice_DatabaseInterface::getLatestReplayForGame(int gameId, int &replayId, QByteArray &data)
+{
+    QSqlQuery *query = prepareQuery("SELECT r.id, r.replay FROM {prefix}_replays r "
+                                    "WHERE r.id_game = :game_id ORDER BY r.id DESC LIMIT 1");
+    query->bindValue(":game_id", gameId);
+    if (!execSqlQuery(query)) {
+        return ReplayAccessResult::Failed;
+    }
+    if (!query->next()) {
+        return ReplayAccessResult::NotFound;
+    }
+
+    replayId = query->value(0).toInt();
+    data = query->value(1).toByteArray();
+    return ReplayAccessResult::Ok;
+}
+
+Server_DatabaseInterface::ReplayWriteResult
+Servatrice_DatabaseInterface::grantReplayAccessByName(int gameId, const QString &userName)
+{
+    QSqlQuery *existsQuery = prepareQuery("select count(*) from {prefix}_replays_access where id_game = :idgame");
+    existsQuery->bindValue(":idgame", gameId);
+    if (!execSqlQuery(existsQuery) || !existsQuery->next()) {
+        return ReplayWriteResult::Failed;
+    }
+    if (existsQuery->value(0).toInt() <= 0) {
+        return ReplayWriteResult::NotFound;
+    }
+
+    QSqlQuery *idQuery = prepareQuery("select id from {prefix}_users WHERE name = :name");
+    idQuery->bindValue(":name", userName);
+    if (!execSqlQuery(idQuery) || !idQuery->next()) {
+        return ReplayWriteResult::Failed;
+    }
+
+    return addReplayAccess(gameId, idQuery->value(0).toInt(), QStringLiteral("Moderator Access Replay Grant"))
+               ? ReplayWriteResult::Ok
+               : ReplayWriteResult::Failed;
+}
+
 bool Servatrice_DatabaseInterface::getDeckFilesInFolder(int folderId, int userId, QList<DeckFileListItem> &files)
 {
     checkSql();
