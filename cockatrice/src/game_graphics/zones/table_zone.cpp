@@ -176,7 +176,7 @@ std::optional<QPainterPath> TableZone::hoveredCardHole() const
     if (!scene) {
         return std::nullopt;
     }
-    CardItem *hovered = scene->getHoveredCard();
+    CardItem *hovered = scene->getHoverZoomedCard();
     if (!hovered) {
         return std::nullopt;
     }

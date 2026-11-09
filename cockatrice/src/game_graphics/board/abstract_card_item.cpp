@@ -57,7 +57,7 @@ static constexpr int FADE_DURATION_MS = 140;
 
 AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef, PlayerLogic *_owner, int _id)
     : ArrowTarget(_owner, parent), state(new CardState(this, nullptr, cardRef, _id)), tapAngle(0),
-      bgColor(Qt::transparent), isHovered(false), isHoverHighlighted(false), realZValue(0)
+      bgColor(Qt::transparent), isHovered(false), isHoverZoomed(false), realZValue(0)
 {
     setCursor(Qt::OpenHandCursor);
     setFlag(ItemIsSelectable);
@@ -82,10 +82,10 @@ AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef
     // the clip escape and the ancestor lift all stay put while the card is still large,
     // so siblings and the clip container cannot cut through the shrinking card.
     connect(hoverZoom, &QPropertyAnimation::finished, this, [this] {
-        if (!isHovered) {
+        if (!isHoverZoomed) {
             // The cursor may still rest on the card (e.g. wheel-up reverts the zoom),
             // in which case the highlight keeps it raised.
-            setZValue(isHoverHighlighted ? ZValues::HOVERED_CARD : realZValue);
+            setZValue(isHovered ? ZValues::HOVERED_CARD : realZValue);
             // Final repaint at the settled footprint: with no scale delta the animation
             // emits no per-frame updates, and zones would keep a stale clip hole behind.
             if (scene()) {
@@ -170,7 +170,7 @@ void AbstractCardItem::setRealZValue(qreal _zValue)
     // During hover, zValue is overridden to HOVERED_CARD. Layout operations
     // like reorganizeCards() call setRealZValue() on all cards including the
     // hovered one — skip setZValue() here to avoid clobbering the override.
-    if (!isHovered && !isHoverHighlighted) {
+    if (!isHovered && !isHoverZoomed) {
         setZValue(_zValue);
     }
 }
@@ -268,9 +268,9 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     painter->setRenderHint(QPainter::Antialiasing, false);
 
-    if (isSelected() || isHovered || isHoverHighlighted) {
+    if (isSelected() || isHovered || isHoverZoomed) {
         QPen pen;
-        if (isHovered || isHoverHighlighted) {
+        if (isHovered || isHoverZoomed) {
             pen.setColor(Qt::yellow);
         }
         if (isSelected()) {
@@ -284,13 +284,13 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->restore();
 }
 
-void AbstractCardItem::setHovered(bool _hovered)
+void AbstractCardItem::setHoverZoomed(bool _hoverZoomed)
 {
-    if (isHovered == _hovered) {
+    if (isHoverZoomed == _hoverZoomed) {
         return;
     }
 
-    if (_hovered) {
+    if (_hoverZoomed) {
         processHoverEvent();
     } else {
         // Mark the hovered card's current scene footprint dirty so overlapped
@@ -304,11 +304,11 @@ void AbstractCardItem::setHovered(bool _hovered)
         }
     }
 
-    isHovered = _hovered;
+    isHoverZoomed = _hoverZoomed;
     // The stacking override is one-directional: it applies the moment the hover starts
     // and only drops once the shrink-out finishes (see the hoverZoom finished handler).
     // Restoring it here would let siblings paint over the still-enlarged card.
-    if (_hovered) {
+    if (_hoverZoomed) {
         setZValue(ZValues::HOVERED_CARD);
     }
     // Scale about the center in both directions: at scale 1 the origin is moot,
@@ -320,7 +320,7 @@ void AbstractCardItem::setHovered(bool _hovered)
     // The target is constant ON-SCREEN pixels: divide out the board view zoom so
     // fullscreen (or zoomed) boards don't overshoot while the fixed-size panel matches.
     qreal target = 1.0;
-    if (_hovered && SettingsCache::instance().cardsDisplay().getScaleCards()) {
+    if (_hoverZoomed && SettingsCache::instance().cardsDisplay().getScaleCards()) {
         const qreal w = boundingRect().width();
         qreal viewScale = 1.0;
         if (scene() && !scene()->views().isEmpty()) {
@@ -335,24 +335,24 @@ void AbstractCardItem::setHovered(bool _hovered)
     hoverZoom->stop();
     hoverZoom->setStartValue(scale());
     hoverZoom->setEndValue(target);
-    hoverZoom->setDuration(_hovered ? HOVER_ZOOM_IN_MS : HOVER_ZOOM_OUT_MS);
+    hoverZoom->setDuration(_hoverZoomed ? HOVER_ZOOM_IN_MS : HOVER_ZOOM_OUT_MS);
     hoverZoom->start();
     update();
 }
 
-void AbstractCardItem::setHoverHighlighted(bool highlighted)
+void AbstractCardItem::setHovered(bool _hovered)
 {
-    if (isHoverHighlighted == highlighted) {
+    if (isHovered == _hovered) {
         return;
     }
 
-    if (highlighted) {
+    if (_hovered) {
         // The card-info widget listens for this: hovering still updates it right away.
         processHoverEvent();
     }
 
-    isHoverHighlighted = highlighted;
-    if (highlighted) {
+    isHovered = _hovered;
+    if (_hovered) {
         setZValue(ZValues::HOVERED_CARD);
     }
 
@@ -368,10 +368,10 @@ void AbstractCardItem::setHoverHighlighted(bool highlighted)
         setTransformOriginPoint(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F);
         hoverZoom->stop();
         hoverZoom->setStartValue(scale());
-        hoverZoom->setEndValue(highlighted ? LEGACY_HOVER_SCALE : 1.0);
-        hoverZoom->setDuration(highlighted ? HOVER_ZOOM_IN_MS : HOVER_ZOOM_OUT_MS);
+        hoverZoom->setEndValue(_hovered ? LEGACY_HOVER_SCALE : 1.0);
+        hoverZoom->setDuration(_hovered ? HOVER_ZOOM_IN_MS : HOVER_ZOOM_OUT_MS);
         hoverZoom->start();
-    } else if (!highlighted && !isHovered && hoverZoom->state() != QAbstractAnimation::Running) {
+    } else if (!_hovered && !isHoverZoomed && hoverZoom->state() != QAbstractAnimation::Running) {
         // A zoomed card keeps its raised z until the shrink-out finishes (its finished
         // handler restores it); a highlight-only card has nothing to unwind.
         setZValue(realZValue);

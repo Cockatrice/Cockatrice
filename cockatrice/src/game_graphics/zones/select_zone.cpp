@@ -119,7 +119,7 @@ void SelectZone::restoreStaleEscapedCards()
         // A card parented to the zone (instead of the clip container) should
         // only occur while it is actively hovered. If hover cleanup was
         // missed, reparent it back so clipping resumes.
-        if (card && card->parentItem() == this && !card->getIsHovered()) {
+        if (card && card->parentItem() == this && !card->getIsHoverZoomed()) {
             card->setParentItem(cardClipContainer);
         }
     }

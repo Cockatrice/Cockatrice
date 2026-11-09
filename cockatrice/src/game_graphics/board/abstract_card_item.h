@@ -37,7 +37,7 @@ protected:
 
 private:
     bool isHovered;
-    bool isHoverHighlighted;
+    bool isHoverZoomed;
     qreal realZValue;
     bool pendingSelectionCollapse;
     int selectionCollapseGeneration = 0; ///< Guards the deferred collapse timer against stale firings
@@ -134,7 +134,6 @@ public:
         return realZValue;
     }
     void setRealZValue(qreal _zValue);
-    void setHovered(bool _hovered);
     /**
      * @brief Shows the hover outline and stacking lift, plus the historical 1.1x hover
      * scale whenever no zoom trigger is configured.
@@ -144,7 +143,8 @@ public:
      * off and the panel not on hover, the old 1.1x enlargement (gated by scaleCards)
      * stays in effect so upgrading does not silently drop it.
      */
-    void setHoverHighlighted(bool highlighted);
+    void setHovered(bool _hovered);
+    void setHoverZoomed(bool _hoverZoomed);
     qreal getCardScale() const;
     void setCardScale(qreal scale);
     qreal getCardOpacity() const;
@@ -152,9 +152,9 @@ public:
     /** @brief Fades the card out under the hover panel, or back in when it closes. */
     void fadeCardOut();
     void fadeCardIn();
-    bool getIsHovered() const
+    bool getIsHoverZoomed() const
     {
-        return isHovered;
+        return isHoverZoomed;
     }
     [[nodiscard]] QString getColor() const
     {
