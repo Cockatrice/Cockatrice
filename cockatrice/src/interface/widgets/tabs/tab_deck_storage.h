@@ -8,7 +8,8 @@
 #ifndef TAB_DECK_STORAGE_H
 #define TAB_DECK_STORAGE_H
 
-#include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
+#include "../../deck_sync/deck_sync_manager.h"
+#include "../server/remote/remote_decklist_tree_widget.h"
 #include "tab.h"
 
 #include <QList>
@@ -25,6 +26,7 @@ class QFileSystemModel;
 class QToolBar;
 class QGroupBox;
 class QTimer;
+class QLabel;
 class CommandContainer;
 class Response;
 class ShareBarWidget;
@@ -50,6 +52,23 @@ private:
     QAction *aOpenLocalDeck, *aRenameLocal, *aUpload, *aNewLocalFolder, *aDeleteLocalDeck;
     QAction *aOpenDecksFolder;
     QAction *aOpenRemoteDeck, *aDownload, *aShareDecks, *aPublishDeck, *aNewFolder, *aDeleteRemoteDeck;
+    QAction *aSyncNow;
+    QLabel *syncStatusLabel;
+    DeckSyncManager *syncManager;
+    QString syncUsername;
+    bool remoteEnabled = false;
+    enum class SyncStatusType
+    {
+        Idle,
+        Working,
+        Finished,
+        Failed
+    };
+    using SyncSummary = DeckSyncManager::SyncSummary;
+    SyncStatusType syncStatusType = SyncStatusType::Idle;
+    QString syncStatusDetail;
+    SyncSummary lastSyncSummary;
+    void renderSyncStatus();
     bool visibilityRefreshStarted = false;
     QTimer *visibilityRefreshTimer;
     QStringList visibilityFailures;
@@ -107,6 +126,10 @@ private slots:
     void actDeleteRemoteDeck();
     void deleteFolderFinished(const Response &response, const CommandContainer &commandContainer);
     void deleteDeckFinished(const Response &response, const CommandContainer &commandContainer);
+
+    void actSyncNow();
+    void onSyncStatusMessage(const QString &message);
+    void onSyncFinished(const SyncSummary &summary, const QString &error);
 
 public:
     TabDeckStorage(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User *currentUserInfo);

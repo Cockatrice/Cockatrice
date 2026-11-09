@@ -9,6 +9,7 @@
 #include "tree/inner_deck_list_node.h"
 
 #include <QAnyStringView>
+#include <QCryptographicHash>
 #include <QDebug>
 #include <QSet>
 #include <QSharedPointer>
@@ -122,9 +123,11 @@ bool DeckList::Metadata::readElement(QXmlStreamReader *xml, const QString &child
     return true;
 }
 
-void DeckList::Metadata::write(QXmlStreamWriter *xml) const
+void DeckList::Metadata::write(QXmlStreamWriter *xml, bool includeLastLoadedTimestamp) const
 {
-    xml->writeTextElement("lastLoadedTimestamp", lastLoadedTimestamp);
+    if (includeLastLoadedTimestamp) {
+        xml->writeTextElement("lastLoadedTimestamp", lastLoadedTimestamp);
+    }
     xml->writeTextElement("deckname", name);
     xml->writeTextElement("format", gameFormat);
     xml->writeStartElement("bannerCard");
@@ -202,12 +205,12 @@ bool DeckList::readElement(QXmlStreamReader *xml)
     return true;
 }
 
-void DeckList::write(QXmlStreamWriter *xml) const
+void DeckList::write(QXmlStreamWriter *xml, bool includeLastLoadedTimestamp) const
 {
     xml->writeStartElement("cockatrice_deck");
     xml->writeAttribute("version", "1");
 
-    metadata.write(xml);
+    metadata.write(xml, includeLastLoadedTimestamp);
 
     // Write zones
     tree.write(xml);
@@ -269,12 +272,12 @@ bool DeckList::loadFromString_Native(const QString &nativeString)
     return loadFromXml(&xml);
 }
 
-QString DeckList::writeToString_Native() const
+QString DeckList::writeToString_Native(bool includeLastLoadedTimestamp) const
 {
     QString result;
     QXmlStreamWriter xml(&result);
     xml.writeStartDocument();
-    write(&xml);
+    write(&xml, includeLastLoadedTimestamp);
     xml.writeEndDocument();
     return result;
 }
@@ -476,6 +479,16 @@ QString DeckList::getDeckHash() const
 void DeckList::refreshDeckHash()
 {
     cachedDeckHash = QString();
+}
+
+QString DeckList::contentHash(const QString &nativeDeck)
+{
+    return QString::fromLatin1(QCryptographicHash::hash(nativeDeck.toUtf8(), QCryptographicHash::Sha1).toHex());
+}
+
+QString DeckList::getContentHash() const
+{
+    return contentHash(writeToString_Native(false));
 }
 
 /**
