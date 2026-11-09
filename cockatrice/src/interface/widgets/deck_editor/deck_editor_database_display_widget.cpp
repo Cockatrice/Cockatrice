@@ -130,19 +130,19 @@ void DeckEditorDatabaseDisplayWidget::actAddCardToSideboard()
 void DeckEditorDatabaseDisplayWidget::addCard(const QString &cardName, const QString &zoneName)
 {
     highlightAllSearchEdit();
-    ExactCard exactCard = CardDatabaseManager::query()->getPreferredCard(cardName);
+    ExactCard exactCard = CardDatabaseManager::query().getPreferredCard(cardName);
     emit cardAdded(exactCard, zoneName);
 }
 
 void DeckEditorDatabaseDisplayWidget::decrementCard(const QString &cardName, const QString &zoneName)
 {
-    ExactCard exactCard = CardDatabaseManager::query()->getPreferredCard(cardName);
+    ExactCard exactCard = CardDatabaseManager::query().getPreferredCard(cardName);
     emit cardDecremented(exactCard, zoneName);
 }
 
 void DeckEditorDatabaseDisplayWidget::updateCard(const QString &cardName)
 {
-    ExactCard exactCard = CardDatabaseManager::query()->getPreferredCard(cardName);
+    ExactCard exactCard = CardDatabaseManager::query().getPreferredCard(cardName);
     emit cardChanged(exactCard);
 }
 
@@ -164,6 +164,6 @@ void DeckEditorDatabaseDisplayWidget::highlightAllSearchEdit()
 
 void DeckEditorDatabaseDisplayWidget::onRelatedCardClicked(const QString &relatedCard)
 {
-    ExactCard exactCard = CardDatabaseManager::query()->guessCard({relatedCard});
+    ExactCard exactCard = CardDatabaseManager::query().guessCard({relatedCard});
     emit cardInfoRequested(exactCard);
 }

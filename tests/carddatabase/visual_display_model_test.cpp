@@ -60,7 +60,7 @@ protected:
         cardModel = std::make_unique<CardDatabaseModel>(db.get(), false);
         displayModel = std::make_unique<CardDatabaseDisplayModel>();
         displayModel->setSourceModel(cardModel.get());
-        visualModel = std::make_unique<CardDatabaseVisualDisplayModel>(displayModel.get(), db->query());
+        visualModel = std::make_unique<CardDatabaseVisualDisplayModel>(displayModel.get(), &db->query());
         visualModel->refresh();
     }
 

@@ -162,7 +162,7 @@ void PlayerEventHandler::eventCreateToken(const Event_CreateToken &event)
     // use db PT if not provided in event and not face-down
     QString pt = QString::fromStdString(event.pt());
     if (pt.isEmpty() && !event.face_down()) {
-        ExactCard dbCard = CardDatabaseManager::query()->getCard(cardRef);
+        ExactCard dbCard = CardDatabaseManager::query().getCard(cardRef);
         if (dbCard) {
             pt = dbCard.getInfo().getPowTough();
         }

@@ -61,9 +61,9 @@ public:
 
     /**
      * @brief Returns the CardDatabaseQuerier of the singleton database.
-     * @return Pointer to CardDatabaseQuerier.
+     * @return Reference to the singleton database querier.
      */
-    static CardDatabaseQuerier *query();
+    static const CardDatabaseQuerier &query();
 
 private:
     /** @brief Private default constructor to enforce singleton. */

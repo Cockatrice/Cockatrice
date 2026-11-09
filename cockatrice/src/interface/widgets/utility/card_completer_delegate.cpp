@@ -266,7 +266,7 @@ QString CardCompleterDelegate::setCodeForCard(const QSharedPointer<CardInfo> &ca
 
     QString code;
 
-    const PrintingInfo printing = CardDatabaseManager::query()->getPreferredPrinting(card);
+    const PrintingInfo printing = CardDatabaseManager::query().getPreferredPrinting(card);
 
     if (auto set = printing.getSet()) {
         code = set->getShortName();

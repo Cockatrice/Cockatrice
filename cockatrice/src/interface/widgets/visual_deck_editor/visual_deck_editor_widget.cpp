@@ -152,7 +152,7 @@ void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
 
 void VisualDeckEditorWidget::addCardFromSearch()
 {
-    ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
+    ExactCard card = CardDatabaseManager::query().getCard({searchBar->text()});
     if (!card) {
         return;
     }

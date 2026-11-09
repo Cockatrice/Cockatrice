@@ -100,7 +100,7 @@ void UserCardArtProvider::processQueue()
         const QString cardName = parts.at(1);
         const QString providerId = parts.at(2);
 
-        ExactCard card = CardDatabaseManager::query()->getCard({cardName, providerId});
+        ExactCard card = CardDatabaseManager::query().getCard({cardName, providerId});
 
         if (!card) {
             pending.remove(key);

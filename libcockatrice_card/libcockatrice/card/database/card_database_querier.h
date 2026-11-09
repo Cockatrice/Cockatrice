@@ -7,10 +7,8 @@
 
 #include <QList>
 #include <QMap>
-#include <QObject>
 #include <QString>
 #include <QStringList>
-#include <qtmetamacros.h>
 
 class CardDatabase;
 class ICardPreferenceProvider;
@@ -25,19 +23,17 @@ struct CardRef;
  * (e.g., CardInfoPtr, ExactCard, and PrintingInfo) from a CardDatabase. It also applies user
  * printing preferences via ICardPreferenceProvider when determining preferred printings.
  */
-class CardDatabaseQuerier : public QObject
+class CardDatabaseQuerier
 {
-    Q_OBJECT
 
 public:
     /**
      * @brief Constructs a CardDatabaseQuerier.
      *
-     * @param parent Parent QObject.
      * @param db Pointer to the CardDatabase used for lookups.
      * @param prefs Pointer to card preference provider which supplies user-preference for printings.
      */
-    explicit CardDatabaseQuerier(QObject *parent, const CardDatabase *db, const ICardPreferenceProvider *prefs);
+    explicit CardDatabaseQuerier(const CardDatabase *db, const ICardPreferenceProvider *prefs);
 
     /**
      * @brief Retrieves a card by its exact name.
@@ -245,8 +241,9 @@ private:
     mutable QMap<QString, int> formatsCountCache;
     mutable QMap<QString, int> tagCountsCache;
 
-private slots:
     void invalidateCaches();
+
+    friend class CardDatabase;
 };
 
 #endif // COCKATRICE_CARD_DATABASE_QUERIER_H

@@ -51,7 +51,7 @@ void CardState::setCardRef(const CardRef &_cardRef)
 
 void CardState::refreshCardInfo()
 {
-    exactCard = CardDatabaseManager::query()->getCard(cardRef);
+    exactCard = CardDatabaseManager::query().getCard(cardRef);
 
     if (!exactCard && !cardRef.name.isEmpty()) {
         CardInfo::UiAttributes attributes = {.tableRow = -1};
@@ -231,7 +231,7 @@ void CardState::setAttachedTo(CardState *_attachedTo)
             parentZone->reorganizeCards();
         }
     } else if (getZone() != nullptr) {
-        emit getZone() -> cardAdded(this);
+        emit getZone()->cardAdded(this);
     }
 
     if (getZone() != nullptr) {

@@ -361,7 +361,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
 void DeckEditorDeckDockWidget::initializeFormats()
 {
-    QStringList allFormats = CardDatabaseManager::query()->getAllFormatsWithCount().keys();
+    QStringList allFormats = CardDatabaseManager::query().getAllFormatsWithCount().keys();
 
     // Rebuilding the list is a view update, not a user edit. In particular,
     // clear() emits currentIndexChanged(-1), which must not clear the deck.
@@ -413,7 +413,7 @@ ExactCard DeckEditorDeckDockWidget::getCurrentCard()
     const QString zoneName = gparent.siblingAtColumn(DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
 
     if (!current.model()->hasChildren(current.siblingAtColumn(DeckListModelColumns::CARD_AMOUNT))) {
-        if (ExactCard selectedCard = CardDatabaseManager::query()->getCard({cardName, cardProviderID})) {
+        if (ExactCard selectedCard = CardDatabaseManager::query().getCard({cardName, cardProviderID})) {
             return selectedCard;
         }
     }
@@ -466,7 +466,7 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     QList<CardRef> cardsInDeck = getModel()->getCardRefs();
 
     for (auto cardRef : cardsInDeck) {
-        if (!CardDatabaseManager::query()->getCard(cardRef)) {
+        if (!CardDatabaseManager::query().getCard(cardRef)) {
             continue;
         }
 

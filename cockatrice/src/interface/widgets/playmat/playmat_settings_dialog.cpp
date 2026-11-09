@@ -211,7 +211,7 @@ void PlaymatSettingsDialog::populateProviderCombo(const QString &cardName)
 {
     providerComboBox->clear();
 
-    auto card = CardDatabaseManager::query()->getCard({cardName});
+    auto card = CardDatabaseManager::query().getCard({cardName});
 
     const auto &sets = card.getInfo().getSets();
 
@@ -239,7 +239,7 @@ void PlaymatSettingsDialog::onCardNameChanged(const QString &name)
         return;
     }
 
-    const ExactCard card = CardDatabaseManager::query()->getCard({name});
+    const ExactCard card = CardDatabaseManager::query().getCard({name});
     if (!card) {
         currentPixmap = QPixmap();
         preview->setPixmap(currentPixmap);
@@ -268,7 +268,7 @@ void PlaymatSettingsDialog::reloadPreview()
         return;
     }
 
-    ExactCard card = CardDatabaseManager::query()->getCard({currentCard.name, currentCard.providerId});
+    ExactCard card = CardDatabaseManager::query().getCard({currentCard.name, currentCard.providerId});
     if (!card) {
         return;
     }

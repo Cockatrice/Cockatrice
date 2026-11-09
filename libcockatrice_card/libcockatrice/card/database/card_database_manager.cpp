@@ -36,7 +36,7 @@ CardDatabase *CardDatabaseManager::getInstance()
     return &instance;
 }
 
-CardDatabaseQuerier *CardDatabaseManager::query()
+const CardDatabaseQuerier &CardDatabaseManager::query()
 {
     return getInstance()->query();
 }

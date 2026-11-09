@@ -103,7 +103,7 @@ void DeckListModel::rebuildTree()
                 continue;
             }
 
-            CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(currentCard->getName());
+            CardInfoPtr info = CardDatabaseManager::query().getCardInfo(currentCard->getName());
             QString groupCriteria = extractGroupCriteriaValue(info, activeGroupCriteria);
 
             auto *groupNode = dynamic_cast<InnerDecklistNode *>(node->findChild(groupCriteria));
@@ -221,7 +221,7 @@ QVariant DeckListModel::data(const QModelIndex &index, int role) const
                     return card->getNumber();
                 case DeckListModelColumns::CARD_NAME: {
                     if (role == Qt::DisplayRole) {
-                        CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(card->getName());
+                        CardInfoPtr info = CardDatabaseManager::query().getCardInfo(card->getName());
                         if (info) {
                             return info->getLocalizedName(displayLang);
                         }
@@ -438,7 +438,7 @@ DecklistModelCardNode *DeckListModel::findCardNode(const QString &cardName,
                                                    const QString &providerId,
                                                    const QString &cardNumber) const
 {
-    CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(cardName);
+    CardInfoPtr info = CardDatabaseManager::query().getCardInfo(cardName);
     if (!info) {
         return nullptr;
     }
@@ -493,7 +493,7 @@ QModelIndex DeckListModel::findCard(const QString &cardName,
 
 QModelIndex DeckListModel::addPreferredPrintingCard(const QString &cardName, const QString &zoneName, bool abAddAnyway)
 {
-    ExactCard card = CardDatabaseManager::query()->getCard({cardName});
+    ExactCard card = CardDatabaseManager::query().getCard({cardName});
 
     if (!card) {
         if (abAddAnyway) {
@@ -910,7 +910,7 @@ static bool isCardQuantityLegalForFormat(const QString &format, const CardInfo &
         return true;
     }
 
-    auto formatRules = CardDatabaseManager::query()->getFormat(format);
+    auto formatRules = CardDatabaseManager::query().getFormat(format);
 
     // if format has no custom rules, then just do the default check
     if (!formatRules) {
@@ -949,7 +949,7 @@ static bool isCardNodeLegalForFormat(const QString &format, const InnerDecklistN
     }
 
     // unknown cards are not legal
-    ExactCard exactCard = CardDatabaseManager::query()->getCard(card->toCardRef());
+    ExactCard exactCard = CardDatabaseManager::query().getCard(card->toCardRef());
     if (!exactCard) {
         return false;
     }

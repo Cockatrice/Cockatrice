@@ -973,7 +973,7 @@ void TabGame::loadDeckForLocalPlayer(PlayerLogic *localPlayer, int playerId, Ser
     TabbedDeckViewContainer *deckViewContainer = deckViewContainers.value(playerId);
     if (playerInfo.has_deck_list()) {
         DeckList deckList = DeckList(QString::fromStdString(playerInfo.deck_list()));
-        CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(deckList.getCardRefList()));
+        CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query().getCards(deckList.getCardRefList()));
         deckViewContainer->playerDeckView->setDeck(deckList);
         localPlayer->setDeck(deckList);
     }

@@ -461,7 +461,7 @@ void PlayerGraphicsItem::updatePlaymat()
     playmatParams = params;
     scaledPlaymatKey = QSize(); // the art crop depends on the params, drop any cached scale
 
-    ExactCard card = CardDatabaseManager::query()->getCard(playmatCard);
+    ExactCard card = CardDatabaseManager::query().getCard(playmatCard);
     if (!card) {
         clearPlaymat();
         return;

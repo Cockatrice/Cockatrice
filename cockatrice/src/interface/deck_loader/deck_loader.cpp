@@ -433,7 +433,7 @@ void DeckLoader::saveToStream_DeckZone(QTextStream &out,
             continue;
         }
 
-        CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(card->getName());
+        CardInfoPtr info = CardDatabaseManager::query().getCardInfo(card->getName());
         QString cardType = info ? info->getMainCardType() : "unknown";
 
         cardsByType.insert(cardType, card);

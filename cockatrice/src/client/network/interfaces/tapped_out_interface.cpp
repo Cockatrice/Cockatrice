@@ -128,7 +128,7 @@ void TappedOutInterface::analyzeDeck(const DeckList &deck)
 void TappedOutInterface::copyDeckSplitMainAndSide(const DeckList &source, DeckList &mainboard, DeckList &sideboard)
 {
     auto copyMainOrSide = [&mainboard, &sideboard](const auto node, const auto card) {
-        CardInfoPtr dbCard = CardDatabaseManager::query()->getCardInfo(card->getName());
+        CardInfoPtr dbCard = CardDatabaseManager::query().getCardInfo(card->getName());
         // Exclude confirmed tokens, but preserve cards missing from the local
         // database, including newly released cards in an imported deck.
         if ((dbCard && dbCard->getIsToken()) || node->getName() == DECK_ZONE_MAYBEBOARD) {

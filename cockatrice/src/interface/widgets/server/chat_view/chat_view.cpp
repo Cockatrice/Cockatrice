@@ -230,7 +230,7 @@ void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
     QTextCharFormat cardFormat = oldFormat;
     cardFormat.setFontItalic(true);
 
-    const CardInfoPtr card = CardDatabaseManager::query()->lookupCardByName(cardName);
+    const CardInfoPtr card = CardDatabaseManager::query().lookupCardByName(cardName);
     if (card.isNull()) {
         cardFormat.setForeground(unresolvedCardTagColor);
         cursor.setCharFormat(cardFormat);

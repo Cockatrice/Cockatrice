@@ -34,7 +34,7 @@ EdhrecCommanderResponseCommanderDetailsDisplayWidget::EdhrecCommanderResponseCom
     navigationAndPricesLayout = new QVBoxLayout();
 
     commanderPicture = new CardInfoPictureWidget(this);
-    commanderPicture->setCard(CardDatabaseManager::query()->getCard({commanderDetails.getName()}));
+    commanderPicture->setCard(CardDatabaseManager::query().getCard({commanderDetails.getName()}));
 
     auto *parentTab = QtUtils::findParentOfType<TabEdhRecMain>(this);
 

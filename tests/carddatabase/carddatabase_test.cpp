@@ -17,6 +17,7 @@
 #include <QHash>
 #include <QIODevice>
 #include <QList>
+#include <QMap>
 #include <QSharedPointer>
 #include <QSignalSpy>
 #include <QString>
@@ -48,22 +49,114 @@ TEST(CardDatabaseTest, LoadXml)
     // ensure the card database is empty at start
     ASSERT_EQ(0, db->getCardList().size()) << "Cards not empty at start";
     ASSERT_EQ(0, db->getSetList().size()) << "Sets not empty at start";
-    ASSERT_EQ(0, db->query()->getAllMainCardTypes().size()) << "Types not empty at start";
+    ASSERT_EQ(0, db->query().getAllMainCardTypes().size()) << "Types not empty at start";
     ASSERT_EQ(NotLoaded, db->getLoadStatus()) << "Incorrect status at start";
 
     // load dummy cards and test result
     db->loadCardDatabases();
     ASSERT_EQ(9, db->getCardList().size()) << "Wrong card count after load";
     ASSERT_EQ(5, db->getSetList().size()) << "Wrong sets count after load";
-    ASSERT_EQ(3, db->query()->getAllMainCardTypes().size()) << "Wrong types count after load";
+    ASSERT_EQ(3, db->query().getAllMainCardTypes().size()) << "Wrong types count after load";
     ASSERT_EQ(Ok, db->getLoadStatus()) << "Wrong status after load";
 
     // ensure the card database is empty after clear()
     db->clear();
     ASSERT_EQ(0, db->getCardList().size()) << "Cards not empty after clear";
     ASSERT_EQ(0, db->getSetList().size()) << "Sets not empty after clear";
-    ASSERT_EQ(0, db->query()->getAllMainCardTypes().size()) << "Types not empty after clear";
+    ASSERT_EQ(0, db->query().getAllMainCardTypes().size()) << "Types not empty after clear";
     ASSERT_EQ(NotLoaded, db->getLoadStatus()) << "Incorrect status after clear";
+}
+
+TEST(CardDatabaseTest, QuerierCachesInvalidateOnCardAddedAndReset)
+{
+    // Same construction as LoadXml: a real database over the checked-in fixture.
+    CardDatabase db(nullptr, new NoopCardPreferenceProvider(), new TestCardDatabasePathProvider(),
+                    new NoopCardSetPriorityController());
+    db.loadCardDatabases();
+
+    ASSERT_EQ(9, db.getCardList().size()) << "fixture card count changed";
+    ASSERT_EQ(5, db.getSetList().size()) << "fixture set count changed";
+
+    // The fixture has no format-* property, so its formats cache would start empty and could not
+    // prove invalidation. A primer card gives all three caches a non-empty pre-mutation state.
+    CardInfo::UiAttributes attributes = {.tableRow = 1};
+    QHash<QString, QString> primerProperties;
+    primerProperties["maintype"] = "Creature";
+    primerProperties["type"] = "Creature — Cat";
+    primerProperties["format-vintage"] = "legal";
+    db.addCard(CardInfo::newInstance("Cache Primer", "", false, primerProperties, {}, {}, {}, attributes));
+
+    // Prime the three lazily rebuilt caches. Each only recomputes while its map is empty, so
+    // these reads pin the pre-mutation snapshot. Fixture counts: cards.xml adds Cat, Dog, Doctor
+    // (Creature), Not Dead and Truth (Instant); tokens.xml adds Kitten and Puppy (Token);
+    // customset1.xml adds Sparrow and Crow (Creature).
+    const QMap<QString, int> primedMain = db.query().getAllMainCardTypesWithCount();
+    EXPECT_EQ(6, primedMain.value("Creature"));
+    EXPECT_EQ(2, primedMain.value("Instant"));
+    EXPECT_EQ(2, primedMain.value("Token"));
+    EXPECT_EQ(3, primedMain.size());
+
+    const QMap<QString, int> primedSub = db.query().getAllSubCardTypesWithCount();
+    EXPECT_EQ(2, primedSub.value("Cat")) << "the primer shares the fixture's Cat subtype";
+    EXPECT_EQ(1, primedSub.value("Dog"));
+    EXPECT_EQ(1, primedSub.value("Human"));
+    EXPECT_EQ(1, primedSub.value("Time"));
+    EXPECT_EQ(1, primedSub.value("Lord"));
+    EXPECT_EQ(1, primedSub.value("Doctor"));
+    EXPECT_EQ(6, primedSub.size());
+
+    const QMap<QString, int> primedFormats = db.query().getAllFormatsWithCount();
+    EXPECT_EQ(1, primedFormats.value("vintage"));
+    EXPECT_EQ(1, primedFormats.size());
+
+    // cardAdded must invalidate the primed caches; without the connection the maps stay
+    // non-empty and the probe's values never appear.
+    QHash<QString, QString> probeProperties;
+    probeProperties["maintype"] = "Enchantment";
+    probeProperties["type"] = "Enchantment — Aura";
+    probeProperties["format-probelegacy"] = "legal";
+    db.addCard(CardInfo::newInstance("Cache Probe", "", false, probeProperties, {}, {}, {}, attributes));
+
+    const QMap<QString, int> afterAddMain = db.query().getAllMainCardTypesWithCount();
+    EXPECT_EQ(1, afterAddMain.value("Enchantment")) << "cardAdded must invalidate the main-type cache";
+    EXPECT_EQ(6, afterAddMain.value("Creature")) << "the rebuilt cache must still hold the earlier cards";
+    EXPECT_EQ(4, afterAddMain.size());
+
+    const QMap<QString, int> afterAddSub = db.query().getAllSubCardTypesWithCount();
+    EXPECT_EQ(1, afterAddSub.value("Aura")) << "cardAdded must invalidate the subtype cache";
+    EXPECT_EQ(2, afterAddSub.value("Cat")) << "the rebuilt cache must still hold the earlier cards";
+    EXPECT_EQ(7, afterAddSub.size());
+
+    const QMap<QString, int> afterAddFormats = db.query().getAllFormatsWithCount();
+    EXPECT_EQ(1, afterAddFormats.value("probelegacy")) << "cardAdded must invalidate the format cache";
+    EXPECT_EQ(1, afterAddFormats.value("vintage")) << "the rebuilt cache must still hold the earlier cards";
+    EXPECT_EQ(2, afterAddFormats.size());
+
+    // Dropping every card must leave the caches rebuilt from an empty database.
+    db.clear();
+    EXPECT_TRUE(db.query().getAllMainCardTypesWithCount().isEmpty()) << "main types after clear()";
+    EXPECT_TRUE(db.query().getAllSubCardTypesWithCount().isEmpty()) << "subtypes after clear()";
+    EXPECT_TRUE(db.query().getAllFormatsWithCount().isEmpty()) << "formats after clear()";
+
+    // cardDatabaseReset is emitted by swapInDatabaseData() (the snapshot swap), not by clear(),
+    // so re-prime over one card and swap in an empty snapshot: only the reset connection can
+    // invalidate the caches there.
+    QHash<QString, QString> resetProperties;
+    resetProperties["maintype"] = "Battle";
+    resetProperties["type"] = "Battle — Siege";
+    resetProperties["format-pauper"] = "legal";
+    db.addCard(CardInfo::newInstance("Reset Probe", "", false, resetProperties, {}, {}, {}, attributes));
+    ASSERT_EQ(1, db.query().getAllMainCardTypesWithCount().value("Battle"));
+    ASSERT_EQ(1, db.query().getAllSubCardTypesWithCount().value("Siege"));
+    ASSERT_EQ(1, db.query().getAllFormatsWithCount().value("pauper"));
+
+    db.swapInDatabaseData(CardDatabaseData{});
+
+    EXPECT_TRUE(db.query().getAllMainCardTypesWithCount().isEmpty())
+        << "cardDatabaseReset must invalidate the main-type cache";
+    EXPECT_TRUE(db.query().getAllSubCardTypesWithCount().isEmpty())
+        << "cardDatabaseReset must invalidate the subtype cache";
+    EXPECT_TRUE(db.query().getAllFormatsWithCount().isEmpty()) << "cardDatabaseReset must invalidate the format cache";
 }
 
 TEST(CardDatabaseTest, LazyPropertiesHashStreamsBlobAccessors)
@@ -112,7 +205,7 @@ TEST(CardDatabaseTest, GuessCardWithProviderIdOnUnknownCardReturnsEmpty)
     NoopCardSetPriorityController controller;
     CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
 
-    const ExactCard guessed = db.query()->guessCard({"Not a Card", "card_Not a Card_fixture"});
+    const ExactCard guessed = db.query().guessCard({"Not a Card", "card_Not a Card_fixture"});
 
     EXPECT_TRUE(guessed.isEmpty());
     EXPECT_FALSE(guessed);
@@ -125,7 +218,7 @@ TEST(CardDatabaseTest, FindPrintingWithIdOnNullCardInfoReturnsEmpty)
     NoopCardSetPriorityController controller;
     CardDatabase db(nullptr, &prefs, &pathProvider, &controller);
 
-    EXPECT_TRUE(db.query()->findPrintingWithId(nullptr, "card_Not a Card_fixture").isEmpty());
+    EXPECT_TRUE(db.query().findPrintingWithId(nullptr, "card_Not a Card_fixture").isEmpty());
 }
 
 TEST(CardInfoTest, ClearDirectRelationsDropsRawPointers)
