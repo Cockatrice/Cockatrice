@@ -3008,7 +3008,7 @@ QList<ServerInfo_ModeratorLogin> Servatrice_DatabaseInterface::getModeratorLastL
     return results;
 }
 
-Servatrice_DatabaseInterface::UptimeSnapshot Servatrice_DatabaseInterface::getLatestUptimeSnapshot(int serverId)
+Server_DatabaseInterface::UptimeSnapshot Servatrice_DatabaseInterface::getLatestUptimeSnapshot(int serverId)
 {
     UptimeSnapshot snapshot;
 
