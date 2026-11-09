@@ -66,14 +66,34 @@ A test is an `<events>` list. Widgets are named by their path from the main wind
 | `screenshot` | `path` | saves an image of the addressed widget; `$VAR` expands from the environment |
 | `dumpTree` | `path` | writes the addressed widget's subtree with the paths tests address |
 | `resize` | `WIDTHxHEIGHT` | resizes the addressed widget's window |
+| `selectRow` | `row[/row…][,column]` | selects a row of an item view through its selection model |
+| `clickRow` | `row[/row…][,column]` | left-clicks a cell, so the view's own handlers run |
+| `doubleClickRow` | `row[/row…][,column]` | double-clicks a cell |
 
 The card, item and property commands are `pqCockatriceEventPlayer`
 (`cockatrice/src/game_graphics/pq_cockatrice_event_player.h`). They resolve cards by name
 and zone through the `QGraphicsScene` and send real mouse events at the card's current
 viewport position, so a test does not depend on the window size or screen resolution.
 
-The capture commands are `pqWidgetTestEventPlayer`
-(`cockatrice/src/interface/pq_widget_test_event_player.h`).
+The capture and row commands are `pqWidgetTestEventPlayer`
+(`cockatrice/src/interface/pq_widget_test_event_player.h`). Rows are model rows of the
+addressed view, so a filtered or sorted model counts the rows it shows. A tree addresses a
+row by the path of rows leading to it: `2/0` is the first child of the third top-level
+row. A click opens a collapsed path first.
+
+## Assertions
+
+`expectProperty` is an action. It fails playback unless a widget property matches.
+QtTesting's own check commands assert model state instead, and they only run when the
+event carries `type="check"`. Without it the event is an action, and a check command is
+rejected as unknown:
+
+```xml
+<event widget="MainWindow/.../deckView" command="modelRowCount" arguments="1" type="check" />
+```
+
+`modelRowCount` compares `model()->rowCount()`. `modelItemData` compares the data of one
+cell, addressed as `row.column,text` (`modelItemData "0.0,Lightning Bolt"`).
 
 ## Screenshots
 
@@ -121,3 +141,9 @@ Record the tree in the same playback that clicks, and copy paths from that dump:
 ./Testing/run_test.sh Testing/screenshot_test.xml
 less build/screenshots/widget-tree.txt
 ```
+
+### Selecting a row
+
+QtTesting's own `currentChanged` takes `row|column`. `0:0` reaches `OldGetIndex`, which
+calls `.at(1)` on a one-element list and aborts the process. Select through `selectRow`
+(or click through `clickRow`) instead. Never use `currentChanged`.

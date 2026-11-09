@@ -1,12 +1,17 @@
 #include "pq_widget_test_event_player.h"
 
+#include <QAbstractItemModel>
+#include <QAbstractItemView>
 #include <QApplication>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QItemSelectionModel>
 #include <QLoggingCategory>
+#include <QMouseEvent>
 #include <QPixmap>
 #include <QTextStream>
+#include <QTreeView>
 #include <QWidget>
 #include <pqObjectNaming.h>
 
@@ -111,6 +116,15 @@ bool pqWidgetTestEventPlayer::playEvent(QObject *object, const QString &command,
     if (command == "resize") {
         return run(playResize(object, arguments));
     }
+    if (command == "selectRow") {
+        return run(playSelectRow(object, arguments));
+    }
+    if (command == "clickRow") {
+        return run(playClickRow(object, arguments, false));
+    }
+    if (command == "doubleClickRow") {
+        return run(playClickRow(object, arguments, true));
+    }
     return false;
 }
 
@@ -196,6 +210,141 @@ bool pqWidgetTestEventPlayer::playResize(QObject *object, const QString &argumen
     // Resize the top-level window: the layout owns the children.
     widget->window()->resize(width, height);
     QApplication::processEvents();
+    return true;
+}
+
+bool pqWidgetTestEventPlayer::playSelectRow(QObject *object, const QString &arguments)
+{
+    QAbstractItemView *view = itemViewFor(object);
+    if (!view) {
+        qCCritical(PQ_WIDGET_TEST_EVENT_PLAYER) << "selectRow: target is not an item view";
+        return false;
+    }
+
+    QModelIndex index;
+    if (!resolveCell(view, arguments, index)) {
+        return false;
+    }
+
+    view->setCurrentIndex(index);
+    // QtTesting's `currentChanged` crashes on a one-element row list, so select
+    // through the selection model.
+    view->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+    view->scrollTo(index);
+    return true;
+}
+
+bool pqWidgetTestEventPlayer::playClickRow(QObject *object, const QString &arguments, bool doubleClick)
+{
+    QAbstractItemView *view = itemViewFor(object);
+    if (!view) {
+        qCCritical(PQ_WIDGET_TEST_EVENT_PLAYER) << "clickRow: target is not an item view";
+        return false;
+    }
+
+    QModelIndex index;
+    if (!resolveCell(view, arguments, index)) {
+        return false;
+    }
+
+    return clickCell(view, index, doubleClick);
+}
+
+QAbstractItemView *pqWidgetTestEventPlayer::itemViewFor(QObject *object)
+{
+    if (auto *view = qobject_cast<QAbstractItemView *>(object)) {
+        return view;
+    }
+    // A recording names the viewport of an item view; the view is its parent.
+    return qobject_cast<QAbstractItemView *>(object ? object->parent() : nullptr);
+}
+
+bool pqWidgetTestEventPlayer::resolveCell(QAbstractItemView *view, const QString &arguments, QModelIndex &index)
+{
+    QAbstractItemModel *model = view->model();
+    if (!model) {
+        qCCritical(PQ_WIDGET_TEST_EVENT_PLAYER) << "item view has no model:" << view;
+        return false;
+    }
+
+    const QStringList parts = arguments.split(QLatin1Char(','));
+    if (parts.isEmpty() || parts.size() > 2) {
+        qCCritical(PQ_WIDGET_TEST_EVENT_PLAYER)
+            << "cell must be 'row[/row...]' or 'row[/row...],column', got:" << arguments;
+        return false;
+    }
+
+    int column = 0;
+    if (parts.size() == 2) {
+        bool okColumn = false;
+        column = parts.at(1).trimmed().toInt(&okColumn);
+        if (!okColumn || column < 0) {
+            qCCritical(PQ_WIDGET_TEST_EVENT_PLAYER) << "invalid column in" << arguments;
+            return false;
+        }
+    }
+
+    // "2/0" is the first child of the third top-level row. A tree addresses a
+    // row by the path of rows leading to it.
+    const QStringList rows = parts.at(0).split(QLatin1Char('/'));
+    index = QModelIndex();
+    for (int depth = 0; depth < rows.size(); ++depth) {
+        bool okRow = false;
+        const int row = rows.at(depth).trimmed().toInt(&okRow);
+        const int columnCount = model->columnCount(index);
+        if (!okRow || row < 0 || row >= model->rowCount(index)) {
+            qCCritical(PQ_WIDGET_TEST_EVENT_PLAYER) << "invalid row" << rows.at(depth) << "in" << arguments
+                                                    << "- the parent has" << model->rowCount(index) << "rows";
+            return false;
+        }
+        if (column >= columnCount) {
+            qCCritical(PQ_WIDGET_TEST_EVENT_PLAYER)
+                << "invalid column" << column << "in" << arguments << "- the row has" << columnCount << "columns";
+            return false;
+        }
+
+        index = model->index(row, depth == rows.size() - 1 ? column : 0, index);
+        if (!index.isValid()) {
+            qCCritical(PQ_WIDGET_TEST_EVENT_PLAYER) << "no model index for" << arguments;
+            return false;
+        }
+    }
+    return true;
+}
+
+bool pqWidgetTestEventPlayer::clickCell(QAbstractItemView *view, const QModelIndex &index, bool doubleClick)
+{
+    // A collapsed tree has no rect for a child, so open the path to it first.
+    if (auto *tree = qobject_cast<QTreeView *>(view); tree && index.parent().isValid()) {
+        tree->expand(index.parent());
+    }
+    view->scrollTo(index);
+    // scrollTo only requests the scroll, so the visual rect is stale until the
+    // view has laid out again.
+    QApplication::processEvents();
+
+    const QRect rect = view->visualRect(index);
+    if (!rect.isValid() || rect.isEmpty()) {
+        qCCritical(PQ_WIDGET_TEST_EVENT_PLAYER) << "cell" << index << "is not visible in" << view;
+        return false;
+    }
+
+    QWidget *viewport = view->viewport();
+    const QPoint pos = rect.center();
+    const auto send = [viewport, &pos](QEvent::Type type) {
+        QMouseEvent event(type, QPointF(pos), QPointF(viewport->mapToGlobal(pos)), Qt::LeftButton, Qt::LeftButton,
+                          Qt::NoModifier);
+        QApplication::sendEvent(viewport, &event);
+    };
+
+    // A double click is press/release, then the double-click event and its
+    // release, as a recording produces it.
+    send(QEvent::MouseButtonPress);
+    send(QEvent::MouseButtonRelease);
+    if (doubleClick) {
+        send(QEvent::MouseButtonDblClick);
+        send(QEvent::MouseButtonRelease);
+    }
     return true;
 }
 

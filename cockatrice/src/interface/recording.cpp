@@ -85,6 +85,13 @@ int XMLEventSource::getNextEvent(QString &widget, QString &command, QString &arg
 
         const QXmlStreamAttributes attributes = xmlStream->attributes();
         eventType = pqEventTypes::ACTION_EVENT;
+        // QtTesting separates what a user does (an action) from what the UI must
+        // show (a check), and its check players are only reached with a check
+        // event. Without this attribute every event is an action, so the check
+        // commands (`modelRowCount`, `modelItemData`) cannot be used from a test.
+        if (attributes.value(QStringLiteral("type")) == QLatin1String("check")) {
+            eventType = pqEventTypes::CHECK_EVENT;
+        }
         widget = attributes.value(QStringLiteral("widget")).toString();
         command = attributes.value(QStringLiteral("command")).toString();
         if (command.isEmpty()) {
