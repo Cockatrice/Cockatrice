@@ -37,7 +37,8 @@ void DlgSyncOnboarding::retranslateUi()
     setWindowTitle(tr("Sync decks to this server"));
     detailLabel->setText(
         tr("You have %1 local decks and %2 decks stored on this server. This choice sets how decks sync with this "
-           "server from now on; you can reset it to two-way sync from the deck storage tab.")
+           "server from now on; you can reset it to two-way sync from the deck storage tab. Only two-way sync keeps "
+           "checking for changes automatically.")
             .arg(localCount)
             .arg(serverCount));
     mergeRadio->setText(tr("Merge: keep everything, sync both ways (recommended)"));

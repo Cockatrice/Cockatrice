@@ -16,6 +16,12 @@ ALTER TABLE `cockatrice_decklist_files`
   ADD COLUMN `last_modified` datetime NULL AFTER `hash`,
   ADD COLUMN `deleted` tinyint(1) NOT NULL DEFAULT 0 AFTER `last_modified`;
 
+-- Rows created before this migration only get a last_modified when a client
+-- re-uploads them, so every sync check would keep reporting them as changed.
+-- Backfill from the upload time once, here, instead of carrying a
+-- "last_modified is null" branch in the poll query forever.
+UPDATE `cockatrice_decklist_files` SET `last_modified` = `upload_time` WHERE `last_modified` IS NULL;
+
 CREATE TABLE IF NOT EXISTS `cockatrice_deck_versions` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
   `deck_id` int(7) unsigned zerofill NOT NULL,

@@ -268,16 +268,31 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
 
     syncManager = new DeckSyncManager(
         client, [](const DeckList &deck) { return getDeckColorIdentity(deck, CardDatabaseManager::query()); }, this);
+    syncManager->setDeckPath(SettingsCache::instance().paths().getDeckPath());
+    connect(&SettingsCache::instance().paths(), &PathsSettings::deckPathChanged, this, [this] {
+        const QString deckPath = SettingsCache::instance().paths().getDeckPath();
+        localDirModel->setRootPath(deckPath);
+        localDirView->setRootIndex(localDirModel->index(localDirModel->rootPath(), 0));
+        syncManager->setDeckPath(deckPath);
+    });
     syncManager->setConflictDefault(SettingsCache::instance().deckSync().getConflictDefault());
+    syncManager->setAutoSyncEnabled(SettingsCache::instance().deckSync().getAutoSync());
+    syncManager->setSyncIntervalMinutes(SettingsCache::instance().deckSync().getSyncIntervalMinutes());
     connect(&SettingsCache::instance().deckSync(), &DeckSyncSettings::conflictDefaultChanged, syncManager,
             &DeckSyncManager::setConflictDefault);
+    connect(&SettingsCache::instance().deckSync(), &DeckSyncSettings::autoSyncChanged, syncManager,
+            &DeckSyncManager::setAutoSyncEnabled);
+    connect(&SettingsCache::instance().deckSync(), &DeckSyncSettings::syncIntervalMinutesChanged, syncManager,
+            &DeckSyncManager::setSyncIntervalMinutes);
     connect(syncManager, &DeckSyncManager::statusMessage, this, &TabDeckStorage::onSyncStatusMessage);
+    connect(syncManager, &DeckSyncManager::syncStarted, this, &TabDeckStorage::onSyncStarted);
     connect(syncManager, &DeckSyncManager::syncFinished, this, &TabDeckStorage::onSyncFinished);
     connect(syncManager, &DeckSyncManager::firstSyncDetected, this, &TabDeckStorage::onFirstSyncDetected);
     connect(syncManager, &DeckSyncManager::conflictRequest, this, &TabDeckStorage::onConflictRequest);
     if (currentUserInfo != nullptr) {
         syncUsername = QString::fromStdString(currentUserInfo->name());
     }
+    syncManager->setServerIdentity(client->serverName(), client->serverPort(), syncUsername);
 
     retranslateUi();
 
@@ -338,6 +353,7 @@ QString TabDeckStorage::getTargetPath() const
 void TabDeckStorage::handleConnected(const ServerInfo_User &userInfo)
 {
     syncUsername = QString::fromStdString(userInfo.name());
+    syncManager->setServerIdentity(client->serverName(), client->serverPort(), syncUsername);
     setRemoteEnabled(userInfo.user_level() & ServerInfo_User::IsRegistered);
 }
 
@@ -570,8 +586,6 @@ void TabDeckStorage::actOpenDecksFolder()
 
 void TabDeckStorage::actSyncNow()
 {
-    DeckSyncProfile profile(client->serverName(), client->serverPort(), syncUsername);
-    syncManager->setProfile(profile);
     syncManager->setDeckPath(SettingsCache::instance().paths().getDeckPath());
     aSyncNow->setEnabled(false);
     aSyncReset->setEnabled(false);
@@ -645,9 +659,19 @@ void TabDeckStorage::onSyncStatusMessage(const QString &message)
     renderSyncStatus();
 }
 
+void TabDeckStorage::onSyncStarted()
+{
+    // An auto run starts from the watcher or the interval timer, so the button
+    // has to follow the manager: a click during a run would be dropped by
+    // syncNow() and leave the user pressing a button that looks live.
+    aSyncNow->setEnabled(false);
+    aSyncReset->setEnabled(false);
+}
+
 void TabDeckStorage::onSyncFinished(const SyncSummary &summary, const QString &error)
 {
     aSyncNow->setEnabled(remoteEnabled);
+    aSyncReset->setEnabled(remoteEnabled);
     if (!error.isEmpty()) {
         syncStatusType = SyncStatusType::Failed;
         syncStatusDetail = error;
@@ -657,7 +681,9 @@ void TabDeckStorage::onSyncFinished(const SyncSummary &summary, const QString &e
         lastSyncSummary = summary;
     }
     renderSyncStatus();
-    if (error.isEmpty()) {
+    // An idle poll changes nothing: refreshing the tree there would send a
+    // fresh Command_DeckList every interval for every connected client.
+    if (error.isEmpty() && summary.uploaded + summary.downloaded + summary.removed > 0) {
         serverDirView->refreshTree();
     }
 }
@@ -678,6 +704,10 @@ void TabDeckStorage::renderSyncStatus()
                                .arg(lastSyncSummary.removed)
                                .arg(lastSyncSummary.unchanged)
                                .arg(lastSyncSummary.skipped);
+            if (lastSyncSummary.conflicts > 0) {
+                text += QStringLiteral(" ") + tr("%n conflicting deck(s) skipped. Press Sync now to resolve them.", "",
+                                                 lastSyncSummary.conflicts);
+            }
             if (!lastSyncSummary.note.isEmpty()) {
                 text += QStringLiteral("\n") + lastSyncSummary.note;
             }

@@ -125,12 +125,15 @@ TEST(DeckSyncSidecarTest, ModeRoundTripsAndDefaultsToLinked)
     ASSERT_TRUE(dir.isValid());
     DeckSyncSidecar sidecar(sidecarPath(dir));
     EXPECT_EQ(sidecar.mode, DeckSyncSidecar::MODE_LINKED);
+    EXPECT_EQ(sidecar.lastSyncSecs, 0);
     sidecar.mode = DeckSyncSidecar::MODE_SEPARATE;
+    sidecar.lastSyncSecs = 1791739200;
     EXPECT_TRUE(sidecar.save());
 
     DeckSyncSidecar reloaded(sidecarPath(dir));
     EXPECT_TRUE(reloaded.load());
     EXPECT_EQ(reloaded.mode, DeckSyncSidecar::MODE_SEPARATE);
+    EXPECT_EQ(reloaded.lastSyncSecs, 1791739200);
 }
 
 TEST(DeckSyncSidecarTest, PathForDeckPathBuildsSidecarPath)

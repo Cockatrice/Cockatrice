@@ -135,6 +135,7 @@ private slots:
     void onFirstSyncDetected(int localCount, int serverCount);
     void onConflictRequest(const DeckSyncConflict &conflict);
     void onSyncStatusMessage(const QString &message);
+    void onSyncStarted();
     void onSyncFinished(const SyncSummary &summary, const QString &error);
 
 public:

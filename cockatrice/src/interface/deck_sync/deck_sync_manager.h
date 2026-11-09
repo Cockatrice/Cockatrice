@@ -17,13 +17,16 @@
 #include <QString>
 #include <QVariant>
 #include <functional>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/settings/deck_sync_settings.h>
 
-class AbstractClient;
 class CommandContainer;
 class DeckList;
+class QFileSystemWatcher;
+class QTimer;
 class Response;
 class ServerInfo_DeckStorage_Folder;
+class ServerInfo_User;
 
 /**
  * @class DeckSyncManager
@@ -67,15 +70,19 @@ public:
         int removed = 0; ///< Decks deleted on the server, or locally to mirror a server delete.
         int unchanged = 0;
         int skipped = 0;
+        /** @brief Both-sides-changed decks left untouched for a manual verdict. */
+        int conflicts = 0;
         QString note; ///< Non-error caveat about this run, empty when there is none.
     };
 
     explicit DeckSyncManager(QObject *parent = nullptr);
     DeckSyncManager(AbstractClient *client, ColorIdentityProvider provider, QObject *parent = nullptr);
 
-    void setProfile(const DeckSyncProfile &_profile);
+    void setServerIdentity(const QString &host, int port, const QString &username);
     void setDeckPath(const QString &path);
     void setConflictDefault(int conflictDefault);
+    void setAutoSyncEnabled(bool enabled);
+    void setSyncIntervalMinutes(int minutes);
     [[nodiscard]] bool isSyncing() const;
 
 public slots:
@@ -98,6 +105,7 @@ signals:
 
 private slots:
     void onListFinished(const Response &response, const CommandContainer &commandContainer);
+    void onCheckFinished(const Response &response, const CommandContainer &commandContainer);
     void
     onEnsureDirFinished(const Response &response, const CommandContainer &commandContainer, const QVariant &extraData);
     void
@@ -160,9 +168,21 @@ private:
         qint64 lastModifiedSecs = 0;
     };
 
+    void startSync(bool autoRun);
     void failSync(const QString &error);
     void finishSync();
     [[nodiscard]] SyncSummary currentSummary() const;
+    void fetchFullList();
+    void sendSyncCheck(qint64 lastSyncSecs);
+    void autoSyncSoon();
+    [[nodiscard]] bool canAutoRun() const;
+    void onDebounceTimeout();
+    void onWatchedPathChanged(const QString &path);
+    void onClientStatusChanged(ClientStatus status);
+    void onUserInfoChanged(const ServerInfo_User &userInfo);
+    void refreshWatcher();
+    void refreshInterval();
+    [[nodiscard]] DeckSyncProfile buildProfile() const;
     void collectServerFiles(const ServerInfo_DeckStorage_Folder &folder,
                             const QString &prefix,
                             QMap<int, ServerFile> &files,
@@ -200,7 +220,9 @@ private:
     QString uniqueLocalPath(const QString &relativePath) const;
 
     AbstractClient *client = nullptr;
-    DeckSyncProfile profile;
+    QString serverHost;
+    int serverPort = 0;
+    QString serverUsername;
     QString deckPath;
     ColorIdentityProvider colorIdentityProvider;
     bool syncing = false;
@@ -218,6 +240,13 @@ private:
     QMap<int, ServerFile> stashedServerFiles;
     ActiveConflict activeConflict;
     DeckSyncMode syncMode = DeckSyncMode::TwoWay; ///< This run's direction, loaded from the sidecar.
+    QFileSystemWatcher *watcher = nullptr;
+    QTimer *debounceTimer = nullptr;
+    QTimer *intervalTimer = nullptr;
+    bool autoSyncEnabled = true;
+    int syncIntervalMinutes = 5;
+    bool offline = false;
+    qint64 pendingServerTime = -1;
     int conflictDefault = DeckSyncConflictAsk;
     int sessionDefault = -1;
     bool firstSyncRun = false;
@@ -226,6 +255,9 @@ private:
     int removedCount = 0;
     int unchangedCount = 0;
     int skippedCount = 0;
+    bool serverChangeSkipped = false; ///< A server change could not be applied; keep the sync baseline.
+    int conflictCount = 0;
+    bool autoRun = false;
 };
 
 #endif // DECK_SYNC_MANAGER_H

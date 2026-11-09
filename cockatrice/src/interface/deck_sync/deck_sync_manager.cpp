@@ -8,10 +8,13 @@
 #include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
+#include <QFileSystemWatcher>
 #include <QLoggingCategory>
 #include <QSaveFile>
 #include <QStringList>
+#include <QTimer>
 #include <QUuid>
+#include <QtGlobal>
 #include <libcockatrice/deck_list/deck_diff.h>
 #include <libcockatrice/deck_list/deck_file_format.h>
 #include <libcockatrice/deck_list/deck_list.h>
@@ -20,12 +23,15 @@
 #include <libcockatrice/protocol/pb/command_deck_download.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_list.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_new_dir.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_sync_check.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_list.pb.h>
+#include <libcockatrice/protocol/pb/response_deck_sync_status.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_deckstorage.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/string_limits.h>
 
@@ -35,6 +41,7 @@ namespace
 {
 constexpr const char *SYNC_META_DIR = ".sync";
 constexpr const char *BACKUP_SUFFIX = ".sync-backup-";
+constexpr int WATCH_DEBOUNCE_MS = 2000;
 
 QString serverPathFor(const QString &relativePath)
 {
@@ -109,6 +116,20 @@ const char *sidecarModeFor(DeckSyncMode mode)
 
 DeckSyncManager::DeckSyncManager(QObject *parent) : QObject(parent)
 {
+    watcher = new QFileSystemWatcher(this);
+    debounceTimer = new QTimer(this);
+    debounceTimer->setSingleShot(true);
+    debounceTimer->setInterval(WATCH_DEBOUNCE_MS);
+    intervalTimer = new QTimer(this);
+    connect(watcher, &QFileSystemWatcher::fileChanged, this,
+            [this](const QString &path) { onWatchedPathChanged(path); });
+    connect(watcher, &QFileSystemWatcher::directoryChanged, this, [this](const QString &path) {
+        refreshWatcher();
+        onWatchedPathChanged(path);
+    });
+    connect(debounceTimer, &QTimer::timeout, this, &DeckSyncManager::onDebounceTimeout);
+    connect(intervalTimer, &QTimer::timeout, this, [this] { autoSyncSoon(); });
+    refreshInterval();
 }
 
 DeckSyncManager::DeckSyncManager(AbstractClient *_client, ColorIdentityProvider provider, QObject *parent)
@@ -116,16 +137,135 @@ DeckSyncManager::DeckSyncManager(AbstractClient *_client, ColorIdentityProvider 
 {
     client = _client;
     colorIdentityProvider = std::move(provider);
+    if (client == nullptr) {
+        return;
+    }
+    connect(client, &AbstractClient::statusChanged, this, &DeckSyncManager::onClientStatusChanged);
+    connect(client, &AbstractClient::userInfoChanged, this, &DeckSyncManager::onUserInfoChanged);
 }
 
-void DeckSyncManager::setProfile(const DeckSyncProfile &_profile)
+void DeckSyncManager::onClientStatusChanged(ClientStatus status)
 {
-    profile = _profile;
+    if (status != StatusDisconnected) {
+        return;
+    }
+    offline = true;
+    debounceTimer->stop();
+    // A run cannot survive the session it was started on: the in-flight
+    // command comes back RespNotConnected, the remaining queue would be
+    // sent on a dead client, and a re-login as another account would
+    // receive this profile's uploads and deletes.
+    if (syncing) {
+        activeConflict = ActiveConflict();
+        failSync(tr("Disconnected."));
+    }
+}
+
+void DeckSyncManager::onUserInfoChanged(const ServerInfo_User &userInfo)
+{
+    offline = false;
+    serverUsername = QString::fromStdString(userInfo.name());
+    autoSyncSoon();
+}
+
+void DeckSyncManager::setServerIdentity(const QString &host, int port, const QString &username)
+{
+    serverHost = host;
+    serverPort = port;
+    serverUsername = username;
 }
 
 void DeckSyncManager::setDeckPath(const QString &path)
 {
     deckPath = path;
+    refreshWatcher();
+}
+
+void DeckSyncManager::setAutoSyncEnabled(bool enabled)
+{
+    autoSyncEnabled = enabled;
+    refreshInterval();
+}
+
+void DeckSyncManager::setSyncIntervalMinutes(int minutes)
+{
+    syncIntervalMinutes = qBound(1, minutes, 60);
+    refreshInterval();
+}
+
+DeckSyncProfile DeckSyncManager::buildProfile() const
+{
+    return DeckSyncProfile(serverHost, serverPort, serverUsername);
+}
+
+void DeckSyncManager::refreshInterval()
+{
+    intervalTimer->stop();
+    if (autoSyncEnabled) {
+        intervalTimer->start(syncIntervalMinutes * 60000);
+    }
+}
+
+void DeckSyncManager::refreshWatcher()
+{
+    watcher->removePaths(watcher->files() + watcher->directories());
+    if (deckPath.isEmpty() || !QDir(deckPath).exists()) {
+        return;
+    }
+    QStringList watched;
+    watched.append(deckPath);
+    QDirIterator it(deckPath, QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        const QString path = it.next();
+        if (!path.contains("/" + QString(SYNC_META_DIR) + "/") && !path.endsWith("/" + QString(SYNC_META_DIR))) {
+            watched.append(path);
+        }
+    }
+    watcher->addPaths(watched);
+}
+
+void DeckSyncManager::onWatchedPathChanged(const QString &path)
+{
+    if (path.contains("/" + QString(SYNC_META_DIR) + "/")) {
+        return;
+    }
+    autoSyncSoon();
+}
+
+void DeckSyncManager::autoSyncSoon()
+{
+    if (!autoSyncEnabled) {
+        return;
+    }
+    debounceTimer->start(WATCH_DEBOUNCE_MS);
+}
+
+void DeckSyncManager::onDebounceTimeout()
+{
+    if (syncing) {
+        debounceTimer->start(WATCH_DEBOUNCE_MS);
+        return;
+    }
+    if (canAutoRun()) {
+        startSync(true);
+    }
+}
+
+bool DeckSyncManager::canAutoRun() const
+{
+    if (!autoSyncEnabled || offline || client == nullptr || deckPath.isEmpty()) {
+        return false;
+    }
+    const DeckSyncProfile autoProfile = buildProfile();
+    if (!autoProfile.isValid()) {
+        return false;
+    }
+    const QString autoSidecarPath = DeckSyncSidecar::pathForDeckPath(deckPath, autoProfile.key());
+    if (!QFileInfo::exists(autoSidecarPath)) {
+        return false;
+    }
+    DeckSyncSidecar sidecar(autoSidecarPath);
+    return sidecar.load() && sidecar.mode == DeckSyncSidecar::MODE_LINKED;
 }
 
 void DeckSyncManager::setConflictDefault(int _conflictDefault)
@@ -140,10 +280,17 @@ bool DeckSyncManager::isSyncing() const
 
 void DeckSyncManager::syncNow()
 {
+    startSync(false);
+}
+
+void DeckSyncManager::startSync(bool _autoRun)
+{
     if (syncing) {
         return;
     }
-    if (client == nullptr || !profile.isValid() || deckPath.isEmpty()) {
+    autoRun = _autoRun;
+    const DeckSyncProfile runProfile = buildProfile();
+    if (client == nullptr || !runProfile.isValid() || deckPath.isEmpty()) {
         emit syncFinished(SyncSummary{}, tr("Not connected to a server."));
         return;
     }
@@ -160,6 +307,7 @@ void DeckSyncManager::syncNow()
     unchangedCount = 0;
     skippedCount = 0;
     syncNote.clear();
+    conflictCount = 0;
     pendingUploads.clear();
     pendingDownloads.clear();
     pendingDeletes.clear();
@@ -172,10 +320,12 @@ void DeckSyncManager::syncNow()
     localFiles.clear();
     sessionDefault = -1;
     firstSyncRun = false;
+    pendingServerTime = -1;
+    serverChangeSkipped = false;
     emit syncStarted();
     emit statusMessage(tr("Scanning local decks..."));
 
-    sidecarPath = DeckSyncSidecar::pathForDeckPath(deckPath, profile.key());
+    sidecarPath = DeckSyncSidecar::pathForDeckPath(deckPath, runProfile.key());
     DeckSyncSidecar sidecar(sidecarPath);
     if (!sidecar.load()) {
         failSync(tr("Could not read sync state."));
@@ -208,10 +358,78 @@ void DeckSyncManager::syncNow()
                                                   .modified = QFileInfo(absolutePath).lastModified()});
     }
 
+    // Always ask the server first: its server_time becomes the sync baseline,
+    // so uploads racing the DeckList response cannot fall outside the window.
+    sendSyncCheck(sidecar.lastSyncSecs);
+}
+
+void DeckSyncManager::fetchFullList()
+{
     Command_DeckList cmd;
     PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &DeckSyncManager::onListFinished);
     client->sendCommand(pend);
+}
+
+void DeckSyncManager::sendSyncCheck(qint64 lastSyncSecs)
+{
+    emit statusMessage(tr("Checking for server changes..."));
+    Command_DeckSyncCheck cmd;
+    cmd.set_last_sync_time(static_cast<google::protobuf::uint64>(lastSyncSecs));
+    PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &DeckSyncManager::onCheckFinished);
+    client->sendCommand(pend);
+}
+
+void DeckSyncManager::onCheckFinished(const Response &response, const CommandContainer & /*commandContainer*/)
+{
+    if (!syncing) {
+        return;
+    }
+    if (response.response_code() != Response::RespOk) {
+        fetchFullList();
+        return;
+    }
+    const Response_DeckSyncStatus &status = response.GetExtension(Response_DeckSyncStatus::ext);
+    if (status.has_server_time()) {
+        pendingServerTime = static_cast<qint64>(status.server_time());
+    }
+    DeckSyncSidecar sidecar(sidecarPath);
+    if (!sidecar.load()) {
+        fetchFullList();
+        return;
+    }
+
+    bool localClean = status.changed_files_size() == 0;
+    if (localClean) {
+        for (auto it = localFiles.begin(); it != localFiles.end(); ++it) {
+            const DeckSyncRecord record = sidecar.get(it.key());
+            if (record.remoteId == -1 || record.baseHash != it.value().hash) {
+                localClean = false;
+                break;
+            }
+        }
+    }
+    if (localClean) {
+        const QMap<QString, DeckSyncRecord> knownRecords = sidecar.records();
+        for (auto it = knownRecords.begin(); it != knownRecords.end(); ++it) {
+            if (!localFiles.contains(it.key())) {
+                localClean = false;
+                break;
+            }
+        }
+    }
+    if (!localClean) {
+        if (status.changed_files_size() > 0) {
+            emit statusMessage(tr("%1 server changes, syncing...").arg(status.changed_files_size()));
+        }
+        fetchFullList();
+        return;
+    }
+
+    unchangedCount = localFiles.size();
+    emit statusMessage(tr("Decks are already in sync."));
+    finishSync();
 }
 
 void DeckSyncManager::collectServerFiles(const ServerInfo_DeckStorage_Folder &folder,
@@ -423,6 +641,10 @@ void DeckSyncManager::classify(const QMap<int, ServerFile> &serverFiles)
                 const QString backupPath =
                     absolutePath + BACKUP_SUFFIX + QString::number(QDateTime::currentDateTime().toSecsSinceEpoch());
                 if (!QFile::copy(absolutePath, backupPath) || !QFile::remove(absolutePath)) {
+                    // The server row is gone but the local file could not be
+                    // removed. Keep the baseline so the next check still reports
+                    // the delete instead of hiding it behind a newer sync time.
+                    serverChangeSkipped = true;
                     ++skippedCount;
                     continue;
                 }
@@ -640,6 +862,16 @@ void DeckSyncManager::queueConflict(const QString &relativePath,
                                .guid = serverGuid,
                                .hash = serverHash,
                                .lastModifiedSecs = serverLastModifiedSecs};
+    if (autoRun) {
+        // An auto run has no user in front of it: opening the modal conflict
+        // dialog from a timer or a file-watcher event would pop up mid-game.
+        // Leave the path untouched so the next manual sync classifies it again
+        // and asks — and skip the server fetch, which would only be discarded
+        // and repeated on every poll.
+        ++conflictCount;
+        ++skippedCount;
+        return;
+    }
     pendingConflicts.insert(relativePath, ctx);
     conflictPaths.insert(relativePath);
     applyDownload(relativePath, deckId, serverGuid, serverHash, serverLastModifiedSecs);
@@ -647,6 +879,9 @@ void DeckSyncManager::queueConflict(const QString &relativePath,
 
 void DeckSyncManager::handleConflictDownload(const QString &relativePath, const QString &serverDeckString)
 {
+    // Only a manual run fetches a conflicting server copy, so this point is
+    // never reached with autoRun set: queueConflict() records the conflict and
+    // leaves the path alone instead.
     const ConflictDownload ctx = pendingConflicts.take(relativePath);
     if (sessionDefault == DeckSyncConflictKeepMine) {
         applyUpload(relativePath, ctx.serverPath, ctx.deckId, ctx.guid);
@@ -1018,6 +1253,7 @@ void DeckSyncManager::onDownloadFinished(const Response &response,
         return;
     }
     if (response.response_code() != Response::RespOk) {
+        serverChangeSkipped = true;
         ++skippedCount;
         processNext();
         return;
@@ -1044,6 +1280,7 @@ void DeckSyncManager::applyDownloadedDeck(const QString &relativePath,
 {
     DeckList deck;
     if (!deck.loadFromString_Native(deckString)) {
+        serverChangeSkipped = true;
         ++skippedCount;
         processNext();
         return;
@@ -1052,6 +1289,7 @@ void DeckSyncManager::applyDownloadedDeck(const QString &relativePath,
     const QString cleanDeckPath = QDir::cleanPath(deckPath);
     const QString absolutePath = QDir::cleanPath(deckPath + "/" + relativePath);
     if (absolutePath != cleanDeckPath && !absolutePath.startsWith(cleanDeckPath + "/")) {
+        serverChangeSkipped = true;
         ++skippedCount;
         processNext();
         return;
@@ -1060,6 +1298,7 @@ void DeckSyncManager::applyDownloadedDeck(const QString &relativePath,
         const QString backupPath =
             absolutePath + BACKUP_SUFFIX + QString::number(QDateTime::currentDateTime().toSecsSinceEpoch());
         if (!QFile::copy(absolutePath, backupPath)) {
+            serverChangeSkipped = true;
             ++skippedCount;
             processNext();
             return;
@@ -1067,6 +1306,7 @@ void DeckSyncManager::applyDownloadedDeck(const QString &relativePath,
     }
     QDir().mkpath(QFileInfo(absolutePath).absolutePath());
     if (!DeckLoader::saveToFile(deck, absolutePath, DeckFileFormat::Cockatrice)) {
+        serverChangeSkipped = true;
         ++skippedCount;
         processNext();
         return;
@@ -1121,7 +1361,8 @@ void DeckSyncManager::onDeleteFinished(const Response &response,
         }
     }
     // Both outcomes converge the record: pushed deletes and server-side
-    // deletes (already tombstoned, answering NameNotFound) are done.
+    // deletes (already tombstoned, answering NameNotFound) are done. Either
+    // way the server tree the client is showing is stale, so both count.
     if (response.response_code() == Response::RespOk || response.response_code() == Response::RespNameNotFound) {
         DeckSyncSidecar sidecar(sidecarPath);
         sidecar.load();
@@ -1173,6 +1414,16 @@ void DeckSyncManager::failSync(const QString &error)
 void DeckSyncManager::finishSync()
 {
     syncing = false;
+    DeckSyncSidecar sidecar(sidecarPath);
+    if (sidecar.load() && !serverChangeSkipped) {
+        // Advance the baseline only when every server change was applied. If one
+        // was skipped, keep the previous baseline so the next check reports it
+        // again instead of hiding it behind a newer sync time.
+        sidecar.lastSyncSecs =
+            pendingServerTime >= 0 ? pendingServerTime : QDateTime::currentDateTime().toSecsSinceEpoch();
+        sidecar.save();
+    }
+    pendingServerTime = -1;
     const SyncSummary summary = currentSummary();
     QString message = tr("Sync complete: %1 uploaded, %2 downloaded, %3 removed, %4 unchanged, %5 skipped.")
                           .arg(summary.uploaded)
@@ -1183,6 +1434,8 @@ void DeckSyncManager::finishSync()
     if (!summary.note.isEmpty()) {
         message += QStringLiteral(" ") + summary.note;
     }
+    // The conflict count travels in the summary: a statusMessage here would be
+    // overwritten by the syncFinished() summary the tab renders next.
     emit statusMessage(message);
     emit syncFinished(summary, QString());
 }
@@ -1195,6 +1448,7 @@ DeckSyncManager::SyncSummary DeckSyncManager::currentSummary() const
         .removed = removedCount,
         .unchanged = unchangedCount,
         .skipped = skippedCount,
+        .conflicts = conflictCount,
         .note = syncNote,
     };
 }
