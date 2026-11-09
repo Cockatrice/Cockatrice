@@ -300,6 +300,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
         qDebug() << "warning: an empty card was added to set" << printingInfo.getSet()->getShortName();
     }
     cards.insert(name, newCard);
+    magicFormatsDirty = true;
 
     return newCard;
 }
@@ -794,8 +795,38 @@ static FormatRulesNameMap buildDefaultMagicFormats()
 
 const FormatRulesNameMap &OracleImporter::createDefaultMagicFormats()
 {
-    static const FormatRulesNameMap cached = buildDefaultMagicFormats();
-    return cached;
+    static const FormatRulesNameMap defaults = buildDefaultMagicFormats();
+    if (!magicFormatsDirty) {
+        return magicFormats;
+    }
+
+    // Sort by name so saved rules are independent of QHash iteration order.
+    QMap<QString, int> finiteLimits;
+    for (const auto &card : cards) {
+        if (const auto limit = parseDeckCopyLimit(card->getName(), card->getText())) {
+            finiteLimits.insert(card->getName(), *limit);
+        }
+    }
+    magicFormats = defaults;
+    if (!finiteLimits.isEmpty()) {
+        for (auto it = magicFormats.begin(); it != magicFormats.end(); ++it) {
+            // Copy the value before appending: defaults and other importer
+            // instances retain their existing shared FormatRules objects.
+            FormatRulesPtr format(new FormatRules(*it.value()));
+            for (auto limit = finiteLimits.cbegin(); limit != finiteLimits.cend(); ++limit) {
+                ExceptionRule exception;
+                exception.conditions.append({"name", "equals", limit.key()});
+                // A card's copy allowance does not make it legal in a format
+                // where it is banned, restricted or outside the card pool.
+                exception.conditions.append({"format-" + it.key(), "equals", "legal"});
+                exception.maxCopies = limit.value();
+                format->exceptions.append(exception);
+            }
+            it.value() = format;
+        }
+    }
+    magicFormatsDirty = false;
+    return magicFormats;
 }
 
 int OracleImporter::startImport()
@@ -806,6 +837,8 @@ int OracleImporter::startImport()
     importError.clear();
     sets.clear();
     cards.clear();
+    magicFormats.clear();
+    magicFormatsDirty = true;
     localizedEntries.clear();
     splitLocalizedTexts.clear();
     if (allSets.isEmpty()) {
@@ -893,6 +926,8 @@ int OracleImporter::failImport(const QString &message)
     importError = message;
     sets.clear();
     cards.clear();
+    magicFormats.clear();
+    magicFormatsDirty = true;
     localizedEntries.clear();
     splitLocalizedTexts.clear();
     qWarning() << message;
@@ -920,6 +955,8 @@ void OracleImporter::clear()
     prepareImport();
     sets.clear();
     cards.clear();
+    magicFormats.clear();
+    magicFormatsDirty = true;
     allSets.clear();
     rawSetsData.clear();
     localizedEntries.clear();
