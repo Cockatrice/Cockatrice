@@ -3843,6 +3843,204 @@ bool Servatrice_DatabaseInterface::getReportComments(int reportId, QList<ServerI
     return true;
 }
 
+bool Servatrice_DatabaseInterface::getReportStats(ReportStatsRecord &stats)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *overviewQuery =
+        prepareQuery("SELECT COUNT(*) AS total, "
+                     "SUM(status IN ('open', 'assigned')) AS pending, "
+                     "SUM(status = 'assigned') AS assigned, "
+                     "SUM(status IN ('resolved', 'dismissed')) AS resolved, "
+                     "SUM(created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)) AS last24h, "
+                     "SUM(created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) AS last7d, "
+                     "SUM(created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) AS last30d, "
+                     "SUM(created_at >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)) AS this_week "
+                     "FROM {prefix}_reports");
+    if (!execSqlQuery(overviewQuery) || !overviewQuery->next()) {
+        return false;
+    }
+
+    stats.totalReports = overviewQuery->value(0).toInt();
+    stats.totalPending = overviewQuery->value(1).toInt();
+    stats.totalAssigned = overviewQuery->value(2).toInt();
+    stats.totalResolved = overviewQuery->value(3).toInt();
+    stats.reportsLast24h = overviewQuery->value(4).toInt();
+    stats.reportsLast7d = overviewQuery->value(5).toInt();
+    stats.reportsLast30d = overviewQuery->value(6).toInt();
+    stats.reportsThisWeek = overviewQuery->value(7).toInt();
+
+    stats.allQueriesOk = true;
+
+    QSqlQuery *lastWeekQuery =
+        prepareQuery("SELECT COUNT(*) FROM {prefix}_reports WHERE created_at >= DATE_SUB(CURDATE(), "
+                     "INTERVAL WEEKDAY(CURDATE()) + 7 DAY) "
+                     "AND created_at < DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)");
+    if (execSqlQuery(lastWeekQuery) && lastWeekQuery->next()) {
+        stats.hasReportsLastWeek = true;
+        stats.reportsLastWeek = lastWeekQuery->value(0).toInt();
+    } else {
+        stats.allQueriesOk = false;
+    }
+
+    QSqlQuery *avgResQuery =
+        prepareQuery("SELECT AVG(TIMESTAMPDIFF(HOUR, created_at, resolution_time)) "
+                     "FROM {prefix}_reports WHERE status IN ('resolved','dismissed') AND resolution_time IS NOT NULL");
+    if (execSqlQuery(avgResQuery) && avgResQuery->next()) {
+        if (!avgResQuery->value(0).isNull()) {
+            stats.hasAvgResolutionHours = true;
+            stats.avgResolutionHours = avgResQuery->value(0).toDouble();
+        }
+    } else {
+        stats.allQueriesOk = false;
+    }
+
+    QSqlQuery *catQuery =
+        prepareQuery("SELECT category, COUNT(*) AS cnt FROM {prefix}_reports GROUP BY category ORDER BY cnt DESC "
+                     "LIMIT 10");
+    if (execSqlQuery(catQuery)) {
+        while (catQuery->next()) {
+            ReportCategoryCountRecord record;
+            record.category = catQuery->value(0).toString();
+            record.count = catQuery->value(1).toInt();
+            stats.categoryCounts.append(record);
+        }
+    } else {
+        stats.allQueriesOk = false;
+    }
+
+    QSqlQuery *topReportedQuery = prepareQuery("SELECT reported_user_name, COUNT(*) AS cnt FROM {prefix}_reports "
+                                               "GROUP BY reported_user_name ORDER BY cnt DESC LIMIT 10");
+    if (execSqlQuery(topReportedQuery)) {
+        while (topReportedQuery->next()) {
+            ReportTopUserRecord record;
+            record.userName = topReportedQuery->value(0).toString();
+            record.count = topReportedQuery->value(1).toInt();
+            stats.topReportedUsers.append(record);
+        }
+    } else {
+        stats.allQueriesOk = false;
+    }
+
+    QSqlQuery *topReporterQuery = prepareQuery("SELECT reporter_name, COUNT(*) AS cnt FROM {prefix}_reports "
+                                               "GROUP BY reporter_name ORDER BY cnt DESC LIMIT 10");
+    if (execSqlQuery(topReporterQuery)) {
+        while (topReporterQuery->next()) {
+            ReportTopUserRecord record;
+            record.userName = topReporterQuery->value(0).toString();
+            record.count = topReporterQuery->value(1).toInt();
+            stats.topReporters.append(record);
+        }
+    } else {
+        stats.allQueriesOk = false;
+    }
+
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::getReportUserInfo(const QString &userName, ReportUserInfoRecord &info)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *userQuery = prepareQuery("SELECT u.admin, u.active, u.registrationDate, u.adminnotes "
+                                        "FROM {prefix}_users u "
+                                        "WHERE u.name = :name");
+    userQuery->bindValue(":name", userName);
+
+    if (!execSqlQuery(userQuery)) {
+        return false;
+    }
+
+    if (!userQuery->next()) {
+        return true;
+    }
+
+    info.found = true;
+    info.isAdmin = userQuery->value(0).toBool();
+    info.isActive = userQuery->value(1).toBool();
+    info.registrationTime = userQuery->value(2).toDateTime().toSecsSinceEpoch();
+
+    if (!userQuery->value(3).isNull()) {
+        info.hasAdminNotes = true;
+        info.adminNotes = userQuery->value(3).toString();
+    }
+
+    QSqlQuery *reportCountQuery =
+        prepareQuery("SELECT COUNT(*) FROM {prefix}_reports WHERE reported_user_name = :name");
+    reportCountQuery->bindValue(":name", userName);
+    if (execSqlQuery(reportCountQuery) && reportCountQuery->next()) {
+        info.hasTotalReports = true;
+        info.totalReports = reportCountQuery->value(0).toInt();
+    }
+
+    QSqlQuery *banCountQuery = prepareQuery("SELECT COUNT(*) FROM {prefix}_bans WHERE user_name = :name");
+    banCountQuery->bindValue(":name", userName);
+    if (execSqlQuery(banCountQuery) && banCountQuery->next()) {
+        info.hasTotalBans = true;
+        info.totalBans = banCountQuery->value(0).toInt();
+    }
+
+    QSqlQuery *warnCountQuery = prepareQuery("SELECT COUNT(*) FROM {prefix}_warnings WHERE user_name = :name");
+    warnCountQuery->bindValue(":name", userName);
+    if (execSqlQuery(warnCountQuery) && warnCountQuery->next()) {
+        info.hasTotalWarns = true;
+        info.totalWarns = warnCountQuery->value(0).toInt();
+    }
+
+    QSqlQuery *lastLoginQuery = prepareQuery("SELECT UNIX_TIMESTAMP(a.last_login) "
+                                             "FROM {prefix}_user_analytics a "
+                                             "JOIN {prefix}_users u ON u.id = a.id "
+                                             "WHERE u.name = :name");
+    lastLoginQuery->bindValue(":name", userName);
+    if (execSqlQuery(lastLoginQuery) && lastLoginQuery->next() && !lastLoginQuery->value(0).isNull()) {
+        info.hasLastLogin = true;
+        info.lastLogin = lastLoginQuery->value(0).toLongLong();
+    }
+
+    QSqlQuery *recentQuery = prepareQuery("SELECT r.id, r.reporter_name, r.reported_user_name, r.game_id, "
+                                          "r.category, r.description, r.created_at, r.status, "
+                                          "r.resolution_note, ru.name AS assigned_mod_name "
+                                          "FROM {prefix}_reports r "
+                                          "LEFT JOIN {prefix}_users ru ON r.assigned_to = ru.id "
+                                          "WHERE r.reported_user_name = :name "
+                                          "ORDER BY r.created_at DESC LIMIT 10");
+    recentQuery->bindValue(":name", userName);
+
+    if (execSqlQuery(recentQuery)) {
+        while (recentQuery->next()) {
+            ServerInfo_Report report;
+            report.set_report_id(recentQuery->value(0).toInt());
+            report.set_reporter_name(recentQuery->value(1).toString().toStdString());
+            report.set_reported_user_name(recentQuery->value(2).toString().toStdString());
+
+            if (!recentQuery->value(3).isNull()) {
+                report.set_game_id(recentQuery->value(3).toInt());
+            }
+
+            report.set_category(recentQuery->value(4).toString().toStdString());
+            report.set_description(recentQuery->value(5).toString().toStdString());
+            report.set_report_time(recentQuery->value(6).toDateTime().toSecsSinceEpoch());
+            report.set_status(recentQuery->value(7).toString().toStdString());
+
+            if (!recentQuery->value(8).isNull()) {
+                report.set_resolution_note(recentQuery->value(8).toString().toStdString());
+            }
+
+            if (!recentQuery->value(9).isNull()) {
+                report.set_assigned_mod_name(recentQuery->value(9).toString().toStdString());
+            }
+
+            info.recentReports.append(report);
+        }
+    }
+
+    return true;
+}
+
 int Servatrice_DatabaseInterface::countReportsSubmittedInLastDay(int reporterId)
 {
     if (!checkSql()) {

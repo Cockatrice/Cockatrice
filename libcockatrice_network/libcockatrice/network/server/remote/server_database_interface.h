@@ -424,6 +424,66 @@ public:
     {
         return false;
     }
+    /** @brief One report category and how many reports it covers. */
+    struct ReportCategoryCountRecord
+    {
+        QString category;
+        int count = 0;
+    };
+    /** @brief One reported or reporting user and how many reports involve them. */
+    struct ReportTopUserRecord
+    {
+        QString userName;
+        int count = 0;
+    };
+    /** @brief Aggregated report queue statistics for the moderator overview. */
+    struct ReportStatsRecord
+    {
+        int totalReports = 0;
+        int totalPending = 0;
+        int totalAssigned = 0;
+        int totalResolved = 0;
+        int reportsLast24h = 0;
+        int reportsLast7d = 0;
+        int reportsLast30d = 0;
+        int reportsThisWeek = 0;
+        bool hasReportsLastWeek = false;
+        int reportsLastWeek = 0;
+        bool hasAvgResolutionHours = false;
+        double avgResolutionHours = 0.0;
+        QList<ReportCategoryCountRecord> categoryCounts;
+        QList<ReportTopUserRecord> topReportedUsers;
+        QList<ReportTopUserRecord> topReporters;
+        /// False when a non-overview query failed, which keeps the result out of the cache.
+        bool allQueriesOk = true;
+    };
+    virtual bool getReportStats(ReportStatsRecord & /* stats */)
+    {
+        return false;
+    }
+    /** @brief Report history and moderation counts for one user, for the moderator overview. */
+    struct ReportUserInfoRecord
+    {
+        bool found = false;
+        bool isAdmin = false;
+        bool isActive = false;
+        qint64 registrationTime = 0;
+        bool hasAdminNotes = false;
+        QString adminNotes;
+        bool hasTotalReports = false;
+        int totalReports = 0;
+        bool hasTotalBans = false;
+        int totalBans = 0;
+        bool hasTotalWarns = false;
+        int totalWarns = 0;
+        bool hasLastLogin = false;
+        qint64 lastLogin = 0;
+        QList<ServerInfo_Report> recentReports;
+    };
+    virtual bool getReportUserInfo(const QString & /* userName */, ReportUserInfoRecord & /* info */)
+    {
+        return false;
+    }
     /** @brief One resolved or dismissed report whose reporter has not been told yet. */
     struct PendingReportNotification
     {

@@ -301,6 +301,8 @@ public:
     Server_DatabaseInterface::ReportLookupResult
     getReportForDetails(int reportId, int &reporterId, ServerInfo_Report &report) override;
     bool getReportComments(int reportId, QList<ServerInfo_ReportComment> &comments) override;
+    bool getReportStats(ReportStatsRecord &stats) override;
+    bool getReportUserInfo(const QString &userName, ReportUserInfoRecord &info) override;
     bool addReport(int reporterId,
                    const QString &reporterName,
                    int reportedUserId,
