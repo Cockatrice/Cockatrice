@@ -2972,9 +2972,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const 
 
     if (cardName.isEmpty()) {
         // Removal path
-        QSqlQuery *q = sqlInterface->prepareQuery("UPDATE {prefix}_users SET card_art_params = NULL WHERE id = :id");
-        q->bindValue(":id", userInfo->id());
-        if (!sqlInterface->execSqlQuery(q)) {
+        if (!databaseInterface->clearCardArtParams(userInfo->id())) {
             return Response::RespInternalError;
         }
         userInfo->clear_card_art_params();
@@ -2982,7 +2980,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const 
         return Response::RespOk;
     }
 
-    if (!sqlInterface->isCardArtAllowed(cardName, cardProviderId)) {
+    if (!databaseInterface->isCardArtAllowed(cardName, cardProviderId)) {
         return Response::RespFunctionNotAllowed;
     }
 
@@ -3002,10 +3000,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const 
     obj["zoom"] = zoom;
     const QString json = QString::fromUtf8(QJsonDocument(obj).toJson(QJsonDocument::Compact));
 
-    QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_users set card_art_params=:params where id=:id");
-    query->bindValue(":params", json);
-    query->bindValue(":id", userInfo->id());
-    if (!sqlInterface->execSqlQuery(query)) {
+    if (!databaseInterface->setCardArtParams(userInfo->id(), json)) {
         return Response::RespInternalError;
     }
 
@@ -3038,20 +3033,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAddCardArtRule(const Co
         return Response::RespInvalidData;
     }
 
-    QSqlQuery *q = sqlInterface->prepareQuery("INSERT INTO {prefix}_card_art_name_rules "
-                                              "(card_name, card_provider_id, mode, reason, created_by) "
-                                              "VALUES (:name, :provider, :mode, :reason, :uid) "
-                                              "ON DUPLICATE KEY UPDATE mode=:mode2, reason=:reason2");
-
-    q->bindValue(":name", cardName);
-    q->bindValue(":provider", cardProviderId);
-    q->bindValue(":mode", mode);
-    q->bindValue(":mode2", mode);
-    q->bindValue(":reason", QString::fromStdString(cmd.reason()));
-    q->bindValue(":reason2", QString::fromStdString(cmd.reason()));
-    q->bindValue(":uid", userInfo->id());
-
-    if (!sqlInterface->execSqlQuery(q)) {
+    if (!databaseInterface->upsertCardArtRule(cardName, cardProviderId, mode, QString::fromStdString(cmd.reason()),
+                                              userInfo->id())) {
         return Response::RespInternalError;
     }
 
@@ -3066,13 +3049,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveCardArtRule(const
     if (cardName.length() > MAX_NAME_LENGTH || cardProviderId.length() > MAX_NAME_LENGTH) {
         return Response::RespInvalidData;
     }
-    QSqlQuery *q = sqlInterface->prepareQuery(
-        "DELETE FROM {prefix}_card_art_name_rules WHERE card_name=:name AND card_provider_id=:provider");
-
-    q->bindValue(":name", cardName);
-    q->bindValue(":provider", cardProviderId);
-
-    if (!sqlInterface->execSqlQuery(q)) {
+    if (!databaseInterface->removeCardArtRule(cardName, cardProviderId)) {
         return Response::RespInternalError;
     }
 
@@ -3082,21 +3059,19 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveCardArtRule(const
 Response::ResponseCode AbstractServerSocketInterface::cmdListCardArtRules(const Command_ListCardArtRules &,
                                                                           ResponseContainer &rc)
 {
-    QSqlQuery *q = sqlInterface->prepareQuery(
-        "SELECT card_name, card_provider_id, mode, reason FROM {prefix}_card_art_name_rules");
-
-    if (!sqlInterface->execSqlQuery(q)) {
+    QList<Server_DatabaseInterface::CardArtRuleRecord> rules;
+    if (!databaseInterface->getCardArtRules(rules)) {
         return Response::RespInternalError;
     }
 
     auto *re = new Response_ListCardArtRules;
 
-    while (q->next()) {
+    for (const Server_DatabaseInterface::CardArtRuleRecord &rule : rules) {
         auto *entry = re->add_entries();
-        entry->set_card_name(q->value(0).toString().toStdString());
-        entry->set_card_provider_id(q->value(1).toString().toStdString());
-        entry->set_mode(q->value(2).toString().toStdString());
-        entry->set_reason(q->value(3).toString().toStdString());
+        entry->set_card_name(rule.cardName.toStdString());
+        entry->set_card_provider_id(rule.cardProviderId.toStdString());
+        entry->set_mode(rule.mode.toStdString());
+        entry->set_reason(rule.reason.toStdString());
     }
 
     rc.setResponseExtension(re);
