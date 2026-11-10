@@ -223,6 +223,8 @@ public:
                             const QString &newPassword,
                             bool newPasswordNeedsHash) override;
     void setForcePasswordChange(const QString &user, bool force) override;
+    bool updateUserAccount(const QString &userName, const AccountUpdateRecord &update) override;
+    bool setUserAvatar(int userId, const QByteArray &image) override;
     QList<ServerInfo_Ban> getUserBanHistory(const QString &userName) override;
     bool addWarning(const QString userName,
                     const QString adminName,

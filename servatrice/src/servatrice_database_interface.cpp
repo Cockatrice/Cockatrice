@@ -2244,6 +2244,51 @@ void Servatrice_DatabaseInterface::setForcePasswordChange(const QString &user, b
     execSqlQuery(query);
 }
 
+bool Servatrice_DatabaseInterface::updateUserAccount(const QString &userName, const AccountUpdateRecord &update)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QStringList queryList;
+    if (update.hasRealName) {
+        queryList << "realname=:realName";
+    }
+    if (update.hasEmail) {
+        queryList << "email=:email";
+    }
+    if (update.hasCountry) {
+        queryList << "country=:country";
+    }
+
+    const QString queryText = QString("update {prefix}_users set %1 where name=:userName").arg(queryList.join(", "));
+    QSqlQuery *query = prepareQuery(queryText);
+    if (update.hasRealName) {
+        query->bindValue(":realName", update.realName);
+    }
+    if (update.hasEmail) {
+        query->bindValue(":email", update.email);
+    }
+    if (update.hasCountry) {
+        query->bindValue(":country", update.country);
+    }
+    query->bindValue(":userName", userName);
+
+    return execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::setUserAvatar(int userId, const QByteArray &image)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("update {prefix}_users set avatar_bmp=:image where id=:id");
+    query->bindValue(":image", image);
+    query->bindValue(":id", userId);
+    return execSqlQuery(query);
+}
+
 bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user,
                                                       const QString &oldPassword,
                                                       bool oldPasswordNeedsHash,
