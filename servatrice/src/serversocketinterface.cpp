@@ -1668,7 +1668,7 @@ void AbstractServerSocketInterface::removeSaidMessages(const QString &userName, 
 Response::ResponseCode AbstractServerSocketInterface::cmdWarnUser(const Command_WarnUser &cmd,
                                                                   ResponseContainer & /*rc*/)
 {
-    if (!sqlInterface->checkSql()) { // sql database is required, without database there are no moderators anyway
+    if (!databaseInterface->checkSql()) { // sql database is required, without database there are no moderators anyway
         return Response::RespInternalError;
     }
 
@@ -1681,7 +1681,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdWarnUser(const Command_
         removeSaidMessages(userName, amountRemove);
     }
 
-    if (sqlInterface->addWarning(userName, sendingModerator, warningReason, clientId)) {
+    if (databaseInterface->addWarning(userName, sendingModerator, warningReason, clientId)) {
         servatrice->clientsLock.lockForRead();
         AbstractServerSocketInterface *user =
             static_cast<AbstractServerSocketInterface *>(server->getUsers().value(userName));
@@ -1713,7 +1713,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdWarnUser(const Command_
 Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Command_BanFromServer &cmd,
                                                                        ResponseContainer & /*rc*/)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
@@ -1735,17 +1735,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
         address = "";
     }
 
-    QSqlQuery *query = sqlInterface->prepareQuery(
-        "insert into {prefix}_bans (user_name, ip_address, id_admin, time_from, minutes, reason, visible_reason, "
-        "clientid) values(:user_name, :ip_address, :id_admin, NOW(), :minutes, :reason, :visible_reason, :client_id)");
-    query->bindValue(":user_name", userName);
-    query->bindValue(":ip_address", address);
-    query->bindValue(":id_admin", userInfo->id());
-    query->bindValue(":minutes", minutes);
-    query->bindValue(":reason", textFromStdString(cmd.reason()));
-    query->bindValue(":visible_reason", visibleReason);
-    query->bindValue(":client_id", nameFromStdString(cmd.clientid()));
-    sqlInterface->execSqlQuery(query);
+    databaseInterface->addBan(userName, address, userInfo->id(), minutes, textFromStdString(cmd.reason()),
+                              visibleReason, nameFromStdString(cmd.clientid()));
 
     servatrice->clientsLock.lockForRead();
     QList<QString> moderatorList = server->getOnlineModeratorList();
@@ -1760,15 +1751,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     }
 
     if (userName.isEmpty() && address.isEmpty() && (!clientId.isEmpty())) {
-        QSqlQuery *clientIdQuery =
-            sqlInterface->prepareQuery("select name from {prefix}_users where clientid = :client_id");
-        clientIdQuery->bindValue(":client_id", nameFromStdString(cmd.clientid()));
-        sqlInterface->execSqlQuery(clientIdQuery);
-        if (!sqlInterface->execSqlQuery(clientIdQuery)) {
+        QList<QString> clientIdUserNames;
+        if (!databaseInterface->getUserNamesByClientId(nameFromStdString(cmd.clientid()), clientIdUserNames)) {
             qCWarning(AbstractServerSocketInterfaceLog) << "ClientID username ban lookup failed: SQL Error";
         } else {
-            while (clientIdQuery->next()) {
-                userName = clientIdQuery->value(0).toString();
+            for (const QString &name : clientIdUserNames) {
+                userName = name;
                 AbstractServerSocketInterface *user =
                     static_cast<AbstractServerSocketInterface *>(server->getUsers().value(userName));
                 if (user && !userList.contains(user)) {
@@ -3573,12 +3561,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReloadConfig(const Comm
 
 bool AbstractServerSocketInterface::addAdminFlagToUser(const QString &userName, int flag)
 {
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("update {prefix}_users set admin = (admin | :adminlevel) where name = :username");
-    query->bindValue(":adminlevel", flag);
-    query->bindValue(":username", userName);
-    if (!sqlInterface->execSqlQuery(query)) {
-        logger->logMessage(QString("Failed to promote user %1: %2").arg(userName).arg(query->lastError().text()));
+    const auto result = databaseInterface->setAdminFlag(userName, flag, true);
+    if (!result.success) {
+        logger->logMessage(QString("Failed to promote user %1: %2").arg(userName).arg(result.errorText));
         return false;
     }
 
@@ -3597,12 +3582,9 @@ bool AbstractServerSocketInterface::addAdminFlagToUser(const QString &userName, 
 
 bool AbstractServerSocketInterface::removeAdminFlagFromUser(const QString &userName, int flag)
 {
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("update {prefix}_users set admin = (admin & ~ :adminlevel) where name = :username");
-    query->bindValue(":adminlevel", flag);
-    query->bindValue(":username", userName);
-    if (!sqlInterface->execSqlQuery(query)) {
-        logger->logMessage(QString("Failed to demote user %1: %2").arg(userName).arg(query->lastError().text()));
+    const auto result = databaseInterface->setAdminFlag(userName, flag, false);
+    if (!result.success) {
+        logger->logMessage(QString("Failed to demote user %1: %2").arg(userName).arg(result.errorText));
         return false;
     }
 
@@ -3686,17 +3668,17 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForceActivateUser(const
                                                                            ResponseContainer &rc)
 {
     // Determine if user exists
-    auto *getUserTokenQuery = sqlInterface->prepareQuery("select token from {prefix}_users WHERE name = :name");
-    getUserTokenQuery->bindValue(":name", QString::fromStdString(cmd.username_to_activate()));
-    if (!sqlInterface->execSqlQuery(getUserTokenQuery)) {
-        // Internal server error
-        return Response::RespInternalError;
+    QString token;
+    switch (databaseInterface->getUserToken(QString::fromStdString(cmd.username_to_activate()), token)) {
+        case Server_DatabaseInterface::UserFieldResult::Ok:
+            break;
+        case Server_DatabaseInterface::UserFieldResult::NotFound:
+            // User doesn't exist
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::UserFieldResult::Failed:
+            // Internal server error
+            return Response::RespInternalError;
     }
-    if (!getUserTokenQuery->next()) {
-        // User doesn't exist
-        return Response::RespNameNotFound;
-    }
-    const auto &token = getUserTokenQuery->value(0).toString();
 
     // Add audit log that Moderator activated account on behalf of user
     const auto &msg = QString("Attempt Force Activation by %1").arg(QString::fromStdString(cmd.moderator_name()));
@@ -3715,17 +3697,17 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForceActivateUser(const
 Response::ResponseCode AbstractServerSocketInterface::cmdGetAdminNotes(const Command_GetAdminNotes &cmd,
                                                                        ResponseContainer &rc)
 {
-    auto *getAdminNotesQuery = sqlInterface->prepareQuery("select adminnotes from {prefix}_users WHERE name = :name");
-    getAdminNotesQuery->bindValue(":name", QString::fromStdString(cmd.user_name()));
-    if (!sqlInterface->execSqlQuery(getAdminNotesQuery)) {
-        // Internal server error
-        return Response::RespInternalError;
+    QString adminNotes;
+    switch (databaseInterface->getAdminNotes(QString::fromStdString(cmd.user_name()), adminNotes)) {
+        case Server_DatabaseInterface::UserFieldResult::Ok:
+            break;
+        case Server_DatabaseInterface::UserFieldResult::NotFound:
+            // User doesn't exist
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::UserFieldResult::Failed:
+            // Internal server error
+            return Response::RespInternalError;
     }
-    if (!getAdminNotesQuery->next()) {
-        // User doesn't exist
-        return Response::RespNameNotFound;
-    }
-    const auto &adminNotes = getAdminNotesQuery->value(0).toString();
 
     Response_GetAdminNotes *re = new Response_GetAdminNotes;
     re->set_user_name(cmd.user_name());
@@ -3738,17 +3720,14 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetAdminNotes(const Com
 Response::ResponseCode AbstractServerSocketInterface::cmdUpdateAdminNotes(const Command_UpdateAdminNotes &cmd,
                                                                           ResponseContainer & /*rc*/)
 {
-    auto *updateAdminNotesQuery =
-        sqlInterface->prepareQuery("update {prefix}_users set adminnotes = :adminnotes where name = :name");
-    updateAdminNotesQuery->bindValue(":adminnotes", QString::fromStdString(cmd.notes()));
-    updateAdminNotesQuery->bindValue(":name", QString::fromStdString(cmd.user_name()));
-
-    if (!sqlInterface->execSqlQuery(updateAdminNotesQuery)) {
-        return Response::RespInternalError;
-    }
-
-    if (updateAdminNotesQuery->numRowsAffected() == 0) {
-        return Response::RespNameNotFound;
+    switch (databaseInterface->setAdminNotes(QString::fromStdString(cmd.user_name()),
+                                             QString::fromStdString(cmd.notes()))) {
+        case Server_DatabaseInterface::UserFieldResult::Ok:
+            break;
+        case Server_DatabaseInterface::UserFieldResult::NotFound:
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::UserFieldResult::Failed:
+            return Response::RespInternalError;
     }
 
     return Response::RespOk;

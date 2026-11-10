@@ -774,6 +774,58 @@ public:
     virtual void setForcePasswordChange(const QString & /* user */, bool /* force */)
     {
     }
+    /** @brief Outcome of reading or writing one account field. */
+    enum class UserFieldResult
+    {
+        Ok,
+        NotFound,
+        Failed
+    };
+    /** @brief Outcome of granting or revoking admin flags; the caller logs the error text. */
+    struct AdminFlagUpdateResult
+    {
+        bool success = false;
+        QString errorText;
+    };
+    virtual AdminFlagUpdateResult setAdminFlag(const QString & /* userName */, int /* flag */, bool /* add */)
+    {
+        return {};
+    }
+    virtual UserFieldResult getUserToken(const QString & /* userName */, QString & /* token */)
+    {
+        return UserFieldResult::Failed;
+    }
+    virtual UserFieldResult getAdminNotes(const QString & /* userName */, QString & /* notes */)
+    {
+        return UserFieldResult::Failed;
+    }
+    virtual UserFieldResult setAdminNotes(const QString & /* userName */, const QString & /* notes */)
+    {
+        return UserFieldResult::Failed;
+    }
+    /** @brief Record a ban; the caller proceeds even when the insert fails, as before. */
+    virtual bool addBan(const QString & /* userName */,
+                        const QString & /* address */,
+                        int /* adminId */,
+                        int /* minutes */,
+                        const QString & /* reason */,
+                        const QString & /* visibleReason */,
+                        const QString & /* clientId */)
+    {
+        return false;
+    }
+    /** @brief All user names carrying a client id; false when the lookup failed. */
+    virtual bool getUserNamesByClientId(const QString & /* clientId */, QList<QString> & /* userNames */)
+    {
+        return false;
+    }
+    virtual bool addWarning(const QString /* userName */,
+                            const QString /* adminName */,
+                            const QString /* warningReason */,
+                            const QString /* clientID */)
+    {
+        return false;
+    }
     /**
      * @brief Whether the given card art may be shown (card art rules).
      *
