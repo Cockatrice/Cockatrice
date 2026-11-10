@@ -530,34 +530,33 @@ void Server_ProtocolHandler::processCommandContainer(const CommandContainer &con
     }
 }
 
+namespace
+{
+/// Advances a rate-limit window by one keep-alive tick: add a fresh bucket at the front and
+/// drop the oldest bucket once the window holds more than `bucketCount` of them.
+void advanceCountingWindow(QList<int> &counts, int bucketCount)
+{
+    counts.prepend(0);
+    if (counts.size() > bucketCount) {
+        counts.removeLast();
+    }
+}
+} // namespace
+
 void Server_ProtocolHandler::pingClockTimeout()
 {
-
-    int cmdcountinterval = server->getCommandCountingInterval();
-    int msgcountinterval = server->getMessageCountingInterval();
-    int pingclockinterval = server->getClientKeepAlive();
-
-    int interval = server->getMessageCountingInterval();
-    if (interval > 0) {
-        if (pingclockinterval > 0) {
-            messageSizeOverTime.prepend(0);
-            if (messageSizeOverTime.size() > (msgcountinterval / pingclockinterval)) {
-                messageSizeOverTime.removeLast();
-            }
-            messageCountOverTime.prepend(0);
-            if (messageCountOverTime.size() > (msgcountinterval / pingclockinterval)) {
-                messageCountOverTime.removeLast();
-            }
+    const int keepAliveInterval = server->getClientKeepAlive();
+    if (keepAliveInterval > 0) {
+        const int messageCountingInterval = server->getMessageCountingInterval();
+        if (messageCountingInterval > 0) {
+            const int messageBucketCount = messageCountingInterval / keepAliveInterval;
+            advanceCountingWindow(messageSizeOverTime, messageBucketCount);
+            advanceCountingWindow(messageCountOverTime, messageBucketCount);
         }
-    }
 
-    interval = server->getCommandCountingInterval();
-    if (interval > 0) {
-        if (pingclockinterval > 0) {
-            commandCountOverTime.prepend(0);
-            if (commandCountOverTime.size() > (cmdcountinterval / pingclockinterval)) {
-                commandCountOverTime.removeLast();
-            }
+        const int commandCountingInterval = server->getCommandCountingInterval();
+        if (commandCountingInterval > 0) {
+            advanceCountingWindow(commandCountOverTime, commandCountingInterval / keepAliveInterval);
         }
     }
 
@@ -565,20 +564,23 @@ void Server_ProtocolHandler::pingClockTimeout()
         prepareDestroy();
     }
 
-    // PrivLevel users, Moderators, Admins, and Developers are not subject to the server idle timeout policy
+    // PrivLevel users, Moderators, Admins, and Developers are not subject to the server idle timeout policy.
     const bool hasPrivLevel = userInfo && QString::fromStdString(userInfo->privlevel()).toLower() != "none";
     const bool isStaff =
         userInfo && (userInfo->user_level() &
                      (ServerInfo_User::IsModerator | ServerInfo_User::IsAdmin | ServerInfo_User::IsDeveloper));
-    if (!hasPrivLevel && !isStaff) {
-        if ((server->getIdleClientTimeout() > 0) && (idleClientWarningSent)) {
-            if (timeRunning - lastActionReceived > server->getIdleClientTimeout()) {
-                prepareDestroy();
-            }
+    const bool isExemptFromIdleTimeout = hasPrivLevel || isStaff;
+    if (!isExemptFromIdleTimeout) {
+        const int idleTimeout = server->getIdleClientTimeout();
+        const int idleDuration = timeRunning - lastActionReceived;
+
+        if (idleTimeout > 0 && idleClientWarningSent && idleDuration > idleTimeout) {
+            prepareDestroy();
         }
 
-        if (((timeRunning - lastActionReceived) >= qCeil(server->getIdleClientTimeout() * .9)) &&
-            (!idleClientWarningSent) && (server->getIdleClientTimeout() > 0)) {
+        const bool shouldWarnBeforeIdleTimeout =
+            idleTimeout > 0 && !idleClientWarningSent && idleDuration >= qCeil(idleTimeout * .9);
+        if (shouldWarnBeforeIdleTimeout) {
             Event_NotifyUser event;
             event.set_type(Event_NotifyUser::IDLEWARNING);
             SessionEvent *se = prepareSessionEvent(event);
