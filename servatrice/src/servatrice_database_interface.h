@@ -199,6 +199,7 @@ public:
                       const QString &country,
                       bool active = false) override;
     bool activateUser(const QString &userName, const QString &token) override;
+    bool addActivationEmail(const QString &userName) override;
     void updateUsersClientID(const QString &userName, const QString &userClientID) override;
     void updateUsersLastLoginData(const QString &userName, const QString &clientVersion) override;
     void logMessage(const int senderId,

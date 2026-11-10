@@ -359,6 +359,13 @@ bool Servatrice_DatabaseInterface::registerUser(const QString &userName,
     return true;
 }
 
+bool Servatrice_DatabaseInterface::addActivationEmail(const QString &userName)
+{
+    QSqlQuery *query = prepareQuery("insert into {prefix}_activation_emails (name) values(:name)");
+    query->bindValue(":name", userName);
+    return execSqlQuery(query);
+}
+
 bool Servatrice_DatabaseInterface::activateUser(const QString &userName, const QString &token)
 {
     if (!checkSql()) {
