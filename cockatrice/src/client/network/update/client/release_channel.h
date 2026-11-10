@@ -98,6 +98,10 @@ protected:
     Release *lastRelease;
 
 protected:
+    // Major OS version an installer asset targets, parsed from its file name; std::nullopt when
+    // the asset has to be skipped: the name carries no target version, that version is newer
+    // than this host's OS, or the platform publishes no updater assets (Linux, 32-bit Windows).
+    // nullopt therefore means "not for this host", not "unknown version".
     static std::optional<int> getTargetVersionForCurrentOS(const QString &fileName);
     static QString findBestDownloadUrl(const QVariantList &assets);
     [[nodiscard]] virtual QString getReleaseChannelUrl() const = 0;
