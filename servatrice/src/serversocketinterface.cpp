@@ -1722,7 +1722,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetPrivateChatHistory(c
 
     // Resolve the peer to an account id. Matching by name alone would merge the
     // conversations of everyone who has ever used that name.
-    const int peerId = sqlInterface->getUserIdInDB(peer);
+    const int peerId = databaseInterface->getUserId(peer);
     if (peerId < 1) {
         return Response::RespNameNotFound;
     }
@@ -1730,8 +1730,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetPrivateChatHistory(c
     const int limit = qBound<quint32>(1, cmd.limit(), 200);
     QList<ServerInfo_PrivateChatMessage> messages;
     bool hasMore = false;
-    if (!sqlInterface->getPrivateChatHistory(userInfo->id(), QString::fromStdString(userInfo->name()), peerId, peer,
-                                             cmd.before(), limit, messages, hasMore)) {
+    if (!databaseInterface->getPrivateChatHistory(userInfo->id(), QString::fromStdString(userInfo->name()), peerId,
+                                                  peer, cmd.before(), limit, messages, hasMore)) {
         return Response::RespInternalError;
     }
 
@@ -1793,8 +1793,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Com
     if (servatrice->getEnableLogQuery()) {
         bool hasMore = false;
         QList<ServerInfo_ChatMessage> history =
-            sqlInterface->getMessageLogHistory(userName, ipAddress, gameName, gameID, message, chatType, gameType,
-                                               roomType, dateRange, maximumResults, offset, beforeTime, &hasMore);
+            databaseInterface->getMessageLogHistory(userName, ipAddress, gameName, gameID, message, chatType, gameType,
+                                                    roomType, dateRange, maximumResults, offset, beforeTime, &hasMore);
         QListIterator<ServerInfo_ChatMessage> messageIterator(history);
         while (messageIterator.hasNext()) {
             ServerInfo_ChatMessage chatMessage = messageIterator.next();

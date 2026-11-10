@@ -230,7 +230,7 @@ public:
                                                        int &maxresults,
                                                        int offset = 0,
                                                        const QString &beforeTime = QString(),
-                                                       bool *hasMore = nullptr);
+                                                       bool *hasMore = nullptr) override;
     QList<ServerInfo_UserSession> getUserSessions(const QString &userName, int limit) override;
     bool getPrivateChatHistory(int callerId,
                                const QString &callerName,
@@ -239,7 +239,7 @@ public:
                                quint64 before,
                                int limit,
                                QList<ServerInfo_PrivateChatMessage> &messages,
-                               bool &hasMore);
+                               bool &hasMore) override;
     QList<ServerInfo_UserAlt> getUserAlts(const QString &userName,
                                           int depth = 1,
                                           bool useEmail = true,
