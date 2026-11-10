@@ -148,4 +148,5 @@ Visual Deck Editor" menu in the application menu bar at the top of the screen.
 Selecting this action will open your browser with the selected service open and the deck list information from the
 client supplied to it.
 
-Currently supported services are DeckList and TappedOut.
+Currently supported services are decklist.org and decklist.xyz, which create a decklist on the selected site, and
+deckstats.net and tappedout.net, which analyze the deck.
