@@ -257,18 +257,7 @@ public:
 
     // Uptime snapshot as recorded by Servatrice::statusUpdate() into the
     // {prefix}_uptime table. valid is false when no snapshot exists yet.
-    struct UptimeSnapshot
-    {
-        bool valid = false;
-        quint64 usersCount = 0;
-        quint64 modsCount = 0;
-        quint64 gamesCount = 0;
-        quint64 txBytes = 0;
-        quint64 rxBytes = 0;
-        quint64 uptimeSecs = 0;
-        quint64 timest = 0;
-    };
-    UptimeSnapshot getLatestUptimeSnapshot(int serverId);
+    UptimeSnapshot getLatestUptimeSnapshot(int serverId) override;
     bool removeUserAvatar(const QString &userName);
 
     // Outcome of removeUserBanner(), so the caller can tell a missing user apart

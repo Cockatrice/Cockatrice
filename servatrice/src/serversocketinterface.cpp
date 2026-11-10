@@ -2186,13 +2186,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportUserInfo(const Co
 Response::ResponseCode AbstractServerSocketInterface::cmdGetServerStats(const Command_GetServerStats & /*cmd */,
                                                                         ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
     // Servatrice::statusUpdate() periodically snapshots server health into the
     // uptime table. Serve the freshest snapshot for this server.
-    const auto snapshot = sqlInterface->getLatestUptimeSnapshot(servatrice->getServerID());
+    const auto snapshot = databaseInterface->getLatestUptimeSnapshot(servatrice->getServerID());
     if (!snapshot.valid) {
         // No snapshot yet (fresh server, or statusUpdate() has not ticked).
         return Response::RespInternalError;

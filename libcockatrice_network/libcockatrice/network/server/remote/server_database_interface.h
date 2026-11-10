@@ -425,6 +425,24 @@ public:
     virtual int getNextReplayId() = 0;
     virtual int getActiveUserCount(QString connectionType = QString()) = 0;
 
+    /** @brief Snapshot recorded by the server's periodic status update into the uptime table. */
+    struct UptimeSnapshot
+    {
+        bool valid = false;
+        quint64 usersCount = 0;
+        quint64 modsCount = 0;
+        quint64 gamesCount = 0;
+        quint64 txBytes = 0;
+        quint64 rxBytes = 0;
+        quint64 uptimeSecs = 0;
+        quint64 timest = 0;
+    };
+    /** @brief Freshest uptime snapshot of one server; an invalid snapshot when none exists. */
+    virtual UptimeSnapshot getLatestUptimeSnapshot(int /* serverId */)
+    {
+        return {};
+    }
+
     virtual void clearSessionTables()
     {
     }
