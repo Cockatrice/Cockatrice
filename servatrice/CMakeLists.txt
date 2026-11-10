@@ -39,8 +39,10 @@ cockatrice_disable_coverage_for(
   src/smtp/qxthmac.cpp src/smtp/qxtmailattachment.cpp src/smtp/qxtmailmessage.cpp src/smtp/qxtsmtp.cpp
 )
 
+set(servatrice_PLATFORM_SOURCES)
+
 if(WIN32)
-  set(servatrice_SOURCES ${servatrice_SOURCES} servatrice.rc)
+  set(servatrice_PLATFORM_SOURCES ${servatrice_PLATFORM_SOURCES} servatrice.rc)
 endif(WIN32)
 
 # Under FreeBSD we need libexecinfo to use backtrace_symbols_fd()
@@ -54,7 +56,7 @@ if(APPLE)
   set_source_files_properties(
     ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources
   )
-  set(servatrice_SOURCES ${servatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
+  set(servatrice_PLATFORM_SOURCES ${servatrice_PLATFORM_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 endif(APPLE)
 
 qt_add_resources(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
@@ -106,21 +108,36 @@ set(DESKTOPDIR
     CACHE STRING "desktop file destination"
 )
 
-# Build servatrice binary and link it
-add_executable(servatrice MACOSX_BUNDLE ${servatrice_MOC_SRCS} ${servatrice_RESOURCES_RCC} ${servatrice_SOURCES})
+# The startup path, shared by the shipped binary and the dev server.
+set(servatrice_CORE_SOURCES ${servatrice_SOURCES})
+list(REMOVE_ITEM servatrice_CORE_SOURCES src/main.cpp)
+list(APPEND servatrice_CORE_SOURCES src/servatrice_globals.cpp)
 
-target_precompile_headers(servatrice PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")
+add_library(servatrice_core OBJECT ${servatrice_MOC_SRCS} ${servatrice_CORE_SOURCES})
+
+target_precompile_headers(servatrice_core PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")
 
 if(CMAKE_HOST_SYSTEM MATCHES "FreeBSD")
   target_link_libraries(
-    servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${SERVATRICE_QT_MODULES}
-    ${LIBEXECINFO_LIBRARY}
+    servatrice_core PUBLIC libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads
+                           ${SERVATRICE_QT_MODULES} ${LIBEXECINFO_LIBRARY}
   )
 else()
   target_link_libraries(
-    servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${SERVATRICE_QT_MODULES}
+    servatrice_core PUBLIC libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads
+                           ${SERVATRICE_QT_MODULES}
   )
 endif()
+
+# Build servatrice binary and link it
+add_executable(
+  servatrice MACOSX_BUNDLE ${servatrice_MOC_SRCS} ${servatrice_PLATFORM_SOURCES} ${servatrice_RESOURCES_RCC}
+                           src/main.cpp
+)
+
+target_precompile_headers(servatrice PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")
+
+target_link_libraries(servatrice PRIVATE servatrice_core)
 
 # install rules
 if(UNIX)
