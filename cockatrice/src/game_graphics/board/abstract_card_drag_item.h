@@ -39,7 +39,7 @@ public:
     {
         return Type;
     }
-    AbstractCardDragItem(AbstractCardItem *_item, const QPointF &_hotSpot, AbstractCardDragItem *parentDrag = 0);
+    AbstractCardDragItem(AbstractCardItem *_item, const QPointF &_hotSpot, AbstractCardDragItem *parentDrag = nullptr);
     [[nodiscard]] QRectF boundingRect() const override
     {
         return QRectF(0, 0, CardDimensions::WIDTH_F, CardDimensions::HEIGHT_F);

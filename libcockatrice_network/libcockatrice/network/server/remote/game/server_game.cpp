@@ -127,7 +127,7 @@ Server_Game::~Server_Game()
 
     room->removeGame(this);
     delete creatorInfo;
-    creatorInfo = 0;
+    creatorInfo = nullptr;
 
     gameMutex.unlock();
     room->gamesLock.unlock();

@@ -27,7 +27,7 @@ CardDragItem::CardDragItem(CardItem *_item,
                            bool _forceFaceDown,
                            AbstractCardDragItem *parentDrag)
     : AbstractCardDragItem(_item, _hotSpot, parentDrag), id(_id), forceFaceDown(_forceFaceDown), occupied(false),
-      currentZone(0)
+      currentZone(nullptr)
 {
 }
 
@@ -46,8 +46,8 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
         scene()->items(cursorScenePos, Qt::IntersectsItemBoundingRect, Qt::DescendingOrder,
                        static_cast<GameScene *>(scene())->getViewTransform());
 
-    CardZone *cardZone = 0;
-    ZoneViewZone *zoneViewZone = 0;
+    CardZone *cardZone = nullptr;
+    ZoneViewZone *zoneViewZone = nullptr;
     for (int i = colliding.size() - 1; i >= 0; i--) {
         CardZone *temp = qgraphicsitem_cast<CardZone *>(colliding.at(i));
         if (!cardZone) {
@@ -57,7 +57,7 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
             zoneViewZone = qobject_cast<ZoneViewZone *>(temp);
         }
     }
-    CardZone *cursorZone = 0;
+    CardZone *cursorZone = nullptr;
     if (zoneViewZone) {
         cursorZone = zoneViewZone;
     } else if (cardZone) {

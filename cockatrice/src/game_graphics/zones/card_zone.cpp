@@ -15,7 +15,7 @@ class QPoint;
 class QPointF;
 
 CardZone::CardZone(CardZoneLogic *_logic, QGraphicsItem *parent)
-    : AbstractGraphicsItem(parent), menu(nullptr), doubleClickAction(0), logic(_logic)
+    : AbstractGraphicsItem(parent), menu(nullptr), doubleClickAction(nullptr), logic(_logic)
 {
     connect(logic, &CardZoneLogic::retranslateUi, this, &CardZone::retranslateUi);
     // Invalidation is connected before any consumer so a handler that reads cardItems()

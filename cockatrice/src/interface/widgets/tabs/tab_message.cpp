@@ -35,7 +35,7 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
     : Tab(_tabSupervisor), client(_client), ownUserInfo(new ServerInfo_User(_ownUserInfo)),
       otherUserInfo(new ServerInfo_User(_otherUserInfo)), userOnline(_userOnline)
 {
-    chatView = new ChatView(tabSupervisor, 0, true);
+    chatView = new ChatView(tabSupervisor, nullptr, true);
     connect(chatView, &ChatView::showCardInfoPopup, this, &TabMessage::showCardInfoPopup);
     connect(chatView, &ChatView::deleteCardInfoPopup, this, &TabMessage::deleteCardInfoPopup);
     connect(chatView, &ChatView::addMentionTag, this, &TabMessage::addMentionTag);
@@ -184,7 +184,7 @@ void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
 
 bool TabMessage::shouldShowSystemPopup(const Event_UserMessage &event)
 {
-    return (QApplication::activeWindow() == 0 || QApplication::focusWidget() == 0 ||
+    return (QApplication::activeWindow() == nullptr || QApplication::focusWidget() == 0 ||
             (event.sender_name() == otherUserInfo->name() &&
              tabSupervisor->currentIndex() != tabSupervisor->indexOf(this)));
 }
@@ -192,7 +192,7 @@ bool TabMessage::shouldShowSystemPopup(const Event_UserMessage &event)
 void TabMessage::showSystemPopup(const Event_UserMessage &event)
 {
     if (trayIcon) {
-        disconnect(trayIcon, &QSystemTrayIcon::messageClicked, 0, 0);
+        disconnect(trayIcon, &QSystemTrayIcon::messageClicked, nullptr, 0);
         trayIcon->showMessage(tr("Private message from") + " " + otherUserInfo->name().c_str(),
                               event.message().c_str());
         connect(trayIcon, &QSystemTrayIcon::messageClicked, this, &TabMessage::messageClicked);

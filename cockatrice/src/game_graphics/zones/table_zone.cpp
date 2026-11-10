@@ -364,7 +364,7 @@ CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const
             return cardItems().at(i);
         }
     }
-    return 0;
+    return nullptr;
 }
 
 CardItem *TableZone::getCardFromCoords(const QPointF &point) const

@@ -180,7 +180,7 @@ public:
     }
     virtual DeckList *getDeckFromDatabase(int /* deckId */, int /* userId */)
     {
-        return 0;
+        return nullptr;
     }
     /** @brief One folder row of a user's deck storage tree. */
     struct DeckListFolderRecord

@@ -47,7 +47,7 @@ struct CardRef;
 DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item,
                                            const QPointF &_hotSpot,
                                            AbstractCardDragItem *parentDrag)
-    : AbstractCardDragItem(_item, _hotSpot, parentDrag), currentZone(0)
+    : AbstractCardDragItem(_item, _hotSpot, parentDrag), currentZone(nullptr)
 {
 }
 
@@ -55,7 +55,7 @@ void DeckViewCardDragItem::updatePosition(const QPointF &cursorScenePos)
 {
     QList<QGraphicsItem *> colliding = scene()->items(cursorScenePos);
 
-    DeckViewCardContainer *cursorZone = 0;
+    DeckViewCardContainer *cursorZone = nullptr;
     for (int i = colliding.size() - 1; i >= 0; i--) {
         if ((cursorZone = qgraphicsitem_cast<DeckViewCardContainer *>(colliding.at(i)))) {
             break;
@@ -105,7 +105,7 @@ void DeckViewCardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 }
 
 DeckViewCard::DeckViewCard(QGraphicsItem *parent, const CardRef &cardRef, const QString &_originZone)
-    : AbstractCardItem(parent, cardRef, 0, -1), originZone(_originZone), dragItem(0)
+    : AbstractCardItem(parent, cardRef, nullptr, -1), originZone(_originZone), dragItem(0)
 {
     setAcceptHoverEvents(true);
 
@@ -364,7 +364,8 @@ void DeckViewCardContainer::setWidth(qreal _width)
     update();
 }
 
-DeckViewScene::DeckViewScene(QObject *parent) : QGraphicsScene(parent), locked(true), deck(0), optimalAspectRatio(1.0)
+DeckViewScene::DeckViewScene(QObject *parent)
+    : QGraphicsScene(parent), locked(true), deck(nullptr), optimalAspectRatio(1.0)
 {
     // Zone headers read the DeckList role at paint time and cache their
     // rendering, so touch every item to invalidate the caches and pick up the
@@ -453,7 +454,7 @@ void DeckViewScene::applySideboardPlan(const QList<MoveCard_ToZone> &plan)
             continue;
         }
 
-        DeckViewCard *card = 0;
+        DeckViewCard *card = nullptr;
         const QList<DeckViewCard *> &cardList = start->getCards();
         for (int j = 0; j < cardList.size(); ++j) {
             if (cardList[j]->getName() == QString::fromStdString(m.card_name())) {

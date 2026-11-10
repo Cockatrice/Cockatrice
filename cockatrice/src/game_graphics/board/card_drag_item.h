@@ -29,7 +29,7 @@ public:
                  int _id,
                  const QPointF &_hotSpot,
                  bool _forceFaceDown,
-                 AbstractCardDragItem *parentDrag = 0);
+                 AbstractCardDragItem *parentDrag = nullptr);
     int getId() const
     {
         return id;

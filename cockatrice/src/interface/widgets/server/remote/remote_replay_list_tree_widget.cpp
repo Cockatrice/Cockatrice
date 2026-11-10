@@ -229,7 +229,7 @@ Qt::ItemFlags RemoteReplayList_TreeModel::flags(const QModelIndex &index) const
 ServerInfo_Replay const *RemoteReplayList_TreeModel::getReplay(const QModelIndex &index) const
 {
     if (!index.isValid()) {
-        return 0;
+        return nullptr;
     }
 
     auto *node = dynamic_cast<ReplayNode *>(static_cast<Node *>(index.internalPointer()));

@@ -245,7 +245,7 @@ public:
     void createGameJoinedEvent(Server_AbstractParticipant *participant, ResponseContainer &rc, bool resuming);
 
     GameEventContainer *
-    prepareGameEvent(const ::google::protobuf::Message &gameEvent, int playerId, GameEventContext *context = 0);
+    prepareGameEvent(const ::google::protobuf::Message &gameEvent, int playerId, GameEventContext *context = nullptr);
     GameEventContext prepareGameEventContext(const ::google::protobuf::Message &gameEventContext);
 
     void sendGameStateToPlayers();
