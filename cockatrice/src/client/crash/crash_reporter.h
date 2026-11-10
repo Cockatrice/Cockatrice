@@ -74,6 +74,12 @@ public:
     void shutdown();
     void giveConsent();
     void revokeConsent();
+    /**
+     * @return true once the event is queued to the local transport; delivery happens later
+     * and is not reported here. false also covers a captured event whose attachment failed,
+     * so false does not mean "nothing was captured" - callers offer the local-save fallback
+     * rather than treating the report as absent.
+     */
     bool sendReport(const QString &redactedPreview, const QString &userNote = QString());
 
     /**
