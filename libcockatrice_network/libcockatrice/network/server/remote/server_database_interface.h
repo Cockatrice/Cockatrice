@@ -248,6 +248,69 @@ public:
     {
         return DeckStorageResult::Failed;
     }
+    /** @brief Metadata of a single deck inside a temporary deck share bundle. */
+    struct DeckShareItemRecord
+    {
+        int id = -1;           ///< Database id, used for downloads.
+        QString name;          ///< Deck name.
+        QStringList tags;      ///< Deck tags.
+        QString bannerCard;    ///< Banner card name (deck image).
+        QString gameFormat;    ///< Game format the deck was built for.
+        QString colorIdentity; ///< Color identity, e.g. "WUBRG".
+        QString content;       ///< Deck content (native format); empty in list queries.
+    };
+    /** @brief Summary of a share bundle owned by a user. */
+    struct DeckShareSummaryRecord
+    {
+        int id = -1;             ///< Database id, used for revocation.
+        QString name;            ///< Share name.
+        qint64 creationTime = 0; ///< Unix timestamp at which the share was created.
+        qint64 expiresAt = 0;    ///< Unix timestamp at which the share expires.
+        int itemCount = 0;       ///< Number of decks in the bundle.
+    };
+    /** @brief One deck file in a folder, as the share builder lists it. */
+    struct DeckFileListItem
+    {
+        int id = -1;
+        QString colorIdentity;
+    };
+    virtual bool createDeckShare(const QString & /* token */,
+                                 const QString & /* name */,
+                                 int /* userId */,
+                                 const QList<DeckShareItemRecord> & /* items */,
+                                 int /* expiryDays */,
+                                 qint64 & /* expiresAt */)
+    {
+        return false;
+    }
+    /** @brief Share bundles the user created in the last day, or -1 when the read failed. */
+    virtual int getDeckSharesCreatedToday(int /* userId */)
+    {
+        return -1;
+    }
+    virtual bool getDeckSharesForUser(int /* userId */, QList<DeckShareSummaryRecord> & /* shares */)
+    {
+        return false;
+    }
+    virtual bool deleteDeckShare(int /* shareId */, int /* userId */)
+    {
+        return false;
+    }
+    virtual bool getDeckShareList(const QString & /* token */,
+                                  QString & /* name */,
+                                  qint64 & /* expiresAt */,
+                                  QList<DeckShareItemRecord> & /* items */)
+    {
+        return false;
+    }
+    virtual bool getDeckShareItem(const QString & /* token */, int /* itemId */, QString & /* content */)
+    {
+        return false;
+    }
+    virtual bool getDeckFilesInFolder(int /* folderId */, int /* userId */, QList<DeckFileListItem> & /* files */)
+    {
+        return false;
+    }
     /** @brief Append a moderator/admin action to the server audit log. */
     virtual void addAuditRecord(const QString & /* user */,
                                 const QString & /* ipaddress */,

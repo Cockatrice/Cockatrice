@@ -1825,6 +1825,36 @@ void Servatrice_DatabaseInterface::cleanupExpiredDeckShares()
     execSqlQuery(query);
 }
 
+int Servatrice_DatabaseInterface::getDeckSharesCreatedToday(int userId)
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("select count(*) from {prefix}_deck_share where created_by = :created_by and "
+                                    "created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)");
+    query->bindValue(":created_by", userId);
+    if (!execSqlQuery(query) || !query->next()) {
+        return -1;
+    }
+    return query->value(0).toInt();
+}
+
+bool Servatrice_DatabaseInterface::getDeckFilesInFolder(int folderId, int userId, QList<DeckFileListItem> &files)
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("select id, color_identity from {prefix}_decklist_files where id_folder = "
+                                    ":id_folder and id_user = :id_user");
+    query->bindValue(":id_folder", folderId);
+    query->bindValue(":id_user", userId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+    while (query->next()) {
+        files.append(DeckFileListItem{.id = query->value(0).toInt(), .colorIdentity = query->value(1).toString()});
+    }
+    return true;
+}
+
 bool Servatrice_DatabaseInterface::getDeckSharesForUser(int userId, QList<DeckShareSummaryRecord> &shares)
 {
     checkSql();

@@ -26,28 +26,6 @@ class QSqlQuery;
 
 class Servatrice;
 
-/** @brief Metadata of a single deck inside a temporary deck share bundle. */
-struct DeckShareItemRecord
-{
-    int id = -1;           ///< Database id, used for downloads.
-    QString name;          ///< Deck name.
-    QStringList tags;      ///< Deck tags.
-    QString bannerCard;    ///< Banner card name (deck image).
-    QString gameFormat;    ///< Game format the deck was built for.
-    QString colorIdentity; ///< Color identity, e.g. "WUBRG".
-    QString content;       ///< Deck content (native format); empty in list queries.
-};
-
-/** @brief Summary of a share bundle owned by a user. */
-struct DeckShareSummaryRecord
-{
-    int id = -1;             ///< Database id, used for revocation.
-    QString name;            ///< Share name.
-    qint64 creationTime = 0; ///< Unix timestamp at which the share was created.
-    qint64 expiresAt = 0;    ///< Unix timestamp at which the share expires.
-    int itemCount = 0;       ///< Number of decks in the bundle.
-};
-
 class Servatrice_DatabaseInterface : public Server_DatabaseInterface
 {
     Q_OBJECT
@@ -156,24 +134,30 @@ public:
                          int userId,
                          const QList<DeckShareItemRecord> &items,
                          int expiryDays,
-                         qint64 &expiresAt);
+                         qint64 &expiresAt) override;
+    int getDeckSharesCreatedToday(int userId) override;
     /** @brief Lists the share bundles created by a user, newest first. */
-    bool getDeckSharesForUser(int userId, QList<DeckShareSummaryRecord> &shares);
+    bool getDeckSharesForUser(int userId, QList<DeckShareSummaryRecord> &shares) override;
     /**
      * @brief Deletes one of a user's own share bundles (cascades to its items).
      * @return false if no such bundle belongs to the user.
      */
-    bool deleteDeckShare(int shareId, int userId);
+    bool deleteDeckShare(int shareId, int userId) override;
     /**
      * @brief Looks up a valid (non-expired) share bundle by token.
      * @return false if the token is unknown or expired.
      */
-    bool getDeckShareList(const QString &token, QString &name, qint64 &expiresAt, QList<DeckShareItemRecord> &items);
+    bool getDeckShareList(const QString &token,
+                          QString &name,
+                          qint64 &expiresAt,
+                          QList<DeckShareItemRecord> &items) override;
     /**
      * @brief Fetches the content of one item of a valid share bundle.
      * @return false if the token is unknown/expired or the item does not belong to the bundle.
      */
-    bool getDeckShareItem(const QString &token, int itemId, QString &content);
+    bool getDeckShareItem(const QString &token, int itemId, QString &content) override;
+    /** @brief Id and color identity of every deck file in a folder, for the share builder. */
+    bool getDeckFilesInFolder(int folderId, int userId, QList<DeckFileListItem> &files) override;
     /** @brief Deletes all expired share bundles (cascades to their items). */
     void cleanupExpiredDeckShares();
 

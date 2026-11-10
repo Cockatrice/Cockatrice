@@ -1024,9 +1024,9 @@ QString generateShareToken()
 }
 
 /** @brief Extracts the share metadata for a deck, materializing its content. */
-DeckShareItemRecord makeShareItemFromDeck(const DeckList &deck, const QString &colorIdentity)
+Server_DatabaseInterface::DeckShareItemRecord makeShareItemFromDeck(const DeckList &deck, const QString &colorIdentity)
 {
-    DeckShareItemRecord item;
+    Server_DatabaseInterface::DeckShareItemRecord item;
     item.name = deck.getName();
     if (item.name.isEmpty()) {
         item.name = "Unnamed deck";
@@ -1047,7 +1047,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const C
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
     const int maxItems = servatrice->getDeckShareMaxDecksPerShare();
     if (maxItems > 0 && cmd.items_size() > maxItems) {
@@ -1058,19 +1058,16 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const C
     // word-of-mouth leak of public decks.
     const int maxSharesPerDay = servatrice->getDeckShareMaxSharesPerDay();
     if (maxSharesPerDay > 0) {
-        QSqlQuery *countQuery = sqlInterface->prepareQuery("select count(*) from {prefix}_deck_share where "
-                                                           "created_by = :created_by and created_at >= "
-                                                           "DATE_SUB(NOW(), INTERVAL 1 DAY)");
-        countQuery->bindValue(":created_by", userInfo->id());
-        if (!sqlInterface->execSqlQuery(countQuery) || !countQuery->next()) {
+        const int createdToday = databaseInterface->getDeckSharesCreatedToday(userInfo->id());
+        if (createdToday < 0) {
             return Response::RespContextError;
         }
-        if (countQuery->value(0).toInt() >= maxSharesPerDay) {
+        if (createdToday >= maxSharesPerDay) {
             return Response::RespTooManyRequests;
         }
     }
 
-    QList<DeckShareItemRecord> items;
+    QList<Server_DatabaseInterface::DeckShareItemRecord> items;
     if (cmd.items_size() > 0) {
         for (const DeckShareItem &shareItem : cmd.items()) {
             if (shareItem.has_deck_list()) {
@@ -1082,7 +1079,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const C
             } else if (shareItem.has_deck_id()) {
                 DeckList *deck;
                 try {
-                    deck = sqlInterface->getDeckFromDatabase(shareItem.deck_id(), userInfo->id());
+                    deck = databaseInterface->getDeckFromDatabase(shareItem.deck_id(), userInfo->id());
                 } catch (Response::ResponseCode &r) {
                     return r;
                 }
@@ -1100,26 +1097,18 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const C
 
         // Drain the deck list before resolving each deck: getDeckFromDatabase
         // issues its own query on the same cached statement set.
-        QSqlQuery *query =
-            sqlInterface->prepareQuery("select id, color_identity from {prefix}_decklist_files where id_folder = "
-                                       ":id_folder and id_user = :id_user");
-        query->bindValue(":id_folder", folderId);
-        query->bindValue(":id_user", userInfo->id());
-        if (!sqlInterface->execSqlQuery(query)) {
+        QList<Server_DatabaseInterface::DeckFileListItem> deckRows;
+        if (!databaseInterface->getDeckFilesInFolder(folderId, userInfo->id(), deckRows)) {
             return Response::RespContextError;
         }
-        QList<std::pair<int, QString>> deckRows;
-        while (query->next()) {
-            deckRows.append({query->value(0).toInt(), query->value(1).toString()});
-        }
-        for (const auto &[deckId, colorIdentity] : deckRows) {
+        for (const Server_DatabaseInterface::DeckFileListItem &deckRow : deckRows) {
             DeckList *deck;
             try {
-                deck = sqlInterface->getDeckFromDatabase(deckId, userInfo->id());
+                deck = databaseInterface->getDeckFromDatabase(deckRow.id, userInfo->id());
             } catch (Response::ResponseCode &r) {
                 return r;
             }
-            items.append(makeShareItemFromDeck(*deck, colorIdentity));
+            items.append(makeShareItemFromDeck(*deck, deckRow.colorIdentity));
             delete deck;
         }
     } else {
@@ -1137,8 +1126,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const C
 
     const QString token = generateShareToken();
     qint64 expiresAt = 0;
-    if (!sqlInterface->createDeckShare(token, shareName, userInfo->id(), items, servatrice->getDeckShareExpiryDays(),
-                                       expiresAt)) {
+    if (!databaseInterface->createDeckShare(token, shareName, userInfo->id(), items,
+                                            servatrice->getDeckShareExpiryDays(), expiresAt)) {
         return Response::RespInvalidData;
     }
 
@@ -1158,15 +1147,15 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareListMine(const
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
-    QList<DeckShareSummaryRecord> shares;
-    if (!sqlInterface->getDeckSharesForUser(userInfo->id(), shares)) {
+    QList<Server_DatabaseInterface::DeckShareSummaryRecord> shares;
+    if (!databaseInterface->getDeckSharesForUser(userInfo->id(), shares)) {
         return Response::RespContextError;
     }
 
     Response_DeckShareListMine *re = new Response_DeckShareListMine;
-    for (const DeckShareSummaryRecord &share : shares) {
+    for (const Server_DatabaseInterface::DeckShareSummaryRecord &share : shares) {
         ServerInfo_DeckShareSummary *summary = re->add_shares();
         summary->set_id(share.id);
         summary->set_name(share.name.toStdString());
@@ -1190,9 +1179,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareRemove(const C
         return Response::RespInvalidData;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
-    if (!sqlInterface->deleteDeckShare(cmd.share_id(), userInfo->id())) {
+    if (!databaseInterface->deleteDeckShare(cmd.share_id(), userInfo->id())) {
         return Response::RespNameNotFound;
     }
 
@@ -1206,19 +1195,19 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareList(const Com
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
     QString name;
     qint64 expiresAt = 0;
-    QList<DeckShareItemRecord> items;
-    if (!sqlInterface->getDeckShareList(nameFromStdString(cmd.token()), name, expiresAt, items)) {
+    QList<Server_DatabaseInterface::DeckShareItemRecord> items;
+    if (!databaseInterface->getDeckShareList(nameFromStdString(cmd.token()), name, expiresAt, items)) {
         return Response::RespNameNotFound;
     }
 
     Response_DeckShareList *re = new Response_DeckShareList;
     re->set_name(name.toStdString());
     re->set_expires_at(expiresAt);
-    for (const DeckShareItemRecord &item : items) {
+    for (const Server_DatabaseInterface::DeckShareItemRecord &item : items) {
         ServerInfo_DeckShareItem *itemInfo = re->add_items();
         itemInfo->set_id(item.id);
         itemInfo->set_name(item.name.toStdString());
@@ -1241,10 +1230,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareDownload(const
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
     QString content;
-    if (!sqlInterface->getDeckShareItem(nameFromStdString(cmd.token()), cmd.item_id(), content)) {
+    if (!databaseInterface->getDeckShareItem(nameFromStdString(cmd.token()), cmd.item_id(), content)) {
         return Response::RespNameNotFound;
     }
 
