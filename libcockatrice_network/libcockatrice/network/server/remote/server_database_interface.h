@@ -404,6 +404,31 @@ public:
     {
         return false;
     }
+    /** @brief Whether an unexpired forgot-password request exists for the user. */
+    virtual bool doesForgotPasswordExist(const QString & /* userName */)
+    {
+        return false;
+    }
+    /** @brief Records a forgot-password request for the user. */
+    virtual bool addForgotPassword(const QString & /* userName */)
+    {
+        return false;
+    }
+    /** @brief The sealed legacy password backup of a user, empty when none is usable. */
+    virtual QString getUsableLegacyBackup(const QString & /* userName */)
+    {
+        return {};
+    }
+    /** @brief Whether the user's stored token matches, case-insensitively. */
+    virtual bool userTokenMatches(const QString & /* userName */, const QString & /* token */)
+    {
+        return false;
+    }
+    /** @brief Whether the user's stored email matches, case-insensitively. */
+    virtual bool userEmailMatches(const QString & /* userName */, const QString & /* email */)
+    {
+        return false;
+    }
     virtual qint64 startSession(const QString & /* userName */,
                                 const QString & /* address */,
                                 const QString & /* clientId */,

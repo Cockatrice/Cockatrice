@@ -3637,7 +3637,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
         return Response::RespOk;
     }
 
-    if (!sqlInterface->userExists(userName)) {
+    if (!databaseInterface->userExists(userName)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
             databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
                                               "PASSWORD_RESET_REQUEST", "User does not exist", false);
@@ -3654,7 +3654,7 @@ Response::ResponseCode AbstractServerSocketInterface::continuePasswordRequest(co
                                                                               ResponseContainer &rc,
                                                                               bool challenged)
 {
-    if (sqlInterface->doesForgotPasswordExist(userName)) {
+    if (databaseInterface->doesForgotPasswordExist(userName)) {
 
         if (servatrice->getEnableForgotPasswordAudit()) {
             databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
@@ -3669,7 +3669,7 @@ Response::ResponseCode AbstractServerSocketInterface::continuePasswordRequest(co
 
     QString banReason;
     int banTimeRemaining;
-    if (sqlInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banTimeRemaining)) {
+    if (databaseInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banTimeRemaining)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
             databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
                                               "PASSWORD_RESET_REQUEST", "User is banned", false);
@@ -3678,7 +3678,7 @@ Response::ResponseCode AbstractServerSocketInterface::continuePasswordRequest(co
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->addForgotPassword(userName)) {
+    if (!databaseInterface->addForgotPassword(userName)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
             databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
                                               "PASSWORD_RESET_REQUEST", "Failed to create password reset", false);
@@ -3707,7 +3707,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
     QString clientId = nameFromStdString(cmd.clientid());
     qCDebug(AbstractServerSocketInterfaceLog) << "Received reset password reset from user:" << userName;
 
-    if (!sqlInterface->doesForgotPasswordExist(userName)) {
+    if (!databaseInterface->doesForgotPasswordExist(userName)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
             databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
                                               "PASSWORD_RESET", "Request does not exist for user", false);
@@ -3716,8 +3716,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->validateTableColumnStringData("{prefix}_users", "token", userName,
-                                                     nameFromStdString(cmd.token()))) {
+    if (!databaseInterface->userTokenMatches(userName, nameFromStdString(cmd.token()))) {
         if (servatrice->getEnableForgotPasswordAudit()) {
             databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), userName.simplified(),
                                               "PASSWORD_RESET", "Failed token validation", false);
@@ -3745,14 +3744,14 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
         return Response::RespClientUpdateRequired;
     }
 
-    if (sqlInterface->changeUserPassword(nameFromStdString(cmd.user_name()), password, passwordNeedsHash)) {
+    if (databaseInterface->changeUserPassword(nameFromStdString(cmd.user_name()), password, passwordNeedsHash)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
             databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
                                               "PASSWORD_RESET", "", true);
         }
 
-        sqlInterface->setForcePasswordChange(nameFromStdString(cmd.user_name()), false);
-        sqlInterface->removeForgotPassword(nameFromStdString(cmd.user_name()));
+        databaseInterface->setForcePasswordChange(nameFromStdString(cmd.user_name()), false);
+        databaseInterface->removeForgotPassword(nameFromStdString(cmd.user_name()));
         return Response::RespOk;
     }
 
@@ -3785,7 +3784,7 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->userExists(userName)) {
+    if (!databaseInterface->userExists(userName)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
             databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
                                               "PASSWORD_RESET_CHALLENGE", "User does not exist", false);
@@ -3794,7 +3793,7 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
     }
 
     const auto parsedEmailAddress = EmailParser::getParsedEmailAddress(nameFromStdString(cmd.email()));
-    if (!sqlInterface->validateTableColumnStringData("{prefix}_users", "email", userName, parsedEmailAddress)) {
+    if (!databaseInterface->userEmailMatches(userName, parsedEmailAddress)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
             databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
                                               "PASSWORD_RESET_CHALLENGE", "Failed to answer email challenge question",
@@ -3816,7 +3815,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(con
     // Simplified exactly like cmdLogin, so the nonce bound to userName here validates
     // against the same normalized name during the login's challenge-response check.
     const QString userName = nameFromStdString(cmd.user_name()).simplified();
-    const QString storedPasswordData = sqlInterface->getUserPasswordData(userName);
+    const QString storedPasswordData = databaseInterface->getUserPasswordData(userName);
     if (storedPasswordData.isEmpty()) {
         if (server->getRegOnlyServerEnabled()) {
             return Response::RespRegistrationRequired;
@@ -3855,7 +3854,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(con
         // encrypted legacy backup exists, serve its salt there so they can still log in;
         // challenge-response clients must use scrypt_salt, which always carries the
         // verifier salt.
-        const QString legacyBackup = sqlInterface->getUsableLegacyBackup(userName);
+        const QString legacyBackup = databaseInterface->getUsableLegacyBackup(userName);
         if (!legacyBackup.isEmpty()) {
             re->set_password_salt(legacyBackup.left(16).toStdString());
         }
@@ -3986,7 +3985,7 @@ AbstractServerSocketInterface::cmdSubmitPasswordVerifier(const Command_SubmitPas
         return Response::RespContextError;
     }
 
-    if (!sqlInterface->submitPasswordVerifier(QString::fromStdString(userInfo->name()), passwordVerifier)) {
+    if (!databaseInterface->submitPasswordVerifier(QString::fromStdString(userInfo->name()), passwordVerifier)) {
         return Response::RespContextError;
     }
 

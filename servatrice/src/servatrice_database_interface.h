@@ -87,7 +87,7 @@ public:
     /** @brief Decrypt the account's legacy password backup when it exists, is decryptable
      *  with the configured key and has not aged out; purges it when it has. Returns the
      *  legacy credential in the stored "salt + hash" format, or an empty string. */
-    QString getUsableLegacyBackup(const QString &user);
+    QString getUsableLegacyBackup(const QString &user) override;
     /** @brief Refresh the age window of the account's legacy password backup. */
     void touchLegacyBackup(const QString &user);
     /** @brief Drop the account's legacy password backup. */
@@ -273,9 +273,11 @@ public:
     RemoveUserBannerResult removeUserBanner(const QString &userName);
     int clearBlacklistedBanners();
     bool isCardArtAllowed(const QString &cardName, const QString &cardProviderId) override;
-    bool addForgotPassword(const QString &user);
+    bool addForgotPassword(const QString &user) override;
     bool removeForgotPassword(const QString &user) override;
-    bool doesForgotPasswordExist(const QString &user);
+    bool doesForgotPasswordExist(const QString &user) override;
+    bool userTokenMatches(const QString &userName, const QString &token) override;
+    bool userEmailMatches(const QString &userName, const QString &email) override;
     bool updateUserToken(const QString &token, const QString &user);
     bool validateTableColumnStringData(const QString &table,
                                        const QString &column,
