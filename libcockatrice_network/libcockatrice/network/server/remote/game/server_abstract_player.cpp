@@ -282,6 +282,23 @@ static bool shouldBeFromTheBottom(const Server_CardZone *startZone, const std::s
     return true;
 }
 
+/**
+ * @brief Whether the attachment rules forbid moving this card to the given target.
+ *
+ * A card attached to a host on the table must move together with that host, and a card that
+ * itself has attachments must not be stacked onto another card.
+ */
+static bool violatesAttachmentRules(const Server_Card *card, const Server_CardZone *targetZone, int xCoord, int yCoord)
+{
+    // do not allow attached cards to move around on the table
+    if (card->getParentCard() && targetZone->getName() == ZoneNames::TABLE) {
+        return true;
+    }
+
+    // do not allow cards with attachments to stack with other cards
+    return !card->getAttachedCards().isEmpty() && !targetZone->isColumnEmpty(xCoord, yCoord);
+}
+
 Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
                                                        Server_CardZone *startzone,
                                                        const QList<const CardToMove *> &_cards,
@@ -292,9 +309,10 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
                                                        bool undoingDraw,
                                                        bool isReversed)
 {
-    // Disallow controller change to other zones than the table.
-    if (((targetzone->getType() != ServerInfo_Zone::PublicZone) || !targetzone->hasCoords()) &&
-        (startzone->getPlayer() != targetzone->getPlayer()) && !isJudge()) {
+    // A move that changes the controller is only allowed onto the table, unless a judge does it.
+    const bool changesController = startzone->getPlayer() != targetzone->getPlayer();
+    const bool targetIsTable = targetzone->getType() == ServerInfo_Zone::PublicZone && targetzone->hasCoords();
+    if (changesController && !targetIsTable && !isJudge()) {
         return Response::RespContextError;
     }
 
@@ -307,31 +325,25 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
 
     std::set<MoveCardStruct> cardsToMove;
     QSet<int> cardIdsToMove;
-    for (auto _card : _cards) {
+    for (const CardToMove *cardToMove : _cards) {
         // The same card being moved twice would lead to undefined behaviour.
-        if (cardIdsToMove.contains(_card->card_id())) {
+        if (cardIdsToMove.contains(cardToMove->card_id())) {
             continue;
         }
-        cardIdsToMove.insert(_card->card_id());
+        cardIdsToMove.insert(cardToMove->card_id());
 
         // Consistency checks. In case the command contains illegal moves, try to resolve the legal ones still.
         int position;
-        Server_Card *card = startzone->getCard(_card->card_id(), &position);
+        Server_Card *card = startzone->getCard(cardToMove->card_id(), &position);
         if (!card) {
             return Response::RespNameNotFound;
         }
 
-        // do not allow attached cards to move around on the table
-        if (card->getParentCard() && targetzone->getName() == ZoneNames::TABLE) {
+        if (violatesAttachmentRules(card, targetzone, xCoord, yCoord)) {
             continue;
         }
 
-        // do not allow cards with attachments to stack with other cards
-        if (!card->getAttachedCards().isEmpty() && !targetzone->isColumnEmpty(xCoord, yCoord)) {
-            continue;
-        }
-
-        cardsToMove.insert(MoveCardStruct{card, position, _card});
+        cardsToMove.insert(MoveCardStruct{card, position, cardToMove});
     }
     // In case all moves were filtered out, abort.
     if (cardsToMove.empty()) {
