@@ -771,6 +771,12 @@ public:
     {
         return false;
     }
+    virtual bool changeUserPasswordWithLegacyBackup(const QString & /* user */,
+                                                    const QString & /* passwordVerifier */,
+                                                    const QString & /* legacyCredential */)
+    {
+        return false;
+    }
     virtual void setForcePasswordChange(const QString & /* user */, bool /* force */)
     {
     }
@@ -789,6 +795,31 @@ public:
         return false;
     }
     virtual bool setUserAvatar(int /* userId */, const QByteArray & /* image */)
+    {
+        return false;
+    }
+    /** @brief Outcome of removing a user's banner, so a missing user stays distinguishable. */
+    enum class RemoveUserBannerResult
+    {
+        Removed,
+        NothingToRemove,
+        NoSuchUser,
+        DatabaseError
+    };
+    virtual RemoveUserBannerResult removeUserBanner(const QString & /* userName */)
+    {
+        return RemoveUserBannerResult::DatabaseError;
+    }
+    virtual bool removeUserAvatar(const QString & /* userName */)
+    {
+        return false;
+    }
+    virtual int clearBlacklistedBanners()
+    {
+        return -1;
+    }
+    /** @brief The raw admin bitmask of a user; false when the query failed or the user is missing. */
+    virtual bool getUserAdminFlags(const QString & /* userName */, int & /* adminFlags */)
     {
         return false;
     }

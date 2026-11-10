@@ -2184,7 +2184,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetModeratorLastLogins(
 Response::ResponseCode AbstractServerSocketInterface::cmdResetUserPassword(const Command_ResetUserPassword &cmd,
                                                                            ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
@@ -2194,12 +2194,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdResetUserPassword(const
     }
 
     // Look up the target user's privilege level to prevent escalation.
-    QSqlQuery *privQuery = sqlInterface->prepareQuery("SELECT admin FROM {prefix}_users WHERE name = :name");
-    privQuery->bindValue(":name", userName);
-    if (!sqlInterface->execSqlQuery(privQuery) || !privQuery->next()) {
+    int targetAdmin = 0;
+    if (!databaseInterface->getUserAdminFlags(userName, targetAdmin)) {
         return Response::RespNameNotFound;
     }
-    const int targetAdmin = privQuery->value(0).toInt();
     const bool targetIsAdmin = targetAdmin & 1;
     const bool targetIsMod = targetAdmin & 2;
 
@@ -2219,10 +2217,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdResetUserPassword(const
     // have none, which changeUserPasswordWithLegacyBackup warns about.
     const QString verifier = PasswordHasher::generatePasswordVerifier(tempPassword);
     const QString legacyCredential = PasswordHasher::computeHash(tempPassword, PasswordHasher::generateRandomSalt());
-    if (!sqlInterface->changeUserPasswordWithLegacyBackup(userName, verifier, legacyCredential)) {
+    if (!databaseInterface->changeUserPasswordWithLegacyBackup(userName, verifier, legacyCredential)) {
         return Response::RespInternalError;
     }
-    sqlInterface->setForcePasswordChange(userName, true);
+    databaseInterface->setForcePasswordChange(userName, true);
 
     databaseInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
                                       "PASSWORD_RESET", "Admin password reset", true);
@@ -2253,7 +2251,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdResetUserPassword(const
 Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserAvatar(const Command_RemoveUserAvatar &cmd,
                                                                           ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
@@ -2262,7 +2260,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserAvatar(const 
         return Response::RespContextError;
     }
 
-    if (!sqlInterface->removeUserAvatar(userName)) {
+    if (!databaseInterface->removeUserAvatar(userName)) {
         return Response::RespInternalError;
     }
 
@@ -2278,7 +2276,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserAvatar(const 
 Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserBanner(const Command_RemoveUserBanner &cmd,
                                                                           ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
@@ -2288,15 +2286,15 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserBanner(const 
     }
 
     bool hadBanner = true;
-    switch (sqlInterface->removeUserBanner(userName)) {
-        case Servatrice_DatabaseInterface::RemoveUserBannerResult::Removed:
+    switch (databaseInterface->removeUserBanner(userName)) {
+        case Server_DatabaseInterface::RemoveUserBannerResult::Removed:
             break;
-        case Servatrice_DatabaseInterface::RemoveUserBannerResult::NothingToRemove:
+        case Server_DatabaseInterface::RemoveUserBannerResult::NothingToRemove:
             hadBanner = false;
             break;
-        case Servatrice_DatabaseInterface::RemoveUserBannerResult::NoSuchUser:
+        case Server_DatabaseInterface::RemoveUserBannerResult::NoSuchUser:
             return Response::RespNameNotFound;
-        case Servatrice_DatabaseInterface::RemoveUserBannerResult::DatabaseError:
+        case Server_DatabaseInterface::RemoveUserBannerResult::DatabaseError:
         default:
             return Response::RespInternalError;
     }
@@ -2317,11 +2315,11 @@ Response::ResponseCode
 AbstractServerSocketInterface::cmdClearBlacklistedBanners(const Command_ClearBlacklistedBanners & /* cmd */,
                                                           ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
-    const int cleared = sqlInterface->clearBlacklistedBanners();
+    const int cleared = databaseInterface->clearBlacklistedBanners();
     if (cleared < 0) {
         return Response::RespInternalError;
     }

@@ -216,7 +216,7 @@ public:
      *  same password as the downgrade backup for pre-challenge clients. */
     bool changeUserPasswordWithLegacyBackup(const QString &user,
                                             const QString &passwordVerifier,
-                                            const QString &legacyCredential);
+                                            const QString &legacyCredential) override;
     bool changeUserPassword(const QString &user,
                             const QString &oldPassword,
                             bool oldPasswordNeedsHash,
@@ -276,19 +276,12 @@ public:
     // Uptime snapshot as recorded by Servatrice::statusUpdate() into the
     // {prefix}_uptime table. valid is false when no snapshot exists yet.
     UptimeSnapshot getLatestUptimeSnapshot(int serverId) override;
-    bool removeUserAvatar(const QString &userName);
-
+    bool removeUserAvatar(const QString &userName) override;
     // Outcome of removeUserBanner(), so the caller can tell a missing user apart
     // from a user who simply has no banner card set.
-    enum class RemoveUserBannerResult
-    {
-        Removed,
-        NothingToRemove,
-        NoSuchUser,
-        DatabaseError,
-    };
-    RemoveUserBannerResult removeUserBanner(const QString &userName);
-    int clearBlacklistedBanners();
+    RemoveUserBannerResult removeUserBanner(const QString &userName) override;
+    int clearBlacklistedBanners() override;
+    bool getUserAdminFlags(const QString &userName, int &adminFlags) override;
     bool isCardArtAllowed(const QString &cardName, const QString &cardProviderId) override;
     bool addForgotPassword(const QString &user) override;
     bool removeForgotPassword(const QString &user) override;
