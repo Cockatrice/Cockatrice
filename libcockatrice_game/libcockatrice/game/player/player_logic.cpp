@@ -254,7 +254,8 @@ void PlayerLogic::deleteCard(CardState *card)
 {
     if (card == nullptr) {
         return;
-    } else if (dialogSemaphore) {
+    }
+    if (dialogSemaphore) {
         cardsToDelete.append(card);
     } else {
         card->deleteView();

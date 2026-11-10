@@ -57,7 +57,8 @@ QVariant CardInfoComparator::getProperty(const CardInfoPtr &card, const QString 
     // Check if the property exists in the main fields of the class
     if (property == "name") {
         return card->getName();
-    } else if (property == "text") {
+    }
+    if (property == "text") {
         return card->getText();
     } else if (property == "isToken") {
         return card->getIsToken();

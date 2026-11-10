@@ -172,7 +172,8 @@ static QString zoneLogName(const QString &zone)
 {
     if (zone == DECK_ZONE_MAIN) {
         return "mainboard";
-    } else if (zone == DECK_ZONE_SIDE) {
+    }
+    if (zone == DECK_ZONE_SIDE) {
         return "sideboard";
     } else if (zone == DECK_ZONE_TOKENS) {
         return "tokens";

@@ -180,7 +180,8 @@ bool ResizablePanel::eventFilter(QObject *obj, QEvent *event)
                 dragButton->setCursor(Qt::ClosedHandCursor);
             }
             return false;
-        } else if (event->type() == QEvent::MouseMove) {
+        }
+        if (event->type() == QEvent::MouseMove) {
             auto *mouseEvent = static_cast<QMouseEvent *>(event);
             if (mouseEvent->buttons() & Qt::LeftButton) {
                 QPoint currentPos = mouseEvent->globalPosition().toPoint();
@@ -207,7 +208,8 @@ bool ResizablePanel::eventFilter(QObject *obj, QEvent *event)
             resizeStartHeight = currentHeight;
             resizeHandle->grabMouse();
             return true;
-        } else if (event->type() == QEvent::MouseMove && isResizing) {
+        }
+        if (event->type() == QEvent::MouseMove && isResizing) {
             auto *mouseEvent = static_cast<QMouseEvent *>(event);
             int deltaY = mouseEvent->globalPosition().y() - resizeStartY;
             int newHeight = resizeStartHeight + deltaY;

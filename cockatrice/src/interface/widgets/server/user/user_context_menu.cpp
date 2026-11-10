@@ -121,7 +121,8 @@ void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandCon
     if (resp.response_code() == Response::RespNameNotFound) {
         QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Error"), tr("This user does not exist."));
         return;
-    } else if (resp.response_code() == Response::RespInIgnoreList) {
+    }
+    if (resp.response_code() == Response::RespInIgnoreList) {
         QMessageBox::critical(
             static_cast<QWidget *>(parent()), tr("Error"),
             tr("You are being ignored by %1 and can't see their games.").arg(QString::fromStdString(cmd.user_name())));
