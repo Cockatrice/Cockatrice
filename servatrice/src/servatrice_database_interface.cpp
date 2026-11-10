@@ -3562,6 +3562,148 @@ bool Servatrice_DatabaseInterface::userEmailMatches(const QString &userName, con
     return validateTableColumnStringData("{prefix}_users", "email", userName, email);
 }
 
+int Servatrice_DatabaseInterface::countReportsSubmittedInLastDay(int reporterId)
+{
+    if (!checkSql()) {
+        return 0;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT COUNT(*) FROM {prefix}_reports WHERE reporter_id = :id "
+                                    "AND created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)");
+    query->bindValue(":id", reporterId);
+    if (!execSqlQuery(query) || !query->next()) {
+        return 0;
+    }
+
+    return query->value(0).toInt();
+}
+
+int Servatrice_DatabaseInterface::getReportedUserId(const QString &userName)
+{
+    if (!checkSql()) {
+        return -1;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT id FROM {prefix}_users WHERE name = :name");
+    query->bindValue(":name", userName);
+    if (!execSqlQuery(query) || !query->next()) {
+        return -1;
+    }
+
+    return query->value(0).toInt();
+}
+
+bool Servatrice_DatabaseInterface::addReport(int reporterId,
+                                             const QString &reporterName,
+                                             int reportedUserId,
+                                             const QString &reportedUserName,
+                                             int gameId,
+                                             int roomId,
+                                             const QString &category,
+                                             const QString &description,
+                                             const QString &chatLog)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("insert into {prefix}_reports "
+                                    "(reporter_id, reporter_name, reported_user_id, reported_user_name, "
+                                    "game_id, room_id, category, description, chat_log, created_at, status) "
+                                    "values "
+                                    "(:reporter_id, :reporter_name, :reported_user_id, :reported_user_name, "
+                                    ":game_id, :room_id, :category, :description, :chat_log, NOW(), 'open')");
+
+    query->bindValue(":reporter_id", reporterId);
+    query->bindValue(":reporter_name", reporterName);
+    query->bindValue(":reported_user_id", reportedUserId);
+    query->bindValue(":reported_user_name", reportedUserName);
+    query->bindValue(":game_id", gameId > 0 ? gameId : QVariant());
+    query->bindValue(":room_id", roomId > 0 ? roomId : QVariant());
+    query->bindValue(":category", category);
+    query->bindValue(":description", description);
+    query->bindValue(":chat_log", chatLog.isEmpty() ? QVariant() : chatLog);
+
+    return execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::getPendingReportNotifications(
+    int reporterId,
+    QList<Server_DatabaseInterface::PendingReportNotification> &notifications)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT id, reported_user_name, status, resolution_note "
+                                    "FROM {prefix}_reports "
+                                    "WHERE reporter_id = :reporter_id AND notified = 0 "
+                                    "AND status IN ('resolved', 'dismissed')");
+    query->bindValue(":reporter_id", reporterId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        PendingReportNotification notification;
+        notification.reportId = query->value(0).toInt();
+        notification.reportedUserName = query->value(1).toString();
+        notification.status = query->value(2).toString();
+        notification.resolutionNote = query->value(3).toString();
+        notifications.append(notification);
+    }
+
+    return true;
+}
+
+void Servatrice_DatabaseInterface::markReportNotified(int reportId)
+{
+    QSqlQuery *query = prepareQuery("UPDATE {prefix}_reports SET notified = 1 WHERE id = :id");
+    query->bindValue(":id", reportId);
+    execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::getPendingReportCommentNotifications(
+    int userId,
+    QList<Server_DatabaseInterface::PendingReportCommentNotification> &notifications)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT c.id, c.report_id, c.author_name, c.comment_text "
+                                    "FROM {prefix}_report_comments c "
+                                    "JOIN {prefix}_reports r ON r.id = c.report_id "
+                                    "WHERE c.notified = 0 "
+                                    "AND c.author_id != :user_id "
+                                    "AND ((c.is_moderator = 1 AND r.reporter_id = :user_id) "
+                                    "OR (c.is_moderator = 0 AND r.assigned_to = :user_id) "
+                                    "OR (c.is_moderator = 1 AND r.assigned_to = :user_id)) "
+                                    "ORDER BY c.created_at ASC");
+    query->bindValue(":user_id", userId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        PendingReportCommentNotification notification;
+        notification.commentId = query->value(0).toLongLong();
+        notification.reportId = query->value(1).toInt();
+        notification.authorName = query->value(2).toString();
+        notification.commentText = query->value(3).toString();
+        notifications.append(notification);
+    }
+
+    return true;
+}
+
+void Servatrice_DatabaseInterface::markReportCommentNotified(qlonglong commentId)
+{
+    QSqlQuery *query = prepareQuery("UPDATE {prefix}_report_comments SET notified = 1 WHERE id = :id");
+    query->bindValue(":id", commentId);
+    execSqlQuery(query);
+}
+
 void Servatrice_DatabaseInterface::addAuditRecord(const QString &user,
                                                   const QString &ipaddress,
                                                   const QString &clientid,

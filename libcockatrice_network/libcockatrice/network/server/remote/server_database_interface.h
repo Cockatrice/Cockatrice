@@ -391,6 +391,65 @@ public:
     {
         return ReplayWriteResult::Failed;
     }
+    /** @brief One resolved or dismissed report whose reporter has not been told yet. */
+    struct PendingReportNotification
+    {
+        int reportId = 0;
+        QString reportedUserName;
+        QString status;
+        QString resolutionNote;
+    };
+    /** @brief One unannounced comment on a report the user reported, was assigned, or moderates. */
+    struct PendingReportCommentNotification
+    {
+        qlonglong commentId = 0;
+        int reportId = 0;
+        QString authorName;
+        QString commentText;
+    };
+    /** @brief Reports the reporter submitted in the last day, for the daily cap. */
+    virtual int countReportsSubmittedInLastDay(int /* reporterId */)
+    {
+        return 0;
+    }
+    /** @brief Resolves a user name for the report's reported-user column, -1 when unknown. */
+    virtual int getReportedUserId(const QString & /* userName */)
+    {
+        return -1;
+    }
+    /** @brief Stores a new open report, returning whether the insert succeeded. */
+    virtual bool addReport(int /* reporterId */,
+                           const QString & /* reporterName */,
+                           int /* reportedUserId */,
+                           const QString & /* reportedUserName */,
+                           int /* gameId */,
+                           int /* roomId */,
+                           const QString & /* category */,
+                           const QString & /* description */,
+                           const QString & /* chatLog */)
+    {
+        return false;
+    }
+    /** @brief Collects the reporter's resolved or dismissed reports that were not announced yet. */
+    virtual bool getPendingReportNotifications(int /* reporterId */,
+                                               QList<PendingReportNotification> & /* notifications */)
+    {
+        return false;
+    }
+    /** @brief Marks a report notification as delivered so it is not announced again. */
+    virtual void markReportNotified(int /* reportId */)
+    {
+    }
+    /** @brief Collects comments on the user's reports that were not announced yet. */
+    virtual bool getPendingReportCommentNotifications(int /* userId */,
+                                                      QList<PendingReportCommentNotification> & /* notifications */)
+    {
+        return false;
+    }
+    /** @brief Marks a comment notification as delivered so it is not announced again. */
+    virtual void markReportCommentNotified(qlonglong /* commentId */)
+    {
+    }
     /** @brief Append a moderator/admin action to the server audit log. */
     virtual void addAuditRecord(const QString & /* user */,
                                 const QString & /* ipaddress */,

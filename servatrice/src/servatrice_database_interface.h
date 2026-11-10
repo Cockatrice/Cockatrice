@@ -289,6 +289,25 @@ public:
                         const QString &action,
                         const QString &details,
                         bool results) override;
+    int countReportsSubmittedInLastDay(int reporterId) override;
+    int getReportedUserId(const QString &userName) override;
+    bool addReport(int reporterId,
+                   const QString &reporterName,
+                   int reportedUserId,
+                   const QString &reportedUserName,
+                   int gameId,
+                   int roomId,
+                   const QString &category,
+                   const QString &description,
+                   const QString &chatLog) override;
+    bool
+    getPendingReportNotifications(int reporterId,
+                                  QList<Server_DatabaseInterface::PendingReportNotification> &notifications) override;
+    void markReportNotified(int reportId) override;
+    bool getPendingReportCommentNotifications(
+        int userId,
+        QList<Server_DatabaseInterface::PendingReportCommentNotification> &notifications) override;
+    void markReportCommentNotified(qlonglong commentId) override;
 };
 
 #endif

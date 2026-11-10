@@ -2582,77 +2582,45 @@ AbstractServerSocketInterface::cmdClearBlacklistedBanners(const Command_ClearBla
 
 void AbstractServerSocketInterface::sendPendingReportNotifications(ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    QList<Server_DatabaseInterface::PendingReportNotification> reportNotifications;
+    if (!databaseInterface->getPendingReportNotifications(userInfo->id(), reportNotifications)) {
         return;
     }
 
-    QSqlQuery *query = sqlInterface->prepareQuery("SELECT id, reported_user_name, status, resolution_note "
-                                                  "FROM {prefix}_reports "
-                                                  "WHERE reporter_id = :reporter_id AND notified = 0 "
-                                                  "AND status IN ('resolved', 'dismissed')");
-    query->bindValue(":reporter_id", userInfo->id());
-
-    if (!sqlInterface->execSqlQuery(query)) {
-        return;
-    }
-
-    while (query->next()) {
-        const int reportId = query->value(0).toInt();
-        const QString reportedUser = query->value(1).toString();
-        const bool dismissed = query->value(2).toString() == "dismissed";
-        const QString note = query->value(3).toString();
+    for (const Server_DatabaseInterface::PendingReportNotification &notification : reportNotifications) {
+        const bool dismissed = notification.status == "dismissed";
 
         Event_NotifyUser event;
         event.set_type(Event_NotifyUser::REPORT_RESOLVED);
         event.set_custom_title(dismissed ? tr("Report Dismissed").toStdString() : tr("Report Resolved").toStdString());
 
-        QString content = dismissed ? tr("Your report about %1 has been dismissed.").arg(reportedUser)
-                                    : tr("Your report about %1 has been resolved.").arg(reportedUser);
-        if (!note.isEmpty()) {
-            content += "\n" + tr("Note: %1").arg(note);
+        QString content = dismissed ? tr("Your report about %1 has been dismissed.").arg(notification.reportedUserName)
+                                    : tr("Your report about %1 has been resolved.").arg(notification.reportedUserName);
+        if (!notification.resolutionNote.isEmpty()) {
+            content += "\n" + tr("Note: %1").arg(notification.resolutionNote);
         }
         event.set_custom_content(content.toStdString());
 
         rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event));
 
-        QSqlQuery *notifiedQuery =
-            sqlInterface->prepareQuery("UPDATE {prefix}_reports SET notified = 1 WHERE id = :id");
-        notifiedQuery->bindValue(":id", reportId);
-        sqlInterface->execSqlQuery(notifiedQuery);
+        databaseInterface->markReportNotified(notification.reportId);
     }
 
-    QSqlQuery *commentQuery = sqlInterface->prepareQuery("SELECT c.id, c.report_id, c.author_name, c.comment_text "
-                                                         "FROM {prefix}_report_comments c "
-                                                         "JOIN {prefix}_reports r ON r.id = c.report_id "
-                                                         "WHERE c.notified = 0 "
-                                                         "AND c.author_id != :user_id "
-                                                         "AND ((c.is_moderator = 1 AND r.reporter_id = :user_id) "
-                                                         "OR (c.is_moderator = 0 AND r.assigned_to = :user_id) "
-                                                         "OR (c.is_moderator = 1 AND r.assigned_to = :user_id)) "
-                                                         "ORDER BY c.created_at ASC");
-    commentQuery->bindValue(":user_id", userInfo->id());
-
-    if (!sqlInterface->execSqlQuery(commentQuery)) {
+    QList<Server_DatabaseInterface::PendingReportCommentNotification> commentNotifications;
+    if (!databaseInterface->getPendingReportCommentNotifications(userInfo->id(), commentNotifications)) {
         return;
     }
 
-    while (commentQuery->next()) {
-        const qlonglong commentId = commentQuery->value(0).toLongLong();
-        const int reportId = commentQuery->value(1).toInt();
-        const QString authorName = commentQuery->value(2).toString();
-        const QString commentText = commentQuery->value(3).toString();
-
+    for (const Server_DatabaseInterface::PendingReportCommentNotification &notification : commentNotifications) {
         Event_NotifyUser event;
         event.set_type(Event_NotifyUser::REPORT_COMMENT);
-        event.set_custom_title(tr("New Comment on Report #%1").arg(reportId).toStdString());
-        event.set_custom_content(tr("%1 commented:\n%2").arg(authorName, commentText).toStdString());
+        event.set_custom_title(tr("New Comment on Report #%1").arg(notification.reportId).toStdString());
+        event.set_custom_content(
+            tr("%1 commented:\n%2").arg(notification.authorName, notification.commentText).toStdString());
 
         rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event));
 
-        QSqlQuery *notifiedQuery =
-            sqlInterface->prepareQuery("UPDATE {prefix}_report_comments SET notified = 1 WHERE id = :id");
-        notifiedQuery->bindValue(":id", commentId);
-        sqlInterface->execSqlQuery(notifiedQuery);
+        databaseInterface->markReportCommentNotified(notification.commentId);
     }
 }
 
@@ -3874,7 +3842,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReport(const Command_Re
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
@@ -3897,24 +3865,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReport(const Command_Re
     }
 
     const int maxReportsPerDay = settingsCache->value("reporting/max_reports_per_day", 10).toInt();
-    if (maxReportsPerDay > 0) {
-        QSqlQuery *countQuery =
-            sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_reports WHERE reporter_id = :id "
-                                       "AND created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)");
-        countQuery->bindValue(":id", userInfo->id());
-        if (sqlInterface->execSqlQuery(countQuery) && countQuery->next() &&
-            countQuery->value(0).toInt() >= maxReportsPerDay) {
-            return Response::RespTooManyRequests;
-        }
+    if (maxReportsPerDay > 0 && databaseInterface->countReportsSubmittedInLastDay(userInfo->id()) >= maxReportsPerDay) {
+        return Response::RespTooManyRequests;
     }
 
-    int reportedUserId = -1;
-    QSqlQuery *lookupQuery = sqlInterface->prepareQuery("SELECT id FROM {prefix}_users WHERE name = :name");
-    lookupQuery->bindValue(":name", reportedUser);
-    if (sqlInterface->execSqlQuery(lookupQuery) && lookupQuery->next()) {
-        reportedUserId = lookupQuery->value(0).toInt();
-    }
-
+    const int reportedUserId = databaseInterface->getReportedUserId(reportedUser);
     if (reportedUserId == -1) {
         return Response::RespNameNotFound;
     }
@@ -3933,28 +3888,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReport(const Command_Re
         }
     }
 
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("insert into {prefix}_reports "
-                                   "(reporter_id, reporter_name, reported_user_id, reported_user_name, "
-                                   "game_id, room_id, category, description, chat_log, created_at, status) "
-                                   "values "
-                                   "(:reporter_id, :reporter_name, :reported_user_id, :reported_user_name, "
-                                   ":game_id, :room_id, :category, :description, :chat_log, NOW(), 'open')");
-
-    query->bindValue(":reporter_id", userInfo->id());
-    query->bindValue(":reporter_name", reporterName);
-    query->bindValue(":reported_user_id", reportedUserId);
-    query->bindValue(":reported_user_name", reportedUser);
-
-    query->bindValue(":game_id", gameId > 0 ? gameId : QVariant());
-
-    query->bindValue(":room_id", roomId > 0 ? roomId : QVariant());
-
-    query->bindValue(":category", category);
-    query->bindValue(":description", description);
-    query->bindValue(":chat_log", chatLog.isEmpty() ? QVariant() : chatLog);
-
-    if (!sqlInterface->execSqlQuery(query)) {
+    if (!databaseInterface->addReport(userInfo->id(), reporterName, reportedUserId, reportedUser, gameId, roomId,
+                                      category, description, chatLog)) {
         return Response::RespInternalError;
     }
 
