@@ -50,7 +50,6 @@
 #include <QSet>
 #include <QSharedPointer>
 #include <QSqlDatabase>
-#include <QSqlQuery>
 #include <QSsl>
 #include <QString>
 #include <QStringList>
@@ -870,10 +869,8 @@ void Servatrice::statusUpdate()
 
     if (getRegistrationEnabled() && getEnableInternalSMTPClient()) {
         if (getRequireEmailActivationEnabled()) {
-            auto servDbSelQuery = servatriceDatabaseInterface->prepareQuery("select a.name, b.email, b.token from "
-                                                                            "{prefix}_activation_emails a left join "
-                                                                            "{prefix}_users b on a.name = b.name");
-            if (!servatriceDatabaseInterface->execSqlQuery(servDbSelQuery)) {
+            QList<Server_DatabaseInterface::PendingActivationMailRecord> activationMails;
+            if (!servatriceDatabaseInterface->getPendingActivationMails(activationMails)) {
                 return;
             }
 
@@ -881,32 +878,23 @@ void Servatrice::statusUpdate()
             // activation e-mail is the database row, which is only removed once delivery has been
             // confirmed by the SMTP client (see onEmailDelivered). This makes sending resilient to
             // transient SMTP failures and server restarts.
-            while (servDbSelQuery->next()) {
-                const QString userName = servDbSelQuery->value(0).toString();
-                const auto emailAddress = EmailParser::getParsedEmailAddress(servDbSelQuery->value(1).toString());
-                const QString token = servDbSelQuery->value(2).toString();
-
-                smtpClient->enqueueActivationTokenMail(userName, emailAddress, token);
+            for (const auto &mail : activationMails) {
+                smtpClient->enqueueActivationTokenMail(
+                    mail.userName, EmailParser::getParsedEmailAddress(mail.emailAddress), mail.token);
             }
         }
 
         if (getEnableForgotPassword()) {
-            auto *forgotPwQuery = servatriceDatabaseInterface->prepareQuery(
-                "select a.id, a.name, b.email, b.token from {prefix}_forgot_password a left join {prefix}_users b on "
-                "a.name = b.name where a.emailed = 0");
-            if (!servatriceDatabaseInterface->execSqlQuery(forgotPwQuery)) {
+            QList<Server_DatabaseInterface::PendingPasswordResetRecord> passwordResets;
+            if (!servatriceDatabaseInterface->getPendingPasswordResets(passwordResets)) {
                 return;
             }
 
             // Rows are intentionally left with emailed = 0 here; they are marked emailed only once
             // delivery is confirmed by the SMTP client (see onEmailDelivered).
-            while (forgotPwQuery->next()) {
-                const qint64 rowId = forgotPwQuery->value(0).toLongLong();
-                const QString userName = forgotPwQuery->value(1).toString();
-                const auto emailAddress = EmailParser::getParsedEmailAddress(forgotPwQuery->value(2).toString());
-                const QString token = forgotPwQuery->value(3).toString();
-
-                smtpClient->enqueueForgotPasswordTokenMail(userName, emailAddress, token, rowId);
+            for (const auto &reset : passwordResets) {
+                smtpClient->enqueueForgotPasswordTokenMail(
+                    reset.userName, EmailParser::getParsedEmailAddress(reset.emailAddress), reset.token, reset.rowId);
             }
         }
 
@@ -952,27 +940,13 @@ bool Servatrice::cleanupDatabaseForEmail(const QString &userName, EmailType type
 {
     Q_UNUSED(token);
     switch (type) {
-        case EmailType::Activation: {
-            QSqlQuery *query =
-                servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name");
-            query->bindValue(":name", userName);
-            return servatriceDatabaseInterface->execSqlQuery(query);
-        }
-        case EmailType::ForgotPassword: {
+        case EmailType::Activation:
+            return servatriceDatabaseInterface->deleteActivationEmail(userName);
+        case EmailType::ForgotPassword:
             // Scope the update to the row that was actually sent: the table
             // holds one row per request, and marking by name would also mark
             // rows for newer tokens that were never delivered.
-            if (rowId >= 0) {
-                QSqlQuery *query = servatriceDatabaseInterface->prepareQuery(
-                    "update {prefix}_forgot_password set emailed = 1 where id = :id");
-                query->bindValue(":id", rowId);
-                return servatriceDatabaseInterface->execSqlQuery(query);
-            }
-            QSqlQuery *query = servatriceDatabaseInterface->prepareQuery(
-                "update {prefix}_forgot_password set emailed = 1 where name = :name");
-            query->bindValue(":name", userName);
-            return servatriceDatabaseInterface->execSqlQuery(query);
-        }
+            return servatriceDatabaseInterface->markPasswordResetEmailDelivered(userName, rowId);
     }
     return false;
 }
