@@ -3293,6 +3293,23 @@ Server_DatabaseInterface::UptimeSnapshot Servatrice_DatabaseInterface::getLatest
     return snapshot;
 }
 
+bool Servatrice_DatabaseInterface::getLatestServerMessage(int serverId, QString &message)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery(
+        "select message from {prefix}_servermessages where id_server = :id_server order by timest desc limit 1");
+    query->bindValue(":id_server", serverId);
+    if (!execSqlQuery(query) || !query->next()) {
+        return false;
+    }
+
+    message = query->value(0).toString();
+    return true;
+}
+
 bool Servatrice_DatabaseInterface::removeUserAvatar(const QString &userName)
 {
     if (!checkSql()) {
