@@ -1,8 +1,10 @@
 #include "dlg_create_token.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../../interface/widgets/printing_selector/printing_selector.h"
 #include "libcockatrice/card/card_info.h"
 #include "libcockatrice/card/database/card_database_querier.h"
+#include "libcockatrice/card/printing/exact_card.h"
 #include "token_preview_widget.h"
 
 #include <QByteArray>
@@ -21,10 +23,12 @@
 #include <QRadioButton>
 #include <QSet>
 #include <QSignalBlocker>
+#include <QTabWidget>
 #include <QTimer>
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QVariant>
+#include <QWidget>
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card_database_model.h>
@@ -34,6 +38,7 @@
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/layouts_settings.h>
 #include <libcockatrice/utility/card_ref.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <qnamespace.h>
 
@@ -150,18 +155,35 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
         cardDatabaseDisplayModel->setCardNameSet(QSet<QString>(predefinedTokens.begin(), predefinedTokens.end()));
     }
 
-    auto *tokenChooseLayout = new QVBoxLayout;
+    auto *tokenChoosePage = new QWidget;
+    tokenChoosePage->setObjectName("tokenChoosePage");
+    auto *tokenChooseLayout = QtUtils::makeLayout<QVBoxLayout>(tokenChoosePage);
     tokenChooseLayout->addWidget(chooseTokenFromAllRadioButton);
     tokenChooseLayout->addWidget(chooseTokenFromDeckRadioButton);
     tokenChooseLayout->addWidget(chooseTokenView);
 
-    auto *tokenChooseGroupBox = new QGroupBox(tr("Choose token from list"));
-    tokenChooseGroupBox->setLayout(tokenChooseLayout);
+    auto *printingsPage = new QWidget;
+    printingsPage->setObjectName("tokenPrintingsPage");
+    auto *printingsLayout = QtUtils::makeLayout<QVBoxLayout>(printingsPage);
+    printingSelector = new PrintingSelector(printingsPage, &printingSelectorHost);
+    printingSelector->setObjectName("tokenPrintingSelector");
+    printingsLayout->addWidget(printingSelector);
+
+    connect(printingSelector, &PrintingSelector::printingSelected, this, [this](const ExactCard &card) {
+        explicitProviderId = card.getPrinting().getUuid();
+        explicitProviderName = card.getName();
+        updatePreview();
+    });
+
+    tokenSourceTabs = new QTabWidget;
+    tokenSourceTabs->setObjectName("tokenSourceTabs");
+    tokenSourceTabs->addTab(tokenChoosePage, tr("&Tokens"));
+    tokenSourceTabs->addTab(printingsPage, tr("&Printings"));
 
     auto *hbox = new QGridLayout;
     hbox->addWidget(pic, 0, 0, 1, 1);
     hbox->addWidget(tokenDataGroupBox, 1, 0, 1, 1);
-    hbox->addWidget(tokenChooseGroupBox, 0, 1, 2, 1);
+    hbox->addWidget(tokenSourceTabs, 0, 1, 2, 1);
     hbox->setColumnStretch(1, 1);
 
     auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -175,13 +197,15 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
 
     setWindowTitle(tr("Create token"));
 
+    connect(nameEdit, &QLineEdit::textChanged, this, &DlgCreateToken::syncPrintingsToToken);
     connect(nameEdit, &QLineEdit::textChanged, this, &DlgCreateToken::updatePreview);
     connect(colorEdit, qOverload<int>(&QComboBox::currentIndexChanged), this, &DlgCreateToken::updatePreview);
     connect(ptEdit, &QLineEdit::textChanged, this, &DlgCreateToken::updatePreview);
     connect(annotationEdit, &QLineEdit::textChanged, this, &DlgCreateToken::updatePreview);
+    syncPrintingsToToken();
     updatePreview();
 
-    resize(600, 500);
+    resize(900, 650);
     restoreGeometry(SettingsCache::instance().layouts().getTokenDialogGeometry());
 }
 
@@ -228,7 +252,38 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
 
     // Filtering, changing the deck/all scope, or reloading the database can
     // invalidate the current row. None of these actions discard the token draft.
+    syncPrintingsToToken();
     updatePreview();
+}
+
+void DlgCreateToken::syncPrintingsToToken()
+{
+    const CardInfoPtr cardInfo = CardDatabaseManager::query()->lookupCardByName(nameEdit->text());
+
+    if (!cardInfo) {
+        explicitProviderId.clear();
+        explicitProviderName.clear();
+    } else if (!explicitProviderId.isEmpty() && explicitProviderName != cardInfo->getName()) {
+        // A pick belongs to the token name it was made for.
+        explicitProviderId.clear();
+        explicitProviderName.clear();
+    }
+
+    if (!cardInfo || cardInfo->getSets().empty()) {
+        printingSelector->setCard(nullptr);
+        printingSelector->setSelectedProviderId(QString());
+        printingSelector->setPlaceholderText(tr("This token has no available printings."));
+        return;
+    }
+
+    printingSelector->setPlaceholderText(QString());
+    printingSelector->setCard(cardInfo);
+
+    const QString providerId =
+        explicitProviderId.isEmpty()
+            ? SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardInfo->getName())
+            : explicitProviderId;
+    printingSelector->setSelectedProviderId(providerId);
 }
 
 void DlgCreateToken::updateSearchFieldWithoutUpdatingFilter(const QString &newValue) const
@@ -275,14 +330,25 @@ void DlgCreateToken::actReject()
 
 TokenInfo DlgCreateToken::tokenDraft() const
 {
+    // Keep an explicit pick only while it still belongs to the current token.
+    QString providerId = explicitProviderId;
+    if (!providerId.isEmpty()) {
+        const CardInfoPtr pickedCard = CardDatabaseManager::query()->lookupCardByName(nameEdit->text());
+        if (!pickedCard || pickedCard->getName() != explicitProviderName) {
+            providerId.clear();
+        }
+    }
+    if (providerId.isEmpty()) {
+        providerId = SettingsCache::instance().cardOverrides().getCardPreferenceOverride(nameEdit->text());
+    }
+
     TokenInfo token = {.name = nameEdit->text(),
                        .color = colorEdit->itemData(colorEdit->currentIndex()).toString(),
                        .pt = ptEdit->text(),
                        .annotation = annotationEdit->text(),
                        .destroy = destroyCheckBox->isChecked(),
                        .faceDown = faceDownCheckBox->isChecked(),
-                       .providerId =
-                           SettingsCache::instance().cardOverrides().getCardPreferenceOverride(nameEdit->text())};
+                       .providerId = providerId};
 
     // Match the normalization applied when the player creates the token, so
     // manually typed aliases and the default P/T preview the actual result.

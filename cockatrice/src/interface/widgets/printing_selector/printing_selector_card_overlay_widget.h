@@ -14,10 +14,9 @@
 
 class QAction;
 class QMenu;
-class AbstractTabDeckEditor;
 class AllZonesCardAmountWidget;
 class CardInfoPictureWidget;
-class DeckStateManager;
+class PrintingSelectorHost;
 class QLabel;
 class QPoint;
 class QSlider;
@@ -28,8 +27,7 @@ class PrintingSelectorCardOverlayWidget : public QWidget
 
 public:
     explicit PrintingSelectorCardOverlayWidget(QWidget *parent,
-                                               AbstractTabDeckEditor *_deckEditor,
-                                               DeckStateManager *_deckStateManager,
+                                               PrintingSelectorHost *_host,
                                                QSlider *_cardSizeSlider,
                                                const ExactCard &_rootCard);
 
@@ -42,6 +40,7 @@ protected:
 
 signals:
     void cardPreferenceChanged();
+    void printingSelected(const ExactCard &card);
 
 public slots:
     void updateCardAmounts(int mainboardAmount, int sideboardAmount, int tokensboardAmount);
@@ -57,9 +56,9 @@ private:
     void refreshPreview();
     void hidePreview();
     CardInfoPictureWidget *cardInfoPicture;
-    AllZonesCardAmountWidget *allZonesCardAmountWidget;
+    AllZonesCardAmountWidget *allZonesCardAmountWidget = nullptr;
     QLabel *pinBadge = nullptr;
-    AbstractTabDeckEditor *deckEditor;
+    PrintingSelectorHost *host;
     ExactCard rootCard;
     QLabel *cardOverridePreviewLabel = nullptr;
     ExactCard hoveredOverrideCard;
