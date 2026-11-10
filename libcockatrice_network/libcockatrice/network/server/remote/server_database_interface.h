@@ -1,7 +1,12 @@
 #ifndef SERVER_DATABASE_INTERFACE_H
 #define SERVER_DATABASE_INTERFACE_H
 
+#include "libcockatrice/protocol/pb/serverinfo_ban.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_moderator_login.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user_alt.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_user_session.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_warning.pb.h"
 #include "server.h"
 
 #include <QMap>
@@ -97,6 +102,41 @@ public:
     virtual bool removeFromIgnoreList(int /* userId */, int /* targetId */)
     {
         return false;
+    }
+    virtual QList<ServerInfo_Ban> getUserBanHistory(const QString & /* userName */)
+    {
+        return {};
+    }
+    virtual QList<ServerInfo_Warning> getUserWarnHistory(const QString & /* userName */)
+    {
+        return {};
+    }
+    virtual QList<ServerInfo_UserSession> getUserSessions(const QString & /* userName */, int /* limit */)
+    {
+        return {};
+    }
+    virtual QList<ServerInfo_UserAlt> getUserAlts(const QString & /* userName */,
+                                                  int /* depth */ = 1,
+                                                  bool /* useEmail */ = true,
+                                                  bool /* useClientId */ = true,
+                                                  bool /* useIp */ = true,
+                                                  int /* sessionMonths */ = 6)
+    {
+        return {};
+    }
+    virtual QList<ServerInfo_ModeratorLogin> getModeratorLastLogins()
+    {
+        return {};
+    }
+    /**
+     * @brief Whether the backing store is reachable, reconnecting when it is not.
+     *
+     * Implementations that cannot report readiness are always ready, so callers
+     * do not have to know which kind of store they hold.
+     */
+    virtual bool checkSql()
+    {
+        return true;
     }
     virtual ServerInfo_User getUserData(const QString &name, bool withId = false) = 0;
     virtual void storeGameInformation(const QString & /* roomName */,
