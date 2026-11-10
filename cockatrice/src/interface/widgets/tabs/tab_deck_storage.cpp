@@ -593,13 +593,19 @@ void TabDeckStorage::renderSyncStatus()
         case SyncStatusType::Failed:
             syncStatusLabel->setText(tr("Sync failed: %1").arg(syncStatusDetail));
             break;
-        case SyncStatusType::Finished:
-            syncStatusLabel->setText(tr("Sync complete: %1 uploaded, %2 downloaded, %3 unchanged, %4 skipped.")
-                                         .arg(lastSyncSummary.uploaded)
-                                         .arg(lastSyncSummary.downloaded)
-                                         .arg(lastSyncSummary.unchanged)
-                                         .arg(lastSyncSummary.skipped));
+        case SyncStatusType::Finished: {
+            QString text = tr("Sync complete: %1 uploaded, %2 downloaded, %3 removed, %4 unchanged, %5 skipped.")
+                               .arg(lastSyncSummary.uploaded)
+                               .arg(lastSyncSummary.downloaded)
+                               .arg(lastSyncSummary.removed)
+                               .arg(lastSyncSummary.unchanged)
+                               .arg(lastSyncSummary.skipped);
+            if (!lastSyncSummary.note.isEmpty()) {
+                text += QStringLiteral("\n") + lastSyncSummary.note;
+            }
+            syncStatusLabel->setText(text);
             break;
+        }
         case SyncStatusType::Idle:
             syncStatusLabel->setText(tr("Not synced yet"));
             break;
