@@ -382,7 +382,7 @@ bool Servatrice::initServer()
 
     if (databaseType != DatabaseNone) {
         dbPrefix = getDBPrefixString();
-        bool dbOpened = servatriceDatabaseInterface->initDatabase(
+        bool dbOpened = servatriceDatabaseInterface->openDatabase(
             "QMYSQL", getDBHostNameString(), getDBDatabaseNameString(), getDBUserNameString(), getDBPasswordString());
         if (!dbOpened) {
             qCCritical(ServatriceLog) << "Failed to open the database; refusing to start.";

@@ -81,7 +81,7 @@ void Servatrice_DatabaseInterface::initDatabase(const QSqlDatabase &_sqlDatabase
     }
 }
 
-bool Servatrice_DatabaseInterface::initDatabase(const QString &type,
+bool Servatrice_DatabaseInterface::openDatabase(const QString &type,
                                                 const QString &hostName,
                                                 const QString &databaseName,
                                                 const QString &userName,
