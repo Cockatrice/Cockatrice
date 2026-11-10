@@ -101,9 +101,10 @@ tries to find a matching picture on disk. If a local picture is found, it is use
 CardPictureLoaderLocal searches three locations:
 
 - The **CUSTOM folder** (`<pictures directory>/CUSTOM/`). Every file in it is indexed recursively by its base name
-  (both `baseName` and `completeBaseName`, so a file named `ExampleCard.jpg` is indexed as `ExampleCard`). The index is rebuilt
-  every 10 seconds, so new files are picked up without restarting the
-  client (changing the configured pictures directory only reassigns the search paths; the next timer tick rebuilds the index).
+  (both `baseName` and `completeBaseName`, so a file named `ExampleCard.jpg` is indexed as `ExampleCard`). A
+  `QFileSystemWatcher` watches that folder and its subfolders, and a burst of change events is debounced into a single
+  rebuild after 500 ms, so new files are picked up without restarting the client. A five-minute fallback poll covers
+  filesystems where watching fails, and changing the configured pictures directory rebuilds the index immediately.
 - The **set-named subfolders** of the pictures directory: `<pictures directory>/<set code>/` and
   `<pictures directory>/downloadedPics/<set code>/`.
 - The **root of the `downloadedPics` folder** (`<pictures directory>/downloadedPics/`). The export naming schemes without a
