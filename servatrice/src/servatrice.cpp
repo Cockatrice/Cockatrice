@@ -879,19 +879,16 @@ void Servatrice::statusUpdate()
     rxBytes = 0;
     rxBytesMutex.unlock();
 
-    QSqlQuery *query = servatriceDatabaseInterface->prepareQuery(
-        "insert into {prefix}_uptime (id_server, timest, uptime, users_count, mods_count, mods_list, games_count, "
-        "tx_bytes, rx_bytes) values(:id, NOW(), :uptime, :users_count, :mods_count, :mods_list, :games_count, :tx, "
-        ":rx)");
-    query->bindValue(":id", serverId);
-    query->bindValue(":uptime", uptime);
-    query->bindValue(":users_count", uc);
-    query->bindValue(":mods_count", mc);
-    query->bindValue(":mods_list", ml);
-    query->bindValue(":games_count", gc);
-    query->bindValue(":tx", tx);
-    query->bindValue(":rx", rx);
-    servatriceDatabaseInterface->execSqlQuery(query);
+    Server_DatabaseInterface::UptimeRecord uptimeRecord;
+    uptimeRecord.serverId = serverId;
+    uptimeRecord.uptimeSecs = uptime;
+    uptimeRecord.usersCount = uc;
+    uptimeRecord.modsCount = mc;
+    uptimeRecord.modsList = ml;
+    uptimeRecord.gamesCount = gc;
+    uptimeRecord.txBytes = tx;
+    uptimeRecord.rxBytes = rx;
+    servatriceDatabaseInterface->recordUptime(uptimeRecord);
 
     if (getRegistrationEnabled() && getEnableInternalSMTPClient()) {
         if (getRequireEmailActivationEnabled()) {

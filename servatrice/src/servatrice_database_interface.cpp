@@ -3337,6 +3337,27 @@ QList<Server_DatabaseInterface::ServerListEntryRecord> Servatrice_DatabaseInterf
     return entries;
 }
 
+void Servatrice_DatabaseInterface::recordUptime(const UptimeRecord &record)
+{
+    if (!checkSql()) {
+        return;
+    }
+
+    QSqlQuery *query = prepareQuery(
+        "insert into {prefix}_uptime (id_server, timest, uptime, users_count, mods_count, mods_list, games_count, "
+        "tx_bytes, rx_bytes) values(:id, NOW(), :uptime, :users_count, :mods_count, :mods_list, :games_count, :tx, "
+        ":rx)");
+    query->bindValue(":id", record.serverId);
+    query->bindValue(":uptime", record.uptimeSecs);
+    query->bindValue(":users_count", record.usersCount);
+    query->bindValue(":mods_count", record.modsCount);
+    query->bindValue(":mods_list", record.modsList);
+    query->bindValue(":games_count", record.gamesCount);
+    query->bindValue(":tx", record.txBytes);
+    query->bindValue(":rx", record.rxBytes);
+    execSqlQuery(query);
+}
+
 bool Servatrice_DatabaseInterface::removeUserAvatar(const QString &userName)
 {
     if (!checkSql()) {

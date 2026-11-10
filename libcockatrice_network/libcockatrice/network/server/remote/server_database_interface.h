@@ -733,6 +733,23 @@ public:
         return {};
     }
 
+    /** @brief One row the periodic status update appends to the uptime table. */
+    struct UptimeRecord
+    {
+        int serverId = 0;
+        int uptimeSecs = 0;
+        int usersCount = 0;
+        int modsCount = 0;
+        QString modsList;
+        int gamesCount = 0;
+        quint64 txBytes = 0;
+        quint64 rxBytes = 0;
+    };
+    /** @brief Appends one uptime row; a no-op when persistence is unavailable. */
+    virtual void recordUptime(const UptimeRecord & /* record */)
+    {
+    }
+
     virtual void clearSessionTables()
     {
     }
