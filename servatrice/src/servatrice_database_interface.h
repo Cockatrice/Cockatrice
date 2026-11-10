@@ -280,6 +280,7 @@ public:
     UptimeSnapshot getLatestUptimeSnapshot(int serverId) override;
     bool getLatestServerMessage(int serverId, QString &message) override;
     QList<ServerListEntryRecord> getServerListEntries() override;
+    void recordUptime(const UptimeRecord &record) override;
     bool removeUserAvatar(const QString &userName) override;
     // Outcome of removeUserBanner(), so the caller can tell a missing user apart
     // from a user who simply has no banner card set.
