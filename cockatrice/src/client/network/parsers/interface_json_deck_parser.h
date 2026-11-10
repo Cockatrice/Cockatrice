@@ -70,6 +70,25 @@ public:
 class MoxfieldJsonParser : public IJsonDeckParser
 {
 public:
+    /**
+     * @brief Builds a deck list from the JSON that Moxfield's export endpoint returns.
+     *
+     * The boards are keyed by card id, and each entry nests the actual card under
+     * `card` with its name, set and collector number. The mainboard and sideboard
+     * are flattened back into the plain-text deck format and handed to
+     * loadFromStream_Plain, so the normal loader still applies its rules: a blank
+     * line ends the mainboard, and card names are normalized on the way in.
+     *
+     * The name and description are set after the load because loading without
+     * metadata clears them, and provider ids are resolved afterwards against the
+     * card database.
+     *
+     * `commanders` become the banner card and are also added to the main zone,
+     * because a commander is a playable card. `signatureSpells` are added to the
+     * main zone too, but deliberately do not replace the banner card. A
+     * signature spell with no name or a non-positive quantity is skipped instead
+     * of failing the import.
+     */
     DeckList parse(const QJsonObject &obj) override
     {
         DeckList deckList;
