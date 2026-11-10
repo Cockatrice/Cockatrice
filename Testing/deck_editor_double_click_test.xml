@@ -1,0 +1,34 @@
+<events>
+    <!--
+        A single click and a double click differ, and only a double click acts.
+
+        The card database view adds the card under the mouse to the deck on
+        double click (CardDatabaseView::actDoubleClick); a single click only
+        moves the current row and updates the preview. Asserting the deck's row
+        count after each proves the MouseButtonDblClick event really reaches the
+        view, which a page-index assertion in the settings tree cannot show.
+
+        The visual deck editor shows its cards in a picture grid, which is not an
+        item view, so the addressable list is the one in its card database dock.
+        Which card lands in the deck does not matter: the test asserts that a
+        click adds nothing and a double click adds one.
+
+        Assertions carry type="check": QtTesting only reaches its check players
+        with a check event.
+    -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabHome/homeWidget/homeActionsScrollArea/qt_scrollarea_viewport/homeButtonsBox/homeCreateNewDeckButton" command="activate" arguments="" />
+    <event widget="MainWindow" command="process_events" arguments="1500" />
+
+    <!-- A fresh deck starts empty -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/deckDock/deckDockContents/deckSplitter/deckListPane/deckView" command="modelRowCount" arguments="0" type="check" />
+
+    <!-- A single click only selects the card -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/databaseView" command="clickRow" arguments="0" />
+    <event widget="MainWindow" command="process_events" arguments="300" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/deckDock/deckDockContents/deckSplitter/deckListPane/deckView" command="modelRowCount" arguments="0" type="check" />
+
+    <!-- A double click adds the card -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/databaseDisplayDock/databaseDisplayDockContents/databaseDisplayWidget/databaseView" command="doubleClickRow" arguments="0" />
+    <event widget="MainWindow" command="process_events" arguments="300" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabDeckEditorVisual/deckDock/deckDockContents/deckSplitter/deckListPane/deckView" command="modelRowCount" arguments="1" type="check" />
+</events>

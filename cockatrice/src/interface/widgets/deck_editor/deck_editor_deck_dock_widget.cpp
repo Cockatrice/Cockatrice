@@ -326,8 +326,10 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     // Create widgets for both layouts to make splitter work correctly
     auto *topWidget = new QWidget;
+    topWidget->setObjectName("deckInfoPane");
     topWidget->setLayout(upperLayout);
     auto *bottomWidget = new QWidget;
+    bottomWidget->setObjectName("deckListPane");
     bottomWidget->setLayout(lowerLayout);
 
     auto *split = new QSplitter;
