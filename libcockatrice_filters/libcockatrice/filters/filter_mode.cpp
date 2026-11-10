@@ -27,38 +27,54 @@ FilterModeInfo getFilterModeInfo(FilterMode filterMode)
     return {CardFilter::Type::TypeEnd, CardFilter::Type::TypeEnd, CardFilter::Attr::AttrEnd};
 }
 
+namespace
+{
+/// Whether every filter in the set could have been created by this mode.
+bool canCreateEveryFilter(const FilterModeInfo &modeInfo, const QList<const CardFilter *> &filters)
+{
+    for (const CardFilter *filter : filters) {
+        const bool createdByMode = filter->attr() == modeInfo.attr &&
+                                   (filter->type() == modeInfo.includeType || filter->type() == modeInfo.excludeType);
+        if (!createdByMode) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/// Modes with both an include and an exclude filter need exactly one filter per color.
+bool hasOneFilterPerColor(const FilterModeInfo &modeInfo, const QList<const CardFilter *> &filters)
+{
+    if (modeInfo.includeType == CardFilter::Type::TypeEnd || modeInfo.excludeType == CardFilter::Type::TypeEnd) {
+        return true;
+    }
+
+    for (const QChar &color : QStringLiteral("WUBRG")) {
+        int count = 0;
+        for (const CardFilter *filter : filters) {
+            if (filter->term() == color) {
+                ++count;
+            }
+        }
+        if (count != 1) {
+            return false;
+        }
+    }
+    return true;
+}
+} // namespace
+
 FilterMode deriveFilterMode(const QList<const CardFilter *> &filters, FilterMode currentMode)
 {
     constexpr int modeCount = static_cast<int>(FilterMode::End);
     bool modeImpossible[modeCount] = {};
-    const QString colors = "WUBRG";
 
     for (int i = 0; i < modeCount; ++i) {
         const FilterModeInfo modeInfo = getFilterModeInfo(static_cast<FilterMode>(i));
 
-        // Remove the modes that cannot create one of the filters.
-        for (const CardFilter *filter : filters) {
-            if (filter->attr() != modeInfo.attr ||
-                (filter->type() != modeInfo.includeType && filter->type() != modeInfo.excludeType)) {
-                modeImpossible[i] = true;
-                break;
-            }
-        }
-
-        // Modes that have both an include and an exclude filter should always have a filter for each color.
-        if (modeInfo.includeType != CardFilter::Type::TypeEnd && modeInfo.excludeType != CardFilter::Type::TypeEnd &&
-            !modeImpossible[i]) {
-            for (const QChar &color : colors) {
-                int count = 0;
-                for (const CardFilter *filter : filters) {
-                    count += filter->term() == color;
-                }
-                if (count != 1) {
-                    modeImpossible[i] = true;
-                    break;
-                }
-            }
-        }
+        // A mode is impossible when it cannot create every filter, or when it has both
+        // an include and an exclude filter and a color is not covered exactly once.
+        modeImpossible[i] = !canCreateEveryFilter(modeInfo, filters) || !hasOneFilterPerColor(modeInfo, filters);
     }
 
     // Keep the current mode if it can produce the filters, so that a live mode is never swapped for another.
