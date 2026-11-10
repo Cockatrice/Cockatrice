@@ -195,8 +195,7 @@ static const int MAX_TCP_MESSAGE_SIZE = 1500000;
 AbstractServerSocketInterface::AbstractServerSocketInterface(Servatrice *_server,
                                                              Servatrice_DatabaseInterface *_databaseInterface,
                                                              QObject *parent)
-    : Server_ProtocolHandler(_server, _databaseInterface, parent), servatrice(_server),
-      sqlInterface(reinterpret_cast<Servatrice_DatabaseInterface *>(databaseInterface))
+    : Server_ProtocolHandler(_server, _databaseInterface, parent), servatrice(_server), sqlInterface(_databaseInterface)
 {
     // Never call flushOutputQueue directly from outputQueueChanged. In case of a socket error,
     // it could lead to this object being destroyed while another function is still on the call stack. -> mutex
