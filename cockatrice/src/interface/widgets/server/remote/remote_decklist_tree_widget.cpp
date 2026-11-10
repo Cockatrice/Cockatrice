@@ -73,7 +73,7 @@ RemoteDeckList_TreeModel::DirectoryNode *RemoteDeckList_TreeModel::DirectoryNode
             return node->getNodeByPath(path);
         }
     }
-    return 0;
+    return nullptr;
 }
 
 RemoteDeckList_TreeModel::FileNode *RemoteDeckList_TreeModel::DirectoryNode::getNodeById(int id) const

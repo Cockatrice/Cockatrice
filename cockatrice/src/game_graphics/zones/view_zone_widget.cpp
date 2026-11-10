@@ -78,7 +78,7 @@ ZoneViewWidget::ZoneViewWidget(PlayerLogic *_player,
                                bool _writeableRevealZone,
                                const QList<const ServerInfo_Card *> &cardList,
                                bool _isReversed)
-    : QGraphicsWidget(0, Qt::Window), canBeShuffled(_origZone->getIsShufflable()), player(_player)
+    : QGraphicsWidget(nullptr, Qt::Window), canBeShuffled(_origZone->getIsShufflable()), player(_player)
 {
     setAcceptHoverEvents(true);
     setAttribute(Qt::WA_DeleteOnClose);
@@ -570,7 +570,7 @@ void ZoneViewWidget::handleScrollBarChange(int value)
 void ZoneViewWidget::closeEvent(QCloseEvent *event)
 {
     stopWindowDrag();
-    disconnect(zone, &ZoneViewZone::closed, this, 0);
+    disconnect(zone, &ZoneViewZone::closed, this, nullptr);
     // manually call zone->close in order to remove it from the origZones views
     zone->close();
     if (shuffleCheckBox.isChecked()) {

@@ -522,7 +522,7 @@ void Server_Room::removeGame(Server_Game *game)
     // No need to lock gamesLock or gameMutex. This method is only
     // called from ~Server_Game, which locks both mutexes anyway beforehand.
 
-    disconnect(game, 0, this, 0);
+    disconnect(game, nullptr, this, 0);
 
     ServerInfo_Game gameInfo;
     game->getInfo(gameInfo);

@@ -66,7 +66,7 @@ private:
     void handleDrop(DeckViewCardContainer *target);
 
 public:
-    DeckViewCardDragItem(DeckViewCard *_item, const QPointF &_hotSpot, AbstractCardDragItem *parentDrag = 0);
+    DeckViewCardDragItem(DeckViewCard *_item, const QPointF &_hotSpot, AbstractCardDragItem *parentDrag = nullptr);
     void updatePosition(const QPointF &cursorScenePos) override;
 
 protected:

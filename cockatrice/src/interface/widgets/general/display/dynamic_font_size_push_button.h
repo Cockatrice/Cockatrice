@@ -17,7 +17,7 @@ class QWidget;
 class DynamicFontSizePushButton : public QPushButton
 {
 public:
-    explicit DynamicFontSizePushButton(QWidget *parent = NULL);
+    explicit DynamicFontSizePushButton(QWidget *parent = nullptr);
 
     /* This method overwrite stylesheet */
     void setTextColor(QColor color);

@@ -91,7 +91,7 @@ public:
      */
     [[nodiscard]] const QList<CardItem *> &cardItems() const;
 
-    void setMenu(QMenu *_menu, QAction *_doubleClickAction = 0)
+    void setMenu(QMenu *_menu, QAction *_doubleClickAction = nullptr)
     {
         menu = _menu;
         doubleClickAction = _doubleClickAction;

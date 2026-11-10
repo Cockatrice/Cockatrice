@@ -137,7 +137,7 @@ Qt::DropActions SetsModel::supportedDropActions() const
 QMimeData *SetsModel::mimeData(const QModelIndexList &indexes) const
 {
     if (indexes.isEmpty()) {
-        return 0;
+        return nullptr;
     }
 
     SetsMimeData *result = new SetsMimeData(indexes[0].row());

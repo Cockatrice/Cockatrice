@@ -128,7 +128,7 @@ public slots:
     void prepareDestroy();
 
 public:
-    Server_ProtocolHandler(Server *_server, Server_DatabaseInterface *_databaseInterface, QObject *parent = 0);
+    Server_ProtocolHandler(Server *_server, Server_DatabaseInterface *_databaseInterface, QObject *parent = nullptr);
     ~Server_ProtocolHandler();
 
     bool getAcceptsUserListChanges() const

@@ -104,7 +104,7 @@ FilterTreeNode *FilterTreeModel::indexToNode(const QModelIndex &idx) const
     }
 
     ip = idx.internalPointer();
-    if (ip == NULL) {
+    if (ip == nullptr) {
         return fTree;
     }
 
@@ -203,7 +203,7 @@ QVariant FilterTreeModel::data(const QModelIndex &index, int role) const
     }
 
     node = indexToNode(index);
-    if (node == NULL) {
+    if (node == nullptr) {
         return QVariant();
     }
 
@@ -250,7 +250,7 @@ bool FilterTreeModel::setData(const QModelIndex &index, const QVariant &value, i
     }
 
     node = indexToNode(index);
-    if (node == NULL || node == fTree) {
+    if (node == nullptr || node == fTree) {
         return false;
     }
 
@@ -357,7 +357,7 @@ bool FilterTreeModel::removeRows(int row, int count, const QModelIndex &parent)
     }
 
     node = indexToNode(parent);
-    if (node == NULL || last >= node->childCount()) {
+    if (node == nullptr || last >= node->childCount()) {
         return false;
     }
 

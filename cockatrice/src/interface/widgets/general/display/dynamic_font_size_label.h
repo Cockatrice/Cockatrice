@@ -21,7 +21,7 @@ class DynamicFontSizeLabel : public QLabel
     Q_OBJECT
 
 public:
-    explicit DynamicFontSizeLabel(QWidget *parent = NULL, Qt::WindowFlags f = Qt::WindowFlags());
+    explicit DynamicFontSizeLabel(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
     ~DynamicFontSizeLabel()
     {
