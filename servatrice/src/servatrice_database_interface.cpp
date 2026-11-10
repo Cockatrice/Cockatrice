@@ -1023,6 +1023,81 @@ int Servatrice_DatabaseInterface::getDeckPathId(const QString &path, int userId)
     return getDeckPathIdAt(0, path.split("/"), userId);
 }
 
+Servatrice_DatabaseInterface::DeckStorageResult
+Servatrice_DatabaseInterface::setDeckVisibility(int deckId, int userId, bool isPublic)
+{
+    QSqlQuery *query = prepareQuery("select 1 from {prefix}_decklist_files where id = :id and id_user = :id_user");
+    query->bindValue(":id", deckId);
+    query->bindValue(":id_user", userId);
+    execSqlQuery(query);
+    if (!query->next()) {
+        return DeckStorageResult::NotFound;
+    }
+
+    query = prepareQuery("update {prefix}_decklist_files set is_public = :is_public where id = :id "
+                         "and id_user = :id_user");
+    query->bindValue(":is_public", isPublic ? 1 : 0);
+    query->bindValue(":id", deckId);
+    query->bindValue(":id_user", userId);
+    if (!execSqlQuery(query)) {
+        return DeckStorageResult::Failed;
+    }
+    return DeckStorageResult::Ok;
+}
+
+Servatrice_DatabaseInterface::DeckStorageResult
+Servatrice_DatabaseInterface::setDeckFolderVisibility(int folderId, int userId, bool isPublic)
+{
+    QSqlQuery *query = prepareQuery(
+        "update {prefix}_decklist_folders set is_public = :is_public where id = :id and id_user = :id_user");
+    query->bindValue(":is_public", isPublic ? 1 : 0);
+    query->bindValue(":id", folderId);
+    query->bindValue(":id_user", userId);
+    if (!execSqlQuery(query)) {
+        return DeckStorageResult::Failed;
+    }
+    return DeckStorageResult::Ok;
+}
+
+Servatrice_DatabaseInterface::DeckStorageResult
+Servatrice_DatabaseInterface::createDeckFolder(int parentId, int userId, const QString &name)
+{
+    QSqlQuery *query = prepareQuery(
+        "insert into {prefix}_decklist_folders (id_parent, id_user, name) values(:id_parent, :id_user, :name)");
+    query->bindValue(":id_parent", parentId);
+    query->bindValue(":id_user", userId);
+    query->bindValue(":name", name);
+    if (!execSqlQuery(query)) {
+        return DeckStorageResult::Failed;
+    }
+    return DeckStorageResult::Ok;
+}
+
+void Servatrice_DatabaseInterface::deleteDeckFolderTree(int basePathId)
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("select id from {prefix}_decklist_folders where id_parent = :id_parent");
+    query->bindValue(":id_parent", basePathId);
+    execSqlQuery(query);
+    while (query->next()) {
+        deleteDeckFolderTree(query->value(0).toInt());
+    }
+
+    query = prepareQuery("delete from {prefix}_decklist_files where id_folder = :id_folder");
+    query->bindValue(":id_folder", basePathId);
+    execSqlQuery(query);
+
+    query = prepareQuery("delete from {prefix}_decklist_folders where id = :id");
+    query->bindValue(":id", basePathId);
+    execSqlQuery(query);
+}
+
+void Servatrice_DatabaseInterface::deleteDeckFolder(int folderId)
+{
+    deleteDeckFolderTree(folderId);
+}
+
 int Servatrice_DatabaseInterface::getDeckOwnerId(int deckId)
 {
     QSqlQuery *query = prepareQuery("select id_user from {prefix}_decklist_files where id = :id");

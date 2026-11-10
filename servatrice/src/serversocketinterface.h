@@ -153,7 +153,6 @@ private:
     Response::ResponseCode cmdDeckListOtherUser(const Command_DeckListOtherUser &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckSetVisibility(const Command_DeckSetVisibility &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckNewDir(const Command_DeckNewDir &cmd, ResponseContainer &rc);
-    void deckDelDirHelper(int basePathId);
     void sendServerMessage(const QString userName, const QString message);
     Response::ResponseCode cmdDeckDelDir(const Command_DeckDelDir &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckDel(const Command_DeckDel &cmd, ResponseContainer &rc);

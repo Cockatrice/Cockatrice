@@ -762,46 +762,30 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckSetVisibility(const
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
+    Server_DatabaseInterface::DeckStorageResult result;
     if (cmd.has_deck_id()) {
-        QSqlQuery *query =
-            sqlInterface->prepareQuery("select 1 from {prefix}_decklist_files where id = :id and id_user = :id_user");
-        query->bindValue(":id", cmd.deck_id());
-        query->bindValue(":id_user", userInfo->id());
-        sqlInterface->execSqlQuery(query);
-        if (!query->next()) {
-            return Response::RespNameNotFound;
-        }
-
-        query = sqlInterface->prepareQuery("update {prefix}_decklist_files set is_public = :is_public where id = :id "
-                                           "and id_user = :id_user");
-        query->bindValue(":is_public", cmd.is_public() ? 1 : 0);
-        query->bindValue(":id", cmd.deck_id());
-        query->bindValue(":id_user", userInfo->id());
-        if (!sqlInterface->execSqlQuery(query)) {
-            return Response::RespContextError;
-        }
+        result = databaseInterface->setDeckVisibility(cmd.deck_id(), userInfo->id(), cmd.is_public());
     } else if (cmd.has_folder_path()) {
         const int folderId = databaseInterface->getDeckPathId(nameFromStdString(cmd.folder_path()), userInfo->id());
         if (folderId == -1 || folderId == 0) {
             return Response::RespNameNotFound;
         }
-
-        QSqlQuery *query =
-            sqlInterface->prepareQuery("update {prefix}_decklist_folders set is_public = :is_public where id = :id "
-                                       "and id_user = :id_user");
-        query->bindValue(":is_public", cmd.is_public() ? 1 : 0);
-        query->bindValue(":id", folderId);
-        query->bindValue(":id_user", userInfo->id());
-        if (!sqlInterface->execSqlQuery(query)) {
-            return Response::RespContextError;
-        }
+        result = databaseInterface->setDeckFolderVisibility(folderId, userInfo->id(), cmd.is_public());
     } else {
         return Response::RespInvalidData;
     }
 
-    return Response::RespOk;
+    switch (result) {
+        case Server_DatabaseInterface::DeckStorageResult::Ok:
+            return Response::RespOk;
+        case Server_DatabaseInterface::DeckStorageResult::NotFound:
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::DeckStorageResult::Failed:
+            return Response::RespContextError;
+    }
+    return Response::RespContextError;
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdDeckDownloadPublic(const Command_DeckDownloadPublic &cmd,
@@ -841,7 +825,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckNewDir(const Comman
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
     QString path = nameFromStdString(cmd.path());
     int folderId = databaseInterface->getDeckPathId(path, userInfo->id());
@@ -854,35 +838,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckNewDir(const Comman
         return Response::RespContextError; // do not allow creation of paths that would be too long to delete
     }
 
-    QSqlQuery *query = sqlInterface->prepareQuery(
-        "insert into {prefix}_decklist_folders (id_parent, id_user, name) values(:id_parent, :id_user, :name)");
-    query->bindValue(":id_parent", folderId);
-    query->bindValue(":id_user", userInfo->id());
-    query->bindValue(":name", name);
-    if (!sqlInterface->execSqlQuery(query)) {
+    if (databaseInterface->createDeckFolder(folderId, userInfo->id(), name) !=
+        Server_DatabaseInterface::DeckStorageResult::Ok) {
         return Response::RespContextError;
     }
     return Response::RespOk;
-}
-
-void AbstractServerSocketInterface::deckDelDirHelper(int basePathId)
-{
-    sqlInterface->checkSql();
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("select id from {prefix}_decklist_folders where id_parent = :id_parent");
-    query->bindValue(":id_parent", basePathId);
-    sqlInterface->execSqlQuery(query);
-    while (query->next()) {
-        deckDelDirHelper(query->value(0).toInt());
-    }
-
-    query = sqlInterface->prepareQuery("delete from {prefix}_decklist_files where id_folder = :id_folder");
-    query->bindValue(":id_folder", basePathId);
-    sqlInterface->execSqlQuery(query);
-
-    query = sqlInterface->prepareQuery("delete from {prefix}_decklist_folders where id = :id");
-    query->bindValue(":id", basePathId);
-    sqlInterface->execSqlQuery(query);
 }
 
 void AbstractServerSocketInterface::sendServerMessage(const QString userName, const QString message)
@@ -909,13 +869,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDelDir(const Comman
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
     int basePathId = databaseInterface->getDeckPathId(nameFromStdString(cmd.path()), userInfo->id());
     if ((basePathId == -1) || (basePathId == 0)) {
         return Response::RespNameNotFound;
     }
-    deckDelDirHelper(basePathId);
+    databaseInterface->deleteDeckFolder(basePathId);
     return Response::RespOk;
 }
 

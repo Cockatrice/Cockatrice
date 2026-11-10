@@ -68,6 +68,7 @@ private:
     QString sealLegacyBackup(const QString &storedName, const QString &credential);
     bool isStrictModeEnabled(bool &ok) const;
     int getDeckPathIdAt(int basePathId, QStringList path, int userId);
+    void deleteDeckFolderTree(int basePathId);
     bool addToList(const QString &table, int userId, int targetId);
     bool removeFromList(const QString &table, int userId, int targetId);
 
@@ -124,6 +125,10 @@ public:
     int getDeckPathId(const QString &path, int userId) override;
     int getDeckOwnerId(int deckId) override;
     bool isDeckEffectivelyPublic(int deckId) override;
+    DeckStorageResult setDeckVisibility(int deckId, int userId, bool isPublic) override;
+    DeckStorageResult setDeckFolderVisibility(int folderId, int userId, bool isPublic) override;
+    DeckStorageResult createDeckFolder(int parentId, int userId, const QString &name) override;
+    void deleteDeckFolder(int folderId) override;
     QMap<QString, ServerInfo_User> getBuddyList(const QString &name) override;
     QMap<QString, ServerInfo_User> getIgnoreList(const QString &name) override;
     bool isInBuddyList(const QString &whoseList, const QString &who) override;
