@@ -163,6 +163,8 @@ private slots:
 
 protected:
     void doSendIslMessage(const IslMessage &msg, int _serverId) override;
+    /** @brief Creates the database interface the server itself runs on; the shipped server uses MySQL. */
+    virtual Server_DatabaseInterface *createMainDatabaseInterface();
 
 private:
     enum DatabaseType

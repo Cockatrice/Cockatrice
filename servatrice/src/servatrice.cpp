@@ -314,6 +314,11 @@ static std::optional<ServerInfo_RoomChannel::AccessLevel> roomChannelAccessFromK
     return std::nullopt;
 }
 
+Server_DatabaseInterface *Servatrice::createMainDatabaseInterface()
+{
+    return new Servatrice_DatabaseInterface(-1, this);
+}
+
 bool Servatrice::initServer()
 {
 
@@ -397,7 +402,11 @@ bool Servatrice::initServer()
     } else {
         databaseType = DatabaseNone;
     }
-    servatriceDatabaseInterface = new Servatrice_DatabaseInterface(-1, this);
+    servatriceDatabaseInterface = createMainDatabaseInterface();
+    if (!servatriceDatabaseInterface) {
+        qCCritical(ServatriceLog) << "Failed to create the database interface; refusing to start.";
+        return false;
+    }
     setDatabaseInterface(servatriceDatabaseInterface);
 
     if (databaseType != DatabaseNone) {
