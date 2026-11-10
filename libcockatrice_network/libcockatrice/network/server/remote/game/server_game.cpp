@@ -641,30 +641,42 @@ Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user,
         }
     }
 
+    // join_as_judge grants referee tools, so it requires the judge flag itself; the staff
+    // override below deliberately does not grant it.
     if (roleInfo.isJudge && !(user->user_level() & ServerInfo_User::IsJudge)) {
         return Response::RespUserLevelTooLow;
     }
-    if (!(overrideRestrictions && (user->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsJudge)))) {
-        if ((_password != password) && !(roleInfo.isSpectator && !spectatorsNeedPassword)) {
+
+    // Moderators and judges may skip the game's entry restrictions, but only when the
+    // request opts in. Seat limits below are never overridden.
+    const bool isStaff = user->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsJudge);
+    const bool staffOverridesRestrictions = overrideRestrictions && isStaff;
+
+    if (!staffOverridesRestrictions) {
+        const bool passwordNotRequired = roleInfo.isSpectator && !spectatorsNeedPassword;
+        if (_password != password && !passwordNotRequired) {
             return Response::RespWrongPassword;
         }
-        if (!(user->user_level() & ServerInfo_User::IsRegistered) && onlyRegistered) {
+
+        const bool isRegistered = user->user_level() & ServerInfo_User::IsRegistered;
+        if (onlyRegistered && !isRegistered) {
             return Response::RespUserLevelTooLow;
         }
-        if (onlyBuddies && (user->name() != creatorInfo->name())) {
-            if (!databaseInterface->isInBuddyList(QString::fromStdString(creatorInfo->name()),
-                                                  QString::fromStdString(user->name()))) {
-                return Response::RespOnlyBuddies;
-            }
+
+        const bool isCreator = user->name() == creatorInfo->name();
+        if (onlyBuddies && !isCreator &&
+            !databaseInterface->isInBuddyList(QString::fromStdString(creatorInfo->name()),
+                                              QString::fromStdString(user->name()))) {
+            return Response::RespOnlyBuddies;
         }
+
         if (databaseInterface->isInIgnoreList(QString::fromStdString(creatorInfo->name()),
                                               QString::fromStdString(user->name()))) {
             return Response::RespInIgnoreList;
         }
-        if (roleInfo.isSpectator) {
-            if (!spectatorsAllowed) {
-                return Response::RespSpectatorsNotAllowed;
-            }
+
+        if (roleInfo.isSpectator && !spectatorsAllowed) {
+            return Response::RespSpectatorsNotAllowed;
         }
     }
     if (!roleInfo.isSpectator && (gameStarted || (getPlayerCount() >= getMaxPlayers()))) {
