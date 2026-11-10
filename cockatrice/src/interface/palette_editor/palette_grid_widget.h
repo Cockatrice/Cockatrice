@@ -31,7 +31,7 @@ signals:
 
 private:
     void buildGrid(QWidget *host);
-    void changeEvent(QEvent *e);
+    void changeEvent(QEvent *e) override;
     void refreshChromePalettes();
 
 private slots:
