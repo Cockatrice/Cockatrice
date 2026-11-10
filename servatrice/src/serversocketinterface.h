@@ -37,7 +37,7 @@
 #include <server_protocolhandler.h>
 
 class Servatrice;
-class Servatrice_DatabaseInterface;
+class Server_DatabaseInterface;
 class DeckList;
 class ServerInfo_DeckStorage_Folder;
 class Command_AddToList;
@@ -247,7 +247,7 @@ private:
 
 public:
     AbstractServerSocketInterface(Servatrice *_server,
-                                  Servatrice_DatabaseInterface *_databaseInterface,
+                                  Server_DatabaseInterface *_databaseInterface,
                                   QObject *parent = 0);
     ~AbstractServerSocketInterface()
     {
@@ -264,9 +264,7 @@ class TcpServerSocketInterface : public AbstractServerSocketInterface
 {
     Q_OBJECT
 public:
-    TcpServerSocketInterface(Servatrice *_server,
-                             Servatrice_DatabaseInterface *_databaseInterface,
-                             QObject *parent = 0);
+    TcpServerSocketInterface(Servatrice *_server, Server_DatabaseInterface *_databaseInterface, QObject *parent = 0);
     ~TcpServerSocketInterface();
 
     QHostAddress getPeerAddress() const
@@ -312,7 +310,7 @@ class WebsocketServerSocketInterface : public AbstractServerSocketInterface
     Q_OBJECT
 public:
     WebsocketServerSocketInterface(Servatrice *_server,
-                                   Servatrice_DatabaseInterface *_databaseInterface,
+                                   Server_DatabaseInterface *_databaseInterface,
                                    QObject *parent = nullptr);
     ~WebsocketServerSocketInterface();
 

@@ -37,7 +37,6 @@
 #include "main.h"
 #include "metrics_registry.h"
 #include "servatrice.h"
-#include "servatrice_database_interface.h"
 #include "server.h"
 #include "server_database_interface.h"
 #include "server_logger.h"
@@ -192,7 +191,7 @@ static const int protocolVersion = 14;
 static const int MAX_TCP_MESSAGE_SIZE = 1500000;
 
 AbstractServerSocketInterface::AbstractServerSocketInterface(Servatrice *_server,
-                                                             Servatrice_DatabaseInterface *_databaseInterface,
+                                                             Server_DatabaseInterface *_databaseInterface,
                                                              QObject *parent)
     : Server_ProtocolHandler(_server, _databaseInterface, parent), servatrice(_server)
 {
@@ -3674,7 +3673,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdUpdateAdminNotes(const 
 }
 
 TcpServerSocketInterface::TcpServerSocketInterface(Servatrice *_server,
-                                                   Servatrice_DatabaseInterface *_databaseInterface,
+                                                   Server_DatabaseInterface *_databaseInterface,
                                                    QObject *parent)
     : AbstractServerSocketInterface(_server, _databaseInterface, parent), messageInProgress(false),
       handshakeStarted(false)
@@ -3869,7 +3868,7 @@ bool TcpServerSocketInterface::initTcpSession()
 }
 
 WebsocketServerSocketInterface::WebsocketServerSocketInterface(Servatrice *_server,
-                                                               Servatrice_DatabaseInterface *_databaseInterface,
+                                                               Server_DatabaseInterface *_databaseInterface,
                                                                QObject *parent)
     : AbstractServerSocketInterface(_server, _databaseInterface, parent), socket(nullptr)
 {
