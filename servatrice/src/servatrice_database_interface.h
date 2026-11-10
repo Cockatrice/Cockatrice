@@ -22,7 +22,7 @@
 
 class QSqlQuery;
 
-#define DATABASE_SCHEMA_VERSION 40
+#define DATABASE_SCHEMA_VERSION 41
 
 class Servatrice;
 
