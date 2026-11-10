@@ -38,6 +38,7 @@
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/layouts_settings.h>
 #include <libcockatrice/utility/card_ref.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <qnamespace.h>
 
@@ -156,16 +157,14 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
 
     auto *tokenChoosePage = new QWidget;
     tokenChoosePage->setObjectName("tokenChoosePage");
-    auto *tokenChooseLayout = new QVBoxLayout(tokenChoosePage);
-    tokenChooseLayout->setContentsMargins(0, 0, 0, 0);
+    auto *tokenChooseLayout = QtUtils::makeLayout<QVBoxLayout>(tokenChoosePage);
     tokenChooseLayout->addWidget(chooseTokenFromAllRadioButton);
     tokenChooseLayout->addWidget(chooseTokenFromDeckRadioButton);
     tokenChooseLayout->addWidget(chooseTokenView);
 
     auto *printingsPage = new QWidget;
     printingsPage->setObjectName("tokenPrintingsPage");
-    auto *printingsLayout = new QVBoxLayout(printingsPage);
-    printingsLayout->setContentsMargins(0, 0, 0, 0);
+    auto *printingsLayout = QtUtils::makeLayout<QVBoxLayout>(printingsPage);
     printingSelector = new PrintingSelector(printingsPage, &printingSelectorHost);
     printingSelector->setObjectName("tokenPrintingSelector");
     printingsLayout->addWidget(printingSelector);
