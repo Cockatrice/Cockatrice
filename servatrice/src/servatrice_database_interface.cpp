@@ -3320,7 +3320,7 @@ void Servatrice_DatabaseInterface::addAuditRecord(const QString &user,
                                                   const QString &clientid,
                                                   const QString &action,
                                                   const QString &details,
-                                                  const bool &results = false)
+                                                  bool results)
 {
     if (!checkSql()) {
         return;
