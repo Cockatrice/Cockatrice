@@ -20,6 +20,8 @@
 #include <qtmetamacros.h>
 
 struct LoadedDeck;
+struct DeckSyncConflict;
+struct DeckSyncResolution;
 class ServerInfo_User;
 class QTreeView;
 class QFileSystemModel;
@@ -53,6 +55,7 @@ private:
     QAction *aOpenDecksFolder;
     QAction *aOpenRemoteDeck, *aDownload, *aShareDecks, *aPublishDeck, *aNewFolder, *aDeleteRemoteDeck;
     QAction *aSyncNow;
+    QAction *aSyncReset;
     QLabel *syncStatusLabel;
     DeckSyncManager *syncManager;
     QString syncUsername;
@@ -128,6 +131,9 @@ private slots:
     void deleteDeckFinished(const Response &response, const CommandContainer &commandContainer);
 
     void actSyncNow();
+    void actResetSyncDirection();
+    void onFirstSyncDetected(int localCount, int serverCount);
+    void onConflictRequest(const DeckSyncConflict &conflict);
     void onSyncStatusMessage(const QString &message);
     void onSyncFinished(const SyncSummary &summary, const QString &error);
 
