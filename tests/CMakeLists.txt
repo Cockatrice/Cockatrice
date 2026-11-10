@@ -366,6 +366,7 @@ cockatrice_add_test(
   LIBS
   libcockatrice_network_server_remote
   libcockatrice_rng
+  libcockatrice_server_dev
   LABELS
   server
 )
@@ -377,6 +378,7 @@ cockatrice_add_test(
   LIBS
   libcockatrice_network_server_remote
   libcockatrice_rng
+  libcockatrice_server_dev
   LABELS
   server
 )
@@ -388,6 +390,7 @@ cockatrice_add_test(
   LIBS
   libcockatrice_network_server_remote
   libcockatrice_rng
+  libcockatrice_server_dev
   LABELS
   server
 )
@@ -423,6 +426,7 @@ cockatrice_add_test(
   LIBS
   libcockatrice_network_server_remote
   libcockatrice_rng
+  libcockatrice_server_dev
   LABELS
   server
 )
