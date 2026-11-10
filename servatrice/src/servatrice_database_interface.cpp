@@ -3552,6 +3552,16 @@ bool Servatrice_DatabaseInterface::validateTableColumnStringData(const QString &
     return false;
 }
 
+bool Servatrice_DatabaseInterface::userTokenMatches(const QString &userName, const QString &token)
+{
+    return validateTableColumnStringData("{prefix}_users", "token", userName, token);
+}
+
+bool Servatrice_DatabaseInterface::userEmailMatches(const QString &userName, const QString &email)
+{
+    return validateTableColumnStringData("{prefix}_users", "email", userName, email);
+}
+
 void Servatrice_DatabaseInterface::addAuditRecord(const QString &user,
                                                   const QString &ipaddress,
                                                   const QString &clientid,
