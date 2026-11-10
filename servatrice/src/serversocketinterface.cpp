@@ -1849,42 +1849,22 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Comman
 Response::ResponseCode AbstractServerSocketInterface::cmdReportAssign(const Command_ReportAssign &cmd,
                                                                       ResponseContainer & /*rc*/)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
-    int reportId = cmd.report_id();
-    int modId = userInfo->id();
+    const int reportId = cmd.report_id();
+    const int modId = userInfo->id();
 
-    QSqlQuery *lookupQuery = sqlInterface->prepareQuery("SELECT status FROM {prefix}_reports WHERE id = :id");
-    lookupQuery->bindValue(":id", reportId);
-
-    if (!sqlInterface->execSqlQuery(lookupQuery)) {
-        return Response::RespInternalError;
-    }
-
-    if (!lookupQuery->next()) {
-        return Response::RespNameNotFound;
-    }
-
-    if (lookupQuery->value(0).toString() != "open") {
-        return Response::RespInvalidData;
-    }
-
-    QSqlQuery *query = sqlInterface->prepareQuery("UPDATE {prefix}_reports "
-                                                  "SET status = 'assigned', assigned_to = :mod_id "
-                                                  "WHERE id = :id AND status = 'open'");
-
-    query->bindValue(":mod_id", modId);
-    query->bindValue(":id", reportId);
-
-    if (!sqlInterface->execSqlQuery(query)) {
-        return Response::RespInternalError;
-    }
-
-    if (query->numRowsAffected() == 0) {
-        // The report was taken by another moderator between the lookup and this update.
-        return Response::RespInvalidData;
+    switch (databaseInterface->assignReport(reportId, modId)) {
+        case Server_DatabaseInterface::ReportAssignResult::Ok:
+            break;
+        case Server_DatabaseInterface::ReportAssignResult::NotFound:
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::ReportAssignResult::NotOpen:
+            return Response::RespInvalidData;
+        case Server_DatabaseInterface::ReportAssignResult::Failed:
+            return Response::RespInternalError;
     }
 
     return Response::RespOk;
@@ -1893,32 +1873,23 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportAssign(const Comm
 Response::ResponseCode AbstractServerSocketInterface::cmdReportResolve(const Command_ReportResolve &cmd,
                                                                        ResponseContainer & /*rc*/)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
-    int reportId = cmd.report_id();
-    QString note = textFromStdString(cmd.resolution_note());
-    bool dismissed = cmd.dismissed();
+    const int reportId = cmd.report_id();
+    const QString note = textFromStdString(cmd.resolution_note());
+    const bool dismissed = cmd.dismissed();
 
-    QString newStatus = dismissed ? "dismissed" : "resolved";
+    const QString newStatus = dismissed ? "dismissed" : "resolved";
 
-    QSqlQuery *query = sqlInterface->prepareQuery("UPDATE {prefix}_reports "
-                                                  "SET status = :status, resolution_note = :note, "
-                                                  "resolution_time = NOW(), resolved_by = :mod_id "
-                                                  "WHERE id = :id AND status IN ('open', 'assigned')");
-
-    query->bindValue(":status", newStatus);
-    query->bindValue(":note", note);
-    query->bindValue(":mod_id", userInfo->id());
-    query->bindValue(":id", reportId);
-
-    if (!sqlInterface->execSqlQuery(query)) {
-        return Response::RespInternalError;
-    }
-
-    if (query->numRowsAffected() == 0) {
-        return Response::RespInvalidData;
+    switch (databaseInterface->resolveReport(reportId, newStatus, note, userInfo->id())) {
+        case Server_DatabaseInterface::ReportUpdateResult::Ok:
+            break;
+        case Server_DatabaseInterface::ReportUpdateResult::InvalidState:
+            return Response::RespInvalidData;
+        case Server_DatabaseInterface::ReportUpdateResult::Failed:
+            return Response::RespInternalError;
     }
 
     databaseInterface->addAuditRecord(QString::number(reportId), this->getAddress(),
@@ -1929,21 +1900,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportResolve(const Com
     // Notifying the reporter is best-effort: the resolve already succeeded. If any of the lookup
     // queries below fail, the report is simply left with notified = 0 and the notification is
     // delivered later via sendPendingReportNotifications.
-    QSqlQuery *lookupQuery =
-        sqlInterface->prepareQuery("SELECT reporter_id, reported_user_name FROM {prefix}_reports WHERE id = :id");
-    lookupQuery->bindValue(":id", reportId);
-
-    QString reporterName;
+    int reporterId = -1;
     QString reportedUser;
-    if (sqlInterface->execSqlQuery(lookupQuery) && lookupQuery->next()) {
-        int reporterId = lookupQuery->value(0).toInt();
-        reportedUser = lookupQuery->value(1).toString();
-
-        QSqlQuery *nameQuery = sqlInterface->prepareQuery("SELECT name FROM {prefix}_users WHERE id = :id");
-        nameQuery->bindValue(":id", reporterId);
-        if (sqlInterface->execSqlQuery(nameQuery) && nameQuery->next()) {
-            reporterName = nameQuery->value(0).toString();
-        }
+    QString reporterName;
+    if (databaseInterface->getReportNotificationTarget(reportId, reporterId, reportedUser)) {
+        databaseInterface->getUserNameById(reporterId, reporterName);
     }
 
     const QString ownName = QString::fromStdString(userInfo->name());
@@ -1951,10 +1912,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportResolve(const Com
         if (reporterName == ownName) {
             // Resolving your own report: no self-notification needed, but mark it as notified
             // so it is not delivered on the next login via sendPendingReportNotifications.
-            QSqlQuery *notifiedQuery =
-                sqlInterface->prepareQuery("UPDATE {prefix}_reports SET notified = 1 WHERE id = :id");
-            notifiedQuery->bindValue(":id", reportId);
-            sqlInterface->execSqlQuery(notifiedQuery);
+            databaseInterface->markReportNotified(reportId);
         } else {
             QReadLocker clientsLocker(&servatrice->clientsLock);
             AbstractServerSocketInterface *reporter =
@@ -1978,10 +1936,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportResolve(const Com
 
                 // Only mark the report as notified if the reporter is still connected; otherwise the
                 // notification is delivered on their next login via sendPendingReportNotifications.
-                QSqlQuery *notifiedQuery =
-                    sqlInterface->prepareQuery("UPDATE {prefix}_reports SET notified = 1 WHERE id = :id");
-                notifiedQuery->bindValue(":id", reportId);
-                sqlInterface->execSqlQuery(notifiedQuery);
+                databaseInterface->markReportNotified(reportId);
             }
         }
     }
@@ -2472,27 +2427,20 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportMyList(const Comm
 Response::ResponseCode AbstractServerSocketInterface::cmdReportReopen(const Command_ReportReopen &cmd,
                                                                       ResponseContainer & /*rc*/)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
-    int reportId = cmd.report_id();
-    QString note = textFromStdString(cmd.reopen_note());
+    const int reportId = cmd.report_id();
+    const QString note = textFromStdString(cmd.reopen_note());
 
-    QSqlQuery *query = sqlInterface->prepareQuery("UPDATE {prefix}_reports "
-                                                  "SET status = 'open', resolution_note = NULL, "
-                                                  "resolution_time = NULL, resolved_by = NULL, assigned_to = NULL, "
-                                                  "notified = 0 "
-                                                  "WHERE id = :id AND status IN ('resolved', 'dismissed')");
-
-    query->bindValue(":id", reportId);
-
-    if (!sqlInterface->execSqlQuery(query)) {
-        return Response::RespInternalError;
-    }
-
-    if (query->numRowsAffected() == 0) {
-        return Response::RespInvalidData;
+    switch (databaseInterface->reopenReport(reportId)) {
+        case Server_DatabaseInterface::ReportUpdateResult::Ok:
+            break;
+        case Server_DatabaseInterface::ReportUpdateResult::InvalidState:
+            return Response::RespInvalidData;
+        case Server_DatabaseInterface::ReportUpdateResult::Failed:
+            return Response::RespInternalError;
     }
 
     QString auditDetails = QString("Report #%1 reopened").arg(reportId);
@@ -2555,89 +2503,58 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportAddComment(const 
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
-    int reportId = cmd.report_id();
-    QString commentText = textFromStdString(cmd.comment()).trimmed();
+    const int reportId = cmd.report_id();
+    const QString commentText = textFromStdString(cmd.comment()).trimmed();
 
     if (commentText.isEmpty()) {
         return Response::RespInvalidData;
     }
 
     const int maxCommentsPerHour = settingsCache->value("reporting/max_comments_per_hour", 30).toInt();
-    if (maxCommentsPerHour > 0) {
-        QSqlQuery *countQuery =
-            sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_report_comments WHERE author_id = :id "
-                                       "AND created_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR)");
-        countQuery->bindValue(":id", userInfo->id());
-        if (sqlInterface->execSqlQuery(countQuery) && countQuery->next() &&
-            countQuery->value(0).toInt() >= maxCommentsPerHour) {
-            return Response::RespTooManyRequests;
-        }
+    if (maxCommentsPerHour > 0 &&
+        databaseInterface->countReportCommentsInLastHour(userInfo->id()) >= maxCommentsPerHour) {
+        return Response::RespTooManyRequests;
     }
 
-    QSqlQuery *checkQuery = sqlInterface->prepareQuery(
-        "SELECT reporter_id, reporter_name, assigned_to, status FROM {prefix}_reports WHERE id = :id");
-    checkQuery->bindValue(":id", reportId);
-
-    if (!sqlInterface->execSqlQuery(checkQuery)) {
+    Server_DatabaseInterface::ReportCommentTargetRecord target;
+    if (!databaseInterface->getReportCommentTarget(reportId, target)) {
         return Response::RespInternalError;
     }
 
-    if (!checkQuery->next()) {
+    if (!target.found) {
         return Response::RespNameNotFound;
     }
 
-    int reporterId = checkQuery->value(0).toInt();
-    QString reporterName = checkQuery->value(1).toString();
-    int assignedToId = checkQuery->value(2).toInt();
-
-    bool isMod = userInfo->user_level() & ServerInfo_User::IsModerator;
+    const bool isMod = userInfo->user_level() & ServerInfo_User::IsModerator;
 
     // Only the reporter (by id) or a moderator may comment on a report.
-    if (reporterId != userInfo->id() && !isMod) {
+    if (target.reporterId != userInfo->id() && !isMod) {
         return Response::RespAccessDenied;
     }
 
-    QString reportStatus = checkQuery->value(3).toString();
-    if (reportStatus == "resolved" || reportStatus == "dismissed") {
+    if (target.status == "resolved" || target.status == "dismissed") {
         return Response::RespInvalidData;
     }
 
-    QSqlQuery *insertQuery = sqlInterface->prepareQuery(
-        "INSERT INTO {prefix}_report_comments (report_id, author_name, author_id, comment_text, created_at, "
-        "is_moderator) "
-        "VALUES (:report_id, :author_name, :author_id, :comment_text, NOW(), :is_moderator)");
-    insertQuery->bindValue(":report_id", reportId);
-    insertQuery->bindValue(":author_name", QString::fromStdString(userInfo->name()));
-    insertQuery->bindValue(":author_id", userInfo->id());
-    insertQuery->bindValue(":comment_text", commentText);
-    insertQuery->bindValue(":is_moderator", isMod);
-
-    if (!sqlInterface->execSqlQuery(insertQuery)) {
+    qlonglong commentId = 0;
+    if (!databaseInterface->addReportComment(reportId, QString::fromStdString(userInfo->name()), userInfo->id(),
+                                             commentText, isMod, commentId)) {
         return Response::RespInternalError;
     }
-
-    const qlonglong commentId = insertQuery->lastInsertId().toLongLong();
 
     QStringList recipients;
     if (isMod) {
         // A moderator comment reaches both the reporter and (if assigned) the assigned moderator.
-        recipients.append(reporterName);
-        if (assignedToId > 0) {
-            QSqlQuery *modNameQuery = sqlInterface->prepareQuery("SELECT name FROM {prefix}_users WHERE id = :id");
-            modNameQuery->bindValue(":id", assignedToId);
-            if (sqlInterface->execSqlQuery(modNameQuery) && modNameQuery->next()) {
-                recipients.append(modNameQuery->value(0).toString());
-            }
-        }
-    } else if (assignedToId > 0) {
-        QSqlQuery *modNameQuery = sqlInterface->prepareQuery("SELECT name FROM {prefix}_users WHERE id = :id");
-        modNameQuery->bindValue(":id", assignedToId);
-        if (sqlInterface->execSqlQuery(modNameQuery) && modNameQuery->next()) {
-            recipients.append(modNameQuery->value(0).toString());
+        recipients.append(target.reporterName);
+    }
+    if (target.assignedToId > 0) {
+        QString modName;
+        if (databaseInterface->getUserNameById(target.assignedToId, modName)) {
+            recipients.append(modName);
         }
     }
 
@@ -2670,10 +2587,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportAddComment(const 
     }
 
     if (allNotified) {
-        QSqlQuery *notifiedQuery =
-            sqlInterface->prepareQuery("UPDATE {prefix}_report_comments SET notified = 1 WHERE id = :id");
-        notifiedQuery->bindValue(":id", commentId);
-        sqlInterface->execSqlQuery(notifiedQuery);
+        databaseInterface->markReportCommentNotified(commentId);
     }
 
     return Response::RespOk;

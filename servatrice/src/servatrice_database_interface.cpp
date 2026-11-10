@@ -4041,6 +4041,203 @@ bool Servatrice_DatabaseInterface::getReportUserInfo(const QString &userName, Re
     return true;
 }
 
+Server_DatabaseInterface::ReportAssignResult Servatrice_DatabaseInterface::assignReport(int reportId, int moderatorId)
+{
+    if (!checkSql()) {
+        return ReportAssignResult::Failed;
+    }
+
+    QSqlQuery *lookupQuery = prepareQuery("SELECT status FROM {prefix}_reports WHERE id = :id");
+    lookupQuery->bindValue(":id", reportId);
+
+    if (!execSqlQuery(lookupQuery)) {
+        return ReportAssignResult::Failed;
+    }
+
+    if (!lookupQuery->next()) {
+        return ReportAssignResult::NotFound;
+    }
+
+    if (lookupQuery->value(0).toString() != "open") {
+        return ReportAssignResult::NotOpen;
+    }
+
+    QSqlQuery *query = prepareQuery("UPDATE {prefix}_reports "
+                                    "SET status = 'assigned', assigned_to = :mod_id "
+                                    "WHERE id = :id AND status = 'open'");
+
+    query->bindValue(":mod_id", moderatorId);
+    query->bindValue(":id", reportId);
+
+    if (!execSqlQuery(query)) {
+        return ReportAssignResult::Failed;
+    }
+
+    if (query->numRowsAffected() == 0) {
+        // The report was taken by another moderator between the lookup and this update.
+        return ReportAssignResult::NotOpen;
+    }
+
+    return ReportAssignResult::Ok;
+}
+
+Server_DatabaseInterface::ReportUpdateResult
+Servatrice_DatabaseInterface::resolveReport(int reportId, const QString &status, const QString &note, int moderatorId)
+{
+    if (!checkSql()) {
+        return ReportUpdateResult::Failed;
+    }
+
+    QSqlQuery *query = prepareQuery("UPDATE {prefix}_reports "
+                                    "SET status = :status, resolution_note = :note, "
+                                    "resolution_time = NOW(), resolved_by = :mod_id "
+                                    "WHERE id = :id AND status IN ('open', 'assigned')");
+
+    query->bindValue(":status", status);
+    query->bindValue(":note", note);
+    query->bindValue(":mod_id", moderatorId);
+    query->bindValue(":id", reportId);
+
+    if (!execSqlQuery(query)) {
+        return ReportUpdateResult::Failed;
+    }
+
+    if (query->numRowsAffected() == 0) {
+        return ReportUpdateResult::InvalidState;
+    }
+
+    return ReportUpdateResult::Ok;
+}
+
+Server_DatabaseInterface::ReportUpdateResult Servatrice_DatabaseInterface::reopenReport(int reportId)
+{
+    if (!checkSql()) {
+        return ReportUpdateResult::Failed;
+    }
+
+    QSqlQuery *query = prepareQuery("UPDATE {prefix}_reports "
+                                    "SET status = 'open', resolution_note = NULL, "
+                                    "resolution_time = NULL, resolved_by = NULL, assigned_to = NULL, "
+                                    "notified = 0 "
+                                    "WHERE id = :id AND status IN ('resolved', 'dismissed')");
+
+    query->bindValue(":id", reportId);
+
+    if (!execSqlQuery(query)) {
+        return ReportUpdateResult::Failed;
+    }
+
+    if (query->numRowsAffected() == 0) {
+        return ReportUpdateResult::InvalidState;
+    }
+
+    return ReportUpdateResult::Ok;
+}
+
+bool Servatrice_DatabaseInterface::getUserNameById(int userId, QString &userName)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT name FROM {prefix}_users WHERE id = :id");
+    query->bindValue(":id", userId);
+    if (!execSqlQuery(query) || !query->next()) {
+        return false;
+    }
+
+    userName = query->value(0).toString();
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::getReportNotificationTarget(int reportId, int &reporterId, QString &reportedUserName)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT reporter_id, reported_user_name FROM {prefix}_reports WHERE id = :id");
+    query->bindValue(":id", reportId);
+    if (!execSqlQuery(query) || !query->next()) {
+        return false;
+    }
+
+    reporterId = query->value(0).toInt();
+    reportedUserName = query->value(1).toString();
+    return true;
+}
+
+int Servatrice_DatabaseInterface::countReportCommentsInLastHour(int authorId)
+{
+    if (!checkSql()) {
+        return 0;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT COUNT(*) FROM {prefix}_report_comments WHERE author_id = :id "
+                                    "AND created_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR)");
+    query->bindValue(":id", authorId);
+    if (!execSqlQuery(query) || !query->next()) {
+        return 0;
+    }
+
+    return query->value(0).toInt();
+}
+
+bool Servatrice_DatabaseInterface::getReportCommentTarget(int reportId, ReportCommentTargetRecord &target)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query =
+        prepareQuery("SELECT reporter_id, reporter_name, assigned_to, status FROM {prefix}_reports WHERE id = :id");
+    query->bindValue(":id", reportId);
+
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    if (!query->next()) {
+        return true;
+    }
+
+    target.found = true;
+    target.reporterId = query->value(0).toInt();
+    target.reporterName = query->value(1).toString();
+    target.assignedToId = query->value(2).toInt();
+    target.status = query->value(3).toString();
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::addReportComment(int reportId,
+                                                    const QString &authorName,
+                                                    int authorId,
+                                                    const QString &commentText,
+                                                    bool isModerator,
+                                                    qlonglong &commentId)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query =
+        prepareQuery("INSERT INTO {prefix}_report_comments (report_id, author_name, author_id, "
+                     "comment_text, created_at, is_moderator) "
+                     "VALUES (:report_id, :author_name, :author_id, :comment_text, NOW(), :is_moderator)");
+    query->bindValue(":report_id", reportId);
+    query->bindValue(":author_name", authorName);
+    query->bindValue(":author_id", authorId);
+    query->bindValue(":comment_text", commentText);
+    query->bindValue(":is_moderator", isModerator);
+
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    commentId = query->lastInsertId().toLongLong();
+    return true;
+}
+
 int Servatrice_DatabaseInterface::countReportsSubmittedInLastDay(int reporterId)
 {
     if (!checkSql()) {
