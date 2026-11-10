@@ -13,6 +13,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_moderator_login.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_private_chat_message.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_report.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user_alt.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user_session.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_warning.pb.h>
@@ -291,6 +292,15 @@ public:
                         bool results) override;
     int countReportsSubmittedInLastDay(int reporterId) override;
     int getReportedUserId(const QString &userName) override;
+    bool getReportList(bool unresolvedOnly,
+                       int offset,
+                       int limit,
+                       int &totalCount,
+                       QList<ServerInfo_Report> &reports) override;
+    bool getReportsSubmittedBy(int reporterId, QList<ServerInfo_Report> &reports) override;
+    Server_DatabaseInterface::ReportLookupResult
+    getReportForDetails(int reportId, int &reporterId, ServerInfo_Report &report) override;
+    bool getReportComments(int reportId, QList<ServerInfo_ReportComment> &comments) override;
     bool addReport(int reporterId,
                    const QString &reporterName,
                    int reportedUserId,
