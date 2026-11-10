@@ -394,6 +394,25 @@ cockatrice_add_test(
   LABELS
   server
 )
+if(WITH_SERVER)
+  # The only test that starts a separately scheduled server process. servatrice-dev is built by the
+  # servatrice subdirectory, which exists only when WITH_SERVER is on; the binary path is baked in
+  # because CTest runs the test from its own working directory.
+  cockatrice_add_test(
+    NAME
+    server_dev_smoke_test
+    SOURCES
+    ${VERSION_STRING_CPP}
+    server_dev_smoke_test.cpp
+    LIBS
+    libcockatrice_network_client_remote
+    LABELS
+    server
+    DEFINITIONS
+    "SERVATRICE_DEV_BINARY=\"$<TARGET_FILE:servatrice-dev>\""
+  )
+  add_dependencies(server_dev_smoke_test servatrice-dev)
+endif()
 cockatrice_add_test(
   NAME
   client_login_status_test
