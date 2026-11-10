@@ -154,7 +154,10 @@ protected:
                 drainProcessOutput();
                 return false;
             }
-            QThread::msleep(20);
+            // An event tick, not a bare sleep: QProcess fills its read buffers and flips its state
+            // only from its socket notifiers, so without this the drain below is a no-op and a dead
+            // child is not noticed until the full timeout has elapsed.
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 20);
         }
         drainProcessOutput();
         return false;
