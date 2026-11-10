@@ -158,6 +158,10 @@ public:
     bool getDeckShareItem(const QString &token, int itemId, QString &content) override;
     /** @brief Id and color identity of every deck file in a folder, for the share builder. */
     bool getDeckFilesInFolder(int folderId, int userId, QList<DeckFileListItem> &files) override;
+    QList<ReplayMatchRecord> getReplayList(int userId) override;
+    ReplayAccessResult getReplayData(int replayId, int userId, QByteArray &data) override;
+    ReplayWriteResult setReplayDoNotHide(int gameId, int userId, bool doNotHide) override;
+    ReplayWriteResult deleteReplayAccess(int gameId, int userId) override;
     /** @brief Deletes all expired share bundles (cascades to their items). */
     void cleanupExpiredDeckShares();
 

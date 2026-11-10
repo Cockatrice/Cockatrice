@@ -11,6 +11,7 @@
 #include "libcockatrice/protocol/pb/serverinfo_warning.pb.h"
 #include "server.h"
 
+#include <QByteArray>
 #include <QMap>
 #include <QObject>
 #include <QString>
@@ -310,6 +311,55 @@ public:
     virtual bool getDeckFilesInFolder(int /* folderId */, int /* userId */, QList<DeckFileListItem> & /* files */)
     {
         return false;
+    }
+    /** @brief One downloaded replay file of a match. */
+    struct ReplayEntry
+    {
+        int replayId = 0;
+        int duration = 0;
+    };
+    /** @brief One replay match visible to a user, with its players and replay files. */
+    struct ReplayMatchRecord
+    {
+        int gameId = 0;
+        QString replayName;
+        QString roomName;
+        int timeStarted = 0;
+        int timeFinished = 0;
+        QString description;
+        bool doNotHide = false;
+        QStringList playerNames;
+        QList<ReplayEntry> replays;
+    };
+    /** @brief Why a replay read succeeded or not, so callers can map it to a response code. */
+    enum class ReplayAccessResult
+    {
+        Ok,
+        AccessDenied,
+        NotFound,
+        Failed
+    };
+    enum class ReplayWriteResult
+    {
+        Ok,
+        NotFound,
+        Failed
+    };
+    virtual QList<ReplayMatchRecord> getReplayList(int /* userId */)
+    {
+        return {};
+    }
+    virtual ReplayAccessResult getReplayData(int /* replayId */, int /* userId */, QByteArray & /* data */)
+    {
+        return ReplayAccessResult::Failed;
+    }
+    virtual ReplayWriteResult setReplayDoNotHide(int /* gameId */, int /* userId */, bool /* doNotHide */)
+    {
+        return ReplayWriteResult::Failed;
+    }
+    virtual ReplayWriteResult deleteReplayAccess(int /* gameId */, int /* userId */)
+    {
+        return ReplayWriteResult::Failed;
     }
     /** @brief Append a moderator/admin action to the server audit log. */
     virtual void addAuditRecord(const QString & /* user */,

@@ -1838,6 +1838,107 @@ int Servatrice_DatabaseInterface::getDeckSharesCreatedToday(int userId)
     return query->value(0).toInt();
 }
 
+QList<Server_DatabaseInterface::ReplayMatchRecord> Servatrice_DatabaseInterface::getReplayList(int userId)
+{
+    QList<ReplayMatchRecord> matches;
+
+    QSqlQuery *query1 = prepareQuery(
+        "select a.id_game, a.replay_name, b.room_name, b.time_started, b.time_finished, b.descr, a.do_not_hide from "
+        "{prefix}_replays_access a left join {prefix}_games b on b.id = a.id_game where a.id_player = :id_player and "
+        "(a.do_not_hide = 1 or date_add(b.time_started, interval 7 day) > now())");
+    query1->bindValue(":id_player", userId);
+    execSqlQuery(query1);
+    while (query1->next()) {
+        ReplayMatchRecord match;
+        match.gameId = query1->value(0).toInt();
+        match.replayName = query1->value(1).toString();
+        match.roomName = query1->value(2).toString();
+        match.timeStarted = query1->value(3).toDateTime().toSecsSinceEpoch();
+        match.timeFinished = query1->value(4).toDateTime().toSecsSinceEpoch();
+        match.description = query1->value(5).toString();
+        match.doNotHide = query1->value(6).toBool();
+
+        {
+            QSqlQuery *query2 = prepareQuery("select player_name from {prefix}_games_players where id_game = :id_game");
+            query2->bindValue(":id_game", match.gameId);
+            execSqlQuery(query2);
+            while (query2->next()) {
+                match.playerNames.append(query2->value(0).toString());
+            }
+        }
+        {
+            QSqlQuery *query3 = prepareQuery("select id, duration from {prefix}_replays where id_game = :id_game");
+            query3->bindValue(":id_game", match.gameId);
+            execSqlQuery(query3);
+            while (query3->next()) {
+                match.replays.append(
+                    ReplayEntry{.replayId = query3->value(0).toInt(), .duration = query3->value(1).toInt()});
+            }
+        }
+
+        matches.append(match);
+    }
+
+    return matches;
+}
+
+Server_DatabaseInterface::ReplayAccessResult
+Servatrice_DatabaseInterface::getReplayData(int replayId, int userId, QByteArray &data)
+{
+    {
+        QSqlQuery *query = prepareQuery("select 1 from {prefix}_replays_access a left join {prefix}_replays b on "
+                                        "a.id_game = b.id_game where b.id = :id_replay and a.id_player = :id_player");
+        query->bindValue(":id_replay", replayId);
+        query->bindValue(":id_player", userId);
+        if (!execSqlQuery(query)) {
+            return ReplayAccessResult::Failed;
+        }
+        if (!query->next()) {
+            return ReplayAccessResult::AccessDenied;
+        }
+    }
+
+    QSqlQuery *query = prepareQuery("select replay from {prefix}_replays where id = :id_replay");
+    query->bindValue(":id_replay", replayId);
+    if (!execSqlQuery(query)) {
+        return ReplayAccessResult::Failed;
+    }
+    if (!query->next()) {
+        return ReplayAccessResult::NotFound;
+    }
+
+    data = query->value(0).toByteArray();
+    return ReplayAccessResult::Ok;
+}
+
+Server_DatabaseInterface::ReplayWriteResult
+Servatrice_DatabaseInterface::setReplayDoNotHide(int gameId, int userId, bool doNotHide)
+{
+    QSqlQuery *query = prepareQuery("update {prefix}_replays_access set do_not_hide=:do_not_hide where "
+                                    "id_player = :id_player and id_game = :id_game");
+    query->bindValue(":id_player", userId);
+    query->bindValue(":id_game", gameId);
+    query->bindValue(":do_not_hide", doNotHide);
+
+    if (!execSqlQuery(query)) {
+        return ReplayWriteResult::Failed;
+    }
+    return query->numRowsAffected() > 0 ? ReplayWriteResult::Ok : ReplayWriteResult::NotFound;
+}
+
+Server_DatabaseInterface::ReplayWriteResult Servatrice_DatabaseInterface::deleteReplayAccess(int gameId, int userId)
+{
+    QSqlQuery *query =
+        prepareQuery("delete from {prefix}_replays_access where id_player = :id_player and id_game = :id_game");
+    query->bindValue(":id_player", userId);
+    query->bindValue(":id_game", gameId);
+
+    if (!execSqlQuery(query)) {
+        return ReplayWriteResult::Failed;
+    }
+    return query->numRowsAffected() > 0 ? ReplayWriteResult::Ok : ReplayWriteResult::NotFound;
+}
+
 bool Servatrice_DatabaseInterface::getDeckFilesInFolder(int folderId, int userId, QList<DeckFileListItem> &files)
 {
     checkSql();
