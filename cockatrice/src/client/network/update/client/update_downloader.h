@@ -21,6 +21,9 @@ class UpdateDownloader : public QObject
     Q_OBJECT
 public:
     explicit UpdateDownloader(QObject *parent);
+    // Starts a transfer and supersedes any reply still in flight: a cancelled or
+    // failed download can be restarted on the same object, and late signals from
+    // the superseded reply are dropped instead of reported.
     void beginDownload(QUrl url);
 signals:
     void downloadSuccessful(QUrl filepath);
