@@ -400,33 +400,12 @@ bool Servatrice::initServer()
     connect(smtpClient, &SmtpClient::mailPermanentlyFailed, this, &Servatrice::onEmailPermanentlyFailed);
 
     if (getRoomsMethodString() == "sql") {
-        QSqlQuery *query = servatriceDatabaseInterface->prepareQuery(
-            "select id, name, descr, permissionlevel, privlevel, auto_join, join_message, chat_history_size from "
-            "{prefix}_rooms where id_server = :id_server order by id asc");
-        query->bindValue(":id_server", serverId);
-        servatriceDatabaseInterface->execSqlQuery(query);
-        while (query->next()) {
-            QSqlQuery *query2 = servatriceDatabaseInterface->prepareQuery(
-                "select name from {prefix}_rooms_gametypes where id_room = :id_room AND id_server = :id_server");
-            query2->bindValue(":id_server", serverId);
-            query2->bindValue(":id_room", query->value(0).toInt());
-            servatriceDatabaseInterface->execSqlQuery(query2);
-            QStringList gameTypes;
-            while (query2->next()) {
-                gameTypes.append(query2->value(0).toString());
-            }
-
-            QSqlQuery *query3 = servatriceDatabaseInterface->prepareQuery(
-                "select channel_id, display_name, access_level, write_access_level, banner_message from "
-                "{prefix}_rooms_channels where id_room = :id_room "
-                "AND id_server = :id_server order by channel_id asc");
-            query3->bindValue(":id_server", serverId);
-            query3->bindValue(":id_room", query->value(0).toInt());
-            servatriceDatabaseInterface->execSqlQuery(query3);
+        const auto bootstrapRooms = servatriceDatabaseInterface->getBootstrapRooms(serverId);
+        for (const auto &roomRecord : bootstrapRooms) {
             QList<ServerInfo_RoomChannel> channels;
             QSet<QString> seenChannelIds;
-            while (query3->next()) {
-                const QString channelId = query3->value(0).toString();
+            for (const auto &channelRecord : roomRecord.channels) {
+                const QString channelId = channelRecord.id;
                 if (channelId.isEmpty()) {
                     qWarning() << "Skipping room channel with empty id";
                     continue;
@@ -440,7 +419,7 @@ bool Servatrice::initServer()
                     continue;
                 }
                 seenChannelIds.insert(channelId);
-                const QString accessKey = query3->value(2).toString();
+                const QString accessKey = channelRecord.accessKey;
                 auto accessLevel =
                     accessKey.trimmed().isEmpty()
                         ? std::optional<ServerInfo_RoomChannel::AccessLevel>(ServerInfo_RoomChannel::Public)
@@ -452,10 +431,10 @@ bool Servatrice::initServer()
                 }
                 ServerInfo_RoomChannel channel;
                 channel.set_id(channelId.toStdString());
-                channel.set_display_name(query3->value(1).toString().toStdString());
+                channel.set_display_name(channelRecord.displayName.toStdString());
                 channel.set_access_level(accessLevel.value());
-                if (!query3->isNull(3)) {
-                    const QString writeKey = query3->value(3).toString();
+                if (channelRecord.hasWriteAccess) {
+                    const QString writeKey = channelRecord.writeAccessKey;
                     if (!writeKey.trimmed().isEmpty()) {
                         auto writeLevel = roomChannelAccessFromKey(writeKey);
                         if (!writeLevel.has_value()) {
@@ -466,14 +445,13 @@ bool Servatrice::initServer()
                         channel.set_write_access_level(writeLevel.value());
                     }
                 }
-                channel.set_banner_message(query3->value(4).toString().toStdString());
+                channel.set_banner_message(channelRecord.bannerMessage.toStdString());
                 channels.append(channel);
             }
 
-            addRoom(new Server_Room(query->value(0).toInt(), query->value(7).toInt(), query->value(1).toString(),
-                                    query->value(2).toString(), query->value(3).toString().toLower(),
-                                    query->value(4).toString().toLower(), static_cast<bool>(query->value(5).toInt()),
-                                    query->value(6).toString(), gameTypes, this, channels));
+            addRoom(new Server_Room(roomRecord.id, roomRecord.chatHistorySize, roomRecord.name, roomRecord.description,
+                                    roomRecord.permissionLevel.toLower(), roomRecord.privateLevel.toLower(),
+                                    roomRecord.autoJoin, roomRecord.joinMessage, roomRecord.gameTypes, this, channels));
         }
     } else {
         int size = settingsCache->beginReadArray("rooms/roomlist");
