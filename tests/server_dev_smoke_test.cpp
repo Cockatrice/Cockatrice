@@ -17,6 +17,7 @@
 #include <QCoreApplication>
 #include <QElapsedTimer>
 #include <QEventLoop>
+#include <QFile>
 #include <QList>
 #include <QProcess>
 #include <QProcessEnvironment>
@@ -92,6 +93,7 @@ protected:
     void SetUp() override
     {
         ASSERT_TRUE(tempDir.isValid());
+        portFilePath = tempDir.filePath(QStringLiteral("listening-port"));
 
         // servatrice-dev writes its throwaway settings under QDir::tempPath(); pointing that at
         // a directory the test owns means a terminated server cannot leave an ini behind.
@@ -102,9 +104,10 @@ protected:
         process.setProcessEnvironment(environment);
         process.setProcessChannelMode(QProcess::SeparateChannels);
         process.start(QStringLiteral(SERVATRICE_DEV_BINARY),
-                      {QStringLiteral("--port"), QStringLiteral("0"), QStringLiteral("--seed"), QStringLiteral("42")});
+                      {QStringLiteral("--port"), QStringLiteral("0"), QStringLiteral("--seed"), QStringLiteral("42"),
+                       QStringLiteral("--port-file"), portFilePath});
         ASSERT_TRUE(process.waitForStarted(kStartupTimeoutMs)) << process.errorString().toStdString();
-        ASSERT_TRUE(readListeningPort()) << "servatrice-dev did not announce a listening port.\nstdout:\n"
+        ASSERT_TRUE(readListeningPort()) << "servatrice-dev did not publish its listening port.\nstdout:\n"
                                          << stdoutText.toStdString() << "\nstderr:\n"
                                          << stderrText.toStdString();
 
@@ -128,34 +131,32 @@ protected:
         }
     }
 
-    /// @brief Reads the child's output until it announces the ephemeral port it listens on.
+    /// @brief Waits for the child to publish the ephemeral port it listens on.
     bool readListeningPort()
     {
-        const QString prefix = QStringLiteral("servatrice-dev: listening on port ");
         QElapsedTimer elapsed;
         elapsed.start();
         while (elapsed.elapsed() < kStartupTimeoutMs) {
-            if (!process.waitForReadyRead(100)) {
-                if (process.state() == QProcess::NotRunning) {
-                    drainProcessOutput();
-                    return false;
-                }
-                continue;
-            }
+            // The child logs heavily during startup; keep its pipes drained so it cannot block.
             drainProcessOutput();
 
-            const int at = stdoutText.indexOf(prefix);
-            if (at < 0) {
-                continue;
+            QFile portFile(portFilePath);
+            if (portFile.open(QIODevice::ReadOnly)) {
+                bool ok = false;
+                const int port = QString::fromLatin1(portFile.readAll()).trimmed().toInt(&ok);
+                if (ok && port > 0) {
+                    listeningPort = port;
+                    return true;
+                }
             }
-            const int end = stdoutText.indexOf(QLatin1Char('\n'), at);
-            if (end < 0) {
-                continue;
+
+            if (process.state() == QProcess::NotRunning) {
+                drainProcessOutput();
+                return false;
             }
-            bool ok = false;
-            listeningPort = stdoutText.mid(at + prefix.size(), end - at - prefix.size()).trimmed().toInt(&ok);
-            return ok && listeningPort > 0;
+            QThread::msleep(20);
         }
+        drainProcessOutput();
         return false;
     }
 
@@ -228,6 +229,7 @@ protected:
 
     QProcess process;
     QTemporaryDir tempDir;
+    QString portFilePath;
     StubNetworkSettingsProvider provider;
     std::unique_ptr<RemoteClient> client;
     int listeningPort = 0;

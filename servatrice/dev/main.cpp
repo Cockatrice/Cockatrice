@@ -15,12 +15,14 @@
 #include "smtpclient.h"
 #include "version_string.h"
 
+#include <QByteArray>
 #include <QCommandLineOption>
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QMetaObject>
+#include <QSaveFile>
 #include <QString>
 #include <QThread>
 #include <cstdlib>
@@ -88,6 +90,23 @@ void dumpState(Servatrice &server, const Servatrice_InMemoryDatabaseInterface &d
     std::cout << "servatrice-dev: log entries=" << database.getLogEntries().size() << std::endl;
 }
 
+/**
+ * @brief Publishes the bound port the way a script can read it.
+ *
+ * The stdout announcement is written from this thread while the logger thread writes to the same
+ * stream, so a reader can see a log line inside it. A file written through QSaveFile is either
+ * absent or complete, which makes the port deterministic to consume.
+ */
+bool writeListeningPort(const QString &path, int port)
+{
+    QSaveFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        return false;
+    }
+    file.write(QByteArray::number(port) + '\n');
+    return file.commit();
+}
+
 } // namespace
 
 int main(int argc, char *argv[])
@@ -103,9 +122,13 @@ int main(int argc, char *argv[])
     parser.addVersionOption();
 
     QCommandLineOption portOption({"p", "port"}, "TCP port to listen on; 0 picks an ephemeral port.", "port", "0");
+    QCommandLineOption portFileOption("port-file",
+                                      "Write the bound listening port to this file once the server listens.",
+                                      "path");
     QCommandLineOption seedOption("seed", "Seed for the game RNG; random when omitted.", "seed");
     QCommandLineOption dumpStateOption("dump-state", "Print the server state after startup and keep serving.");
     parser.addOption(portOption);
+    parser.addOption(portFileOption);
     parser.addOption(seedOption);
     parser.addOption(dumpStateOption);
     parser.process(app);
@@ -169,11 +192,18 @@ int main(int argc, char *argv[])
             std::cerr << "servatrice-dev: the server is not listening" << std::endl;
             retval = EXIT_FAILURE;
         } else {
-            std::cout << "servatrice-dev: listening on port " << listeningPort << std::endl;
-            if (parser.isSet(dumpStateOption)) {
-                dumpState(*server, *server->getInMemoryDatabase());
+            const QString portFilePath = parser.value(portFileOption);
+            if (!portFilePath.isEmpty() && !writeListeningPort(portFilePath, listeningPort)) {
+                std::cerr << "servatrice-dev: cannot write the listening port to " << portFilePath.toStdString()
+                          << std::endl;
+                retval = EXIT_FAILURE;
+            } else {
+                std::cout << "servatrice-dev: listening on port " << listeningPort << std::endl;
+                if (parser.isSet(dumpStateOption)) {
+                    dumpState(*server, *server->getInMemoryDatabase());
+                }
+                retval = QCoreApplication::exec();
             }
-            retval = QCoreApplication::exec();
         }
     }
 
