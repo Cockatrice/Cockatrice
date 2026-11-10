@@ -1992,99 +1992,50 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportResolve(const Com
 Response::ResponseCode AbstractServerSocketInterface::cmdReportUserInfo(const Command_ReportUserInfo &cmd,
                                                                         ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
-    QString userName = nameFromStdString(cmd.user_name());
+    const QString userName = nameFromStdString(cmd.user_name());
 
-    QSqlQuery *userQuery = sqlInterface->prepareQuery("SELECT u.admin, u.active, u.registrationDate, u.adminnotes "
-                                                      "FROM {prefix}_users u "
-                                                      "WHERE u.name = :name");
-    userQuery->bindValue(":name", userName);
-
-    if (!sqlInterface->execSqlQuery(userQuery)) {
+    Server_DatabaseInterface::ReportUserInfoRecord userReportInfo;
+    if (!databaseInterface->getReportUserInfo(userName, userReportInfo)) {
         return Response::RespInternalError;
     }
 
-    if (!userQuery->next()) {
+    if (!userReportInfo.found) {
         return Response::RespNameNotFound;
     }
 
     Response_ReportUserInfo *re = new Response_ReportUserInfo;
     re->set_user_name(cmd.user_name());
 
-    re->set_is_admin(userQuery->value(0).toBool());
-    re->set_is_active(userQuery->value(1).toBool());
-    re->set_registration_time(userQuery->value(2).toDateTime().toSecsSinceEpoch());
+    re->set_is_admin(userReportInfo.isAdmin);
+    re->set_is_active(userReportInfo.isActive);
+    re->set_registration_time(userReportInfo.registrationTime);
 
-    if (!userQuery->value(3).isNull()) {
-        re->set_admin_notes(userQuery->value(3).toString().toStdString());
+    if (userReportInfo.hasAdminNotes) {
+        re->set_admin_notes(userReportInfo.adminNotes.toStdString());
     }
 
-    QSqlQuery *reportCountQuery =
-        sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_reports WHERE reported_user_name = :name");
-    reportCountQuery->bindValue(":name", userName);
-    if (sqlInterface->execSqlQuery(reportCountQuery) && reportCountQuery->next()) {
-        re->set_total_reports(reportCountQuery->value(0).toInt());
+    if (userReportInfo.hasTotalReports) {
+        re->set_total_reports(userReportInfo.totalReports);
     }
 
-    QSqlQuery *banCountQuery = sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_bans WHERE user_name = :name");
-    banCountQuery->bindValue(":name", userName);
-    if (sqlInterface->execSqlQuery(banCountQuery) && banCountQuery->next()) {
-        re->set_total_bans(banCountQuery->value(0).toInt());
+    if (userReportInfo.hasTotalBans) {
+        re->set_total_bans(userReportInfo.totalBans);
     }
 
-    QSqlQuery *warnCountQuery =
-        sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_warnings WHERE user_name = :name");
-    warnCountQuery->bindValue(":name", userName);
-    if (sqlInterface->execSqlQuery(warnCountQuery) && warnCountQuery->next()) {
-        re->set_total_warns(warnCountQuery->value(0).toInt());
+    if (userReportInfo.hasTotalWarns) {
+        re->set_total_warns(userReportInfo.totalWarns);
     }
 
-    QSqlQuery *lastLoginQuery = sqlInterface->prepareQuery("SELECT UNIX_TIMESTAMP(a.last_login) "
-                                                           "FROM {prefix}_user_analytics a "
-                                                           "JOIN {prefix}_users u ON u.id = a.id "
-                                                           "WHERE u.name = :name");
-    lastLoginQuery->bindValue(":name", userName);
-    if (sqlInterface->execSqlQuery(lastLoginQuery) && lastLoginQuery->next() && !lastLoginQuery->value(0).isNull()) {
-        re->set_last_login(lastLoginQuery->value(0).toLongLong());
+    if (userReportInfo.hasLastLogin) {
+        re->set_last_login(userReportInfo.lastLogin);
     }
 
-    QSqlQuery *recentQuery =
-        sqlInterface->prepareQuery("SELECT r.id, r.reporter_name, r.reported_user_name, r.game_id, "
-                                   "r.category, r.description, r.created_at, r.status, "
-                                   "r.resolution_note, ru.name AS assigned_mod_name "
-                                   "FROM {prefix}_reports r "
-                                   "LEFT JOIN {prefix}_users ru ON r.assigned_to = ru.id "
-                                   "WHERE r.reported_user_name = :name "
-                                   "ORDER BY r.created_at DESC LIMIT 10");
-    recentQuery->bindValue(":name", userName);
-
-    if (sqlInterface->execSqlQuery(recentQuery)) {
-        while (recentQuery->next()) {
-            ServerInfo_Report *info = re->add_recent_reports();
-            info->set_report_id(recentQuery->value(0).toInt());
-            info->set_reporter_name(recentQuery->value(1).toString().toStdString());
-            info->set_reported_user_name(recentQuery->value(2).toString().toStdString());
-
-            if (!recentQuery->value(3).isNull()) {
-                info->set_game_id(recentQuery->value(3).toInt());
-            }
-
-            info->set_category(recentQuery->value(4).toString().toStdString());
-            info->set_description(recentQuery->value(5).toString().toStdString());
-            info->set_report_time(recentQuery->value(6).toDateTime().toSecsSinceEpoch());
-            info->set_status(recentQuery->value(7).toString().toStdString());
-
-            if (!recentQuery->value(8).isNull()) {
-                info->set_resolution_note(recentQuery->value(8).toString().toStdString());
-            }
-
-            if (!recentQuery->value(9).isNull()) {
-                info->set_assigned_mod_name(recentQuery->value(9).toString().toStdString());
-            }
-        }
+    for (const ServerInfo_Report &report : userReportInfo.recentReports) {
+        re->add_recent_reports()->CopyFrom(report);
     }
 
     rc.setResponseExtension(re);
@@ -2167,7 +2118,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetServerStats(const Co
 Response::ResponseCode AbstractServerSocketInterface::cmdReportStats(const Command_ReportStats & /*cmd */,
                                                                      ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
@@ -2176,94 +2127,48 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportStats(const Comma
         return Response::RespOk;
     }
 
-    Response_ReportStats *re = new Response_ReportStats;
-
-    QSqlQuery *overviewQuery = sqlInterface->prepareQuery(
-        "SELECT COUNT(*) AS total, "
-        "SUM(status IN ('open', 'assigned')) AS pending, "
-        "SUM(status = 'assigned') AS assigned, "
-        "SUM(status IN ('resolved', 'dismissed')) AS resolved, "
-        "SUM(created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)) AS last24h, "
-        "SUM(created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) AS last7d, "
-        "SUM(created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) AS last30d, "
-        "SUM(created_at >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)) AS this_week "
-        "FROM {prefix}_reports");
-    if (!sqlInterface->execSqlQuery(overviewQuery) || !overviewQuery->next()) {
-        delete re;
+    Server_DatabaseInterface::ReportStatsRecord stats;
+    if (!databaseInterface->getReportStats(stats)) {
         return Response::RespInternalError;
     }
 
-    re->set_total_reports(overviewQuery->value(0).toInt());
-    re->set_total_pending(overviewQuery->value(1).toInt());
-    re->set_total_assigned(overviewQuery->value(2).toInt());
-    re->set_total_resolved(overviewQuery->value(3).toInt());
-    re->set_reports_last_24h(overviewQuery->value(4).toInt());
-    re->set_reports_last_7d(overviewQuery->value(5).toInt());
-    re->set_reports_last_30d(overviewQuery->value(6).toInt());
-    re->set_reports_this_week(overviewQuery->value(7).toInt());
+    auto *re = new Response_ReportStats;
+    re->set_total_reports(stats.totalReports);
+    re->set_total_pending(stats.totalPending);
+    re->set_total_assigned(stats.totalAssigned);
+    re->set_total_resolved(stats.totalResolved);
+    re->set_reports_last_24h(stats.reportsLast24h);
+    re->set_reports_last_7d(stats.reportsLast7d);
+    re->set_reports_last_30d(stats.reportsLast30d);
+    re->set_reports_this_week(stats.reportsThisWeek);
 
-    bool allQueriesOk = true;
-
-    QSqlQuery *lastWeekQuery =
-        sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_reports WHERE created_at >= DATE_SUB(CURDATE(), "
-                                   "INTERVAL WEEKDAY(CURDATE()) + 7 DAY) "
-                                   "AND created_at < DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)");
-    if (sqlInterface->execSqlQuery(lastWeekQuery) && lastWeekQuery->next()) {
-        re->set_reports_last_week(lastWeekQuery->value(0).toInt());
-    } else {
-        allQueriesOk = false;
+    if (stats.hasReportsLastWeek) {
+        re->set_reports_last_week(stats.reportsLastWeek);
     }
 
-    QSqlQuery *avgResQuery = sqlInterface->prepareQuery(
-        "SELECT AVG(TIMESTAMPDIFF(HOUR, created_at, resolution_time)) "
-        "FROM {prefix}_reports WHERE status IN ('resolved','dismissed') AND resolution_time IS NOT NULL");
-    if (sqlInterface->execSqlQuery(avgResQuery) && avgResQuery->next()) {
-        if (!avgResQuery->value(0).isNull()) {
-            re->set_avg_resolution_hours(avgResQuery->value(0).toDouble());
-        }
-    } else {
-        allQueriesOk = false;
+    if (stats.hasAvgResolutionHours) {
+        re->set_avg_resolution_hours(stats.avgResolutionHours);
     }
 
-    QSqlQuery *catQuery = sqlInterface->prepareQuery(
-        "SELECT category, COUNT(*) AS cnt FROM {prefix}_reports GROUP BY category ORDER BY cnt DESC LIMIT 10");
-    if (sqlInterface->execSqlQuery(catQuery)) {
-        while (catQuery->next()) {
-            ReportCategoryCount *cc = re->add_category_counts();
-            cc->set_category(catQuery->value(0).toString().toStdString());
-            cc->set_count(catQuery->value(1).toInt());
-        }
-    } else {
-        allQueriesOk = false;
+    for (const Server_DatabaseInterface::ReportCategoryCountRecord &count : stats.categoryCounts) {
+        ReportCategoryCount *cc = re->add_category_counts();
+        cc->set_category(count.category.toStdString());
+        cc->set_count(count.count);
     }
 
-    QSqlQuery *topReportedQuery =
-        sqlInterface->prepareQuery("SELECT reported_user_name, COUNT(*) AS cnt FROM {prefix}_reports "
-                                   "GROUP BY reported_user_name ORDER BY cnt DESC LIMIT 10");
-    if (sqlInterface->execSqlQuery(topReportedQuery)) {
-        while (topReportedQuery->next()) {
-            ReportTopUser *tu = re->add_top_reported_users();
-            tu->set_user_name(topReportedQuery->value(0).toString().toStdString());
-            tu->set_count(topReportedQuery->value(1).toInt());
-        }
-    } else {
-        allQueriesOk = false;
+    for (const Server_DatabaseInterface::ReportTopUserRecord &user : stats.topReportedUsers) {
+        ReportTopUser *tu = re->add_top_reported_users();
+        tu->set_user_name(user.userName.toStdString());
+        tu->set_count(user.count);
     }
 
-    QSqlQuery *topReporterQuery =
-        sqlInterface->prepareQuery("SELECT reporter_name, COUNT(*) AS cnt FROM {prefix}_reports "
-                                   "GROUP BY reporter_name ORDER BY cnt DESC LIMIT 10");
-    if (sqlInterface->execSqlQuery(topReporterQuery)) {
-        while (topReporterQuery->next()) {
-            ReportTopUser *tu = re->add_top_reporters();
-            tu->set_user_name(topReporterQuery->value(0).toString().toStdString());
-            tu->set_count(topReporterQuery->value(1).toInt());
-        }
-    } else {
-        allQueriesOk = false;
+    for (const Server_DatabaseInterface::ReportTopUserRecord &user : stats.topReporters) {
+        ReportTopUser *tu = re->add_top_reporters();
+        tu->set_user_name(user.userName.toStdString());
+        tu->set_count(user.count);
     }
 
-    if (allQueriesOk) {
+    if (stats.allQueriesOk) {
         servatrice->cacheReportStats(*re);
     }
 
