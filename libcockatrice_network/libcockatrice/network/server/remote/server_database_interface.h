@@ -182,6 +182,33 @@ public:
     {
         return 0;
     }
+    /** @brief One folder row of a user's deck storage tree. */
+    struct DeckListFolderRecord
+    {
+        int id = 0;
+        QString name;
+        bool isPublic = false;
+    };
+    /** @brief One deck file row of a user's deck storage tree. */
+    struct DeckListFileRecord
+    {
+        int id = 0;
+        QString name;
+        qint64 uploadTime = 0;
+        bool isPublic = false;
+        QString bannerCardName;
+        QString bannerCardProvider;
+        QString colorIdentity;
+        QStringList tags;
+    };
+    virtual bool getDeckListFolders(int /* folderId */, int /* userId */, QList<DeckListFolderRecord> & /* folders */)
+    {
+        return false;
+    }
+    virtual bool getDeckListFiles(int /* folderId */, int /* userId */, QList<DeckListFileRecord> & /* files */)
+    {
+        return false;
+    }
     /** @brief Id of the folder at a "/"-separated path for one user, 0 for the root, -1 when absent. */
     virtual int getDeckPathId(const QString & /* path */, int /* userId */)
     {

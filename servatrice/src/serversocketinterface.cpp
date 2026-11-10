@@ -68,7 +68,6 @@
 #include <QReadWriteLock>
 #include <QSharedPointer>
 #include <QSqlError>
-#include <QSqlQuery>
 #include <QString>
 #include <QStringLiteral>
 #include <QTextStream>
@@ -195,7 +194,7 @@ static const int MAX_TCP_MESSAGE_SIZE = 1500000;
 AbstractServerSocketInterface::AbstractServerSocketInterface(Servatrice *_server,
                                                              Servatrice_DatabaseInterface *_databaseInterface,
                                                              QObject *parent)
-    : Server_ProtocolHandler(_server, _databaseInterface, parent), servatrice(_server), sqlInterface(_databaseInterface)
+    : Server_ProtocolHandler(_server, _databaseInterface, parent), servatrice(_server)
 {
     // Never call flushOutputQueue directly from outputQueueChanged. In case of a socket error,
     // it could lead to this object being destroyed while another function is still on the call stack. -> mutex
@@ -640,28 +639,20 @@ bool AbstractServerSocketInterface::deckListHelper(int folderId,
                                                    bool inheritedPublic,
                                                    bool publicOnly)
 {
-    QSqlQuery *query = sqlInterface->prepareQuery("select id, name, is_public from {prefix}_decklist_folders where "
-                                                  "id_parent = :id_parent and id_user = :id_user");
-    query->bindValue(":id_parent", folderId);
-    query->bindValue(":id_user", userId);
-    if (!sqlInterface->execSqlQuery(query)) {
+    QList<Server_DatabaseInterface::DeckListFolderRecord> folders;
+    if (!databaseInterface->getDeckListFolders(folderId, userId, folders)) {
         return false;
     }
 
-    QList<std::pair<int, std::pair<QString, bool>>> folderRows;
-    while (query->next()) {
-        folderRows.append({query->value(0).toInt(), {query->value(1).toString(), query->value(2).toBool()}});
-    }
-    std::sort(folderRows.begin(), folderRows.end(), [](const auto &a, const auto &b) { return a.first < b.first; });
+    std::sort(folders.begin(), folders.end(), [](const auto &a, const auto &b) { return a.id < b.id; });
 
-    for (const auto &[folderIdValue, folderInfo] : folderRows) {
-        const QString name = folderInfo.first;
-        const bool ownPublic = folderInfo.second;
+    for (const Server_DatabaseInterface::DeckListFolderRecord &folderRecord : folders) {
+        const bool ownPublic = folderRecord.isPublic;
         const bool effectivePublic = inheritedPublic || ownPublic;
 
         ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
-        newItem->set_id(folderIdValue);
-        newItem->set_name(name.toStdString());
+        newItem->set_id(folderRecord.id);
+        newItem->set_name(folderRecord.name.toStdString());
         newItem->mutable_folder()->set_is_public(ownPublic);
 
         if (!deckListHelper(newItem->id(), newItem->mutable_folder(), userId, effectivePublic, publicOnly)) {
@@ -673,32 +664,28 @@ bool AbstractServerSocketInterface::deckListHelper(int folderId,
         }
     }
 
-    query = sqlInterface->prepareQuery("select id, name, upload_time, is_public, banner_card_name, "
-                                       "banner_card_provider, color_identity, tags from {prefix}_decklist_files where "
-                                       "id_folder = :id_folder and id_user = :id_user");
-    query->bindValue(":id_folder", folderId);
-    query->bindValue(":id_user", userId);
-    if (!sqlInterface->execSqlQuery(query)) {
+    QList<Server_DatabaseInterface::DeckListFileRecord> files;
+    if (!databaseInterface->getDeckListFiles(folderId, userId, files)) {
         return false;
     }
 
-    while (query->next()) {
-        const bool ownPublic = query->value(3).toBool();
+    for (const Server_DatabaseInterface::DeckListFileRecord &file : files) {
+        const bool ownPublic = file.isPublic;
         if (publicOnly && !(inheritedPublic || ownPublic)) {
             continue;
         }
 
         ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
-        newItem->set_id(query->value(0).toInt());
-        newItem->set_name(query->value(1).toString().toStdString());
+        newItem->set_id(file.id);
+        newItem->set_name(file.name.toStdString());
 
         ServerInfo_DeckStorage_File *newFile = newItem->mutable_file();
-        newFile->set_creation_time(query->value(2).toDateTime().toSecsSinceEpoch());
+        newFile->set_creation_time(file.uploadTime);
         newFile->set_is_public(ownPublic);
-        newFile->set_banner_card_name(query->value(4).toString().toStdString());
-        newFile->set_banner_card_provider(query->value(5).toString().toStdString());
-        newFile->set_color_identity(query->value(6).toString().toStdString());
-        for (const QString &tag : deserializeDeckTags(query->value(7).toString())) {
+        newFile->set_banner_card_name(file.bannerCardName.toStdString());
+        newFile->set_banner_card_provider(file.bannerCardProvider.toStdString());
+        newFile->set_color_identity(file.colorIdentity.toStdString());
+        for (const QString &tag : file.tags) {
             newFile->add_tags(tag.toStdString());
         }
     }
@@ -716,7 +703,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckList(const Command_
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
     Response_DeckList *re = new Response_DeckList;
     ServerInfo_DeckStorage_Folder *root = re->mutable_root();
@@ -736,10 +723,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckListOtherUser(const
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
     const QString userName = nameFromStdString(cmd.user_name());
-    const int userId = sqlInterface->getUserIdInDB(userName);
+    const int userId = databaseInterface->getUserId(userName);
     if (userId == -1) {
         return Response::RespNameNotFound;
     }
@@ -795,7 +782,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDownloadPublic(cons
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
     const int deckId = cmd.deck_id();
     const int ownerId = databaseInterface->getDeckOwnerId(deckId);
@@ -805,7 +792,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDownloadPublic(cons
 
     DeckList *deck;
     try {
-        deck = sqlInterface->getDeckFromDatabase(deckId, ownerId);
+        deck = databaseInterface->getDeckFromDatabase(deckId, ownerId);
     } catch (Response::ResponseCode &r) {
         return r;
     }
@@ -1000,7 +987,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDownload(const Comm
 
     DeckList *deck;
     try {
-        deck = sqlInterface->getDeckFromDatabase(cmd.deck_id(), userInfo->id());
+        deck = databaseInterface->getDeckFromDatabase(cmd.deck_id(), userInfo->id());
     } catch (Response::ResponseCode &r) {
         return r;
     }
