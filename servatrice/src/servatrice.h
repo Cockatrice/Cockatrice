@@ -259,6 +259,8 @@ public:
     {
         return getAuthenticationStrictness() == AuthenticationStrict;
     }
+    /** @brief The port the game server listens on, or -1 when it is not listening. */
+    int getGameServerPort() const;
     /** @brief Key sealing legacy password backups, or empty when they are disabled. */
     QByteArray getLegacyBackupKey() const;
     /** @brief Days a legacy password backup may go unused before it is purged. */
