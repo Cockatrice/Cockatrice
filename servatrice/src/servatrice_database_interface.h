@@ -66,11 +66,11 @@ public slots:
 public:
     explicit Servatrice_DatabaseInterface(int _instanceId, Servatrice *_server);
     ~Servatrice_DatabaseInterface() override;
-    bool initDatabase(const QString &type,
+    bool openDatabase(const QString &type,
                       const QString &hostName,
                       const QString &databaseName,
                       const QString &userName,
-                      const QString &password);
+                      const QString &password) override;
     bool openDatabase();
     bool checkSql() override;
     QSqlQuery *prepareQuery(const QString &queryText);
@@ -94,7 +94,7 @@ public:
     /** @brief Drop the account's legacy password backup. */
     void clearLegacyBackup(const QString &user);
     /** @brief Drop every legacy password backup that has not been used within the TTL. */
-    void purgeExpiredLegacyBackups();
+    void purgeExpiredLegacyBackups() override;
     int getUserIdInDB(const QString &name);
     int getUserId(const QString &name) override;
     bool addToBuddyList(int userId, int targetId) override;
@@ -172,7 +172,7 @@ public:
     ReplayAccessResult getLatestReplayForGame(int gameId, int &replayId, QByteArray &data) override;
     ReplayWriteResult grantReplayAccessByName(int gameId, const QString &userName) override;
     /** @brief Deletes all expired share bundles (cascades to their items). */
-    void cleanupExpiredDeckShares();
+    void cleanupExpiredDeckShares() override;
 
     int getNextGameId() override;
     int getNextReplayId() override;

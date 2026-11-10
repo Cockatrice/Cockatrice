@@ -816,6 +816,24 @@ public:
         return false;
     }
 
+    /** @brief Opens the server's main database connection; false when it cannot be opened. */
+    virtual bool openDatabase(const QString & /* type */,
+                              const QString & /* hostName */,
+                              const QString & /* databaseName */,
+                              const QString & /* userName */,
+                              const QString & /* password */)
+    {
+        return false;
+    }
+    /** @brief Drops expired deck shares; a no-op when persistence is unavailable. */
+    virtual void cleanupExpiredDeckShares()
+    {
+    }
+    /** @brief Purges expired legacy password backups; a no-op when persistence is unavailable. */
+    virtual void purgeExpiredLegacyBackups()
+    {
+    }
+
     virtual void clearSessionTables()
     {
     }
