@@ -3,6 +3,6 @@
 
 #include <QMap>
 
-typedef QMap<int, QString> GameTypeMap;
+using GameTypeMap = QMap<int, QString>;
 
 #endif

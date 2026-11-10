@@ -27,14 +27,14 @@ class CardInfo;
 class CardSet;
 class CardRelation;
 
-typedef QSharedPointer<CardInfo> CardInfoPtr;
-typedef QSharedPointer<CardSet> CardSetPtr;
-typedef QSharedPointer<FormatRules> FormatRulesPtr;
-typedef QMap<QString, QList<PrintingInfo>> SetToPrintingsMap;
+using CardInfoPtr = QSharedPointer<CardInfo>;
+using CardSetPtr = QSharedPointer<CardSet>;
+using FormatRulesPtr = QSharedPointer<FormatRules>;
+using SetToPrintingsMap = QMap<QString, QList<PrintingInfo>>;
 
-typedef QHash<QString, CardInfoPtr> CardNameMap;
-typedef QHash<QString, CardSetPtr> SetNameMap;
-typedef QHash<QString, FormatRulesPtr> FormatRulesNameMap;
+using CardNameMap = QHash<QString, CardInfoPtr>;
+using SetNameMap = QHash<QString, CardSetPtr>;
+using FormatRulesNameMap = QHash<QString, FormatRulesPtr>;
 
 Q_DECLARE_METATYPE(CardInfoPtr)
 

@@ -18,18 +18,18 @@ struct CardSearchLanguage;
 
 inline Q_LOGGING_CATEGORY(FilterStringLog, "filter_string");
 
-typedef CardInfoPtr CardData;
-typedef std::function<bool(const CardData &)> Filter;
-typedef std::function<bool(const QString &)> StringMatcher;
-typedef std::function<bool(int)> NumberMatcher;
-typedef std::function<bool(int, int)> NumberComparer;
+using CardData = CardInfoPtr;
+using Filter = std::function<bool(const CardData &)>;
+using StringMatcher = std::function<bool(const QString &)>;
+using NumberMatcher = std::function<bool(int)>;
+using NumberComparer = std::function<bool(int, int)>;
 
 namespace peg
 {
 template <typename Annotation> struct AstBase;
 struct EmptyType;
 
-typedef AstBase<EmptyType> Ast;
+using Ast = AstBase<EmptyType>;
 } // namespace peg
 
 class FilterString

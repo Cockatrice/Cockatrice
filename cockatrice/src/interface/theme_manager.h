@@ -23,8 +23,8 @@
 
 inline Q_LOGGING_CATEGORY(ThemeManagerLog, "theme_manager");
 
-typedef QMap<QString, QString> QStringMap;
-typedef QMap<int, QBrush> QBrushMap;
+using QStringMap = QMap<QString, QString>;
+using QBrushMap = QMap<int, QBrush>;
 
 class ThemeManager : public QObject
 {
