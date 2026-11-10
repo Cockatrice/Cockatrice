@@ -2437,6 +2437,139 @@ bool Servatrice_DatabaseInterface::addWarning(const QString userName,
     return true;
 }
 
+Server_DatabaseInterface::AdminFlagUpdateResult
+Servatrice_DatabaseInterface::setAdminFlag(const QString &userName, int flag, bool add)
+{
+    AdminFlagUpdateResult result;
+    if (!checkSql()) {
+        return result;
+    }
+
+    QSqlQuery *query =
+        add ? prepareQuery("update {prefix}_users set admin = (admin | :adminlevel) where name = :username")
+            : prepareQuery("update {prefix}_users set admin = (admin & ~ :adminlevel) where name = :username");
+    query->bindValue(":adminlevel", flag);
+    query->bindValue(":username", userName);
+    if (!execSqlQuery(query)) {
+        result.errorText = query->lastError().text();
+        return result;
+    }
+
+    result.success = true;
+    return result;
+}
+
+Server_DatabaseInterface::UserFieldResult Servatrice_DatabaseInterface::getUserToken(const QString &userName,
+                                                                                     QString &token)
+{
+    if (!checkSql()) {
+        return UserFieldResult::Failed;
+    }
+
+    QSqlQuery *query = prepareQuery("select token from {prefix}_users WHERE name = :name");
+    query->bindValue(":name", userName);
+    if (!execSqlQuery(query)) {
+        return UserFieldResult::Failed;
+    }
+
+    if (!query->next()) {
+        return UserFieldResult::NotFound;
+    }
+
+    token = query->value(0).toString();
+    return UserFieldResult::Ok;
+}
+
+Server_DatabaseInterface::UserFieldResult Servatrice_DatabaseInterface::getAdminNotes(const QString &userName,
+                                                                                      QString &notes)
+{
+    if (!checkSql()) {
+        return UserFieldResult::Failed;
+    }
+
+    QSqlQuery *query = prepareQuery("select adminnotes from {prefix}_users WHERE name = :name");
+    query->bindValue(":name", userName);
+    if (!execSqlQuery(query)) {
+        return UserFieldResult::Failed;
+    }
+
+    if (!query->next()) {
+        return UserFieldResult::NotFound;
+    }
+
+    notes = query->value(0).toString();
+    return UserFieldResult::Ok;
+}
+
+Server_DatabaseInterface::UserFieldResult Servatrice_DatabaseInterface::setAdminNotes(const QString &userName,
+                                                                                      const QString &notes)
+{
+    if (!checkSql()) {
+        return UserFieldResult::Failed;
+    }
+
+    QSqlQuery *query = prepareQuery("update {prefix}_users set adminnotes = :adminnotes where name = :name");
+    query->bindValue(":adminnotes", notes);
+    query->bindValue(":name", userName);
+
+    if (!execSqlQuery(query)) {
+        return UserFieldResult::Failed;
+    }
+
+    if (query->numRowsAffected() == 0) {
+        return UserFieldResult::NotFound;
+    }
+
+    return UserFieldResult::Ok;
+}
+
+bool Servatrice_DatabaseInterface::addBan(const QString &userName,
+                                          const QString &address,
+                                          int adminId,
+                                          int minutes,
+                                          const QString &reason,
+                                          const QString &visibleReason,
+                                          const QString &clientId)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery(
+        "insert into {prefix}_bans (user_name, ip_address, id_admin, time_from, minutes, reason, visible_reason, "
+        "clientid) values(:user_name, :ip_address, :id_admin, NOW(), :minutes, :reason, :visible_reason, :client_id)");
+    query->bindValue(":user_name", userName);
+    query->bindValue(":ip_address", address);
+    query->bindValue(":id_admin", adminId);
+    query->bindValue(":minutes", minutes);
+    query->bindValue(":reason", reason);
+    query->bindValue(":visible_reason", visibleReason);
+    query->bindValue(":client_id", clientId);
+    return execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::getUserNamesByClientId(const QString &clientId, QList<QString> &userNames)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("select name from {prefix}_users where clientid = :client_id");
+    query->bindValue(":client_id", clientId);
+    // The original call executed the query twice: the first result was discarded and the
+    // second governed the loop. Both executions are kept so the failure behaviour is identical.
+    execSqlQuery(query);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        userNames.append(query->value(0).toString());
+    }
+
+    return true;
+}
+
 QList<ServerInfo_Warning> Servatrice_DatabaseInterface::getUserWarnHistory(const QString &userName)
 {
     QList<ServerInfo_Warning> results;

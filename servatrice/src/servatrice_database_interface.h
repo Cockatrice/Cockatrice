@@ -224,8 +224,22 @@ public:
                             bool newPasswordNeedsHash) override;
     void setForcePasswordChange(const QString &user, bool force) override;
     QList<ServerInfo_Ban> getUserBanHistory(const QString &userName) override;
-    bool
-    addWarning(const QString userName, const QString adminName, const QString warningReason, const QString clientID);
+    bool addWarning(const QString userName,
+                    const QString adminName,
+                    const QString warningReason,
+                    const QString clientID) override;
+    Server_DatabaseInterface::AdminFlagUpdateResult setAdminFlag(const QString &userName, int flag, bool add) override;
+    Server_DatabaseInterface::UserFieldResult getUserToken(const QString &userName, QString &token) override;
+    Server_DatabaseInterface::UserFieldResult getAdminNotes(const QString &userName, QString &notes) override;
+    Server_DatabaseInterface::UserFieldResult setAdminNotes(const QString &userName, const QString &notes) override;
+    bool addBan(const QString &userName,
+                const QString &address,
+                int adminId,
+                int minutes,
+                const QString &reason,
+                const QString &visibleReason,
+                const QString &clientId) override;
+    bool getUserNamesByClientId(const QString &clientId, QList<QString> &userNames) override;
     QList<ServerInfo_Warning> getUserWarnHistory(const QString &userName) override;
     QList<ServerInfo_ChatMessage> getMessageLogHistory(const QString &user,
                                                        const QString &ipaddress,
