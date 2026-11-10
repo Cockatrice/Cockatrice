@@ -3562,6 +3562,287 @@ bool Servatrice_DatabaseInterface::userEmailMatches(const QString &userName, con
     return validateTableColumnStringData("{prefix}_users", "email", userName, email);
 }
 
+namespace
+{
+// The user level the protocol expects for a report's reported user, resolved from the
+// joined user row: the row is absent when the reported name no longer exists.
+int reportUserLevel(bool userExists, int adminFlags)
+{
+    int userLevel = ServerInfo_User::IsUser;
+    if (userExists) {
+        userLevel |= ServerInfo_User::IsRegistered;
+        if (adminFlags & 1) {
+            userLevel |= ServerInfo_User::IsAdmin | ServerInfo_User::IsModerator;
+        } else if (adminFlags & 2) {
+            userLevel |= ServerInfo_User::IsModerator;
+        }
+        if (adminFlags & 4) {
+            userLevel |= ServerInfo_User::IsJudge;
+        }
+        if (adminFlags & 8) {
+            userLevel |= ServerInfo_User::IsDeveloper;
+        }
+    }
+    return userLevel;
+}
+} // namespace
+
+bool Servatrice_DatabaseInterface::getReportList(bool unresolvedOnly,
+                                                 int offset,
+                                                 int limit,
+                                                 int &totalCount,
+                                                 QList<ServerInfo_Report> &reports)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QString whereClause;
+    if (unresolvedOnly) {
+        whereClause = "WHERE r.status = 'open' OR r.status = 'assigned' ";
+    }
+
+    QSqlQuery *countQuery = prepareQuery("SELECT COUNT(*) FROM {prefix}_reports r " + whereClause);
+    totalCount = 0;
+    if (execSqlQuery(countQuery) && countQuery->next()) {
+        totalCount = countQuery->value(0).toInt();
+    }
+
+    QString queryStr = "SELECT r.id, r.reporter_name, r.reported_user_name, r.game_id, "
+                       "r.category, r.description, r.created_at, r.status, "
+                       "r.resolution_note, u.name AS assigned_mod_name, ru.name AS resolved_by_name, r.room_id, "
+                       "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
+                       "AS replay_id, u2.id AS reported_user_id, u2.admin AS reported_user_admin "
+                       "FROM {prefix}_reports r "
+                       "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
+                       "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id "
+                       "LEFT JOIN {prefix}_users u2 ON u2.name = r.reported_user_name ";
+
+    if (unresolvedOnly) {
+        queryStr += "WHERE r.status = 'open' OR r.status = 'assigned' ";
+    }
+
+    queryStr += "ORDER BY r.created_at DESC LIMIT :limit OFFSET :offset";
+
+    QSqlQuery *query = prepareQuery(queryStr);
+    query->bindValue(":limit", limit);
+    query->bindValue(":offset", offset);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        ServerInfo_Report info;
+
+        info.set_report_id(query->value(0).toInt());
+        info.set_reporter_name(query->value(1).toString().toStdString());
+        info.set_reported_user_name(query->value(2).toString().toStdString());
+
+        if (!query->value(3).isNull()) {
+            info.set_game_id(query->value(3).toInt());
+        }
+
+        info.set_category(query->value(4).toString().toStdString());
+        info.set_description(query->value(5).toString().toStdString());
+        info.set_report_time(query->value(6).toDateTime().toSecsSinceEpoch());
+        info.set_status(query->value(7).toString().toStdString());
+
+        if (!query->value(8).isNull()) {
+            info.set_resolution_note(query->value(8).toString().toStdString());
+        }
+
+        if (!query->value(9).isNull()) {
+            info.set_assigned_mod_name(query->value(9).toString().toStdString());
+        }
+        if (!query->value(10).isNull()) {
+            info.set_resolved_by_name(query->value(10).toString().toStdString());
+        }
+
+        if (!query->value(11).isNull()) {
+            info.set_room_id(query->value(11).toInt());
+        }
+
+        if (!query->value(12).isNull()) {
+            info.set_replay_id(query->value(12).toInt());
+        }
+
+        info.set_reported_user_level(reportUserLevel(!query->value(13).isNull(), query->value(14).toInt()));
+
+        reports.append(info);
+    }
+
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::getReportsSubmittedBy(int reporterId, QList<ServerInfo_Report> &reports)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QString queryStr = "SELECT r.id, r.reporter_name, r.reported_user_name, r.game_id, "
+                       "r.category, r.description, r.created_at, r.status, "
+                       "r.resolution_note, u.name AS assigned_mod_name, ru.name AS resolved_by_name, r.room_id, "
+                       "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
+                       "AS replay_id, u2.id AS reported_user_id, u2.admin AS reported_user_admin "
+                       "FROM {prefix}_reports r "
+                       "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
+                       "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id "
+                       "LEFT JOIN {prefix}_users u2 ON u2.name = r.reported_user_name "
+                       "WHERE r.reporter_id = :reporter_id "
+                       "ORDER BY r.created_at DESC LIMIT 200";
+
+    QSqlQuery *query = prepareQuery(queryStr);
+    query->bindValue(":reporter_id", reporterId);
+
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        ServerInfo_Report info;
+
+        info.set_report_id(query->value(0).toInt());
+        info.set_reporter_name(query->value(1).toString().toStdString());
+        info.set_reported_user_name(query->value(2).toString().toStdString());
+
+        if (!query->value(3).isNull()) {
+            info.set_game_id(query->value(3).toInt());
+        }
+
+        info.set_category(query->value(4).toString().toStdString());
+        info.set_description(query->value(5).toString().toStdString());
+        info.set_report_time(query->value(6).toDateTime().toSecsSinceEpoch());
+        info.set_status(query->value(7).toString().toStdString());
+
+        if (!query->value(8).isNull()) {
+            info.set_resolution_note(query->value(8).toString().toStdString());
+        }
+
+        if (!query->value(9).isNull()) {
+            info.set_assigned_mod_name(query->value(9).toString().toStdString());
+        }
+        if (!query->value(10).isNull()) {
+            info.set_resolved_by_name(query->value(10).toString().toStdString());
+        }
+
+        if (!query->value(11).isNull()) {
+            info.set_room_id(query->value(11).toInt());
+        }
+
+        if (!query->value(12).isNull()) {
+            info.set_replay_id(query->value(12).toInt());
+        }
+
+        info.set_reported_user_level(reportUserLevel(!query->value(13).isNull(), query->value(14).toInt()));
+
+        reports.append(info);
+    }
+
+    return true;
+}
+
+Server_DatabaseInterface::ReportLookupResult
+Servatrice_DatabaseInterface::getReportForDetails(int reportId, int &reporterId, ServerInfo_Report &report)
+{
+    if (!checkSql()) {
+        return ReportLookupResult::Failed;
+    }
+
+    QString queryStr =
+        "SELECT r.id, r.reporter_id, r.reporter_name, r.reported_user_name, r.game_id, "
+        "r.category, r.description, r.created_at, r.status, "
+        "r.resolution_note, u.name AS assigned_mod_name, ru.name AS resolved_by_name, r.chat_log, r.room_id, "
+        "r.resolution_time, "
+        "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
+        "AS replay_id "
+        "FROM {prefix}_reports r "
+        "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
+        "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id "
+        "WHERE r.id = :id";
+    QSqlQuery *query = prepareQuery(queryStr);
+    query->bindValue(":id", reportId);
+
+    if (!execSqlQuery(query)) {
+        return ReportLookupResult::Failed;
+    }
+
+    if (!query->next()) {
+        return ReportLookupResult::NotFound;
+    }
+
+    reporterId = query->value(1).toInt();
+
+    report.set_report_id(query->value(0).toInt());
+    report.set_reporter_name(query->value(2).toString().toStdString());
+    report.set_reported_user_name(query->value(3).toString().toStdString());
+
+    if (!query->value(4).isNull()) {
+        report.set_game_id(query->value(4).toInt());
+    }
+
+    report.set_category(query->value(5).toString().toStdString());
+    report.set_description(query->value(6).toString().toStdString());
+    report.set_report_time(query->value(7).toDateTime().toSecsSinceEpoch());
+    report.set_status(query->value(8).toString().toStdString());
+
+    if (!query->value(9).isNull()) {
+        report.set_resolution_note(query->value(9).toString().toStdString());
+    }
+
+    if (!query->value(10).isNull()) {
+        report.set_assigned_mod_name(query->value(10).toString().toStdString());
+    }
+    if (!query->value(11).isNull()) {
+        report.set_resolved_by_name(query->value(11).toString().toStdString());
+    }
+
+    if (!query->value(12).isNull()) {
+        report.set_chat_log(query->value(12).toString().toStdString());
+    }
+
+    if (!query->value(13).isNull()) {
+        report.set_room_id(query->value(13).toInt());
+    }
+
+    if (!query->value(14).isNull()) {
+        report.set_resolution_time(query->value(14).toDateTime().toSecsSinceEpoch());
+    }
+
+    if (!query->value(15).isNull()) {
+        report.set_replay_id(query->value(15).toInt());
+    }
+
+    return ReportLookupResult::Ok;
+}
+
+bool Servatrice_DatabaseInterface::getReportComments(int reportId, QList<ServerInfo_ReportComment> &comments)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT c.author_name, c.comment_text, c.created_at, c.is_moderator "
+                                    "FROM {prefix}_report_comments c "
+                                    "WHERE c.report_id = :report_id ORDER BY c.created_at ASC");
+    query->bindValue(":report_id", reportId);
+
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        ServerInfo_ReportComment comment;
+        comment.set_author_name(query->value(0).toString().toStdString());
+        comment.set_comment_text(query->value(1).toString().toStdString());
+        comment.set_comment_time(query->value(2).toDateTime().toSecsSinceEpoch());
+        comment.set_is_moderator(query->value(3).toBool());
+        comments.append(comment);
+    }
+
+    return true;
+}
+
 int Servatrice_DatabaseInterface::countReportsSubmittedInLastDay(int reporterId)
 {
     if (!checkSql()) {

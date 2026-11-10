@@ -5,6 +5,7 @@
 #include "libcockatrice/protocol/pb/serverinfo_chat_message.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_moderator_login.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_private_chat_message.pb.h"
+#include "libcockatrice/protocol/pb/serverinfo_report.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_user_alt.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_user_session.pb.h"
@@ -390,6 +391,38 @@ public:
     virtual ReplayWriteResult grantReplayAccessByName(int /* gameId */, const QString & /* userName */)
     {
         return ReplayWriteResult::Failed;
+    }
+    /** @brief Outcome of fetching one report row for the detail view. */
+    enum class ReportLookupResult
+    {
+        Ok,
+        NotFound,
+        Failed
+    };
+    /** @brief One page of reports with their joined moderator names, plus the total row count. */
+    virtual bool getReportList(bool /* unresolvedOnly */,
+                               int /* offset */,
+                               int /* limit */,
+                               int & /* totalCount */,
+                               QList<ServerInfo_Report> & /* reports */)
+    {
+        return false;
+    }
+    /** @brief The newest reports the user filed, for their own list. */
+    virtual bool getReportsSubmittedBy(int /* reporterId */, QList<ServerInfo_Report> & /* reports */)
+    {
+        return false;
+    }
+    /** @brief One report row for the detail view; also returns the reporter id for the access check. */
+    virtual ReportLookupResult
+    getReportForDetails(int /* reportId */, int & /* reporterId */, ServerInfo_Report & /* report */)
+    {
+        return ReportLookupResult::Failed;
+    }
+    /** @brief The comments of a report in creation order. */
+    virtual bool getReportComments(int /* reportId */, QList<ServerInfo_ReportComment> & /* comments */)
+    {
+        return false;
     }
     /** @brief One resolved or dismissed report whose reporter has not been told yet. */
     struct PendingReportNotification
