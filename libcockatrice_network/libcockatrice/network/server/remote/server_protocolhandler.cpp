@@ -302,10 +302,22 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
     return finalResponseCode;
 }
 
-Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const CommandContainer &cont,
-                                                                           ResponseContainer &rc)
+namespace
 {
-    static QList<GameCommand::GameCommandType> antifloodCommandsWhiteList =
+/**
+ * @brief Records one game command in the flood window and reports whether the window is over its limit.
+ * Bursty commands are not counted, so drawing ten cards one by one does not trip the limit.
+ */
+bool commandExceedsFloodLimit(const GameCommand &command,
+                              QList<int> &commandCountOverTime,
+                              int commandCountingInterval,
+                              int maxCommandCountPerInterval)
+{
+    if (commandCountingInterval <= 0) {
+        return false;
+    }
+
+    static const QList<GameCommand::GameCommandType> antifloodCommandsWhiteList =
         QList<GameCommand::GameCommandType>()
         // draw/undo card draw (example: drawing 10 cards one by one from the deck)
         << GameCommand::DRAW_CARDS
@@ -322,6 +334,26 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
         // allows a user to sideboard without receiving flooding message
         << GameCommand::MOVE_CARD;
 
+    if (commandCountOverTime.isEmpty()) {
+        commandCountOverTime.prepend(0);
+    }
+
+    if (!antifloodCommandsWhiteList.contains(static_cast<GameCommand::GameCommandType>(getPbExtension(command)))) {
+        ++commandCountOverTime[0];
+    }
+
+    int totalCount = 0;
+    for (int count : commandCountOverTime) {
+        totalCount += count;
+    }
+
+    return maxCommandCountPerInterval > 0 && totalCount > maxCommandCountPerInterval;
+}
+} // namespace
+
+Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const CommandContainer &cont,
+                                                                           ResponseContainer &rc)
+{
     if (authState == NotLoggedIn) {
         return Response::RespLoginNeeded;
     }
@@ -367,23 +399,8 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
             logDebugMessage(QString("game %1 player %2: ").arg(cont.game_id()).arg(playerId) + getSafeDebugString(sc));
         }
 
-        if (commandCountingInterval > 0) {
-            int totalCount = 0;
-            if (commandCountOverTime.isEmpty()) {
-                commandCountOverTime.prepend(0);
-            }
-
-            if (!antifloodCommandsWhiteList.contains((GameCommand::GameCommandType)getPbExtension(sc))) {
-                ++commandCountOverTime[0];
-            }
-
-            for (int count : commandCountOverTime) {
-                totalCount += count;
-            }
-
-            if (maxCommandCountPerInterval > 0 && totalCount > maxCommandCountPerInterval) {
-                return Response::RespChatFlood;
-            }
+        if (commandExceedsFloodLimit(sc, commandCountOverTime, commandCountingInterval, maxCommandCountPerInterval)) {
+            return Response::RespChatFlood;
         }
 
         Response::ResponseCode resp = participant->processGameCommand(sc, rc, ges);
