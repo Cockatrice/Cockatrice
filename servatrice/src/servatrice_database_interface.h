@@ -279,6 +279,7 @@ public:
     // {prefix}_uptime table. valid is false when no snapshot exists yet.
     UptimeSnapshot getLatestUptimeSnapshot(int serverId) override;
     bool getLatestServerMessage(int serverId, QString &message) override;
+    QList<ServerListEntryRecord> getServerListEntries() override;
     bool removeUserAvatar(const QString &userName) override;
     // Outcome of removeUserBanner(), so the caller can tell a missing user apart
     // from a user who simply has no banner card set.

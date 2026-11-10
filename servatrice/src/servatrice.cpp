@@ -743,13 +743,10 @@ void Servatrice::updateServerList()
     serverListMutex.lock();
     serverList.clear();
 
-    QSqlQuery *query = servatriceDatabaseInterface->prepareQuery(
-        "select id, ssl_cert, hostname, address, game_port, control_port from {prefix}_servers order by id asc");
-    servatriceDatabaseInterface->execSqlQuery(query);
-    while (query->next()) {
-        ServerProperties prop(query->value(0).toInt(), QSslCertificate(query->value(1).toString().toUtf8()),
-                              query->value(2).toString(), QHostAddress(query->value(3).toString()),
-                              query->value(4).toInt(), query->value(5).toInt());
+    const auto serverListEntries = servatriceDatabaseInterface->getServerListEntries();
+    for (const auto &entry : serverListEntries) {
+        ServerProperties prop(entry.id, QSslCertificate(entry.sslCert), entry.hostname, QHostAddress(entry.address),
+                              entry.gamePort, entry.controlPort);
         serverList.append(prop);
         qDebug() << QString("#%1 CERT=%2 NAME=%3 IP=%4:%5 CPORT=%6")
                         .arg(prop.id)

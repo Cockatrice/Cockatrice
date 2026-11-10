@@ -717,6 +717,21 @@ public:
     {
         return false;
     }
+    /** @brief One row of the server list, with the certificate exactly as stored. */
+    struct ServerListEntryRecord
+    {
+        int id = 0;
+        QByteArray sslCert;
+        QString hostname;
+        QString address;
+        int gamePort = 0;
+        int controlPort = 0;
+    };
+    /** @brief Every published server-list row, in id order; empty when the query fails. */
+    virtual QList<ServerListEntryRecord> getServerListEntries()
+    {
+        return {};
+    }
 
     virtual void clearSessionTables()
     {
