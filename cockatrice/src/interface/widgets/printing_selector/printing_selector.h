@@ -85,7 +85,7 @@ signals:
     void cardAmountsChanged(const QMap<QString, ZoneCounts> &uuidToAmounts);
 
     /**
-     * A printing was picked while the selector runs in selection-only mode.
+     * A printing was picked in the selector.
      * @param card The picked card and printing.
      */
     void printingSelected(const ExactCard &card);

@@ -14,7 +14,7 @@
 #include <qnamespace.h>
 
 DeckEditorPrintingSelectorDockWidget::DeckEditorPrintingSelectorDockWidget(AbstractTabDeckEditor *parent)
-    : QDockWidget(parent), deckEditor(parent)
+    : QDockWidget(parent), deckEditor(parent), printingSelectorHost(parent)
 {
     setObjectName("printingSelectorDock");
 
@@ -33,12 +33,9 @@ DeckEditorPrintingSelectorDockWidget::DeckEditorPrintingSelectorDockWidget(Abstr
     retranslateUi();
 }
 
-DeckEditorPrintingSelectorDockWidget::~DeckEditorPrintingSelectorDockWidget() = default;
-
 void DeckEditorPrintingSelectorDockWidget::createPrintingSelectorDock()
 {
-    printingSelectorHost = std::make_unique<DeckEditorPrintingSelectorHost>(deckEditor);
-    printingSelector = new PrintingSelector(this, printingSelectorHost.get());
+    printingSelector = new PrintingSelector(this, &printingSelectorHost);
     printingSelector->setObjectName("printingSelector");
     auto *printingSelectorFrame = new QVBoxLayout;
     printingSelectorFrame->setObjectName("printingSelectorFrame");

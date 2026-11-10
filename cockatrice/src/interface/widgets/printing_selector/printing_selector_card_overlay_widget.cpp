@@ -117,10 +117,10 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     cardInfoPicture->setCard(_rootCard);
     mainLayout->addWidget(cardInfoPicture);
 
-    // In a selection-only host a click picks this printing instead of changing a deck.
+    // A left click reports the printing; consumers that only want a pick connect to the signal.
     connect(cardInfoPicture, &CardInfoPictureWidget::cardClicked, this,
             [this](QMouseEvent *event, const ExactCard &card) {
-                if (host->isSelectionOnly() && event->button() == Qt::LeftButton) {
+                if (event->button() == Qt::LeftButton) {
                     emit printingSelected(card);
                 }
             });

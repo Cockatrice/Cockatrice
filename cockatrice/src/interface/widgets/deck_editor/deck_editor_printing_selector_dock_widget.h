@@ -7,11 +7,11 @@
 #ifndef DECK_EDITOR_PRINTING_SELECTOR_DOCK_WIDGET_H
 #define DECK_EDITOR_PRINTING_SELECTOR_DOCK_WIDGET_H
 
+#include "deck_editor_printing_selector_host.h"
+
 #include <QDockWidget>
-#include <memory>
 #include <qtmetamacros.h>
 
-class DeckEditorPrintingSelectorHost;
 class PrintingDisabledInfoWidget;
 class AbstractTabDeckEditor;
 class PrintingSelector;
@@ -22,7 +22,6 @@ class DeckEditorPrintingSelectorDockWidget : public QDockWidget
     Q_OBJECT
 public:
     explicit DeckEditorPrintingSelectorDockWidget(AbstractTabDeckEditor *parent);
-    ~DeckEditorPrintingSelectorDockWidget() override;
     void createPrintingSelectorDock();
     void retranslateUi();
 
@@ -30,7 +29,7 @@ public:
 
 private:
     AbstractTabDeckEditor *deckEditor;
-    std::unique_ptr<DeckEditorPrintingSelectorHost> printingSelectorHost;
+    DeckEditorPrintingSelectorHost printingSelectorHost;
     QWidget *printingSelectorDockContents;
     PrintingDisabledInfoWidget *printingDisabledInfoWidget;
 
