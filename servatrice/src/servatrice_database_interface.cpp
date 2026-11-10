@@ -3358,6 +3358,69 @@ void Servatrice_DatabaseInterface::recordUptime(const UptimeRecord &record)
     execSqlQuery(query);
 }
 
+QList<Server_DatabaseInterface::BootstrapRoomRecord> Servatrice_DatabaseInterface::getBootstrapRooms(int serverId)
+{
+    QList<BootstrapRoomRecord> rooms;
+    if (!checkSql()) {
+        return rooms;
+    }
+
+    QSqlQuery *query = prepareQuery(
+        "select id, name, descr, permissionlevel, privlevel, auto_join, join_message, chat_history_size from "
+        "{prefix}_rooms where id_server = :id_server order by id asc");
+    query->bindValue(":id_server", serverId);
+    if (!execSqlQuery(query)) {
+        return rooms;
+    }
+
+    while (query->next()) {
+        BootstrapRoomRecord room;
+        room.id = query->value(0).toInt();
+        room.name = query->value(1).toString();
+        room.description = query->value(2).toString();
+        room.permissionLevel = query->value(3).toString();
+        room.privateLevel = query->value(4).toString();
+        room.autoJoin = query->value(5).toInt() != 0;
+        room.joinMessage = query->value(6).toString();
+        room.chatHistorySize = query->value(7).toInt();
+
+        QSqlQuery *gameTypesQuery = prepareQuery(
+            "select name from {prefix}_rooms_gametypes where id_room = :id_room AND id_server = :id_server");
+        gameTypesQuery->bindValue(":id_server", serverId);
+        gameTypesQuery->bindValue(":id_room", room.id);
+        if (execSqlQuery(gameTypesQuery)) {
+            while (gameTypesQuery->next()) {
+                room.gameTypes.append(gameTypesQuery->value(0).toString());
+            }
+        }
+
+        QSqlQuery *channelsQuery =
+            prepareQuery("select channel_id, display_name, access_level, write_access_level, banner_message from "
+                         "{prefix}_rooms_channels where id_room = :id_room "
+                         "AND id_server = :id_server order by channel_id asc");
+        channelsQuery->bindValue(":id_server", serverId);
+        channelsQuery->bindValue(":id_room", room.id);
+        if (execSqlQuery(channelsQuery)) {
+            while (channelsQuery->next()) {
+                BootstrapRoomChannelRecord channel;
+                channel.id = channelsQuery->value(0).toString();
+                channel.displayName = channelsQuery->value(1).toString();
+                channel.accessKey = channelsQuery->value(2).toString();
+                channel.hasWriteAccess = !channelsQuery->isNull(3);
+                if (channel.hasWriteAccess) {
+                    channel.writeAccessKey = channelsQuery->value(3).toString();
+                }
+                channel.bannerMessage = channelsQuery->value(4).toString();
+                room.channels.append(channel);
+            }
+        }
+
+        rooms.append(room);
+    }
+
+    return rooms;
+}
+
 bool Servatrice_DatabaseInterface::removeUserAvatar(const QString &userName)
 {
     if (!checkSql()) {

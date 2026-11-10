@@ -750,6 +750,36 @@ public:
     {
     }
 
+    /** @brief One channel row of a bootstrap room, with the access keys exactly as stored. */
+    struct BootstrapRoomChannelRecord
+    {
+        QString id;
+        QString displayName;
+        QString accessKey;
+        bool hasWriteAccess = false;
+        QString writeAccessKey;
+        QString bannerMessage;
+    };
+    /** @brief One room row of the SQL room bootstrap, with its game types and channels. */
+    struct BootstrapRoomRecord
+    {
+        int id = 0;
+        QString name;
+        QString description;
+        QString permissionLevel;
+        QString privateLevel;
+        bool autoJoin = false;
+        QString joinMessage;
+        int chatHistorySize = 0;
+        QStringList gameTypes;
+        QList<BootstrapRoomChannelRecord> channels;
+    };
+    /** @brief Every SQL-configured room for one server, in id order; empty when the query fails. */
+    virtual QList<BootstrapRoomRecord> getBootstrapRooms(int /* serverId */)
+    {
+        return {};
+    }
+
     virtual void clearSessionTables()
     {
     }
