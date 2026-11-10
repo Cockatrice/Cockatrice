@@ -124,6 +124,8 @@ public:
                               const QSet<QString> &allSpectatorsEver,
                               const QList<GameReplay *> &replayList) override;
     DeckList *getDeckFromDatabase(int deckId, int userId) override;
+    bool getDeckListFolders(int folderId, int userId, QList<DeckListFolderRecord> &folders) override;
+    bool getDeckListFiles(int folderId, int userId, QList<DeckListFileRecord> &files) override;
 
     /**
      * @brief Creates a new temporary deck share bundle.

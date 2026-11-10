@@ -2062,6 +2062,58 @@ bool Servatrice_DatabaseInterface::getDeckFilesInFolder(int folderId, int userId
     return true;
 }
 
+bool Servatrice_DatabaseInterface::getDeckListFolders(int folderId, int userId, QList<DeckListFolderRecord> &folders)
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("select id, name, is_public from {prefix}_decklist_folders where "
+                                    "id_parent = :id_parent and id_user = :id_user");
+    query->bindValue(":id_parent", folderId);
+    query->bindValue(":id_user", userId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        DeckListFolderRecord folder;
+        folder.id = query->value(0).toInt();
+        folder.name = query->value(1).toString();
+        folder.isPublic = query->value(2).toBool();
+        folders.append(folder);
+    }
+
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::getDeckListFiles(int folderId, int userId, QList<DeckListFileRecord> &files)
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("select id, name, upload_time, is_public, banner_card_name, "
+                                    "banner_card_provider, color_identity, tags from {prefix}_decklist_files where "
+                                    "id_folder = :id_folder and id_user = :id_user");
+    query->bindValue(":id_folder", folderId);
+    query->bindValue(":id_user", userId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        DeckListFileRecord file;
+        file.id = query->value(0).toInt();
+        file.name = query->value(1).toString();
+        file.uploadTime = query->value(2).toDateTime().toSecsSinceEpoch();
+        file.isPublic = query->value(3).toBool();
+        file.bannerCardName = query->value(4).toString();
+        file.bannerCardProvider = query->value(5).toString();
+        file.colorIdentity = query->value(6).toString();
+        file.tags = deserializeDeckTags(query->value(7).toString());
+        files.append(file);
+    }
+
+    return true;
+}
+
 bool Servatrice_DatabaseInterface::getDeckSharesForUser(int userId, QList<DeckShareSummaryRecord> &shares)
 {
     checkSql();

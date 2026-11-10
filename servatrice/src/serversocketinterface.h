@@ -139,8 +139,6 @@ protected:
     QMutex outputQueueMutex;
 
 private:
-    Servatrice_DatabaseInterface *sqlInterface;
-
     Response::ResponseCode cmdAddToList(const Command_AddToList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdGetPrivateChatHistory(const Command_GetPrivateChatHistory &cmd, ResponseContainer &rc);
