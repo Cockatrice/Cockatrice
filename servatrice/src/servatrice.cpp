@@ -49,7 +49,6 @@
 #include <QRegularExpression>
 #include <QSet>
 #include <QSharedPointer>
-#include <QSqlDatabase>
 #include <QSsl>
 #include <QString>
 #include <QStringList>
@@ -83,12 +82,16 @@ static constexpr qint64 kLegacyBackupSweepIntervalMs = 6 * 60 * 60 * 1000;
 
 Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server,
                                              int _numberPools,
-                                             const QSqlDatabase &_sqlDatabase,
+                                             Server_DatabaseInterface *_databaseInterface,
                                              QObject *parent)
     : QTcpServer(parent), server(_server)
 {
     for (int i = 0; i < _numberPools; ++i) {
-        auto newDatabaseInterface = new Servatrice_DatabaseInterface(i, server);
+        auto *newDatabaseInterface = _databaseInterface->createWorkerInterface(i);
+        if (!newDatabaseInterface) {
+            qCCritical(ServatriceLog) << "Cannot create the database interface for pool" << i;
+            continue;
+        }
         auto newPool = new Servatrice_ConnectionPool(newDatabaseInterface);
 
         auto newThread = new QThread;
@@ -100,8 +103,7 @@ Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server,
         newThread->start();
         server->watchWorkerThread(newThread);
         QMetaObject::invokeMethod(
-            newDatabaseInterface,
-            [newDatabaseInterface, _sqlDatabase] { newDatabaseInterface->initDatabase(_sqlDatabase); },
+            newDatabaseInterface, [newDatabaseInterface] { newDatabaseInterface->initialiseWorkerDatabase(); },
             Qt::BlockingQueuedConnection);
 
         connectionPools.append(newPool);
@@ -122,6 +124,10 @@ Servatrice_GameServer::~Servatrice_GameServer()
 void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
 {
     Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
+    if (!pool) {
+        qCCritical(ServatriceLog) << "No database pool available; refusing connection";
+        return;
+    }
 
     auto ssi = new TcpServerSocketInterface(server, pool->getDatabaseInterface());
     ssi->moveToThread(pool->thread());
@@ -134,6 +140,10 @@ void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
 
 Servatrice_ConnectionPool *Servatrice_GameServer::findLeastUsedConnectionPool()
 {
+    if (connectionPools.isEmpty()) {
+        return nullptr;
+    }
+
     int minClientCount = -1;
     int poolIndex = -1;
     QStringList debugStr;
@@ -153,13 +163,17 @@ Servatrice_ConnectionPool *Servatrice_GameServer::findLeastUsedConnectionPool()
 
 Servatrice_WebsocketGameServer::Servatrice_WebsocketGameServer(Servatrice *_server,
                                                                int _numberPools,
-                                                               const QSqlDatabase &_sqlDatabase,
+                                                               Server_DatabaseInterface *_databaseInterface,
                                                                QObject *parent)
     : QWebSocketServer("Servatrice", QWebSocketServer::NonSecureMode, parent), server(_server)
 {
     for (int i = 0; i < _numberPools; ++i) {
         int poolNumber = WEBSOCKET_POOL_NUMBER + i;
-        auto newDatabaseInterface = new Servatrice_DatabaseInterface(poolNumber, server);
+        auto *newDatabaseInterface = _databaseInterface->createWorkerInterface(poolNumber);
+        if (!newDatabaseInterface) {
+            qCCritical(ServatriceLog) << "Cannot create the database interface for pool" << poolNumber;
+            continue;
+        }
         auto newPool = new Servatrice_ConnectionPool(newDatabaseInterface);
 
         auto newThread = new QThread;
@@ -171,8 +185,7 @@ Servatrice_WebsocketGameServer::Servatrice_WebsocketGameServer(Servatrice *_serv
         newThread->start();
         server->watchWorkerThread(newThread);
         QMetaObject::invokeMethod(
-            newDatabaseInterface,
-            [newDatabaseInterface, _sqlDatabase] { newDatabaseInterface->initDatabase(_sqlDatabase); },
+            newDatabaseInterface, [newDatabaseInterface] { newDatabaseInterface->initialiseWorkerDatabase(); },
             Qt::BlockingQueuedConnection);
 
         connectionPools.append(newPool);
@@ -195,6 +208,10 @@ Servatrice_WebsocketGameServer::~Servatrice_WebsocketGameServer()
 void Servatrice_WebsocketGameServer::onNewConnection()
 {
     Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
+    if (!pool) {
+        qCCritical(ServatriceLog) << "No database pool available; refusing connection";
+        return;
+    }
 
     auto ssi = new WebsocketServerSocketInterface(server, pool->getDatabaseInterface());
     /*
@@ -211,6 +228,10 @@ void Servatrice_WebsocketGameServer::onNewConnection()
 
 Servatrice_ConnectionPool *Servatrice_WebsocketGameServer::findLeastUsedConnectionPool()
 {
+    if (connectionPools.isEmpty()) {
+        return nullptr;
+    }
+
     int minClientCount = -1;
     int poolIndex = -1;
     QStringList debugStr;
@@ -243,7 +264,6 @@ Servatrice::Servatrice(QObject *parent)
     : Server(parent), authenticationMethod(AuthenticationNone), uptime(0), txBytes(0), rxBytes(0),
       shutdownTimer(nullptr)
 {
-    qRegisterMetaType<QSqlDatabase>("QSqlDatabase");
 }
 
 Servatrice::~Servatrice()
@@ -618,8 +638,7 @@ bool Servatrice::initServer()
 
     // SOCKET SERVER
     if (getNumberOfTCPPools() > 0) {
-        gameServer =
-            new Servatrice_GameServer(this, getNumberOfTCPPools(), servatriceDatabaseInterface->getDatabase(), this);
+        gameServer = new Servatrice_GameServer(this, getNumberOfTCPPools(), servatriceDatabaseInterface, this);
         gameServer->setMaxPendingConnections(1000);
         QHostAddress tcpHost = getServerTCPHost();
         qDebug() << "Starting server on host" << tcpHost.toString() << "port" << getServerTCPPort();
@@ -633,8 +652,8 @@ bool Servatrice::initServer()
 
     // WEBSOCKET SERVER
     if (getNumberOfWebSocketPools() > 0) {
-        websocketGameServer = new Servatrice_WebsocketGameServer(this, getNumberOfWebSocketPools(),
-                                                                 servatriceDatabaseInterface->getDatabase(), this);
+        websocketGameServer =
+            new Servatrice_WebsocketGameServer(this, getNumberOfWebSocketPools(), servatriceDatabaseInterface, this);
         websocketGameServer->setMaxPendingConnections(1000);
         QHostAddress webSocketHost = getServerWebSocketHost();
         qDebug() << "Starting websocket server on host" << webSocketHost.toString() << "port"
@@ -708,7 +727,7 @@ qint64 Servatrice::getCardsInGamesTotal() const
     return total;
 }
 
-void Servatrice::addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface)
+void Servatrice::addDatabaseInterface(QThread *thread, Server_DatabaseInterface *databaseInterface)
 {
     databaseInterfaces.insert(thread, databaseInterface);
 }

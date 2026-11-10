@@ -833,6 +833,15 @@ public:
     virtual void purgeExpiredLegacyBackups()
     {
     }
+    /** @brief Creates the database interface a worker connection pool runs on; nullptr when unsupported. */
+    virtual Server_DatabaseInterface *createWorkerInterface(int /* instanceId */)
+    {
+        return nullptr;
+    }
+    /** @brief Opens a worker interface's connection on its own thread; a no-op when unsupported. */
+    virtual void initialiseWorkerDatabase()
+    {
+    }
 
     virtual void clearSessionTables()
     {

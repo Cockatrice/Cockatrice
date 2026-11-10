@@ -81,6 +81,18 @@ void Servatrice_DatabaseInterface::initDatabase(const QSqlDatabase &_sqlDatabase
     }
 }
 
+Server_DatabaseInterface *Servatrice_DatabaseInterface::createWorkerInterface(int instanceId)
+{
+    auto *worker = new Servatrice_DatabaseInterface(instanceId, server);
+    worker->inheritedDatabase = sqlDatabase;
+    return worker;
+}
+
+void Servatrice_DatabaseInterface::initialiseWorkerDatabase()
+{
+    initDatabase(inheritedDatabase);
+}
+
 bool Servatrice_DatabaseInterface::openDatabase(const QString &type,
                                                 const QString &hostName,
                                                 const QString &databaseName,
