@@ -712,6 +712,11 @@ public:
     {
         return {};
     }
+    /** @brief The newest server message for the login banner; false when the lookup fails or finds no row. */
+    virtual bool getLatestServerMessage(int /* serverId */, QString & /* message */)
+    {
+        return false;
+    }
 
     virtual void clearSessionTables()
     {

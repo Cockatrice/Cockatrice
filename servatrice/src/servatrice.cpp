@@ -820,26 +820,20 @@ void Servatrice::updateLoginMessage()
         return;
     }
 
-    QSqlQuery *query = servatriceDatabaseInterface->prepareQuery(
-        "select message from {prefix}_servermessages where id_server = :id_server order by timest desc limit 1");
-    query->bindValue(":id_server", serverId);
-    if (servatriceDatabaseInterface->execSqlQuery(query)) {
-        if (query->next()) {
-            const QString newLoginMessage = query->value(0).toString();
+    QString newLoginMessage;
+    if (servatriceDatabaseInterface->getLatestServerMessage(serverId, newLoginMessage)) {
+        loginMessageMutex.lock();
+        loginMessage = newLoginMessage;
+        loginMessageMutex.unlock();
 
-            loginMessageMutex.lock();
-            loginMessage = newLoginMessage;
-            loginMessageMutex.unlock();
-
-            Event_ServerMessage event;
-            event.set_message(newLoginMessage.toStdString());
-            SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
-            QMapIterator<QString, Server_ProtocolHandler *> usersIterator(users);
-            while (usersIterator.hasNext()) {
-                usersIterator.next().value()->sendProtocolItem(*se);
-            }
-            delete se;
+        Event_ServerMessage event;
+        event.set_message(newLoginMessage.toStdString());
+        SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
+        QMapIterator<QString, Server_ProtocolHandler *> usersIterator(users);
+        while (usersIterator.hasNext()) {
+            usersIterator.next().value()->sendProtocolItem(*se);
         }
+        delete se;
     }
 }
 
