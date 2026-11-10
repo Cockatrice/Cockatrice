@@ -780,6 +780,42 @@ public:
         return {};
     }
 
+    /** @brief One queued activation e-mail, with the address exactly as stored. */
+    struct PendingActivationMailRecord
+    {
+        QString userName;
+        QString emailAddress;
+        QString token;
+    };
+    /** @brief One queued password-reset e-mail, identified by its queue row. */
+    struct PendingPasswordResetRecord
+    {
+        qint64 rowId = 0;
+        QString userName;
+        QString emailAddress;
+        QString token;
+    };
+    /** @brief Fills the queued activation e-mails; false when the query fails. */
+    virtual bool getPendingActivationMails(QList<PendingActivationMailRecord> & /* mails */)
+    {
+        return false;
+    }
+    /** @brief Fills the unsent password-reset e-mails; false when the query fails. */
+    virtual bool getPendingPasswordResets(QList<PendingPasswordResetRecord> & /* resets */)
+    {
+        return false;
+    }
+    /** @brief Deletes a delivered activation e-mail queue row; false when the statement fails. */
+    virtual bool deleteActivationEmail(const QString & /* userName */)
+    {
+        return false;
+    }
+    /** @brief Marks a password-reset queue row as emailed, by row id when known; false on failure. */
+    virtual bool markPasswordResetEmailDelivered(const QString & /* userName */, qint64 /* rowId */)
+    {
+        return false;
+    }
+
     virtual void clearSessionTables()
     {
     }

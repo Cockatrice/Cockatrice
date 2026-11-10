@@ -3421,6 +3421,83 @@ QList<Server_DatabaseInterface::BootstrapRoomRecord> Servatrice_DatabaseInterfac
     return rooms;
 }
 
+bool Servatrice_DatabaseInterface::getPendingActivationMails(QList<PendingActivationMailRecord> &mails)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("select a.name, b.email, b.token from "
+                                    "{prefix}_activation_emails a left join "
+                                    "{prefix}_users b on a.name = b.name");
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        PendingActivationMailRecord mail;
+        mail.userName = query->value(0).toString();
+        mail.emailAddress = query->value(1).toString();
+        mail.token = query->value(2).toString();
+        mails.append(mail);
+    }
+
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::getPendingPasswordResets(QList<PendingPasswordResetRecord> &resets)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery(
+        "select a.id, a.name, b.email, b.token from {prefix}_forgot_password a left join {prefix}_users b on "
+        "a.name = b.name where a.emailed = 0");
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        PendingPasswordResetRecord reset;
+        reset.rowId = query->value(0).toLongLong();
+        reset.userName = query->value(1).toString();
+        reset.emailAddress = query->value(2).toString();
+        reset.token = query->value(3).toString();
+        resets.append(reset);
+    }
+
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::deleteActivationEmail(const QString &userName)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("delete from {prefix}_activation_emails where name = :name");
+    query->bindValue(":name", userName);
+    return execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::markPasswordResetEmailDelivered(const QString &userName, qint64 rowId)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    if (rowId >= 0) {
+        QSqlQuery *query = prepareQuery("update {prefix}_forgot_password set emailed = 1 where id = :id");
+        query->bindValue(":id", rowId);
+        return execSqlQuery(query);
+    }
+
+    QSqlQuery *query = prepareQuery("update {prefix}_forgot_password set emailed = 1 where name = :name");
+    query->bindValue(":name", userName);
+    return execSqlQuery(query);
+}
+
 bool Servatrice_DatabaseInterface::removeUserAvatar(const QString &userName)
 {
     if (!checkSql()) {

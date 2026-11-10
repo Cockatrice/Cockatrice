@@ -282,6 +282,10 @@ public:
     QList<ServerListEntryRecord> getServerListEntries() override;
     void recordUptime(const UptimeRecord &record) override;
     QList<BootstrapRoomRecord> getBootstrapRooms(int serverId) override;
+    bool getPendingActivationMails(QList<PendingActivationMailRecord> &mails) override;
+    bool getPendingPasswordResets(QList<PendingPasswordResetRecord> &resets) override;
+    bool deleteActivationEmail(const QString &userName) override;
+    bool markPasswordResetEmailDelivered(const QString &userName, qint64 rowId) override;
     bool removeUserAvatar(const QString &userName) override;
     // Outcome of removeUserBanner(), so the caller can tell a missing user apart
     // from a user who simply has no banner card set.
