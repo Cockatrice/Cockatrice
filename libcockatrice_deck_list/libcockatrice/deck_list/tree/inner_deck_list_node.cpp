@@ -36,7 +36,8 @@ QString InnerDecklistNode::visibleNameFromName(const QString &_name)
 {
     if (_name == DECK_ZONE_MAIN) {
         return QObject::tr("Maindeck");
-    } else if (_name == DECK_ZONE_SIDE) {
+    }
+    if (_name == DECK_ZONE_SIDE) {
         return QObject::tr("Sideboard");
     } else if (_name == DECK_ZONE_TOKENS) {
         return QObject::tr("Tokens");

@@ -194,7 +194,8 @@ QString CardZoneLogic::getTranslatedName(bool theirOwn, GrammaticalCase gc) cons
     QString ownerName = player->getPlayerInfo()->getName();
     if (name == ZoneNames::HAND) {
         return (theirOwn ? tr("their hand", "nominative") : tr("%1's hand", "nominative").arg(ownerName));
-    } else if (name == ZoneNames::DECK) {
+    }
+    if (name == ZoneNames::DECK) {
         switch (gc) {
             case CaseLookAtZone:
                 return (theirOwn ? tr("their library", "look at zone")

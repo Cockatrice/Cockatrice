@@ -37,7 +37,8 @@ bool parseDeckUrl(const QString &url, ParsedDeckInfo &outInfo)
                                  .fullUrl = TAPPEDOUT_BASE + slug + TAPPEDOUT_SUFFIX,
                                  .provider = DeckProvider::TappedOut};
         return true;
-    } else if ((match = rxArchidekt.match(url)).hasMatch()) {
+    }
+    if ((match = rxArchidekt.match(url)).hasMatch()) {
         QString deckID = match.captured(1);
         outInfo = ParsedDeckInfo{.baseUrl = ARCHIDEKT_BASE,
                                  .deckID = deckID,

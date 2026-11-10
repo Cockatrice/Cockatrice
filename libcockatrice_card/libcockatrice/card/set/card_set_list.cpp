@@ -154,7 +154,8 @@ void CardSetList::defaultSort()
         // Sort by priority, then by release date, then by short name
         if (a->getPriority() != b->getPriority()) {
             return a->getPriority() < b->getPriority(); // lowest first
-        } else if (a->getReleaseDate() != b->getReleaseDate()) {
+        }
+        if (a->getReleaseDate() != b->getReleaseDate()) {
             return a->getReleaseDate() > b->getReleaseDate(); // most recent first
         } else {
             return a->getShortName() < b->getShortName(); // alphabetically

@@ -621,7 +621,8 @@ bool AbstractTabDeckEditor::confirmClose()
         int ret = createSaveConfirmationWindow()->exec();
         if (ret == QMessageBox::Save) {
             return actSaveDeck();
-        } else if (ret == QMessageBox::Cancel) {
+        }
+        if (ret == QMessageBox::Cancel) {
             return false;
         }
     }

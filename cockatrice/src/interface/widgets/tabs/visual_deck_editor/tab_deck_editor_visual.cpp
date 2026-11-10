@@ -265,7 +265,8 @@ static QString zoneForClickModifiers(const Qt::KeyboardModifiers &modifiers)
 {
     if (modifiers.testFlag(Qt::ControlModifier)) {
         return DECK_ZONE_SIDE;
-    } else if (modifiers.testFlag(Qt::ShiftModifier)) {
+    }
+    if (modifiers.testFlag(Qt::ShiftModifier)) {
         return DECK_ZONE_MAYBEBOARD;
     } else {
         return DECK_ZONE_MAIN;

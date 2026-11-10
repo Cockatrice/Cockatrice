@@ -33,7 +33,8 @@ AbstractClient *AbstractGame::getClientForPlayer(int playerId) const
         }
 
         return gameState->getClients().at(playerId);
-    } else if (gameState->getClients().isEmpty()) {
+    }
+    if (gameState->getClients().isEmpty()) {
         return nullptr;
     } else {
         return gameState->getClients().first();

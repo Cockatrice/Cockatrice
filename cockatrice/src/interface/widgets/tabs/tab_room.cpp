@@ -360,7 +360,8 @@ void TabRoom::sendMessage()
     }
     if (sayEdit->text().isEmpty()) {
         return;
-    } else if (sayEdit->hasVisibleCompleterPopup()) {
+    }
+    if (sayEdit->hasVisibleCompleterPopup()) {
         sayEdit->hideCompleterPopups();
         return;
     } else {

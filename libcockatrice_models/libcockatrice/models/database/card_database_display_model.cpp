@@ -128,7 +128,8 @@ int CardDatabaseDisplayModel::lessThanNumerically(QStringView left, QStringView 
     if (okLeft && okRight) {
         if (leftNum < rightNum) {
             return -1;
-        } else if (leftNum > rightNum) {
+        }
+        if (leftNum > rightNum) {
             return 1;
         } else {
             return 0;

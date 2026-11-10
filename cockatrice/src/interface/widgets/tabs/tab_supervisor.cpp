@@ -1447,9 +1447,10 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
                 !userLevel.testFlag(ServerInfo_User::IsRegistered)) {
                 // Flags are additive, so reg/mod/admin are all IsRegistered
                 return;
-            } else if (SettingsCache::instance().chat().getIgnoreNonBuddyUserMessages() &&
-                       !userListManager->isUserBuddy(senderName) && !userLevel.testFlag(ServerInfo_User::IsModerator) &&
-                       !userLevel.testFlag(ServerInfo_User::IsAdmin)) {
+            }
+            if (SettingsCache::instance().chat().getIgnoreNonBuddyUserMessages() &&
+                !userListManager->isUserBuddy(senderName) && !userLevel.testFlag(ServerInfo_User::IsModerator) &&
+                !userLevel.testFlag(ServerInfo_User::IsAdmin)) {
                 // Ignore private messages from non-buddies
                 // Moderator/Admin messages are exempt to ensure warnings reach users
                 return;

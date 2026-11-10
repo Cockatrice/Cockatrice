@@ -251,7 +251,8 @@ bool ThemeManager::isDarkMode(const QString &themeDirPath) const
     const ThemeConfig themeConfig = loadColorSchemeConfig(themeDirPath, systemThemeDir);
     if (themeConfig.colorScheme.compare("Dark", Qt::CaseInsensitive) == 0) {
         return true;
-    } else if (themeConfig.colorScheme.compare("Light", Qt::CaseInsensitive) == 0) {
+    }
+    if (themeConfig.colorScheme.compare("Light", Qt::CaseInsensitive) == 0) {
         return false;
     } else {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
