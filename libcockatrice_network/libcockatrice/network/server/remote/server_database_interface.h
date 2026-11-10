@@ -484,6 +484,72 @@ public:
     {
         return false;
     }
+    /** @brief Outcome of a report state change. */
+    enum class ReportUpdateResult
+    {
+        Ok,
+        InvalidState,
+        Failed
+    };
+    /** @brief Outcome of claiming an open report for a moderator. */
+    enum class ReportAssignResult
+    {
+        Ok,
+        NotFound,
+        NotOpen,
+        Failed
+    };
+    virtual ReportAssignResult assignReport(int /* reportId */, int /* moderatorId */)
+    {
+        return ReportAssignResult::Failed;
+    }
+    virtual ReportUpdateResult
+    resolveReport(int /* reportId */, const QString & /* status */, const QString & /* note */, int /* moderatorId */)
+    {
+        return ReportUpdateResult::Failed;
+    }
+    virtual ReportUpdateResult reopenReport(int /* reportId */)
+    {
+        return ReportUpdateResult::Failed;
+    }
+    /** @brief The user name behind a database user id; false when the lookup fails or finds no row. */
+    virtual bool getUserNameById(int /* userId */, QString & /* userName */)
+    {
+        return false;
+    }
+    /** @brief The reporter and reported user of a report, for the resolve notification. */
+    virtual bool
+    getReportNotificationTarget(int /* reportId */, int & /* reporterId */, QString & /* reportedUserName */)
+    {
+        return false;
+    }
+    /** @brief Comments the author wrote in the last hour, for the hourly cap. */
+    virtual int countReportCommentsInLastHour(int /* authorId */)
+    {
+        return 0;
+    }
+    /** @brief One report's reporter, assignee and status, for the comment checks. */
+    struct ReportCommentTargetRecord
+    {
+        bool found = false;
+        int reporterId = 0;
+        QString reporterName;
+        int assignedToId = 0;
+        QString status;
+    };
+    virtual bool getReportCommentTarget(int /* reportId */, ReportCommentTargetRecord & /* target */)
+    {
+        return false;
+    }
+    virtual bool addReportComment(int /* reportId */,
+                                  const QString & /* authorName */,
+                                  int /* authorId */,
+                                  const QString & /* commentText */,
+                                  bool /* isModerator */,
+                                  qlonglong & /* commentId */)
+    {
+        return false;
+    }
     /** @brief One resolved or dismissed report whose reporter has not been told yet. */
     struct PendingReportNotification
     {

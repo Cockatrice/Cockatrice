@@ -303,6 +303,20 @@ public:
     bool getReportComments(int reportId, QList<ServerInfo_ReportComment> &comments) override;
     bool getReportStats(ReportStatsRecord &stats) override;
     bool getReportUserInfo(const QString &userName, ReportUserInfoRecord &info) override;
+    Server_DatabaseInterface::ReportAssignResult assignReport(int reportId, int moderatorId) override;
+    Server_DatabaseInterface::ReportUpdateResult
+    resolveReport(int reportId, const QString &status, const QString &note, int moderatorId) override;
+    Server_DatabaseInterface::ReportUpdateResult reopenReport(int reportId) override;
+    bool getUserNameById(int userId, QString &userName) override;
+    bool getReportNotificationTarget(int reportId, int &reporterId, QString &reportedUserName) override;
+    int countReportCommentsInLastHour(int authorId) override;
+    bool getReportCommentTarget(int reportId, ReportCommentTargetRecord &target) override;
+    bool addReportComment(int reportId,
+                          const QString &authorName,
+                          int authorId,
+                          const QString &commentText,
+                          bool isModerator,
+                          qlonglong &commentId) override;
     bool addReport(int reporterId,
                    const QString &reporterName,
                    int reportedUserId,
