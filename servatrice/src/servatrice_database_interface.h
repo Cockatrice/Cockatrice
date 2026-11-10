@@ -33,6 +33,7 @@ class Servatrice_DatabaseInterface : public Server_DatabaseInterface
 private:
     int instanceId;
     QSqlDatabase sqlDatabase;
+    QSqlDatabase inheritedDatabase;
     QHash<QString, QSqlQuery *> preparedStatements;
     Servatrice *server;
     ServerInfo_User evalUserQueryResult(const QSqlQuery *query, bool complete, bool withId = false);
@@ -72,13 +73,11 @@ public:
                       const QString &userName,
                       const QString &password) override;
     bool openDatabase();
+    Server_DatabaseInterface *createWorkerInterface(int instanceId) override;
+    void initialiseWorkerDatabase() override;
     bool checkSql() override;
     QSqlQuery *prepareQuery(const QString &queryText);
     bool execSqlQuery(QSqlQuery *query);
-    const QSqlDatabase &getDatabase()
-    {
-        return sqlDatabase;
-    }
 
     bool activeUserExists(const QString &user) override;
     bool userExists(const QString &user) override;

@@ -36,10 +36,6 @@
 #include <QSslCertificate>
 #include <QSslKey>
 #include <QString>
-
-// IWYU pragma: keep
-// Q_DECLARE_METATYPE below needs the complete type.
-#include <QSqlDatabase>
 #include <QTcpServer>
 #include <QWebSocketServer>
 #include <QtGlobal>
@@ -53,8 +49,6 @@
 class QObject;
 class QThread;
 class SessionEvent;
-
-Q_DECLARE_METATYPE(QSqlDatabase)
 
 class QTimer;
 class Servatrice;
@@ -73,7 +67,7 @@ private:
 public:
     Servatrice_GameServer(Servatrice *_server,
                           int _numberPools,
-                          const QSqlDatabase &_sqlDatabase,
+                          Server_DatabaseInterface *_databaseInterface,
                           QObject *parent = nullptr);
     ~Servatrice_GameServer() override;
 
@@ -92,7 +86,7 @@ private:
 public:
     Servatrice_WebsocketGameServer(Servatrice *_server,
                                    int _numberPools,
-                                   const QSqlDatabase &_sqlDatabase,
+                                   Server_DatabaseInterface *_databaseInterface,
                                    QObject *parent = nullptr);
     ~Servatrice_WebsocketGameServer() override;
 
@@ -190,7 +184,7 @@ private:
     QString dbPrefix;
     QMap<QString, bool> serverRequiredFeatureList;
     QString officialWarnings;
-    Servatrice_DatabaseInterface *servatriceDatabaseInterface;
+    Server_DatabaseInterface *servatriceDatabaseInterface;
     bool cleanupDatabaseForEmail(const QString &userName, EmailType type, const QString &token, qint64 rowId);
     int serverId;
     int uptime;
@@ -339,7 +333,7 @@ public:
     QList<AbstractServerSocketInterface *> getUsersWithAddressAsList(const QHostAddress &address) const;
     void incTxBytes(quint64 num);
     void incRxBytes(quint64 num);
-    void addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface);
+    void addDatabaseInterface(QThread *thread, Server_DatabaseInterface *databaseInterface);
 
     // Metrics (see [metrics] section in servatrice.ini.example)
     MetricsRegistry &getMetricsRegistry()
