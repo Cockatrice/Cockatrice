@@ -4628,3 +4628,89 @@ bool Servatrice_DatabaseInterface::isCardArtAllowed(const QString &cardName, con
 
     return q->value(0).toString() != "DENY";
 }
+
+bool Servatrice_DatabaseInterface::upsertCardArtRule(const QString &cardName,
+                                                     const QString &cardProviderId,
+                                                     const QString &mode,
+                                                     const QString &reason,
+                                                     int createdBy)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *q = prepareQuery("INSERT INTO {prefix}_card_art_name_rules "
+                                "(card_name, card_provider_id, mode, reason, created_by) "
+                                "VALUES (:name, :provider, :mode, :reason, :uid) "
+                                "ON DUPLICATE KEY UPDATE mode=:mode2, reason=:reason2");
+
+    q->bindValue(":name", cardName);
+    q->bindValue(":provider", cardProviderId);
+    q->bindValue(":mode", mode);
+    q->bindValue(":mode2", mode);
+    q->bindValue(":reason", reason);
+    q->bindValue(":reason2", reason);
+    q->bindValue(":uid", createdBy);
+
+    return execSqlQuery(q);
+}
+
+bool Servatrice_DatabaseInterface::removeCardArtRule(const QString &cardName, const QString &cardProviderId)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *q =
+        prepareQuery("DELETE FROM {prefix}_card_art_name_rules WHERE card_name=:name AND card_provider_id=:provider");
+    q->bindValue(":name", cardName);
+    q->bindValue(":provider", cardProviderId);
+
+    return execSqlQuery(q);
+}
+
+bool Servatrice_DatabaseInterface::getCardArtRules(QList<CardArtRuleRecord> &rules)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *q = prepareQuery("SELECT card_name, card_provider_id, mode, reason FROM {prefix}_card_art_name_rules");
+    if (!execSqlQuery(q)) {
+        return false;
+    }
+
+    while (q->next()) {
+        CardArtRuleRecord rule;
+        rule.cardName = q->value(0).toString();
+        rule.cardProviderId = q->value(1).toString();
+        rule.mode = q->value(2).toString();
+        rule.reason = q->value(3).toString();
+        rules.append(rule);
+    }
+
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::setCardArtParams(int userId, const QString &paramsJson)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("update {prefix}_users set card_art_params=:params where id=:id");
+    query->bindValue(":params", paramsJson);
+    query->bindValue(":id", userId);
+    return execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::clearCardArtParams(int userId)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("UPDATE {prefix}_users SET card_art_params = NULL WHERE id = :id");
+    query->bindValue(":id", userId);
+    return execSqlQuery(query);
+}

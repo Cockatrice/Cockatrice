@@ -283,6 +283,15 @@ public:
     int clearBlacklistedBanners() override;
     bool getUserAdminFlags(const QString &userName, int &adminFlags) override;
     bool isCardArtAllowed(const QString &cardName, const QString &cardProviderId) override;
+    bool upsertCardArtRule(const QString &cardName,
+                           const QString &cardProviderId,
+                           const QString &mode,
+                           const QString &reason,
+                           int createdBy) override;
+    bool removeCardArtRule(const QString &cardName, const QString &cardProviderId) override;
+    bool getCardArtRules(QList<CardArtRuleRecord> &rules) override;
+    bool setCardArtParams(int userId, const QString &paramsJson) override;
+    bool clearCardArtParams(int userId) override;
     bool addForgotPassword(const QString &user) override;
     bool removeForgotPassword(const QString &user) override;
     bool doesForgotPasswordExist(const QString &user) override;

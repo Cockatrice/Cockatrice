@@ -875,6 +875,38 @@ public:
     {
         return false;
     }
+    /** @brief One card-art name rule. */
+    struct CardArtRuleRecord
+    {
+        QString cardName;
+        QString cardProviderId;
+        QString mode;
+        QString reason;
+    };
+    virtual bool upsertCardArtRule(const QString & /* cardName */,
+                                   const QString & /* cardProviderId */,
+                                   const QString & /* mode */,
+                                   const QString & /* reason */,
+                                   int /* createdBy */)
+    {
+        return false;
+    }
+    virtual bool removeCardArtRule(const QString & /* cardName */, const QString & /* cardProviderId */)
+    {
+        return false;
+    }
+    virtual bool getCardArtRules(QList<CardArtRuleRecord> & /* rules */)
+    {
+        return false;
+    }
+    virtual bool setCardArtParams(int /* userId */, const QString & /* paramsJson */)
+    {
+        return false;
+    }
+    virtual bool clearCardArtParams(int /* userId */)
+    {
+        return false;
+    }
     /**
      * @brief Whether the given card art may be shown (card art rules).
      *
