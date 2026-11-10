@@ -1359,19 +1359,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplayDeleteMatch(const
  */
 QString AbstractServerSocketInterface::createHashForReplay(int gameId)
 {
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("select replay from {prefix}_replays where id_game = :id_game limit 3");
-    query->bindValue(":id_game", gameId);
-
-    if (!sqlInterface->execSqlQuery(query)) {
-        return "";
-    }
-
     QByteArray replaysBytes;
-    while (query->next()) {
-        QByteArray replay = query->value(0).toByteArray();
-        replay.truncate(128);
-        replaysBytes.append(replay);
+    if (!databaseInterface->getReplayHashSource(gameId, replaysBytes)) {
+        return "";
     }
 
     auto hash =
@@ -1388,17 +1378,14 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplayGetCode(const Com
     }
 
     // Check that user has access to replay match
-    {
-        QSqlQuery *query = sqlInterface->prepareQuery(
-            "select 1 from {prefix}_replays_access where id_game = :id_game and id_player = :id_player");
-        query->bindValue(":id_game", cmd.game_id());
-        query->bindValue(":id_player", userInfo->id());
-        if (!sqlInterface->execSqlQuery(query)) {
-            return Response::RespInternalError;
-        }
-        if (!query->next()) {
+    switch (databaseInterface->checkReplayAccess(cmd.game_id(), userInfo->id())) {
+        case Server_DatabaseInterface::ReplayAccessResult::Ok:
+            break;
+        case Server_DatabaseInterface::ReplayAccessResult::AccessDenied:
             return Response::RespAccessDenied;
-        }
+        case Server_DatabaseInterface::ReplayAccessResult::NotFound:
+        case Server_DatabaseInterface::ReplayAccessResult::Failed:
+            return Response::RespInternalError;
     }
 
     QString hash = createHashForReplay(cmd.game_id());
@@ -1434,17 +1421,16 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const 
     QString hash = split[1];
 
     // Determine if the replay actually exists (and grab the replay name while at it)
-    auto *replayExistsQuery =
-        sqlInterface->prepareQuery("select replay_name from {prefix}_replays_access where id_game = :id_game limit 1");
-    replayExistsQuery->bindValue(":id_game", gameId);
-    if (!sqlInterface->execSqlQuery(replayExistsQuery)) {
-        return Response::RespInternalError;
+    QString replayName;
+    switch (databaseInterface->getReplayName(gameId.toInt(), replayName)) {
+        case Server_DatabaseInterface::ReplayAccessResult::Ok:
+            break;
+        case Server_DatabaseInterface::ReplayAccessResult::NotFound:
+        case Server_DatabaseInterface::ReplayAccessResult::AccessDenied:
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::ReplayAccessResult::Failed:
+            return Response::RespInternalError;
     }
-    if (!replayExistsQuery->next()) {
-        return Response::RespNameNotFound;
-    }
-
-    const auto &replayName = replayExistsQuery->value(0).toString();
 
     // Check if hash is correct
     if (hash != createHashForReplay(gameId.toInt())) {
@@ -1452,26 +1438,18 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const 
     }
 
     // Determine if user already has access to replay
-    auto *alreadyAccessQuery = sqlInterface->prepareQuery(
-        "select 1 from {prefix}_replays_access where id_game = :id_game and id_player = :id_player");
-    alreadyAccessQuery->bindValue(":id_game", gameId);
-    alreadyAccessQuery->bindValue(":id_player", userInfo->id());
-    if (!sqlInterface->execSqlQuery(alreadyAccessQuery)) {
-        return Response::RespInternalError;
-    }
-    if (alreadyAccessQuery->next()) {
-        return Response::RespOk;
+    switch (databaseInterface->checkReplayAccess(gameId.toInt(), userInfo->id())) {
+        case Server_DatabaseInterface::ReplayAccessResult::Ok:
+            return Response::RespOk;
+        case Server_DatabaseInterface::ReplayAccessResult::AccessDenied:
+            break;
+        case Server_DatabaseInterface::ReplayAccessResult::NotFound:
+        case Server_DatabaseInterface::ReplayAccessResult::Failed:
+            return Response::RespInternalError;
     }
 
     // Grant the User access to the replay
-    auto *grantReplayAccessQuery =
-        sqlInterface->prepareQuery("insert into {prefix}_replays_access (id_game, id_player, replay_name, do_not_hide) "
-                                   "values(:idgame, :idplayer, :replayname, 0)");
-    grantReplayAccessQuery->bindValue(":idgame", gameId);
-    grantReplayAccessQuery->bindValue(":idplayer", userInfo->id());
-    grantReplayAccessQuery->bindValue(":replayname", replayName);
-
-    if (!sqlInterface->execSqlQuery(grantReplayAccessQuery)) {
+    if (!databaseInterface->addReplayAccess(gameId.toInt(), userInfo->id(), replayName)) {
         return Response::RespInternalError;
     }
 
@@ -3043,24 +3021,21 @@ AbstractServerSocketInterface::cmdReplayDownloadByGameId(const Command_ReplayDow
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
-    QSqlQuery *query = sqlInterface->prepareQuery("SELECT r.id, r.replay FROM {prefix}_replays r "
-                                                  "WHERE r.id_game = :game_id ORDER BY r.id DESC LIMIT 1");
-    query->bindValue(":game_id", cmd.game_id());
-
-    if (!sqlInterface->execSqlQuery(query)) {
-        return Response::RespInternalError;
+    int replayId = 0;
+    QByteArray data;
+    switch (databaseInterface->getLatestReplayForGame(cmd.game_id(), replayId, data)) {
+        case Server_DatabaseInterface::ReplayAccessResult::Ok:
+            break;
+        case Server_DatabaseInterface::ReplayAccessResult::NotFound:
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::ReplayAccessResult::AccessDenied:
+        case Server_DatabaseInterface::ReplayAccessResult::Failed:
+            return Response::RespInternalError;
     }
-
-    if (!query->next()) {
-        return Response::RespNameNotFound;
-    }
-
-    int replayId = query->value(0).toInt();
-    QByteArray data = query->value(1).toByteArray();
 
     Response_ReplayDownloadByGameId *re = new Response_ReplayDownloadByGameId;
     re->set_replay_data(data.data(), data.size());
@@ -4153,47 +4128,15 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAdjustMod(const Command
 Response::ResponseCode AbstractServerSocketInterface::cmdGrantReplayAccess(const Command_GrantReplayAccess &cmd,
                                                                            ResponseContainer & /*rc*/)
 {
-    // Determine if the replay actually exists already
-    auto *replayExistsQuery =
-        sqlInterface->prepareQuery("select count(*) from {prefix}_replays_access where id_game = :idgame");
-    replayExistsQuery->bindValue(":idgame", cmd.replay_id());
-    if (!sqlInterface->execSqlQuery(replayExistsQuery)) {
-        return Response::RespInternalError;
+    switch (databaseInterface->grantReplayAccessByName(cmd.replay_id(), QString::fromStdString(cmd.moderator_name()))) {
+        case Server_DatabaseInterface::ReplayWriteResult::Ok:
+            return Response::RespOk;
+        case Server_DatabaseInterface::ReplayWriteResult::NotFound:
+            return Response::RespContextError;
+        case Server_DatabaseInterface::ReplayWriteResult::Failed:
+            return Response::RespInternalError;
     }
-    if (!replayExistsQuery->next()) {
-        return Response::RespInternalError;
-    }
-
-    const auto &replayExists = replayExistsQuery->value(0).toInt() > 0;
-    if (!replayExists) {
-        return Response::RespContextError;
-    }
-
-    // Determine the Moderator's User ID (As it's not apart of client, only username is)
-    auto *getModeratorUserIdQuery = sqlInterface->prepareQuery("select id from {prefix}_users WHERE name = :name");
-    getModeratorUserIdQuery->bindValue(":name", QString::fromStdString(cmd.moderator_name()));
-    if (!sqlInterface->execSqlQuery(getModeratorUserIdQuery)) {
-        return Response::RespInternalError;
-    }
-    if (!getModeratorUserIdQuery->next()) {
-        return Response::RespInternalError;
-    }
-
-    const auto &moderator_id = getModeratorUserIdQuery->value(0).toString();
-
-    // Grant the Moderator access to the replay
-    auto *grantReplayAccessQuery =
-        sqlInterface->prepareQuery("insert into {prefix}_replays_access (id_game, id_player, replay_name, do_not_hide) "
-                                   "values(:idgame, :idplayer, :replayname, 0)");
-    grantReplayAccessQuery->bindValue(":idgame", cmd.replay_id());
-    grantReplayAccessQuery->bindValue(":idplayer", moderator_id);
-    grantReplayAccessQuery->bindValue(":replayname", "Moderator Access Replay Grant");
-
-    if (!sqlInterface->execSqlQuery(grantReplayAccessQuery)) {
-        return Response::RespInternalError;
-    }
-
-    return Response::RespOk;
+    return Response::RespInternalError;
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdForceActivateUser(const Command_ForceActivateUser &cmd,
