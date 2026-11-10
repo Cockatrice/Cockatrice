@@ -4,6 +4,7 @@
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../printing_selector/printing_selector.h"
 #include "deck_editor_deck_dock_widget.h"
+#include "deck_editor_printing_selector_host.h"
 #include "printing_disabled_info_widget.h"
 
 #include <QFlags>
@@ -13,7 +14,7 @@
 #include <qnamespace.h>
 
 DeckEditorPrintingSelectorDockWidget::DeckEditorPrintingSelectorDockWidget(AbstractTabDeckEditor *parent)
-    : QDockWidget(parent), deckEditor(parent)
+    : QDockWidget(parent), deckEditor(parent), printingSelectorHost(parent)
 {
     setObjectName("printingSelectorDock");
 
@@ -34,7 +35,7 @@ DeckEditorPrintingSelectorDockWidget::DeckEditorPrintingSelectorDockWidget(Abstr
 
 void DeckEditorPrintingSelectorDockWidget::createPrintingSelectorDock()
 {
-    printingSelector = new PrintingSelector(this, deckEditor);
+    printingSelector = new PrintingSelector(this, &printingSelectorHost);
     printingSelector->setObjectName("printingSelector");
     auto *printingSelectorFrame = new QVBoxLayout;
     printingSelectorFrame->setObjectName("printingSelectorFrame");
