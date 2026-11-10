@@ -1,10 +1,10 @@
 #include "servatrice_connection_pool.h"
 
-#include "servatrice_database_interface.h"
+#include "server_database_interface.h"
 
 #include <QThread>
 
-Servatrice_ConnectionPool::Servatrice_ConnectionPool(Servatrice_DatabaseInterface *_databaseInterface)
+Servatrice_ConnectionPool::Servatrice_ConnectionPool(Server_DatabaseInterface *_databaseInterface)
     : databaseInterface(_databaseInterface), threaded(false), clientCount(0)
 {
 }
