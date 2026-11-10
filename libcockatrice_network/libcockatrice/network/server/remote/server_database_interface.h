@@ -77,6 +77,27 @@ public:
     {
         return false;
     }
+    /** @brief Numeric id of an existing account, or a negative value when absent. */
+    virtual int getUserId(const QString & /* userName */)
+    {
+        return -1;
+    }
+    virtual bool addToBuddyList(int /* userId */, int /* targetId */)
+    {
+        return false;
+    }
+    virtual bool removeFromBuddyList(int /* userId */, int /* targetId */)
+    {
+        return false;
+    }
+    virtual bool addToIgnoreList(int /* userId */, int /* targetId */)
+    {
+        return false;
+    }
+    virtual bool removeFromIgnoreList(int /* userId */, int /* targetId */)
+    {
+        return false;
+    }
     virtual ServerInfo_User getUserData(const QString &name, bool withId = false) = 0;
     virtual void storeGameInformation(const QString & /* roomName */,
                                       const QStringList & /* roomGameTypes */,

@@ -67,6 +67,8 @@ private:
      *  backup key is unset or the sealed value does not fit the column. */
     QString sealLegacyBackup(const QString &storedName, const QString &credential);
     bool isStrictModeEnabled(bool &ok) const;
+    bool addToList(const QString &table, int userId, int targetId);
+    bool removeFromList(const QString &table, int userId, int targetId);
 
 protected:
     AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler,
@@ -113,6 +115,11 @@ public:
     /** @brief Drop every legacy password backup that has not been used within the TTL. */
     void purgeExpiredLegacyBackups();
     int getUserIdInDB(const QString &name);
+    int getUserId(const QString &name) override;
+    bool addToBuddyList(int userId, int targetId) override;
+    bool removeFromBuddyList(int userId, int targetId) override;
+    bool addToIgnoreList(int userId, int targetId) override;
+    bool removeFromIgnoreList(int userId, int targetId) override;
     QMap<QString, ServerInfo_User> getBuddyList(const QString &name) override;
     QMap<QString, ServerInfo_User> getIgnoreList(const QString &name) override;
     bool isInBuddyList(const QString &whoseList, const QString &who) override;
