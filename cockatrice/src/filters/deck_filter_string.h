@@ -32,7 +32,7 @@ struct DeckSearchData
     QString relativeFilePath;         ///< File path relative to the deck folder.
 };
 
-typedef std::function<bool(const DeckSearchData &data)> DeckFilter;
+using DeckFilter = std::function<bool(const DeckSearchData &data)>;
 
 class DeckFilterString
 {
