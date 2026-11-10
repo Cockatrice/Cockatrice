@@ -98,6 +98,37 @@ Server_DatabaseInterface *Server::getDatabaseInterface() const
     return databaseInterfaces.value(QThread::currentThread());
 }
 
+namespace
+{
+/// Logs out a session that still holds this name, or warns when only the
+/// sessions table thinks it does. Either way the name cannot simply be inserted.
+void disconnectExistingSession(const QString &name,
+                               const QMap<QString, Server_ProtocolHandler *> &users,
+                               Server_DatabaseInterface *databaseInterface)
+{
+    if (!users.contains(name)) {
+        if (databaseInterface->userSessionExists(name)) {
+            qDebug() << "Active session and sessions table inconsistent, please validate session table information "
+                        "for user "
+                     << name;
+        }
+        return;
+    }
+
+    qDebug("Session already logged in, logging old session out");
+    Event_ConnectionClosed event;
+    event.set_reason(Event_ConnectionClosed::LOGGEDINELSEWERE);
+    event.set_reason_str("You have been logged out due to logging in at another location.");
+    event.set_end_time(QDateTime::currentDateTime().toSecsSinceEpoch());
+
+    SessionEvent *se = users.value(name)->prepareSessionEvent(event);
+    users.value(name)->sendProtocolItem(*se);
+    delete se;
+
+    users.value(name)->prepareDestroy();
+}
+} // namespace
+
 AuthenticationResult Server::loginUser(Server_ProtocolHandler *session,
                                        QString &name,
                                        const QString &password,
@@ -108,14 +139,10 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session,
                                        QString &clientVersion,
                                        QString & /* connectionType */)
 {
-    bool hasClientId = false;
-    if (clientid.isEmpty()) {
+    const bool hasClientId = !clientid.isEmpty();
+    if (!hasClientId && getClientIDRequiredEnabled()) {
         // client id is empty, either out dated client or client has been modified
-        if (getClientIDRequiredEnabled()) {
-            return ClientIdRequired;
-        }
-    } else {
-        hasClientId = true;
+        return ClientIdRequired;
     }
 
     if (name.size() > 35) {
@@ -146,26 +173,7 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session,
     name = QString::fromStdString(data.name()); // Compensate for case indifference
 
     if (authState == PasswordRight) {
-        if (users.contains(name) || databaseInterface->userSessionExists(name)) {
-            if (users.contains(name)) {
-                qDebug("Session already logged in, logging old session out");
-                Event_ConnectionClosed event;
-                event.set_reason(Event_ConnectionClosed::LOGGEDINELSEWERE);
-                event.set_reason_str("You have been logged out due to logging in at another location.");
-                event.set_end_time(QDateTime::currentDateTime().toSecsSinceEpoch());
-
-                SessionEvent *se = users.value(name)->prepareSessionEvent(event);
-                users.value(name)->sendProtocolItem(*se);
-                delete se;
-
-                users.value(name)->prepareDestroy();
-            } else {
-                qDebug() << "Active session and sessions table inconsistent, please validate session table information "
-                            "for user "
-                         << name;
-            }
-        }
-
+        disconnectExistingSession(name, users, databaseInterface);
     } else if (authState == UnknownUser) {
         // Change user name so that no two users have the same names,
         // don't interfere with registered user names though.
