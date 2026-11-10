@@ -139,6 +139,15 @@ target_precompile_headers(servatrice PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtco
 
 target_link_libraries(servatrice PRIVATE servatrice_core)
 
+# The dev server runs the shipped startup on the in-memory database. It is never installed.
+add_executable(servatrice-dev dev/main.cpp)
+
+target_precompile_headers(servatrice-dev PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")
+
+target_include_directories(servatrice-dev PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+target_link_libraries(servatrice-dev PRIVATE servatrice_core libcockatrice_server_dev)
+
 # install rules
 if(UNIX)
   if(APPLE)

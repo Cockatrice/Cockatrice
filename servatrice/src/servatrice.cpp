@@ -261,7 +261,7 @@ void Servatrice_IslServer::incomingConnection(qintptr socketDescriptor)
 }
 
 Servatrice::Servatrice(QObject *parent)
-    : Server(parent), authenticationMethod(AuthenticationNone), uptime(0), txBytes(0), rxBytes(0),
+    : Server(parent), authenticationMethod(AuthenticationNone), gameServer(nullptr), uptime(0), txBytes(0), rxBytes(0),
       shutdownTimer(nullptr)
 {
 }
@@ -317,6 +317,11 @@ static std::optional<ServerInfo_RoomChannel::AccessLevel> roomChannelAccessFromK
 Server_DatabaseInterface *Servatrice::createMainDatabaseInterface()
 {
     return new Servatrice_DatabaseInterface(-1, this);
+}
+
+int Servatrice::getGameServerPort() const
+{
+    return gameServer != nullptr && gameServer->isListening() ? gameServer->serverPort() : -1;
 }
 
 bool Servatrice::initServer()

@@ -432,6 +432,17 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  servatrice_in_memory_database_test
+  SOURCES
+  servatrice_in_memory_database_test.cpp
+  LIBS
+  libcockatrice_server_dev
+  LABELS
+  server
+)
+
+cockatrice_add_test(
+  NAME
   private_chat_paging_test
   SOURCES
   ${CMAKE_SOURCE_DIR}/servatrice/src/private_chat_paging.cpp

@@ -5,7 +5,9 @@
 
 #include <QHash>
 #include <QList>
+#include <QMutex>
 #include <QString>
+#include <memory>
 
 /**
  * @brief In-memory Server_DatabaseInterface for tests and the dev server.
@@ -37,8 +39,10 @@ public:
     void setAuthenticationResult(AuthenticationResult result);
     /** @brief Sets the value getActiveUserCount() reports. */
     void setActiveUserCount(int count);
+    /** @brief Adds a room the SQL room bootstrap returns, in insertion order. */
+    void addRoom(const BootstrapRoomRecord &room);
 
-    const QList<LogEntry> &getLogEntries() const;
+    QList<LogEntry> getLogEntries() const;
 
     AuthenticationResult checkUserPassword(Server_ProtocolHandler * /* handler */,
                                            const QString & /* user */,
@@ -51,6 +55,8 @@ public:
     int getNextGameId() override;
     int getNextReplayId() override;
     int getActiveUserCount(QString connectionType = QString()) override;
+    QList<BootstrapRoomRecord> getBootstrapRooms(int serverId) override;
+    Server_DatabaseInterface *createWorkerInterface(int instanceId) override;
     void logMessage(const int /* senderId */,
                     const QString &senderName,
                     const QString & /* senderIp */,
@@ -61,12 +67,20 @@ public:
                     const QString &channel = QString()) override;
 
 private:
-    QHash<QString, ServerInfo_User> users;
-    AuthenticationResult authenticationResult = NotLoggedIn;
-    int activeUserCount = 0;
-    int nextGameId = 1;
-    int nextReplayId = 1;
-    QList<LogEntry> logEntries;
+    /** @brief The state every interface created by createWorkerInterface() shares. */
+    struct State
+    {
+        QHash<QString, ServerInfo_User> users;
+        AuthenticationResult authenticationResult = NotLoggedIn;
+        int activeUserCount = 0;
+        int nextGameId = 1;
+        int nextReplayId = 1;
+        QList<BootstrapRoomRecord> rooms;
+        QList<LogEntry> logEntries;
+        mutable QMutex mutex;
+    };
+
+    std::shared_ptr<State> state;
 };
 
 #endif // SERVATRICE_IN_MEMORY_DATABASE_INTERFACE_H
