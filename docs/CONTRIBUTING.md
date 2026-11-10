@@ -272,7 +272,8 @@ servatrice.sql.
 ### Protocol Buffer ###
 
 Cockatrice and Servatrice exchange data using binary messages. The syntax of
-these messages is defined in the `proto` files in the `common/pb` folder. These
+these messages is defined in the `proto` files in the
+`libcockatrice_protocol/libcockatrice/protocol/pb` folder. These
 files define the way data contained in each message is serialized using
 Google's [protocol buffers](https://developers.google.com/protocol-buffers/).
 Any change to the `proto` files should be taken with caution and tested
