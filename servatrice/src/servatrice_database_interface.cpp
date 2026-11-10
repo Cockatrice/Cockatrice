@@ -3310,6 +3310,33 @@ bool Servatrice_DatabaseInterface::getLatestServerMessage(int serverId, QString 
     return true;
 }
 
+QList<Server_DatabaseInterface::ServerListEntryRecord> Servatrice_DatabaseInterface::getServerListEntries()
+{
+    QList<ServerListEntryRecord> entries;
+    if (!checkSql()) {
+        return entries;
+    }
+
+    QSqlQuery *query = prepareQuery(
+        "select id, ssl_cert, hostname, address, game_port, control_port from {prefix}_servers order by id asc");
+    if (!execSqlQuery(query)) {
+        return entries;
+    }
+
+    while (query->next()) {
+        ServerListEntryRecord entry;
+        entry.id = query->value(0).toInt();
+        entry.sslCert = query->value(1).toString().toUtf8();
+        entry.hostname = query->value(2).toString();
+        entry.address = query->value(3).toString();
+        entry.gamePort = query->value(4).toInt();
+        entry.controlPort = query->value(5).toInt();
+        entries.append(entry);
+    }
+
+    return entries;
+}
+
 bool Servatrice_DatabaseInterface::removeUserAvatar(const QString &userName)
 {
     if (!checkSql()) {
