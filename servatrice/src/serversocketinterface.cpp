@@ -2903,43 +2903,26 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountEdit(const Comma
         }
     }
 
-    QStringList queryList({});
-    if (cmd.has_real_name()) {
-        queryList << "realname=:realName";
-    }
+    Server_DatabaseInterface::AccountUpdateRecord update;
+    update.hasRealName = cmd.has_real_name();
+    update.realName = realName;
+    update.hasCountry = cmd.has_country();
+    update.country = country;
     if (cmd.has_email()) {
         // a real password is required in order to change the email address
         if (usingRealPassword || checkedPassword) {
-            queryList << "email=:email";
+            update.hasEmail = true;
+            update.email = parsedEmailAddress;
         } else {
             return Response::RespFunctionNotAllowed;
         }
     }
-    if (cmd.has_country()) {
-        queryList << "country=:country";
-    }
 
-    if (queryList.isEmpty()) {
+    if (!update.hasRealName && !update.hasEmail && !update.hasCountry) {
         return Response::RespOk;
     }
 
-    QString queryText = QString("update {prefix}_users set %1 where name=:userName").arg(queryList.join(", "));
-    QSqlQuery *query = sqlInterface->prepareQuery(queryText);
-    if (cmd.has_real_name()) {
-        auto _realName = nameFromStdString(cmd.real_name());
-        query->bindValue(":realName", _realName);
-    }
-    if (cmd.has_email()) {
-        const auto _parsedEmailAddress = EmailParser::getParsedEmailAddress(nameFromStdString(cmd.email()));
-        query->bindValue(":email", _parsedEmailAddress);
-    }
-    if (cmd.has_country()) {
-        auto _country = nameFromStdString(cmd.country());
-        query->bindValue(":country", _country);
-    }
-    query->bindValue(":userName", userName);
-
-    if (!sqlInterface->execSqlQuery(query)) {
+    if (!databaseInterface->updateUserAccount(userName, update)) {
         return Response::RespInternalError;
     }
 
@@ -2967,10 +2950,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountImage(const Comm
     QByteArray image(cmd.image().c_str(), length);
     int id = userInfo->id();
 
-    QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_users set avatar_bmp=:image where id=:id");
-    query->bindValue(":image", image);
-    query->bindValue(":id", id);
-    if (!sqlInterface->execSqlQuery(query)) {
+    if (!databaseInterface->setUserAvatar(id, image)) {
         return Response::RespInternalError;
     }
 

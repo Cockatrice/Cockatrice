@@ -774,6 +774,24 @@ public:
     virtual void setForcePasswordChange(const QString & /* user */, bool /* force */)
     {
     }
+    /** @brief The account fields a self-service edit may change; unset fields are left alone. */
+    struct AccountUpdateRecord
+    {
+        bool hasRealName = false;
+        QString realName;
+        bool hasEmail = false;
+        QString email;
+        bool hasCountry = false;
+        QString country;
+    };
+    virtual bool updateUserAccount(const QString & /* userName */, const AccountUpdateRecord & /* update */)
+    {
+        return false;
+    }
+    virtual bool setUserAvatar(int /* userId */, const QByteArray & /* image */)
+    {
+        return false;
+    }
     /** @brief Outcome of reading or writing one account field. */
     enum class UserFieldResult
     {
