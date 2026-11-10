@@ -46,6 +46,16 @@ PrintingSelectorPlaceholderWidget::PrintingSelectorPlaceholderWidget(QWidget *pa
     retranslateUi();
 }
 
+void PrintingSelectorPlaceholderWidget::setText(const QString &text)
+{
+    textLabel->setText(text);
+}
+
+void PrintingSelectorPlaceholderWidget::resetText()
+{
+    retranslateUi();
+}
+
 void PrintingSelectorPlaceholderWidget::retranslateUi()
 {
     textLabel->setText(tr("Select a card to view its available printings"));
