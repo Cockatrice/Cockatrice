@@ -218,6 +218,36 @@ public:
     virtual void deleteDeckFolder(int /* folderId */)
     {
     }
+    /** @brief The mutable deck-file columns, as the upload command supplies them. */
+    struct DeckFileData
+    {
+        QString name;
+        QString content;
+        bool isPublic = false;
+        QString bannerCardName;
+        QString bannerCardProvider;
+        QString colorIdentity;
+        QString tagsJson;
+    };
+    struct DeckFileWriteResult
+    {
+        DeckStorageResult result = DeckStorageResult::Failed;
+        int deckId = 0;
+        bool isPublic = false;
+    };
+    virtual DeckFileWriteResult createDeckFile(int /* folderId */, int /* userId */, const DeckFileData & /* data */)
+    {
+        return DeckFileWriteResult{};
+    }
+    virtual DeckFileWriteResult
+    updateDeckFile(int /* deckId */, int /* userId */, const DeckFileData & /* data */, bool /* updateVisibility */)
+    {
+        return DeckFileWriteResult{};
+    }
+    virtual DeckStorageResult deleteDeckFile(int /* deckId */, int /* userId */)
+    {
+        return DeckStorageResult::Failed;
+    }
     virtual bool removeForgotPassword(const QString & /* user */)
     {
         return false;

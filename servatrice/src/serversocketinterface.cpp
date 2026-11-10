@@ -885,21 +885,16 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDel(const Command_D
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("select id from {prefix}_decklist_files where id = :id and id_user = :id_user");
-    query->bindValue(":id", cmd.deck_id());
-    query->bindValue(":id_user", userInfo->id());
-    sqlInterface->execSqlQuery(query);
-    if (!query->next()) {
-        return Response::RespNameNotFound;
+    databaseInterface->checkSql();
+    switch (databaseInterface->deleteDeckFile(cmd.deck_id(), userInfo->id())) {
+        case Server_DatabaseInterface::DeckStorageResult::Ok:
+            return Response::RespOk;
+        case Server_DatabaseInterface::DeckStorageResult::NotFound:
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::DeckStorageResult::Failed:
+            return Response::RespContextError;
     }
-
-    query = sqlInterface->prepareQuery("delete from {prefix}_decklist_files where id = :id");
-    query->bindValue(":id", cmd.deck_id());
-    sqlInterface->execSqlQuery(query);
-
-    return Response::RespOk;
+    return Response::RespContextError;
 }
 
 namespace
@@ -933,7 +928,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
         return Response::RespInvalidData;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
     QString deckStr = fileFromStdString(cmd.deck_list());
     DeckList deck;
@@ -954,86 +949,44 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
     const QString tagsJson = serializeDeckTags(deck.getTags());
     const QString colorIdentity = sanitizeColorIdentity(nameFromStdString(cmd.color_identity()));
 
+    const Server_DatabaseInterface::DeckFileData data{.name = deckName,
+                                                      .content = deckStr,
+                                                      .isPublic = cmd.has_is_public() && cmd.is_public(),
+                                                      .bannerCardName = bannerCardName,
+                                                      .bannerCardProvider = bannerCardProvider,
+                                                      .colorIdentity = colorIdentity,
+                                                      .tagsJson = tagsJson};
+
+    Server_DatabaseInterface::DeckFileWriteResult writeResult;
     if (cmd.has_path()) {
         int folderId = databaseInterface->getDeckPathId(nameFromStdString(cmd.path()), userInfo->id());
         if (folderId == -1) {
             return Response::RespNameNotFound;
         }
 
-        QSqlQuery *query =
-            sqlInterface->prepareQuery("insert into {prefix}_decklist_files (id_folder, id_user, name, upload_time, "
-                                       "content, is_public, banner_card_name, banner_card_provider, color_identity, "
-                                       "tags) values(:id_folder, :id_user, :name, NOW(), :content, :is_public, "
-                                       ":banner_card_name, :banner_card_provider, :color_identity, :tags)");
-        query->bindValue(":id_folder", folderId);
-        query->bindValue(":id_user", userInfo->id());
-        query->bindValue(":name", deckName);
-        query->bindValue(":content", deckStr);
-        query->bindValue(":is_public", cmd.has_is_public() && cmd.is_public() ? 1 : 0);
-        query->bindValue(":banner_card_name", bannerCardName);
-        query->bindValue(":banner_card_provider", bannerCardProvider);
-        query->bindValue(":color_identity", colorIdentity);
-        query->bindValue(":tags", tagsJson);
-        if (!sqlInterface->execSqlQuery(query)) {
+        writeResult = databaseInterface->createDeckFile(folderId, userInfo->id(), data);
+        if (writeResult.result != Server_DatabaseInterface::DeckStorageResult::Ok) {
             return Response::RespContextError;
         }
-
-        Response_DeckUpload *re = new Response_DeckUpload;
-        ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
-        fileInfo->set_id(query->lastInsertId().toInt());
-        fileInfo->set_name(deckName.toStdString());
-        fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toSecsSinceEpoch());
-        fileInfo->mutable_file()->set_is_public(cmd.has_is_public() && cmd.is_public());
-        rc.setResponseExtension(re);
     } else if (cmd.has_deck_id()) {
-        QString updateQuery = "update {prefix}_decklist_files set name=:name, upload_time=NOW(), content=:content, "
-                              "banner_card_name=:banner_card_name, banner_card_provider=:banner_card_provider, "
-                              "color_identity=:color_identity, tags=:tags";
-        if (cmd.has_is_public()) {
-            updateQuery += ", is_public=:is_public";
-        }
-        updateQuery += " where id = :id_deck and id_user = :id_user";
-
-        QSqlQuery *query = sqlInterface->prepareQuery(updateQuery);
-        query->bindValue(":id_deck", cmd.deck_id());
-        query->bindValue(":id_user", userInfo->id());
-        query->bindValue(":name", deckName);
-        query->bindValue(":content", deckStr);
-        query->bindValue(":banner_card_name", bannerCardName);
-        query->bindValue(":banner_card_provider", bannerCardProvider);
-        query->bindValue(":color_identity", colorIdentity);
-        query->bindValue(":tags", tagsJson);
-        if (cmd.has_is_public()) {
-            query->bindValue(":is_public", cmd.is_public() ? 1 : 0);
-        }
-        if (!sqlInterface->execSqlQuery(query)) {
-            return Response::RespContextError;
-        }
-
-        if (query->numRowsAffected() == 0) {
+        writeResult = databaseInterface->updateDeckFile(cmd.deck_id(), userInfo->id(), data, cmd.has_is_public());
+        if (writeResult.result == Server_DatabaseInterface::DeckStorageResult::NotFound) {
             return Response::RespNameNotFound;
         }
-
-        QSqlQuery *visibilityQuery =
-            sqlInterface->prepareQuery("select is_public from {prefix}_decklist_files where id = :id and "
-                                       "id_user = :id_user");
-        visibilityQuery->bindValue(":id", cmd.deck_id());
-        visibilityQuery->bindValue(":id_user", userInfo->id());
-        if (!sqlInterface->execSqlQuery(visibilityQuery)) {
+        if (writeResult.result != Server_DatabaseInterface::DeckStorageResult::Ok) {
             return Response::RespContextError;
         }
-        const bool isPublic = visibilityQuery->next() && visibilityQuery->value(0).toBool();
-
-        Response_DeckUpload *re = new Response_DeckUpload;
-        ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
-        fileInfo->set_id(cmd.deck_id());
-        fileInfo->set_name(deckName.toStdString());
-        fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toSecsSinceEpoch());
-        fileInfo->mutable_file()->set_is_public(isPublic);
-        rc.setResponseExtension(re);
     } else {
         return Response::RespInvalidData;
     }
+
+    Response_DeckUpload *re = new Response_DeckUpload;
+    ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
+    fileInfo->set_id(writeResult.deckId);
+    fileInfo->set_name(deckName.toStdString());
+    fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toSecsSinceEpoch());
+    fileInfo->mutable_file()->set_is_public(writeResult.isPublic);
+    rc.setResponseExtension(re);
 
     return Response::RespOk;
 }
