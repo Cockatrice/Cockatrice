@@ -5,8 +5,8 @@
 
 #include "libcockatrice/protocol/pb/response.pb.h"
 #include "libcockatrice/protocol/pb/server_message.pb.h"
+#include "libcockatrice/server/dev/servatrice_in_memory_database_interface.h"
 #include "server.h"
-#include "server_database_interface.h"
 #include "server_protocolhandler.h"
 
 #include <QString>
@@ -22,49 +22,21 @@ RNG_Abstract *rng = nullptr; // referenced by the server_remote library
 namespace
 {
 
-class MockDatabaseInterface : public Server_DatabaseInterface
-{
-public:
-    AuthenticationResult checkUserPassword(Server_ProtocolHandler *,
-                                           const QString &,
-                                           const QString &,
-                                           const QString &,
-                                           QString &,
-                                           int &,
-                                           bool) override
-    {
-        return PasswordChangeRequired;
-    }
-    ServerInfo_User getUserData(const QString &name, bool withId) override
-    {
-        ServerInfo_User user;
-        user.set_name(name.toStdString());
-        user.set_user_level(ServerInfo_User::IsUser | ServerInfo_User::IsRegistered | ServerInfo_User::IsModerator);
-        if (withId) {
-            user.set_id(1);
-        }
-        return user;
-    }
-    int getNextReplayId() override
-    {
-        return 1;
-    }
-    int getNextGameId() override
-    {
-        return 1;
-    }
-    int getActiveUserCount(QString) override
-    {
-        return 0;
-    }
-};
-
 class FakeServer : public Server
 {
 public:
     FakeServer()
     {
-        setDatabaseInterface(new MockDatabaseInterface());
+        auto *db = new Servatrice_InMemoryDatabaseInterface();
+        db->setAuthenticationResult(PasswordChangeRequired);
+
+        ServerInfo_User user;
+        user.set_name("mod");
+        user.set_user_level(ServerInfo_User::IsUser | ServerInfo_User::IsRegistered | ServerInfo_User::IsModerator);
+        user.set_id(1);
+        db->addUser(user);
+
+        setDatabaseInterface(db);
     }
 };
 

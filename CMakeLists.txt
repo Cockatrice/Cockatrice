@@ -496,6 +496,7 @@ if(WITH_CLIENT
    OR WITH_ORACLE
 )
   add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_network ${CMAKE_BINARY_DIR}/libcockatrice_network)
+  add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_server_dev ${CMAKE_BINARY_DIR}/libcockatrice_server_dev)
 endif()
 add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_deck_list ${CMAKE_BINARY_DIR}/libcockatrice_deck_list)
 add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_rng ${CMAKE_BINARY_DIR}/libcockatrice_rng)
