@@ -2289,6 +2289,22 @@ bool Servatrice_DatabaseInterface::setUserAvatar(int userId, const QByteArray &i
     return execSqlQuery(query);
 }
 
+bool Servatrice_DatabaseInterface::getUserAdminFlags(const QString &userName, int &adminFlags)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT admin FROM {prefix}_users WHERE name = :name");
+    query->bindValue(":name", userName);
+    if (!execSqlQuery(query) || !query->next()) {
+        return false;
+    }
+
+    adminFlags = query->value(0).toInt();
+    return true;
+}
+
 bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user,
                                                       const QString &oldPassword,
                                                       bool oldPasswordNeedsHash,
