@@ -33,9 +33,9 @@ version does not read the new per-group files, so it will start with default set
 
 Before downgrading, copy your settings folder somewhere safe, for example:
 
--   Linux: `~/.local/share/Cockatrice/settings/`
--   macOS: `~/Library/Application Support/Cockatrice/settings/`
--   Windows: `%LOCALAPPDATA%\Cockatrice\settings\`
+-   Linux: `~/.local/share/Cockatrice/Cockatrice/settings/`
+-   macOS: `~/Library/Application Support/Cockatrice/Cockatrice/settings/`
+-   Windows: `%LOCALAPPDATA%\Cockatrice\Cockatrice\settings\`
 
 Portable installs keep the settings folder in the `data` folder next to the executable.
 
