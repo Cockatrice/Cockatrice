@@ -468,16 +468,28 @@ void RemoteClient::passwordSaltResponse(const Response &response)
     }
 }
 
+namespace
+{
+// The features the server reports it could not use for this login, in the order it sent them.
+QList<QString> missingFeatureList(const Response_Login &resp)
+{
+    QList<QString> missingFeatures;
+    for (int i = 0; i < resp.missing_features_size(); ++i) {
+        missingFeatures << QString::fromStdString(resp.missing_features(i));
+    }
+    return missingFeatures;
+}
+} // namespace
+
 void RemoteClient::loginResponse(const Response &response)
 {
     const Response_Login &resp = response.GetExtension(Response_Login::ext);
 
-    QString possibleMissingFeatures;
-    if (resp.missing_features_size() > 0) {
-        for (int i = 0; i < resp.missing_features_size(); ++i) {
-            possibleMissingFeatures.append("," + QString::fromStdString(resp.missing_features(i)));
-        }
-    }
+    const QList<QString> missingFeatures = missingFeatureList(resp);
+    // The settings store remembers the known features as a comma-prefixed list, so keep
+    // that shape when comparing this server's set against it.
+    const QString possibleMissingFeatures =
+        missingFeatures.isEmpty() ? QString() : QString(",") + missingFeatures.join(",");
 
     if (response.response_code() == Response::RespOk) {
         setStatus(StatusLoggedIn);
@@ -503,7 +515,7 @@ void RemoteClient::loginResponse(const Response &response)
         }
         emit ignoreListReceived(ignoreList);
 
-        if (newMissingFeatureFound(possibleMissingFeatures) && resp.missing_features_size() > 0 &&
+        if (newMissingFeatureFound(possibleMissingFeatures) && !missingFeatures.isEmpty() &&
             networkSettingsProvider->getNotifyAboutUpdates()) {
             networkSettingsProvider->setKnownMissingFeatures(possibleMissingFeatures);
             emit notifyUserAboutUpdate();
@@ -517,35 +529,24 @@ void RemoteClient::loginResponse(const Response &response)
         // the command would sit in pendingCommands forever, because the ping timer that
         // times it out stops with the connection. Keep the session and let the controller
         // report the outcome through accountPasswordResponse().
-        QList<QString> missingFeatures;
-        if (resp.missing_features_size() > 0) {
-            for (int i = 0; i < resp.missing_features_size(); ++i) {
-                missingFeatures << QString::fromStdString(resp.missing_features(i));
-            }
-        }
         setStatus(StatusPasswordChangeRequired);
         emit loginError(response.response_code(), QString::fromStdString(resp.denied_reason_str()),
                         static_cast<quint32>(resp.denied_end_time()), missingFeatures);
     } else if (response.response_code() != Response::RespNotConnected) {
-        QList<QString> missingFeatures;
-        if (resp.missing_features_size() > 0) {
-            for (int i = 0; i < resp.missing_features_size(); ++i) {
-                missingFeatures << QString::fromStdString(resp.missing_features(i));
-            }
-        }
+        QList<QString> reportedFeatures = missingFeatures;
 
         QString reasonStr = QString::fromStdString(resp.denied_reason_str());
         // A strict server reports a login that carried no credential as a missing feature,
         // because challenge-response needs one. No client update can supply a password, so
         // report it like the other local aborts instead of advising an update.
-        if (response.response_code() == Response::RespClientUpdateRequired && missingFeatures.size() == 1 &&
-            missingFeatures.first() == "challenge_response_auth" && password.isEmpty() && storedVerifier.isEmpty()) {
-            missingFeatures.clear();
+        if (response.response_code() == Response::RespClientUpdateRequired && reportedFeatures.size() == 1 &&
+            reportedFeatures.first() == "challenge_response_auth" && password.isEmpty() && storedVerifier.isEmpty()) {
+            reportedFeatures.clear();
             reasonStr = tr(LOGIN_ABORT_PASSWORD_MISSING);
         }
 
         emit loginError(response.response_code(), reasonStr, static_cast<quint32>(resp.denied_end_time()),
-                        missingFeatures);
+                        reportedFeatures);
         setStatus(StatusDisconnecting);
     }
 }
