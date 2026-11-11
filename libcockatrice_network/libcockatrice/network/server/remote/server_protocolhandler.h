@@ -129,7 +129,7 @@ public slots:
 
 public:
     Server_ProtocolHandler(Server *_server, Server_DatabaseInterface *_databaseInterface, QObject *parent = nullptr);
-    ~Server_ProtocolHandler();
+    ~Server_ProtocolHandler() override;
 
     bool getAcceptsUserListChanges() const
     {
@@ -153,17 +153,17 @@ public:
     /** @brief Invalidate the pending nonce (single-use). */
     void clearAuthNonce();
 
-    int getLastCommandTime() const
+    int getLastCommandTime() const override
     {
         return timeRunning - lastDataReceived;
     }
-    bool addSaidMessageSize(int size);
+    bool addSaidMessageSize(int size) override;
     virtual void processCommandContainer(const CommandContainer &cont);
 
-    void sendProtocolItem(const Response &item);
-    void sendProtocolItem(const SessionEvent &item);
-    void sendProtocolItem(const GameEventContainer &item);
-    void sendProtocolItem(const RoomEvent &item);
+    void sendProtocolItem(const Response &item) override;
+    void sendProtocolItem(const SessionEvent &item) override;
+    void sendProtocolItem(const GameEventContainer &item) override;
+    void sendProtocolItem(const RoomEvent &item) override;
 };
 
 #endif

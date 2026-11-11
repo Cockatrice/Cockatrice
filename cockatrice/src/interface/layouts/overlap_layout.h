@@ -27,7 +27,7 @@ public:
                   int maxRows = 2,
                   Qt::Orientation overlapDirection = Qt::Vertical,
                   Qt::Orientation flowDirection = Qt::Horizontal);
-    ~OverlapLayout();
+    ~OverlapLayout() override;
     void insertWidgetAtIndex(QWidget *toInsert, int index);
 
     void addItem(QLayoutItem *item) override;

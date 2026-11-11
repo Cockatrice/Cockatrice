@@ -145,7 +145,7 @@ public:
                                              const QString &attrValue,
                                              Server_Card *unzonedCard = nullptr);
 
-    virtual Response::ResponseCode
+    Response::ResponseCode
     cmdConcede(const Command_Concede &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
     virtual Response::ResponseCode
     cmdUnconcede(const Command_Unconcede &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
@@ -177,14 +177,14 @@ public:
     cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
     Response::ResponseCode
     cmdRevealRandomCards(const Command_RevealRandomCards &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
-    virtual Response::ResponseCode cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd,
-                                                           ResponseContainer &rc,
-                                                           GameEventStorage &ges) override;
+    Response::ResponseCode cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd,
+                                                   ResponseContainer &rc,
+                                                   GameEventStorage &ges) override;
 
-    virtual void getInfo(ServerInfo_Player *info,
-                         Server_AbstractParticipant *playerWhosAsking,
-                         bool omniscient,
-                         bool withUserInfo) override;
+    void getInfo(ServerInfo_Player *info,
+                 Server_AbstractParticipant *playerWhosAsking,
+                 bool omniscient,
+                 bool withUserInfo) override;
 };
 
 #endif

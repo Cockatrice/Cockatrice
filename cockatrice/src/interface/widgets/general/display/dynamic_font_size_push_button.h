@@ -25,11 +25,11 @@ public:
     void setTextAndColor(const QString &text, QColor color = QColor::Invalid);
 
     // QWidget interface
-    QSize minimumSizeHint() const;
-    QSize sizeHint() const;
+    QSize minimumSizeHint() const override;
+    QSize sizeHint() const override;
 
 protected:
-    void paintEvent(QPaintEvent *event);
+    void paintEvent(QPaintEvent *event) override;
 
 private:
     QColor textColor;

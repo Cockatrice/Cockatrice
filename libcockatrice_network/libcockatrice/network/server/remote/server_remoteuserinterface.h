@@ -14,19 +14,19 @@ public:
     {
     }
 
-    int getLastCommandTime() const
+    int getLastCommandTime() const override
     {
         return 0;
     }
-    bool addSaidMessageSize(int /*size*/)
+    bool addSaidMessageSize(int /*size*/) override
     {
         return true;
     }
 
-    void sendProtocolItem(const Response &item);
-    void sendProtocolItem(const SessionEvent &item);
-    void sendProtocolItem(const GameEventContainer &item);
-    void sendProtocolItem(const RoomEvent &item);
+    void sendProtocolItem(const Response &item) override;
+    void sendProtocolItem(const SessionEvent &item) override;
+    void sendProtocolItem(const GameEventContainer &item) override;
+    void sendProtocolItem(const RoomEvent &item) override;
 };
 
 #endif
