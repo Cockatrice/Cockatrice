@@ -61,6 +61,23 @@ QString uniqueTargetPath(const QString &sessionDir, const QString &fileName)
     }
 }
 
+/// Copies one source into @p sessionDir. The created target is appended to
+/// @p locations even for a partial copy, so callers can point the user at what
+/// was salvaged. @returns whether the source was copied completely.
+bool backupPath(const QString &sourcePath, const QString &sessionDir, QStringList &locations)
+{
+    const QFileInfo source(sourcePath);
+    const QString backupLocation = uniqueTargetPath(sessionDir, source.fileName());
+    const bool copied =
+        source.isDir() ? copyDirectoryRecursively(sourcePath, backupLocation) : QFile::copy(sourcePath, backupLocation);
+    if (!QFileInfo::exists(backupLocation)) {
+        // Total failure with no target created (e.g. QFile::copy failed).
+        return false;
+    }
+    locations.append(backupLocation);
+    return copied;
+}
+
 } // namespace
 
 bool copyDirectoryRecursively(const QString &sourceDir, const QString &destDir)
@@ -137,6 +154,15 @@ bool backupAtRiskPaths(const QStringList &sourcePaths,
                        QStringList *backupLocationsOut,
                        QString *sessionDirOut)
 {
+    // The outputs describe this call only: keep them empty until something is
+    // actually backed up so callers never have to clear a stale value.
+    if (backupLocationsOut) {
+        backupLocationsOut->clear();
+    }
+    if (sessionDirOut) {
+        sessionDirOut->clear();
+    }
+
     QStringList existing;
     for (const QString &sourcePath : sourcePaths) {
         if (QFileInfo::exists(sourcePath)) {
@@ -144,23 +170,11 @@ bool backupAtRiskPaths(const QStringList &sourcePaths,
         }
     }
     if (existing.isEmpty()) {
-        if (backupLocationsOut) {
-            backupLocationsOut->clear();
-        }
-        if (sessionDirOut) {
-            sessionDirOut->clear();
-        }
         return false;
     }
 
     QString sessionDir;
     if (!createBackupSessionDir(backupRoot, &sessionDir)) {
-        if (backupLocationsOut) {
-            backupLocationsOut->clear();
-        }
-        if (sessionDirOut) {
-            sessionDirOut->clear();
-        }
         return false;
     }
     if (sessionDirOut) {
@@ -170,32 +184,14 @@ bool backupAtRiskPaths(const QStringList &sourcePaths,
     bool allOk = true;
     QStringList locations;
     for (const QString &sourcePath : existing) {
-        const QFileInfo source(sourcePath);
-        const QString backupLocation = uniqueTargetPath(sessionDir, source.fileName());
-        bool ok;
-        if (source.isDir()) {
-            ok = copyDirectoryRecursively(sourcePath, backupLocation);
-        } else {
-            ok = QFile::copy(sourcePath, backupLocation);
-        }
-        // Report the location whenever a target was created, even for partial
-        // copies, so callers can point the user at what was salvaged.
-        if (QFileInfo::exists(backupLocation)) {
-            locations.append(backupLocation);
-        } else {
-            // Total failure with no target created (e.g. QFile::copy failed).
-            ok = false;
-        }
-        allOk = allOk && ok;
+        const bool complete = backupPath(sourcePath, sessionDir, locations);
+        allOk = allOk && complete;
     }
     if (locations.isEmpty()) {
         // Nothing salvaged: remove the session again so the empty directory
         // neither blocks a retry via the recent-session reuse nor evicts a
         // good session in pruneOldBackupSessions().
         QDir(sessionDir).removeRecursively();
-        if (backupLocationsOut) {
-            backupLocationsOut->clear();
-        }
         if (sessionDirOut) {
             sessionDirOut->clear();
         }
