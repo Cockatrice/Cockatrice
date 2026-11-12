@@ -21,7 +21,7 @@ QString buildArtAttribution(const ExactCard &card)
     if (artist.isEmpty()) {
         return QString();
     }
-    return QObject::tr("Art: %1").arg(artist);
+    return QString("✎ %1").arg(artist);
 }
 
 QRectF paintArtAttribution(QPainter &painter,
