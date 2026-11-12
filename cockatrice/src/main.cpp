@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
     }
 
     qSetMessagePattern(
-        "\033[0m[%{time yyyy-MM-dd h:mm:ss.zzz} "
+        "\033[0m[%{time yyyy-MM-dd h:mm:ss} "
         "%{if-debug}\033[36mD%{endif}%{if-info}\033[32mI%{endif}%{if-warning}\033[33mW%{endif}%{if-critical}\033[31mC%{"
         "endif}%{if-fatal}\033[1;31mF%{endif}\033[0m] [%{function}] - %{message} [%{file}:%{line}]");
     QApplication app(argc, argv);
