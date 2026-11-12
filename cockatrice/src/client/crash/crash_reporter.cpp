@@ -234,7 +234,7 @@ void CrashReporter::init(const QString &dsn,
             // A deliberate choice rather than a misconfiguration, so it is not a warning. The
             // no-DSN case is reported by the caller, which is the only place that knows whether
             // the environment or the build supplied the DSN.
-            qCInfo(CrashReportLog) << "crash reporting disabled by preference (Never send)";
+            qCInfo(CrashReportLog) << "Crash reporting disabled by preference (Never send)";
         }
         return;
     }
@@ -248,7 +248,7 @@ void CrashReporter::init(const QString &dsn,
     for (const QString &envelopePath : pendingEnvelopes) {
         const QString mismatch = describeOriginMismatch(envelopePath, dsn);
         if (!mismatch.isEmpty()) {
-            qCWarning(CrashReportLog) << "pending crash envelope" << envelopePath << mismatch;
+            qCWarning(CrashReportLog) << "Pending crash envelope" << envelopePath << mismatch;
         }
     }
     qCInfo(CrashReportLog) << "crash reporting armed for" << describeDsn(dsn);
@@ -282,7 +282,7 @@ void CrashReporter::init(const QString &dsn,
     Q_UNUSED(release);
     // Not a misconfiguration like an empty DSN: this build cannot report whatever the DSN says, so
     // a tester forcing a crash needs to know the difference.
-    qCInfo(CrashReportLog) << "crash reporting unavailable: built without Sentry support";
+    qCInfo(CrashReportLog) << "Crash reporting unavailable: built without Sentry support";
     ready = false;
 #endif
 }
