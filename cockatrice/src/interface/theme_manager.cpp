@@ -338,7 +338,7 @@ QString ThemeManager::writableThemeDir(const QString &themeName)
 static QString systemThemesBasePath()
 {
     QString base = qApp->applicationDirPath();
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     base += "/../Resources/themes";
 #elif defined(Q_OS_WIN)
     base += "/themes";

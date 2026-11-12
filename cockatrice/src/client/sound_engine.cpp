@@ -113,7 +113,7 @@ QStringMap &SoundEngine::getAvailableThemes()
 
     // Load themes from Cockatrice system dir
     dir.setPath(qApp->applicationDirPath() +
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
                 "/../Resources/sounds"
 #elif defined(Q_OS_WIN)
                 "/sounds"

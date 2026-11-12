@@ -224,7 +224,7 @@ int main(int argc, char *argv[])
         "endif}%{if-fatal}\033[1;31mF%{endif}\033[0m] [%{function}] - %{message} [%{file}:%{line}]");
     QApplication app(argc, argv);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     UrlSchemeEventFilter cockatriceFilter(QStringList{QStringLiteral("cockatrice")});
 
     QStringList pendingMacUrls;
@@ -251,7 +251,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("Cockatrice");
     QCoreApplication::setApplicationVersion(VERSION_STRING);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     qApp->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 #endif
 
@@ -332,7 +332,7 @@ int main(int argc, char *argv[])
     }
 
     // Translations
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     translationPath = qApp->applicationDirPath() + "/../Resources/translations";
 #elif defined(Q_OS_WIN)
     translationPath = qApp->applicationDirPath() + "/translations";
@@ -478,7 +478,7 @@ int main(int argc, char *argv[])
     bool hasUrlActivation = std::any_of(startupFiles.begin(), startupFiles.end(), [](const QString &file) {
         return file.startsWith(QStringLiteral("cockatrice://"));
     });
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     // On macOS the launch can arrive through the URL scheme instead of as a
     // positional argument (captured in pendingMacUrls); count those too or the
     // window would auto-connect into the link's own connection attempt.
@@ -504,7 +504,7 @@ int main(int argc, char *argv[])
         }
     };
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     QObject::disconnect(cocoaBufferConn);
 
     QObject::connect(&cockatriceFilter, &UrlSchemeEventFilter::urlReceived,
@@ -545,7 +545,7 @@ int main(int argc, char *argv[])
     qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus,
                        !SettingsCache::instance().userInterface().getShowShortcuts());
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     for (const QString &url : pendingMacUrls) {
         handleActivation(url);
     }
