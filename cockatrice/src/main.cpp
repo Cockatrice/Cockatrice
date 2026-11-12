@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
     // liability; unclean exits are detected via CrashReporter::beginSession below.)
 
     // Logging setup
-#ifdef Q_OS_APPLE
+#ifdef Q_OS_MACOS
     // <build>/cockatrice/cockatrice.app/Contents/MacOS/cockatrice
     const QByteArray configPath = "../../../qtlogging.ini";
 #elif defined(Q_OS_UNIX)

@@ -58,7 +58,7 @@ For configuring our logging, we use the qtlogging.ini, located under cockatrice/
 baked into the application in release version and set as the QT_LOGGING_CONF environment variable in main.cpp.
 
 ```c++
-#ifdef Q_OS_APPLE
+#ifdef Q_OS_MACOS
     // <build>/cockatrice/cockatrice.app/Contents/MacOS/cockatrice
     const QByteArray configPath = "../../../qtlogging.ini";
 #elif defined(Q_OS_UNIX)
