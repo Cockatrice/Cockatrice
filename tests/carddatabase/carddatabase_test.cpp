@@ -663,6 +663,24 @@ TEST_F(CardDatabaseCacheInvalidationTest, MarkAllSetsAsKnownIsBatched)
     EXPECT_TRUE(controller.isEnabled("XXX"));
 }
 
+TEST_F(CardDatabaseCacheInvalidationTest, MarkAllSetsAsKnownDoesNotOverwriteSettings)
+{
+    SeededSetPriorityController controller;
+    CardSetList sets;
+    sets.append(CardSet::newInstance(&controller, "XXX")); // no metadata: ignored
+
+    // Ignored sets keep their known state but are enabled.
+    sets.markAllAsKnownBatched(&controller);
+    EXPECT_TRUE(controller.isEnabled("XXX")) << "unnamed set starts enabled";
+
+    // disable the set
+    controller.setEnabled("XXX", false);
+
+    // set should still be disabled after batching
+    sets.markAllAsKnownBatched(&controller);
+    EXPECT_FALSE(controller.isEnabled("XXX")) << "unnamed set should still be disabled after marking";
+}
+
 TEST_F(CardDatabaseCacheInvalidationTest, ReloadReleasesPreviousSnapshot)
 {
     NoopCardPreferenceProvider prefs;
