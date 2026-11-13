@@ -17,7 +17,7 @@ class QString;
  * database has no artist data for the card.
  *
  * @param card The card whose art is being displayed.
- * @return Caption such as "Art: John Avon", or empty.
+ * @return Caption such as "✎ John Avon", or empty.
  */
 QString buildArtAttribution(const ExactCard &card);
 
