@@ -12,9 +12,9 @@ git submodule update --init external/qttesting      # once
 cmake -S . -B build/debug -DCMAKE_BUILD_TYPE=Debug -DWITH_SERVER=0 -DWITH_GUI_TEST=ON
 cmake --build build/debug -j 24
 
-./Testing/run_test.sh --all                        # headless, offscreen
-./Testing/run_test.sh Testing/smoke_test.xml       # one file
-./Testing/run_test.sh --visual Testing/smoke_test.xml   # shows the window
+./tests_gui/run_test.sh --all                                # headless, offscreen
+./tests_gui/run_test.sh tests_gui/smoke_test.xml             # one file
+./tests_gui/run_test.sh --visual tests_gui/smoke_test.xml    # shows the window
 ```
 
 `WITH_GUI_TEST` is on by default. Without the submodule the build configures with a
@@ -138,7 +138,7 @@ which resolves some hidden-page paths but not all of them.
 Record the tree in the same playback that clicks, and copy paths from that dump:
 
 ```bash
-./Testing/run_test.sh Testing/screenshot_test.xml
+./tests_gui/run_test.sh tests_gui/screenshot_test.xml
 less build/screenshots/widget-tree.txt
 ```
 
