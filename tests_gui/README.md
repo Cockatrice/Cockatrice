@@ -17,11 +17,11 @@ cmake --build build/debug -j 24
 ./tests_gui/run_test.sh --visual tests_gui/smoke_test.xml    # shows the window
 ```
 
-`WITH_GUI_TEST` is on by default. Without the submodule the build configures with a
-warning and no harness. `COCKATRICE_BIN` points the runner at another build, and
-`TEST_TIMEOUT` (seconds, default 180) bounds a single test, because a failing event
-inside a modal dialog can leave the process alive. The client also hard-exits a few
-seconds after playback returns, whatever the result.
+`WITH_GUI_TEST` is off by default, passing `-DWITH_GUI_TEST=ON` to cmake will include them.
+Without the submodule, the build configures with a warning and no harness. 
+`COCKATRICE_BIN` points the runner at another build, and `TEST_TIMEOUT` (seconds, default 180)
+bounds a single test, because a failing event inside a modal dialog can leave the process alive.
+The client also hard-exits a few seconds after playback returns, whatever the result.
 
 The tests are **not** part of `ctest`. They need a card database and a developer's
 settings, so they stay a local loop for now.
