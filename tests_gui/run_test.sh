@@ -2,12 +2,12 @@
 # Run QtTesting XML test files against the Cockatrice build.
 #
 # Usage:
-#   ./Testing/run_test.sh [--visual] [--all | <test-file.xml> ...]
+#   ./tests_gui/run_test.sh [--visual] [--all | <test-file.xml> ...]
 #
 # Options:
 #   --visual    Run with native display (shows the GUI window).
 #               Default is headless (QT_QPA_PLATFORM=offscreen).
-#   --all       Run every *.xml file in Testing/.
+#   --all       Run every *.xml file in tests_gui/.
 #
 # Environment:
 #   COCKATRICE_BIN   Path to the client binary (default: build/debug/cockatrice/cockatrice,
@@ -33,7 +33,7 @@ elif [ "$(uname -s)" = "Darwin" ]; then
 else
     COCKATRICE="$REPO_ROOT/build/debug/cockatrice/cockatrice"
 fi
-TEST_DIR="$REPO_ROOT/Testing"
+TEST_DIR="$REPO_ROOT/tests_gui"
 TEST_TIMEOUT="${TEST_TIMEOUT:-180}"
 
 # Tests that capture the UI address this as $COCKATRICE_SCREENSHOT_DIR/name.png.
@@ -76,9 +76,9 @@ elif [ $# -ge 1 ]; then
     TEST_FILES=("$@")
 else
     echo "Usage: $0 [--visual] [--all | <test-file.xml> ...]" >&2
-    echo "  Run a single test:  $0 Testing/smoke_test.xml" >&2
+    echo "  Run a single test:  $0 tests_gui/smoke_test.xml" >&2
     echo "  Run all tests:      $0 --all" >&2
-    echo "  Run visually:       $0 --visual Testing/smoke_test.xml" >&2
+    echo "  Run visually:       $0 --visual tests_gui/smoke_test.xml" >&2
     echo "  Run all visually:   $0 --visual --all" >&2
     exit 1
 fi
