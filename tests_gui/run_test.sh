@@ -18,8 +18,6 @@
 #                    $COCKATRICE_SCREENSHOT_DIR/name.png.
 #   TEST_TIMEOUT     Seconds a single test may run before it is killed (default: 180).
 #                    Uses timeout, or gtimeout from coreutils on macOS.
-#
-# Requires the debug build to exist at build/debug/cockatrice/cockatrice.
 
 set -euo pipefail
 shopt -s nullglob
