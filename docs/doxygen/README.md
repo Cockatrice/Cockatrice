@@ -12,15 +12,15 @@ Doxygen's own documenation can be found at [www.doxygen.nl/manual](https://www.d
 
 <br>
 
-## Doxygen Documentation Theme
+## Documentation Theme
 
-Required changes to the `Doxyfile` config from the [theme docs](https://jothepro.github.io/doxygen-awesome-css/index.html#autotoc_md16) to make [doxygen-awesome-css](https://github.com/jothepro/doxygen-awesome-css) work:
+The used [doxygen-awesome-css](https://github.com/jothepro/doxygen-awesome-css) theme requires specific settings in the `Doxyfile` config.  From the [theme docs](https://jothepro.github.io/doxygen-awesome-css/index.html#autotoc_md16):
 ```
-HTML_EXTRA_STYLESHEET  = doxygen-awesome.css      # Main CSS file of the theme
-GENERATE_TREEVIEW      = YES                      # Optional, also works without
-HTML_COLORSTYLE        = LIGHT                    # Required with doxygen-awesome-css theme, Auto Dark Mode will still work
-DISABLE_INDEX          = NO                       # YES is bugged in the theme, see jothepro/doxygen-awesome-css/issues/201
-FULL_SIDEBAR           = NO                       # Required for doxygen-awesome-css theme
+HTML_EXTRA_STYLESHEET  = doxygen-awesome.css    # Required, main CSS file of the theme
+HTML_COLORSTYLE        = LIGHT                  # Required, "Auto Dark Mode" will work nontheless
+FULL_SIDEBAR           = NO                     # Required
+DISABLE_INDEX          = NO                     # Required, YES is bugged in the theme. See jothepro/doxygen-awesome-css/issues/201
+GENERATE_TREEVIEW      = YES                    # Optional
 ```
 
 <br>
