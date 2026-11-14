@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
 #ifdef Q_OS_MACOS
     // <build>/cockatrice/cockatrice.app/Contents/MacOS/cockatrice
     const QByteArray configPath = "../../../qtlogging.ini";
-#elif defined(Q_OS_UNIX)
+#elif defined(Q_OS_LINUX)
     // <build>/cockatrice/cockatrice
     const QByteArray configPath = "./qtlogging.ini";
 #elif defined(Q_OS_WIN)
