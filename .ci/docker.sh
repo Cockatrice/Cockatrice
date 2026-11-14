@@ -7,18 +7,18 @@
 # usage: source <script> <name> [--get] [--build] [--save] [--interactive] [--set-cache <location>]
 # <name> sets the name of the docker image, these correspond to directories in .ci
 # --get loads the image from a previously saved image cache, will build if no image is found
-# --build builds the image from the Dockerfile in .ci/$NAME
+# --build builds the image from the Dockerfile in .ci/$BUILD_REFERENCE
 # --save stores the image, if an image was loaded it will not be stored
 # --interactive immediately starts the image interactively for debugging
 # --set-cache <location> sets the location to cache the image or for ccache
 #
 # requires: docker
-# uses env: NAME IMAGE_SUFFIX CACHE BUILD GET SAVE INTERACTIVE
+# uses env: BUILD_REFERENCE IMAGE_SUFFIX CACHE_DIR BUILD GET SAVE INTERACTIVE
 # (correspond to args: <name> --set-cache <cache> --build --get --save --interactive)
 # sets env: RUN CCACHE_DIR IMAGE_NAME RUN_ARGS RUN_OPTS BUILD_SCRIPT
 # exitcode: 1 for failure, 2 for missing dockerfile, 3 for invalid arguments
 #
-# IMAGE_SUFFIX is optional and only appended to the image name, never to NAME, so that a matrix
+# IMAGE_SUFFIX is optional and only appended to the image name, never to BUILD_REFERENCE, so that a matrix
 # leg can have its own image and image cache without needing its own directory under .ci. Two legs
 # building and tagging the same image concurrently would race on `docker build --tag`.
 # It is deliberately not called SUFFIX: compile.sh already uses SUFFIX for output file names, and
@@ -63,10 +63,10 @@ while [[ $# != 0 ]]; do
         echo "--set-cache expects an argument" >&2
         exit 3
       fi
-      CACHE=$1
+      CACHE_DIR=$1
       shift
-      if ! [[ -d $CACHE ]]; then
-        echo "could not find cache path: $CACHE" >&2
+      if ! [[ -d $CACHE_DIR ]]; then
+        echo "could not find cache path: $CACHE_DIR" >&2
         return 3
       fi
       ;;
@@ -75,45 +75,45 @@ while [[ $# != 0 ]]; do
         echo "unrecognized option: $1"
         return 3
       fi
-      NAME="$1"
+      BUILD_REFERENCE="$1"
       shift
       ;;
   esac
 done
 
 # Setup
-if ! [[ $NAME ]]; then
+if ! [[ $BUILD_REFERENCE ]]; then
   echo "no build name given" >&2
   return 3
 fi
 
-export IMAGE_NAME="${project_name,,}_${NAME,,}${IMAGE_SUFFIX:+_${IMAGE_SUFFIX,,}}" # lower case
+export IMAGE_NAME="${project_name,,}_${BUILD_REFERENCE,,}${IMAGE_SUFFIX:+_${IMAGE_SUFFIX,,}}" # lower case
 
-docker_dir=".ci/$NAME"
+docker_dir=".ci/$BUILD_REFERENCE"
 if ! [[ -r $docker_dir/Dockerfile ]]; then
   echo "could not find Dockerfile in $docker_dir" >&2
   return 2 # even if the image is cached, we do not want to run if there is no way to build this image
 fi
 
-if ! [[ $CACHE ]]; then
+if ! [[ $CACHE_DIR ]]; then
   echo "cache dir is not set!" >&2
-  CACHE="$(mktemp -d)"
-  echo "set cache dir to $CACHE" >&2
+  CACHE_DIR="$(mktemp -d)"
+  echo "set cache dir to $CACHE_DIR" >&2
 fi
-if ! [[ -d $CACHE ]]; then
-  echo "could not find cache dir: $CACHE" >&2
-  mkdir -p "$CACHE"
+if ! [[ -d $CACHE_DIR ]]; then
+  echo "could not find cache dir: $CACHE_DIR" >&2
+  mkdir -p "$CACHE_DIR"
   unset GET # the dir is empty
 fi
 if [[ $GET || $SAVE ]]; then
-  img_dir="$CACHE/$image_cache"
+  img_dir="$CACHE_DIR/$image_cache"
   img_save="$img_dir/$IMAGE_NAME$save_extension"
   if ! [[ -d $img_dir ]]; then
     echo "could not find image dir: $img_dir" >&2
     mkdir -p "$img_dir"
   fi
 fi
-export CCACHE_DIR="$CACHE/$ccache_cache"
+export CCACHE_DIR="$CACHE_DIR/$ccache_cache"
 if ! [[ -d $CCACHE_DIR ]]; then
   echo "could not find ccache dir: $CCACHE_DIR" >&2
   mkdir -p "$CCACHE_DIR"
