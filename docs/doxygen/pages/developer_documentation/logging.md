@@ -61,7 +61,7 @@ baked into the application in release version and set as the QT_LOGGING_CONF env
 #ifdef Q_OS_MACOS
     // <build>/cockatrice/cockatrice.app/Contents/MacOS/cockatrice
     const QByteArray configPath = "../../../qtlogging.ini";
-#elif defined(Q_OS_UNIX)
+#elif defined(Q_OS_LINUX)
     // <build>/cockatrice/cockatrice
     const QByteArray configPath = "./qtlogging.ini";
 #elif defined(Q_OS_WIN)
