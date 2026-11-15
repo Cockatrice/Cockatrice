@@ -2,6 +2,7 @@
  * @file abstract_card_drag_item.h
  * @ingroup GameGraphicsCards
  */
+
 //! \todo Document this file.
 
 #ifndef ABSTRACTCARDDRAGITEM_H

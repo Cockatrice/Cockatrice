@@ -3,6 +3,7 @@
  * @ingroup CardExtraInfoWidgets
  * @ingroup PrintingWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef CARD_AMOUNT_WIDGET_H

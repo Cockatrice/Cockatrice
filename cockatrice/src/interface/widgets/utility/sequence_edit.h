@@ -2,6 +2,7 @@
  * @file sequence_edit.h
  * @ingroup UI
  */
+
 //! \todo Document this file.
 
 #ifndef SEQUENCEEDIT_H

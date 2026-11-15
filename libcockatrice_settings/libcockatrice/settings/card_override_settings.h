@@ -2,6 +2,7 @@
  * @file card_override_settings.h
  * @ingroup CardSettings
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_CARD_OVERRIDE_SETTINGS_H

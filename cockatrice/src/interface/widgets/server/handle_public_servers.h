@@ -2,6 +2,7 @@
  * @file handle_public_servers.h
  * @ingroup Server
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_HANDLE_PUBLIC_SERVERS_H

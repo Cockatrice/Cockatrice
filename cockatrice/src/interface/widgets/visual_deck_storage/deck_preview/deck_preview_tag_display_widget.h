@@ -2,6 +2,7 @@
  * @file deck_preview_tag_display_widget.h
  * @ingroup VisualDeckPreviewWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef DECK_PREVIEW_TAG_DISPLAY_WIDGET_H
@@ -57,9 +58,7 @@ signals:
      */
     void tagClicked();
 
-    /**
-     * @brief Emitted when the close button is clicked.
-     */
+    /** @brief Emitted when the close button is clicked */
     void tagClosed();
 
 protected:

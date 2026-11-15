@@ -2,6 +2,7 @@
  * @file edhrec_deck_api_response.h
  * @ingroup ApiResponses
  */
+
 //! \todo Document this file.
 
 #ifndef EDHREC_DECK_API_RESPONSE_H

@@ -2,6 +2,7 @@
  * @file table_zone_logic.h
  * @ingroup GameLogicZones
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_TABLE_ZONE_LOGIC_H
@@ -32,9 +33,7 @@ public:
     /** @brief Number of rows in the table zone grid (0=creatures, 1=noncreatures, 2=lands). */
     static const int ROW_COUNT = 3;
 
-    /**
-     * Clamps a grid row index into [0, ROW_COUNT - 1].
-     */
+    /** Clamps a grid row index into [0, ROW_COUNT - 1] */
     static int clampValidTableRow(const int row);
 
     /**

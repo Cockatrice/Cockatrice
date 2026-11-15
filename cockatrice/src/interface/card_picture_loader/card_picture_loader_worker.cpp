@@ -505,9 +505,7 @@ void CardPictureLoaderWorker::handleImageLoadEnqueued(const ExactCard &card)
     }
 }
 
-/**
- * Called when image loading is done. Failures are indicated by an empty QImage.
- */
+/** Called when image loading is done. Failures are indicated by an empty QImage */
 void CardPictureLoaderWorker::handleImageLoaded(const ExactCard &card, const QImage &image)
 {
     currentlyLoading.remove(card.getPixmapCacheKey());

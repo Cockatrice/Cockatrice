@@ -201,9 +201,7 @@ QSettings::Status SettingsManager::batchWrite(std::function<void(QSettings &)> b
     return settings.status();
 }
 
-/**
- * Calls sync on the underlying QSettings object
- */
+/** Calls sync on the underlying QSettings object */
 void SettingsManager::sync()
 {
     auto settings = getSettings();

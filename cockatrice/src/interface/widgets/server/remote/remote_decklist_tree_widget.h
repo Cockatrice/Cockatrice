@@ -3,6 +3,7 @@
  * @ingroup NetworkingWidgets
  * @ingroup DeckStorageWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef REMOTEDECKLIST_TREEWIDGET_H

@@ -1,6 +1,7 @@
-/** @file server_card_counter_test.cpp
- *  @brief Tests for Server_Card counter operations.
- *  @ingroup Tests
+/**
+ * @file server_card_counter_test.cpp
+ * @brief Tests for Server_Card counter operations.
+ * @ingroup Tests
  */
 
 #include <QMap>

@@ -130,9 +130,7 @@ public:
     {
         return text;
     }
-    /**
-     * @brief The cardLang rules text of this face's foreignData entry, if any.
-     */
+    /** @brief The cardLang rules text of this face's foreignData entry, if any */
     inline const QString &getLocalizedText() const
     {
         return localizedText;
@@ -167,18 +165,14 @@ class OracleImporter : public QObject
 private:
     static const QRegularExpression formatRegex;
 
-    /**
-     * The cards, indexed by name.
-     */
+    /** The cards, indexed by name */
     CardNameMap cards;
 
     // Shared defaults are immutable; card-specific copy limits belong to this import.
     FormatRulesNameMap magicFormats;
     bool magicFormatsDirty = true;
 
-    /**
-     * The sets, indexed by short name.
-     */
+    /** The sets, indexed by short name */
     SetNameMap sets;
 
     QList<SetToDownload> allSets;
@@ -210,9 +204,7 @@ private:
     // Discard the incomplete in-memory database; the installed file is untouched.
     int failImport(const QString &message);
 
-    /**
-     * The ISO-639 language code whose foreignData is imported; "en" by default.
-     */
+    /** The ISO-639 language code whose foreignData is imported; "en" by default */
     QString cardLang = "en";
 
     /**

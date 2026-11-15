@@ -2,6 +2,7 @@
  * @file user_list_manager.h
  * @ingroup Lobby
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_USER_LIST_MANAGER_H

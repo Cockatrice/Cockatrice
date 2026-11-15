@@ -136,9 +136,7 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     switchToDeckSelectView();
 }
 
-/**
- * Creates the VDS widget and inserts it into the layout. No-ops if the widget already exists
- */
+/** Creates the VDS widget and inserts it into the layout. No-ops if the widget already exists */
 void DeckViewContainer::tryCreateVisualDeckStorageWidget()
 {
     if (visualDeckStorageWidget) {
@@ -452,9 +450,7 @@ void DeckViewContainer::sideboardPlanChanged()
     parentGame->getGame()->getGameEventHandler()->sendSetSideboardPlan(deckView->getSideboardPlan(), playerId);
 }
 
-/**
- * Sends the basic ReadyStart command.
- */
+/** Sends the basic ReadyStart command */
 void DeckViewContainer::sendReadyStartCommand(bool ready)
 {
     if (ready) {

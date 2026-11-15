@@ -2,6 +2,7 @@
  * @file dynamic_font_size_label.h
  * @ingroup Widgets
  */
+
 //! \todo Document this file.
 
 #ifndef DYNAMICFONTSIZELABEL_H

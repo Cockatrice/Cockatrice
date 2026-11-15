@@ -2,6 +2,7 @@
  * @file background_sources.h
  * @ingroup UI
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_BACKGROUND_SOURCES_H

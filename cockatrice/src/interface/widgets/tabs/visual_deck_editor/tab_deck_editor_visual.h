@@ -67,19 +67,13 @@ class TabDeckEditorVisual : public AbstractTabDeckEditor
     Q_OBJECT
 
 protected slots:
-    /**
-     * @brief Load the editor layout from settings.
-     */
+    /** @brief Load the editor layout from settings */
     void loadLayout() override;
 
-    /**
-     * @brief Reset and restart the layout to default.
-     */
+    /** @brief Reset and restart the layout to default */
     void restartLayout() override;
 
-    /**
-     * @brief Refresh keyboard shortcuts for this tab.
-     */
+    /** @brief Refresh keyboard shortcuts for this tab */
     void refreshShortcuts() override;
 
     /**
@@ -106,9 +100,7 @@ public:
      */
     explicit TabDeckEditorVisual(TabSupervisor *_tabSupervisor);
 
-    /**
-     * @brief Retranslate UI strings (for i18n support).
-     */
+    /** @brief Retranslate UI strings (for i18n support) */
     void retranslateUi() override;
 
     /**
@@ -129,30 +121,20 @@ public:
      */
     void changeModelIndexToCard(const ExactCard &activeCard);
 
-    /**
-     * @brief Create the deck analytics dock widget.
-     */
+    /** @brief Create the deck analytics dock widget */
     void createDeckAnalyticsDock();
 
-    /**
-     * @brief Setup menus for this visual deck editor.
-     */
+    /** @brief Setup menus for this visual deck editor */
     void createMenus() override;
 
-    /**
-     * @brief Create search and database display frame.
-     */
+    /** @brief Create search and database display frame */
     void createSearchAndDatabaseFrame();
 
-    /**
-     * @brief Create central frame for visual widgets.
-     */
+    /** @brief Create central frame for visual widgets */
     void createCentralFrame();
 
 public slots:
-    /**
-     * @brief Refresh UI when the deck changes.
-     */
+    /** @brief Refresh UI when the deck changes */
     void onDeckChanged() override;
 
     /**

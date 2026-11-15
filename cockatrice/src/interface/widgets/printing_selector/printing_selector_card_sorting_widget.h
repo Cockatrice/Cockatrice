@@ -2,6 +2,7 @@
  * @file printing_selector_card_sorting_widget.h
  * @ingroup PrintingWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef PRINTING_SELECTOR_CARD_SORTING_WIDGET_H

@@ -33,21 +33,19 @@ class QObject;
 
 namespace VisualDeckStorageRoles
 {
-/**
- * @brief Custom roles exposed by the VisualDeckStorageModel.
- */
+/** @brief Custom roles exposed by the VisualDeckStorageModel */
 enum
 {
-    FilePathRole = Qt::UserRole + 1, /**< Absolute file path of the deck. */
-    RelativeFilePathRole,            /**< File path relative to the deck folder. */
-    FolderPathRole,                  /**< Directory of the deck relative to the deck folder ("" for root). */
-    DisplayNameRole,                 /**< Deck name, or the file name if the deck has no name. */
-    TagsRole,                        /**< The deck's tags. */
-    ColorIdentityRole,               /**< The deck's color identity (WUBRG order). */
-    LastModifiedRole,                /**< QDateTime of the deck file's last modification. */
-    LastLoadedRole,                  /**< QDateTime when the deck was last loaded from the file. */
-    BannerCardNameRole,              /**< Name of the deck's banner card. */
-    BannerCardProviderIdRole,        /**< Provider id of the deck's banner card. */
+    FilePathRole = Qt::UserRole + 1, ///< Absolute file path of the deck.
+    RelativeFilePathRole,            ///< File path relative to the deck folder.
+    FolderPathRole,                  ///< Directory of the deck relative to the deck folder ("" for root).
+    DisplayNameRole,                 ///< Deck name, or the file name if the deck has no name.
+    TagsRole,                        ///< The deck's tags.
+    ColorIdentityRole,               ///< The deck's color identity (WUBRG order).
+    LastModifiedRole,                ///< QDateTime of the deck file's last modification.
+    LastLoadedRole,                  ///< QDateTime when the deck was last loaded from the file.
+    BannerCardNameRole,              ///< Name of the deck's banner card.
+    BannerCardProviderIdRole,        ///< Provider id of the deck's banner card.
     /**
      * @brief Whether the row passes the proxy's current search / tag / color filters.
      *
@@ -81,9 +79,7 @@ struct DeckPreviewData
     bool loadInProgress = false; ///< Whether the deck file is currently being loaded.
 };
 
-/**
- * @brief One finished background deck load that has not been applied to the model yet.
- */
+/** @brief One finished background deck load that has not been applied to the model yet */
 struct PendingDeckLoad
 {
     QString filePath;       ///< Identifies the row the result belongs to.
@@ -120,9 +116,7 @@ public:
      */
     void setDeckPath(const QString &path);
 
-    /**
-     * @brief Re-scans the current deck folder, reloading every deck file.
-     */
+    /** @brief Re-scans the current deck folder, reloading every deck file */
     void refresh();
 
     [[nodiscard]] QString getDeckPath() const

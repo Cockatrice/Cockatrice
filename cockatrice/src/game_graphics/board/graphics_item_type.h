@@ -2,6 +2,7 @@
  * @file graphics_item_type.h
  * @ingroup GameGraphics
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_GRAPHICS_ITEM_TYPE_H

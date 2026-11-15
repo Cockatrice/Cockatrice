@@ -12,9 +12,9 @@ Q_DECLARE_LOGGING_CATEGORY(TranslationLoaderLog)
 /** @brief The outcome of a translation load attempt. */
 enum class TranslationLoadResult
 {
-    Loaded,     /**< A translation file was found and loaded into the translator. */
-    Missing,    /**< The search directories exist but hold no file for this language. */
-    NoDirectory /**< Not a single search directory exists, so no lookup could be attempted. */
+    Loaded,     ///< A translation file was found and loaded into the translator.
+    Missing,    ///< The search directories exist but hold no file for this language.
+    NoDirectory ///< Not a single search directory exists, so no lookup could be attempted.
 };
 
 namespace TranslationLoader
@@ -28,10 +28,7 @@ namespace TranslationLoader
  */
 QList<QString> qtTranslationCandidates();
 
-/**
- * @brief The candidates that actually exist, most likely first, so no caller searches a path that is
- *        not there.
- */
+/** @brief The candidates that actually exist, most likely first, so no caller searches a path that is not there */
 QList<QString> qtTranslationPaths();
 
 /**

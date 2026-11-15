@@ -2,6 +2,7 @@
  * @file edhrec_commander_api_response_navigation_widget.h
  * @ingroup ApiResponseDisplayWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef EDHREC_COMMANDER_API_RESPONSE_NAVIGATION_WIDGET_H

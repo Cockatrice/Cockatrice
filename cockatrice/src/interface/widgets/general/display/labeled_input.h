@@ -2,6 +2,7 @@
  * @file labeled_input.h
  * @ingroup DeckEditorCardGroupWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef LABELED_INPUT_H

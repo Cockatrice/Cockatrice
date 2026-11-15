@@ -2,6 +2,7 @@
  * @file tab_logs.h
  * @ingroup ServerTabs
  */
+
 //! \todo Document this file.
 
 #ifndef TAB_LOG_H

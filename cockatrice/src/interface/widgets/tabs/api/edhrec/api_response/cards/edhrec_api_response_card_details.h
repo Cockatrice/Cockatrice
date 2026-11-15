@@ -2,6 +2,7 @@
  * @file edhrec_api_response_card_details.h
  * @ingroup ApiResponses
  */
+
 //! \todo Document this file.
 
 #ifndef CARD_VIEW_H

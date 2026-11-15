@@ -11,9 +11,7 @@
 
 namespace CardLocalization
 {
-/**
- * @brief The language code selected for localized card text and images.
- */
+/** @brief The language code selected for localized card text and images */
 inline QString displayLang()
 {
     return SettingsCache::instance().cardsDisplay().getCardLang();

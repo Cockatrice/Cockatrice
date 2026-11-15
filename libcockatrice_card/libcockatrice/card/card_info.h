@@ -71,8 +71,9 @@ public:
     };
 
 private:
-    /** @name Private Card Properties
-     *  @anchor PrivateCardProperties
+    /**
+     * @name Private Card Properties
+     * @anchor PrivateCardProperties
      */
     ///@{
     QString name;       ///< Full name of the card.

@@ -2,6 +2,7 @@
  * @file user_context_menu.h
  * @ingroup Lobby
  */
+
 //! \todo Document this file.
 
 #ifndef USER_CONTEXT_MENU_H

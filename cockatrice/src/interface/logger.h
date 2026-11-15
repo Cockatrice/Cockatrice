@@ -2,6 +2,7 @@
  * @file logger.h
  * @ingroup Core
  */
+
 //! \todo Document this file.
 
 #ifndef LOGGER_H

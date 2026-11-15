@@ -55,9 +55,7 @@ public:
         QStringList tags;
     };
 
-    /**
-     * @brief The color identity filter mode, shared with the Visual Deck Storage.
-     */
+    /** @brief The color identity filter mode, shared with the Visual Deck Storage */
     using FilterMode = VisualDeckStorageSortFilterProxyModel::FilterMode;
 
     explicit RemotePublicDecksModel(AbstractClient *client, QObject *parent = nullptr);

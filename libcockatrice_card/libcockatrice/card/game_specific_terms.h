@@ -2,6 +2,7 @@
  * @file game_specific_terms.h
  * @ingroup Cards
  */
+
 //! \todo Document this file.
 
 #ifndef GAME_SPECIFIC_TERMS_H

@@ -35,18 +35,14 @@ public:
         });
     }
 
-    /**
-     * @brief Schedules @p newCallback, replacing any callback not run yet.
-     */
+    /** @brief Schedules @p newCallback, replacing any callback not run yet */
     void call(std::function<void()> newCallback)
     {
         callback = std::move(newCallback);
         timer.start();
     }
 
-    /**
-     * @brief Drops the pending callback and stops the timer.
-     */
+    /** @brief Drops the pending callback and stops the timer */
     void cancel()
     {
         timer.stop();

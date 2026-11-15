@@ -2,6 +2,7 @@
  * @file local_client.h
  * @ingroup Client
  */
+
 //! \todo Document this file.
 
 #ifndef LOCALCLIENT_H

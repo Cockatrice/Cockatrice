@@ -4,8 +4,8 @@
 #include <QString>
 
 /**
- * Functor that normalizes the raw card name parsed during a plaintext deck import into the card name that Cockatrice
- * uses.
+ * Functor that normalizes the raw card name parsed during a plaintext deck import
+ * into the card name that Cockatrice uses.
  */
 struct CardNameNormalizer
 {

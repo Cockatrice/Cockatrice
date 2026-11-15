@@ -2,6 +2,7 @@
  * @file say_menu.h
  * @ingroup GameMenusPlayers
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_SAY_MENU_H

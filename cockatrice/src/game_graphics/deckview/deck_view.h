@@ -2,6 +2,7 @@
  * @file deck_view.h
  * @ingroup Lobby
  */
+
 //! \todo Document this file.
 
 #ifndef DECKVIEW_H

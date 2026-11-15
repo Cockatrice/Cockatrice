@@ -2,6 +2,7 @@
  * @file card_completer_delegate.h
  * @ingroup UtilityWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef CARD_COMPLETER_DELEGATE_H

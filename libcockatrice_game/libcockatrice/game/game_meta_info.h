@@ -2,6 +2,7 @@
  * @file game_meta_info.h
  * @ingroup GameLogic
  */
+
 //! \todo Document this file.
 
 #ifndef GAME_META_INFO_H

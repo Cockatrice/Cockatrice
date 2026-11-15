@@ -2,6 +2,7 @@
  * @file deck_stats_interface.h
  * @ingroup ApiInterfaces
  */
+
 //! \todo Document this file.
 
 #ifndef DECKSTATS_INTERFACE_H

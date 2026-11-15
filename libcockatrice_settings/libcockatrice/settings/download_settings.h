@@ -2,6 +2,7 @@
  * @file download_settings.h
  * @ingroup NetworkSettings
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_DOWNLOADSETTINGS_H

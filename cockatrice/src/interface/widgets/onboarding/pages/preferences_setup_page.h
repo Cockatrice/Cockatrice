@@ -11,8 +11,7 @@ class QGroupBox;
 class QLabel;
 class QWidget;
 
-/** @brief A curated subset of settings for the user to adjust.
- **/
+/** @brief A curated subset of settings for the user to adjust */
 class PreferencesSetupPage : public FirstRunWizardPage
 {
     Q_OBJECT

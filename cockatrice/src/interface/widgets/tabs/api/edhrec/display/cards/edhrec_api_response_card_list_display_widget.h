@@ -2,6 +2,7 @@
  * @file edhrec_api_response_card_list_display_widget.h
  * @ingroup ApiResponseDisplayWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef EDHREC_COMMANDER_API_RESPONSE_CARD_LIST_DISPLAY_WIDGET_H

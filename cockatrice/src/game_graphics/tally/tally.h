@@ -14,9 +14,7 @@ struct TallyRow
     bool operator==(const TallyRow &) const = default;
 };
 
-/**
- * The tally type
- */
+/** The tally type */
 enum class TallyType
 {
     None,

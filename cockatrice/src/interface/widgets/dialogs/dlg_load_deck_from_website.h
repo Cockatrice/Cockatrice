@@ -3,6 +3,7 @@
  * @ingroup RemoteDeckStorageDialogs
  * @ingroup Lobby
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_LOAD_DECK_FROM_WEBSITE_H

@@ -2,6 +2,7 @@
  * @file dlg_edit_password.h
  * @ingroup AccountDialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_EDITPASSWORD_H

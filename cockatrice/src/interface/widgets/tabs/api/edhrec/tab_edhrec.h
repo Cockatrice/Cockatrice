@@ -2,6 +2,7 @@
  * @file tab_edhrec.h
  * @ingroup Tabs
  */
+
 //! \todo Document this file.
 
 #ifndef TAB_EDHREC_H

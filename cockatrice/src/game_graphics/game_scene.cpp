@@ -141,9 +141,7 @@ GameScene::~GameScene()
     }
 }
 
-/**
- * @brief Updates localized text in all zone views.
- */
+/** @brief Updates localized text in all zone views */
 void GameScene::retranslateUi()
 {
     for (ZoneViewWidget *view : zoneViews) {

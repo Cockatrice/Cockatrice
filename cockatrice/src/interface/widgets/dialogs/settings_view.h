@@ -3,6 +3,7 @@
  * @brief Settings content widget hosted by the settings dialog
  * @ingroup Dialogs
  */
+ 
 #ifndef SETTINGS_VIEW_H
 #define SETTINGS_VIEW_H
 

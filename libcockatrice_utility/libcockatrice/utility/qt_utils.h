@@ -170,17 +170,13 @@ fadeWindow(QWidget *window, qreal startOpacity, qreal endOpacity, int durationMs
     return animation;
 }
 
-/**
- * @brief Opens @p path with the platform's file manager or default handler.
- */
+/** @brief Opens @p path with the platform's file manager or default handler */
 static inline bool openPathInFileManager(const QString &path)
 {
     return QDesktopServices::openUrl(QUrl::fromLocalFile(path));
 }
 
-/**
- * @brief Returns @p font with bold styling enabled.
- */
+/** @brief Returns @p font with bold styling enabled */
 static inline QFont boldFont(QFont font)
 {
     font.setBold(true);

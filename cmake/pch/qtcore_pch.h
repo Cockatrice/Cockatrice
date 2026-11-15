@@ -1,5 +1,6 @@
-/** @file qtcore_pch.h
- *  @brief Precompiled header for all Qt targets (Qt Core only).
+/**
+ * @file qtcore_pch.h
+ * @brief Precompiled header for all Qt targets (Qt Core only).
  *
  * Safe for every target that links Qt Core, including the headless
  * Servatrice binary. Keep this header free of any widget/gui types.

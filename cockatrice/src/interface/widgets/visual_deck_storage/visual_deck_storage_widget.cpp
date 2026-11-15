@@ -254,26 +254,20 @@ void VisualDeckStorageWidget::setShareSelectedFiles(const QStringList &paths)
     }
 }
 
-/**
- * Gets a const pointer to the quick settings so that the values can be accessed.
- */
+/** Gets a const pointer to the quick settings so that the values can be accessed */
 const VisualDeckStorageQuickSettingsWidget *VisualDeckStorageWidget::settings() const
 {
     return quickSettingsWidget;
 }
 
-/**
- * Reapplies all sort and filter options by updating the proxy model.
- */
+/** Reapplies all sort and filter options by updating the proxy model */
 void VisualDeckStorageWidget::reapplySortAndFilters()
 {
     storageProxyModel->setSortOrder(sortWidget->currentSortOrder());
     storageProxyModel->reapplyFilters();
 }
 
-/**
- * @brief Scans the deck folder and rebuilds the folder tree of deck previews.
- */
+/** @brief Scans the deck folder and rebuilds the folder tree of deck previews */
 void VisualDeckStorageWidget::createRootFolderWidget()
 {
     storageModel->setDeckPath(SettingsCache::instance().paths().getDeckPath());
@@ -319,9 +313,7 @@ void VisualDeckStorageWidget::updateTagFilter()
     tagFilterWidget->refreshTags();
 }
 
-/**
- * @brief The tags of all decks currently accepted by the proxy model.
- */
+/** @brief The tags of all decks currently accepted by the proxy model */
 QSet<QString> VisualDeckStorageWidget::gatherVisibleTags() const
 {
     QSet<QString> allTags;
@@ -338,18 +330,14 @@ QSet<QString> VisualDeckStorageWidget::gatherVisibleTags() const
     return allTags;
 }
 
-/**
- * Pushes the color identity filter widget's state into the proxy model.
- */
+/** Pushes the color identity filter widget's state into the proxy model */
 void VisualDeckStorageWidget::updateColorFilter()
 {
     storageProxyModel->setColorFilter(deckPreviewColorIdentityFilterWidget->getFilterMode(),
                                       deckPreviewColorIdentityFilterWidget->getActiveColors());
 }
 
-/**
- * Pushes the search bar's text into the proxy model.
- */
+/** Pushes the search bar's text into the proxy model */
 void VisualDeckStorageWidget::updateSearchFilter(const QString &text)
 {
     storageProxyModel->setSearchText(text);

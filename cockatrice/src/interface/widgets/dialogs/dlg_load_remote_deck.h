@@ -3,6 +3,7 @@
  * @ingroup RemoteDeckStorageDialogs
  * @ingroup Lobby
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_STARTGAME_H

@@ -2,6 +2,7 @@
  * @file mana_base_widget.h
  * @ingroup DeckEditorAnalyticsWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef MANA_BASE_WIDGET_H

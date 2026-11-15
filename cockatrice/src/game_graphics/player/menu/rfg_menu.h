@@ -2,6 +2,7 @@
  * @file rfg_menu.h
  * @ingroup GameMenusZones
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_RFG_MENU_H

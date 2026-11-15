@@ -2,6 +2,7 @@
  * @file tab_account.h
  * @ingroup AccountTabs
  */
+
 //! \todo Document this file.
 
 #ifndef TAB_ACCOUNT_H

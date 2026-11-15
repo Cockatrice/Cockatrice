@@ -40,9 +40,7 @@ public:
 
     bool isEmpty() const;
 
-    /**
-     * @brief Deletes all nodes except the root.
-     */
+    /** @brief Deletes all nodes except the root */
     void clear();
 
     /**
@@ -59,19 +57,13 @@ public:
      */
     QList<const InnerDecklistNode *> getZoneNodes(const QSet<QString> &restrictToZones = {}) const;
 
-    /**
-     * @brief Computes the deck hash
-     */
+    /** @brief Computes the deck hash */
     QString computeDeckHash() const;
 
-    /**
-     *@brief Writes the contents of the deck to xml
-     */
+    /** @brief Writes the contents of the deck to xml */
     void write(QXmlStreamWriter *xml) const;
 
-    /**
-     * @brief Reads a "zone" section of the xml to this tree
-     */
+    /** @brief Reads a "zone" section of the xml to this tree */
     void readZoneElement(QXmlStreamReader *xml);
 
     DecklistCardNode *addCard(const QString &cardName,

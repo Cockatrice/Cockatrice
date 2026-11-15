@@ -158,9 +158,7 @@ void CardAmountWidget::applyCardTextFont()
     adjustFontSize(cardSizeSlider->value());
 }
 
-/**
- * @brief Updates the card count display in the widget.
- */
+/** @brief Updates the card count display in the widget */
 void CardAmountWidget::updateCardCount()
 {
     cardCountInZone->setText("<font color='white'>" + QString::number(amount) + "</font>");
@@ -248,49 +246,37 @@ void CardAmountWidget::addPrinting(const QString &zone)
     }
 }
 
-/**
- * @brief Adds a printing to the mainboard zone.
- */
+/** @brief Adds a printing to the mainboard zone */
 void CardAmountWidget::addPrintingMainboard()
 {
     addPrinting(DECK_ZONE_MAIN);
 }
 
-/**
- * @brief Adds a printing to the sideboard zone.
- */
+/** @brief Adds a printing to the sideboard zone */
 void CardAmountWidget::addPrintingSideboard()
 {
     addPrinting(DECK_ZONE_SIDE);
 }
 
-/**
- * @brief Adds a printing to the tokens zone.
- */
+/** @brief Adds a printing to the tokens zone */
 void CardAmountWidget::addPrintingTokensboard()
 {
     addPrinting(DECK_ZONE_TOKENS);
 }
 
-/**
- * @brief Removes a printing from the mainboard zone.
- */
+/** @brief Removes a printing from the mainboard zone */
 void CardAmountWidget::removePrintingMainboard()
 {
     decrementCardHelper(DECK_ZONE_MAIN);
 }
 
-/**
- * @brief Removes a printing from the sideboard zone.
- */
+/** @brief Removes a printing from the sideboard zone */
 void CardAmountWidget::removePrintingSideboard()
 {
     decrementCardHelper(DECK_ZONE_SIDE);
 }
 
-/**
- * @brief Removes a printing from the tokens zone.
- */
+/** @brief Removes a printing from the tokens zone */
 void CardAmountWidget::removePrintingTokensboard()
 {
     decrementCardHelper(DECK_ZONE_TOKENS);

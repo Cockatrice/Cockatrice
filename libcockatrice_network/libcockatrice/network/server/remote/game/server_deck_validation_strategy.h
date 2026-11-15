@@ -30,9 +30,7 @@ public:
     validate(Server_Game *game, Server_Player *player, DeckList *deck, ResponseContainer &rc) = 0;
 };
 
-/**
- * @brief Default deck validation strategy that accepts every deck.
- */
+/** @brief Default deck validation strategy that accepts every deck */
 class Server_DefaultDeckValidationStrategy : public Server_DeckValidationStrategy
 {
 public:

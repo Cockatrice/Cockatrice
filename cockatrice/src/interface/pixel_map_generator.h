@@ -2,6 +2,7 @@
  * @file pixel_map_generator.h
  * @ingroup UI
  */
+
 //! \todo Document this file.
 
 #ifndef PIXMAPGENERATOR_H

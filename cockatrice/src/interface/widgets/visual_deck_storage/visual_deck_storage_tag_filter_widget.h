@@ -29,19 +29,13 @@ public:
     explicit VisualDeckStorageTagFilterWidget(QWidget *parent = nullptr);
     [[nodiscard]] QStringList getAllKnownTags() const;
 
-    /**
-     * @brief Sets a provider for the full set of tags to draw chips from.
-     */
+    /** @brief Sets a provider for the full set of tags to draw chips from */
     void setAllTagsProvider(const std::function<QSet<QString>()> &provider);
 
-    /**
-     * @brief The tags currently in "selected" state.
-     */
+    /** @brief The tags currently in "selected" state */
     [[nodiscard]] QStringList selectedTags() const;
 
-    /**
-     * @brief The tags currently in "excluded" state.
-     */
+    /** @brief The tags currently in "excluded" state */
     [[nodiscard]] QStringList excludedTags() const;
 
 signals:
@@ -54,9 +48,7 @@ signals:
     void filterChanged();
 
 public slots:
-    /**
-     * @brief Rebuilds the tag chips from the currently available tags.
-     */
+    /** @brief Rebuilds the tag chips from the currently available tags */
     void refreshTags();
     void showEvent(QShowEvent *event) override;
 };

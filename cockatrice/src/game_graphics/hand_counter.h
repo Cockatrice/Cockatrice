@@ -2,6 +2,7 @@
  * @file hand_counter.h
  * @ingroup GameGraphicsPlayers
  */
+
 //! \todo Document this file.
 
 #ifndef HANDCOUNTER_H

@@ -39,9 +39,7 @@
 #include <qnamespace.h>
 #include <utility>
 
-/**
- * @brief Creates a circular icon filled with the specified color.
- */
+/** @brief Creates a circular icon filled with the specified color */
 static QIcon createCircleIcon(const QColor &color)
 {
     QPixmap pixmap(32, 32);

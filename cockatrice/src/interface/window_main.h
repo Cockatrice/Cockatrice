@@ -17,10 +17,12 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
 /**
  * @file window_main.h
  * @ingroup Core
  */
+
 //! \todo Document this file.
 #ifndef WINDOW_H
 #define WINDOW_H
@@ -77,9 +79,12 @@ signals:
     /** @brief Emitted after the card-database update subprocess exits. */
     void cardDatabaseUpdateFinished(bool success);
 
-    /** @brief Emitted while the card-database update subprocess runs.
-     *         @p progress.done/@p progress.total are byte counts for the first two stages
-     *         and set indices for "import". */
+    /**
+     * @brief Emitted while the card-database update subprocess runs.
+     *
+     * @p progress.done/@p progress.total are byte counts for the first two stages
+     * and set indices for "import".
+     */
     void cardDatabaseUpdateProgress(const CardUpdateProgress &progress);
 
 public slots:
@@ -217,14 +222,14 @@ private:
     bool skipStartupAutoConnect = false;
     bool startupAutoConnectAttempted = false;
     bool firstRunWizardActive = false;
-    bool noConnect = false; ///< --no-connect: skip every startup connection
+    bool noConnect = false;                                           ///< --no-connect: skip every startup connection
     QProcess *cardUpdateProcess;
     QByteArray cardUpdateOutputBuffer;
-    QByteArray cardUpdateErrorOutput;  ///< diagnostic output collected from the updater's stderr
-    QByteArray cardUpdateErrorPartial; ///< incomplete trailing stderr line, kept for line-based logging
+    QByteArray cardUpdateErrorOutput;                                 ///< diagnostic output collected from the updater's stderr
+    QByteArray cardUpdateErrorPartial;                                ///< incomplete trailing stderr line, kept for line-based logging
     CardUpdateStage cardUpdateLoggedStage = CardUpdateStage::Unknown; ///< stage of the last logged progress update
-    QElapsedTimer cardUpdateProgressLogTimer;                   ///< throttles progress logging to the running stage
-    CardDatabaseUpdateStatusBar *cardUpdateStatusBar = nullptr; ///< status bar widget tracking the card database update
+    QElapsedTimer cardUpdateProgressLogTimer;                         ///< throttles progress logging to the running stage
+    CardDatabaseUpdateStatusBar *cardUpdateStatusBar = nullptr;       ///< status bar widget tracking the card database update
     DlgViewLog *logviewDialog;
     GameReplay *replay;
     DlgTipOfTheDay *tip;

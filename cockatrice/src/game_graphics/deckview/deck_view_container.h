@@ -2,6 +2,7 @@
  * @file deck_view_container.h
  * @ingroup Lobby
  */
+
 //! \todo Document this file.
 
 #ifndef DECK_VIEW_CONTAINER_H
@@ -22,9 +23,7 @@ class Response;
 class TabGame;
 class DeckView;
 
-/**
- * Custom QButton implementation in order to have the red/green toggling square around the button
- */
+/** Custom QButton implementation in order to have the red/green toggling square around the button */
 class ToggleButton : public QPushButton
 {
     Q_OBJECT
@@ -45,9 +44,7 @@ protected:
     void paintEvent(QPaintEvent *event) override;
 };
 
-/**
- * This widget contains the deck selection view that is used before a game begins.
- */
+/** This widget contains the deck selection view that is used before a game begins */
 class DeckViewContainer : public QWidget
 {
     Q_OBJECT

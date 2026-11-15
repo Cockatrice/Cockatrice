@@ -2,6 +2,7 @@
  * @file edhrec_api_response_card_container.h
  * @ingroup ApiResponses
  */
+
 //! \todo Document this file.
 
 #ifndef CONTAINER_ENTRY_H

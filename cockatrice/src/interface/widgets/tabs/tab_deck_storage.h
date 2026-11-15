@@ -3,6 +3,7 @@
  * @ingroup DeckStorageWidgets
  * @ingroup Tabs
  */
+
 //! \todo Document this file.
 
 #ifndef TAB_DECK_STORAGE_H

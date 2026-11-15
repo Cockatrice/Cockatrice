@@ -2,6 +2,7 @@
  * @file tab_home.h
  * @ingroup Tabs
  */
+
 //! \todo Document this file.
 
 #ifndef TAB_HOME_H

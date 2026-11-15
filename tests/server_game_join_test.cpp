@@ -1,6 +1,7 @@
-/** @file server_game_join_test.cpp
- *  @brief Tests for the moderator/judge game-entry restriction override in Server_Game::checkJoin.
- *  @ingroup Tests
+/**
+ * @file server_game_join_test.cpp
+ * @brief Tests for the moderator/judge game-entry restriction override in Server_Game::checkJoin.
+ * @ingroup Tests
  */
 
 #include "game/game_config.h"

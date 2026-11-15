@@ -2,6 +2,7 @@
  * @file share_bar_widget.h
  * @ingroup DeckShareWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef SHARE_BAR_WIDGET_H

@@ -2,6 +2,7 @@
  * @file visual_database_display_filter_save_load_widget.h
  * @ingroup VisualCardDatabaseWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef VISUAL_DATABASE_DISPLAY_FILTER_SAVE_LOAD_WIDGET_H

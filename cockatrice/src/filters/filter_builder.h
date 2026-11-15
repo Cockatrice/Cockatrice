@@ -2,6 +2,7 @@
  * @file filter_builder.h
  * @ingroup CardDatabaseModelFilters
  */
+
 //! \todo Document this file.
 
 #ifndef FILTERBUILDER_H

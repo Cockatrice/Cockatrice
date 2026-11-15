@@ -2,6 +2,7 @@
  * @file tearoff_menu.h
  * @ingroup GameMenus
  */
+
 //! \todo Document this file.
 
 #pragma once

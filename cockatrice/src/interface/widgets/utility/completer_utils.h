@@ -2,6 +2,7 @@
  * @file completer_utils.h
  * @ingroup UtilityWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef COMPLETER_UTILS_H

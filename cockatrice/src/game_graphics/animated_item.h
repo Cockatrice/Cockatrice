@@ -10,7 +10,6 @@
  * owning their own QTimer) implement this interface and register with the scene
  * via GameScene::registerAnimationItem.
  */
-
 class IAnimatedItem
 {
 public:

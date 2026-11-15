@@ -2,6 +2,7 @@
  * @file deck_filter_string.h
  * @ingroup DeckStorageWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef DECK_FILTER_STRING_H

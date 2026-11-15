@@ -1,9 +1,8 @@
 /**
  * @file deck_list.h
- * @brief Defines the DeckList class, which manages a full
- *        deck structure including cards, zones, sideboard plans, and
- *        serialization to/from multiple formats. This is a logic class which
- *        does not care about Qt or user facing views.
+ * @brief Defines the DeckList class, which manages a full deck structure including
+ *        cards, zones, sideboard plans, and serialization to/from multiple formats.
+ *        This is a logic class which does not care about Qt or user facing views.
  *        See @c DeckListModel for the actual Qt Model to be used for views
  */
 
@@ -76,9 +75,7 @@ public:
         QString lastLoadedTimestamp; ///< Timestamp string of last load.
         PlaymatInfo playmat;         ///< Optional playmat background for table+stack zones.
 
-        /**
-         * @brief Checks if all values (except for lastLoadedTimestamp) in the metadata is empty.
-         */
+        /** @brief Checks if all values (except for lastLoadedTimestamp) in the metadata is empty */
         bool isEmpty() const;
 
         /**

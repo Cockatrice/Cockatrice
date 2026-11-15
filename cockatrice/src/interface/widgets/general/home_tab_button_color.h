@@ -6,9 +6,7 @@
 namespace HomeTabButtonColor
 {
 
-/**
- * @brief Where to get the colors for the home tab buttons from
- */
+/** @brief Where to get the colors for the home tab buttons from */
 enum Source
 {
     FromThemeColors, ///< Use the theme's identity accent colors

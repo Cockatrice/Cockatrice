@@ -2,6 +2,7 @@
  * @file theme_manager.h
  * @ingroup CoreSettings
  */
+
 //! \todo Document this file.
 
 #ifndef THEMEMANAGER_H
@@ -151,9 +152,11 @@ public:
     // Load the theme's shipped default fonts, falling back to the system theme
     // directory when fonts.toml is absent from the resolved (user) directory.
     static FontConfig loadDefaultFontConfig(const QString &themeDirPath, const QString &themeName);
-    /** @brief Writes cfg to disk as the theme's palette-<scheme>.toml and updates the
-     *         theme's stored colour scheme to match. Shared by PaletteEditorDialog::onSave
-     *         and FirstRunWizard's theme step so the two "generate + keep" paths can't drift. */
+    /**
+     * @brief Writes cfg to disk as the theme's palette-<scheme>.toml and updates the
+     *        theme's stored colour scheme to match. Shared by PaletteEditorDialog::onSave
+     *        and FirstRunWizard's theme step so the two "generate + keep" paths can't drift.
+     */
     static bool commitPalette(const QString &themeDirPath, const QString &colorScheme, const PaletteConfig &cfg);
     void setColorScheme(const QString &scheme);
     void setStyleName(const QString &styleName);
@@ -166,29 +169,39 @@ public:
     // when present, otherwise a palette-accent-derived fallback for accents and
     // a scheme-appropriate semantic default for positive / negative.
     QColor appColor(AppColor::Role role) const;
-    /** @brief Resolves an application font role: the theme's stored [Fonts]
-     *         value when present, otherwise the application font. Roles that
-     *         had a historical hardcoded family ask for it through
-     *         cardTextFont() and deckListFont() instead. */
+    /**
+     * @brief Resolves an application font role: the theme's stored [Fonts]
+     *        value when present, otherwise the application font. Roles that
+     *        had a historical hardcoded family ask for it through
+     *        cardTextFont() and deckListFont() instead.
+     */
     QFont appFont(AppFont::Role role) const;
-    /** @brief Whether the active theme defines this role in fonts.toml. */
+    /** @brief Whether the active theme defines this role in fonts.toml */
     bool hasAppFont(AppFont::Role role) const;
-    /** @brief The CardText role with its historical Serif fallback. Used by the
-     *         counter painters, which were Serif before the role existed. */
+    /**
+     * @brief The CardText role with its historical Serif fallback. Used by the
+     *        counter painters, which were Serif before the role existed.
+     */
     QFont cardTextFont() const;
-    /** @brief The DeckList role with its historical Serif fallback. Used by the
-     *         two surfaces that hardcoded Serif before the role existed (the
-     *         deck view zone headers and the printed deck list); every other
-     *         DeckList reader falls back to the application font. */
+    /**
+     * @brief The DeckList role with its historical Serif fallback. Used by the
+     *        two surfaces that hardcoded Serif before the role existed (the
+     *        deck view zone headers and the printed deck list); every other
+     *        DeckList reader falls back to the application font.
+     */
     QFont deckListFont() const;
-    /** @brief Resolves an application font role against the startup font only,
-     *         ignoring any previewed config in currentFonts. Editors that show
-     *         "what this role resolves to" must use this, because appFont()
-     *         reflects a live preview while the editor is open. */
+    /**
+     * @brief Resolves an application font role against the startup font only,
+     *        ignoring any previewed config in currentFonts. Editors that show
+     *        "what this role resolves to" must use this, because appFont()
+     *        reflects a live preview while the editor is open.
+     */
     QFont defaultAppFont(AppFont::Role role) const;
-    /** @brief CardText max size resolved the way the font editor shows it:
-     *         stored CardTextMaxSize, else the CardText point size, else 12,
-     *         clamped to the editor's representable range. */
+    /**
+     * @brief CardText max size resolved the way the font editor shows it:
+     *        stored CardTextMaxSize, else the CardText point size, else 12,
+     *        clamped to the editor's representable range.
+     */
     int cardTextMaxSize() const;
     /** @brief CardText shrink-to-fit floor resolved the same way. */
     int cardTextMinSize() const;

@@ -2,6 +2,7 @@
  * @file card_info_picture_art_crop_widget.h
  * @ingroup CardWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef CARD_INFO_PICTURE_ART_CROP_WIDGET_H

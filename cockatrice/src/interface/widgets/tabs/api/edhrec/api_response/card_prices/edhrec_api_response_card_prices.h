@@ -2,6 +2,7 @@
  * @file edhrec_api_response_card_prices.h
  * @ingroup ApiResponses
  */
+
 //! \todo Document this file.
 
 #ifndef EDHREC_COMMANDER_API_RESPONSE_CARD_PRICES_H

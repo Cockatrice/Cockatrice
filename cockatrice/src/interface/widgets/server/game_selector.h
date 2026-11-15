@@ -63,14 +63,10 @@ private slots:
      */
     void actClearFilter();
 
-    /**
-     * @brief Opens the dialog to create a new game in the current room.
-     */
+    /** @brief Opens the dialog to create a new game in the current room */
     void actCreate();
 
-    /**
-     * @brief Creates a game immediately from the remembered settings, without a dialog.
-     */
+    /** @brief Creates a game immediately from the remembered settings, without a dialog */
     void actQuickHost();
 
     /**
@@ -79,18 +75,12 @@ private slots:
      */
     void checkQuickHostResponse(const Response &response);
 
-    /**
-     * @brief Joins the currently selected game as a player.
-     */
+    /** @brief Joins the currently selected game as a player */
     void actJoin();
-    /**
-     * @brief Joins the currently selected game as a judge.
-     */
+    /** @brief Joins the currently selected game as a judge */
     void actJoinAsJudge();
 
-    /**
-     * @brief Joins the currently selected game as a spectator.
-     */
+    /** @brief Joins the currently selected game as a spectator */
     void actJoinAsSpectator();
     void actJoinAsJudgeSpectator();
 
@@ -152,38 +142,38 @@ protected:
     void changeEvent(QEvent *event) override;
 
 private:
-    AbstractClient *client;       /**< The network client used to communicate with the server. */
-    TabSupervisor *tabSupervisor; /**< Reference to TabSupervisor for managing tabs and rooms. */
-    TabRoom *room;                /**< The current room. */
+    AbstractClient *client;       ///< The network client used to communicate with the server.
+    TabSupervisor *tabSupervisor; ///< Reference to TabSupervisor for managing tabs and rooms.
+    TabRoom *room;                ///< The current room.
 
-    QTreeView *gameListView;             /**< View widget for displaying the game list. */
-    GamesModel *gameListModel;           /**< Model containing all games. */
-    GamesProxyModel *gameListProxyModel; /**< Proxy model for filtering and sorting the game list. */
+    QTreeView *gameListView;             ///< View widget for displaying the game list.
+    GamesModel *gameListModel;           ///< Model containing all games.
+    GamesProxyModel *gameListProxyModel; ///< Proxy model for filtering and sorting the game list.
 
     GameSelectorQuickFilterToolBar *quickFilterToolBar;
 
-    QPushButton *filterButton;                     /**< Button to open the filter dialog. */
-    QPushButton *clearFilterButton;                /**< Button to clear active filters. */
-    QToolButton *hostGameSplitButton = nullptr;    /**< Split host button, on every style that can draw one. */
-    QPushButton *hostGameButton = nullptr;         /**< Primary quick-host button, on the native macOS style only. */
-    QPushButton *hostGameSettingsButton = nullptr; /**< Opens the host form; a sibling button on macOS. */
-    QMenu *hostGameMenu = nullptr;                 /**< Menu behind the split arrow (non-macOS styles only). */
-    QAction *hostGameAction = nullptr;             /**< Quick-host action, carrying the keyboard shortcut. */
-    QAction *gameSettingsAction = nullptr;         /**< Opens the host form with the current settings. */
-    QLabel *hostErrorLabel;                        /**< Inline failure message for a quick-host request. */
-    QPushButton *joinButton;                       /**< Button to join the selected game. */
-    QPushButton *joinAsJudgeButton;                /**< Button to join the selected game as a judge. */
-    QPushButton *spectateButton;                   /**< Button to spectate the selected game. */
-    QPushButton *joinAsJudgeSpectatorButton;       /**< Button to join the selected game as a spectating judge. */
+    QPushButton *filterButton;                     ///< Button to open the filter dialog.
+    QPushButton *clearFilterButton;                ///< Button to clear active filters.
+    QToolButton *hostGameSplitButton = nullptr;    ///< Split host button, on every style that can draw one.
+    QPushButton *hostGameButton = nullptr;         ///< Primary quick-host button, on the native macOS style only.
+    QPushButton *hostGameSettingsButton = nullptr; ///< Opens the host form; a sibling button on macOS.
+    QMenu *hostGameMenu = nullptr;                 ///< Menu behind the split arrow (non-macOS styles only).
+    QAction *hostGameAction = nullptr;             ///< Quick-host action, carrying the keyboard shortcut.
+    QAction *gameSettingsAction = nullptr;         ///< Opens the host form with the current settings.
+    QLabel *hostErrorLabel;                        ///< Inline failure message for a quick-host request.
+    QPushButton *joinButton;                       ///< Button to join the selected game.
+    QPushButton *joinAsJudgeButton;                ///< Button to join the selected game as a judge.
+    QPushButton *spectateButton;                   ///< Button to spectate the selected game.
+    QPushButton *joinAsJudgeSpectatorButton;       ///< Button to join the selected game as a spectating judge.
 
-    const bool showFilters;  /**< Determines whether filter buttons are displayed. */
-    GameTypeMap gameTypeMap; /**< Mapping of game types for the current room. */
+    const bool showFilters;  ///< Determines whether filter buttons are displayed.
+    GameTypeMap gameTypeMap; ///< Mapping of game types for the current room.
 
-    QTimer filterSaveDebounceTimer; /**< Delays persisting quick-filter edits so typing does not rewrite the settings
-                                       file on every keystroke. */
+    /** Delays persisting quick-filter edits so typing does not rewrite the settings file on every keystroke. */
+    QTimer filterSaveDebounceTimer;
 
-    bool hostCommandPending = false; /**< True while a quick-host command is in flight. */
-    bool joinCommandPending = false; /**< True while a join/spectate command is in flight. */
+    bool hostCommandPending = false; ///< True while a quick-host command is in flight.
+    bool joinCommandPending = false; ///< True while a join/spectate command is in flight.
 
     /** @brief Shows a quick-host failure above the game list. */
     void showHostError(const QString &message);
@@ -211,14 +201,10 @@ private:
      */
     void updateTitle();
 
-    /**
-     * @brief Disables create/join/spectate buttons.
-     */
+    /** @brief Disables create/join/spectate buttons */
     void disableButtons();
 
-    /**
-     * @brief Enables buttons for the currently selected game.
-     */
+    /** @brief Enables buttons for the currently selected game */
     void enableButtons();
 
     /**
@@ -269,14 +255,10 @@ public:
                  QWidget *parent = nullptr);
     ~GameSelector() override;
 
-    /**
-     * @brief Updates UI text for translation/localization.
-     */
+    /** @brief Updates UI text for translation/localization */
     void retranslateUi();
 
-    /**
-     * @brief Re-reads the quick-host and review shortcuts after the user rebinds them.
-     */
+    /** @brief Re-reads the quick-host and review shortcuts after the user rebinds them */
     void refreshShortcuts();
 
     /**

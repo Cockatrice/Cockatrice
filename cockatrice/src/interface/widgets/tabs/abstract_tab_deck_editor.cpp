@@ -146,9 +146,7 @@ void AbstractTabDeckEditor::onDeckChanged()
 {
 }
 
-/**
- * @brief Marks the tab as modified and updates the save menu status.
- */
+/** @brief Marks the tab as modified and updates the save menu status */
 void AbstractTabDeckEditor::onDeckModified()
 {
     deckMenu->setSaveStatus(!deckStateManager->isBlankNewDeck());
@@ -401,9 +399,7 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     return true;
 }
 
-/**
- * @brief Opens the deck share dialog with the current deck preselected.
- */
+/** @brief Opens the deck share dialog with the current deck preselected */
 void AbstractTabDeckEditor::actShareDeck()
 {
     AbstractClient *client = tabSupervisor->getServerClient();
@@ -523,9 +519,7 @@ void AbstractTabDeckEditor::actPrintDeck()
     dlg->exec();
 }
 
-/**
- * @brief Loads a deck from a website.
- */
+/** @brief Loads a deck from a website */
 void AbstractTabDeckEditor::actLoadDeckFromWebsite()
 {
     auto deckOpenLocation = confirmOpen();

@@ -2,6 +2,7 @@
  * @file card_info_display_widget.h
  * @ingroup CardWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef CARDINFOWIDGET_H

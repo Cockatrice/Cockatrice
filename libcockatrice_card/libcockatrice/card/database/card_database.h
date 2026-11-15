@@ -63,9 +63,7 @@ protected:
     CardDatabaseQuerier *querier;
 
 private:
-    /**
-     * @brief Refreshes the cached reverse-related cards for all cards.
-     */
+    /** @brief Refreshes the cached reverse-related cards for all cards */
     void refreshCachedReverseRelatedCards();
 
     /**

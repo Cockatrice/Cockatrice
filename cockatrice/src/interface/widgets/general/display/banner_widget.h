@@ -4,6 +4,7 @@
  * @ingroup DeckEditorCardGroupWidgets
  * @ingroup DeckStorageWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef BANNER_WIDGET_H

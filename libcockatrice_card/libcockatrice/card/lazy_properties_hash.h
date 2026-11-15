@@ -46,19 +46,13 @@ class LazyPropertiesHash
         bool valid = false;
     };
 
-    /**
-     * @brief Looks up @p key in a serialized blob without materializing it.
-     */
+    /** @brief Looks up @p key in a serialized blob without materializing it */
     static QString blobValue(const QByteArray &blob, const QString &key);
 
-    /**
-     * @brief Checks whether @p key is present in a serialized blob without materializing it.
-     */
+    /** @brief Checks whether @p key is present in a serialized blob without materializing it */
     static bool blobContains(const QByteArray &blob, const QString &key);
 
-    /**
-     * @brief Lists the keys of a serialized blob without materializing it.
-     */
+    /** @brief Lists the keys of a serialized blob without materializing it */
     static QStringList blobKeys(const QByteArray &blob);
 
     mutable QByteArray blob;                         ///< Serialized properties (load form).
@@ -68,7 +62,7 @@ class LazyPropertiesHash
 
     /**
      * @brief Materializes properties from blob if not already done. Clears blob afterward.
-     * Safe to call from const getters (members are mutable).
+     *        Safe to call from const getters (members are mutable).
      */
     void ensureMaterialized() const;
 
@@ -99,9 +93,7 @@ class LazyPropertiesHash
     }
 
 public:
-    /**
-     * @brief Default constructor.
-     */
+    /** @brief Default constructor */
     LazyPropertiesHash();
 
     /**
@@ -152,19 +144,13 @@ public:
      */
     bool contains(const QString &key) const;
 
-    /**
-     * @brief Returns the number of properties.
-     */
+    /** @brief Returns the number of properties */
     int size() const;
 
-    /**
-     * @brief Returns whether there are no properties.
-     */
+    /** @brief Returns whether there are no properties */
     bool isEmpty() const;
 
-    /**
-     * @brief Returns the property names, reading them from the blob when possible.
-     */
+    /** @brief Returns the property names, reading them from the blob when possible */
     QStringList keys() const;
 
     /**

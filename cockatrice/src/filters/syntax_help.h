@@ -3,6 +3,7 @@
  * @ingroup CardDatabaseModelFilters
  * @ingroup DeckStorageWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef SEARCH_SYNTAX_HELP_H

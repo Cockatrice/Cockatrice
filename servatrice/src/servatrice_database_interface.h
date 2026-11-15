@@ -43,8 +43,10 @@ private:
     bool checkUserIsIpBanned(const QString &ipAddress, QString &banReason, int &banSecondsRemaining);
     /** Must be called after checkSql and server is known to be in auth mode. */
     bool checkUserIsNameBanned(QString const &userName, QString &banReason, int &banSecondsRemaining);
-    /** Seal a legacy credential for the account's downgrade backup; empty when the
-     *  backup key is unset or the sealed value does not fit the column. */
+    /**
+     * Seal a legacy credential for the account's downgrade backup; empty when the
+     * backup key is unset or the sealed value does not fit the column.
+     */
     QString sealLegacyBackup(const QString &storedName, const QString &credential);
     bool isStrictModeEnabled(bool &ok) const;
     int getDeckPathIdAt(int basePathId, QStringList path, int userId);
@@ -84,9 +86,11 @@ public:
     QString getUserSalt(const QString &user) override;
     QString getUserPasswordData(const QString &user) override;
     bool submitPasswordVerifier(const QString &user, const QString &passwordVerifier) override;
-    /** @brief Decrypt the account's legacy password backup when it exists, is decryptable
-     *  with the configured key and has not aged out; purges it when it has. Returns the
-     *  legacy credential in the stored "salt + hash" format, or an empty string. */
+    /**
+     * @brief Decrypt the account's legacy password backup when it exists, is decryptable
+     * with the configured key and has not aged out; purges it when it has. Returns the
+     * legacy credential in the stored "salt + hash" format, or an empty string.
+     */
     QString getUsableLegacyBackup(const QString &user) override;
     /** @brief Refresh the age window of the account's legacy password backup. */
     void touchLegacyBackup(const QString &user);
@@ -213,8 +217,10 @@ public:
                     const QString &targetName,
                     const QString &channel = QString()) override;
     bool changeUserPassword(const QString &user, const QString &password, bool passwordNeedsHash) override;
-    /** Replace a credential with an already-derived verifier, keeping a sealed legacy hash of the
-     *  same password as the downgrade backup for pre-challenge clients. */
+    /**
+     * Replace a credential with an already-derived verifier, keeping a sealed legacy hash of the
+     * same password as the downgrade backup for pre-challenge clients.
+     */
     bool changeUserPasswordWithLegacyBackup(const QString &user,
                                             const QString &passwordVerifier,
                                             const QString &legacyCredential) override;

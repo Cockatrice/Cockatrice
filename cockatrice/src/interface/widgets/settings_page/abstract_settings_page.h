@@ -12,9 +12,7 @@
 
 struct SettingsSearchEntry;
 
-/**
- * @brief A navigable section of a settings page (one group box)
- */
+/** @brief A navigable section of a settings page (one group box) */
 struct SettingsPageSection
 {
     QString title;                    ///< Translated group title

@@ -3,6 +3,7 @@
  * @ingroup LocalDeckStorageDialogs
  * @ingroup Lobby
  */
+
 //! \todo Document this file.
 
 #ifndef DIALOG_CONVERT_DECK_TO_COD_FORMAT_H

@@ -2,6 +2,7 @@
  * @file sets_model.h
  * @ingroup CardDatabaseModels
  */
+
 //! \todo Document this file.
 
 #ifndef SETSMODEL_H

@@ -2,6 +2,7 @@
  * @file recents_settings.h
  * @ingroup DeckSettings
  */
+
 //! \todo Document this file.
 
 #ifndef RECENTS_SETTINGS_H

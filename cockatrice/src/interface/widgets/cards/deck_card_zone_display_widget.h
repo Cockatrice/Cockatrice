@@ -2,6 +2,7 @@
  * @file deck_card_zone_display_widget.h
  * @ingroup DeckEditorWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef DECK_CARD_ZONE_DISPLAY_WIDGET_H

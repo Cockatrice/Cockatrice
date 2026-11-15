@@ -2,6 +2,7 @@
  * @file custom_zone_menu.h
  * @ingroup GameMenusZones
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_CUSTOM_ZONE_MENU_H

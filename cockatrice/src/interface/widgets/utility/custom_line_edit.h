@@ -2,6 +2,7 @@
  * @file custom_line_edit.h
  * @ingroup UI
  */
+
 //! \todo Document this file.
 
 #ifndef CUSTOMLINEEDIT_H

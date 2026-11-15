@@ -589,9 +589,7 @@ bool DeckStateManager::modifyTree(const QString &reason, const std::function<boo
     return success;
 }
 
-/**
- * @brief Handles updating state and emitting signals whenever the cards are modified
- */
+/** @brief Handles updating state and emitting signals whenever the cards are modified */
 void DeckStateManager::doCardModified()
 {
     setModified(true);
@@ -599,9 +597,7 @@ void DeckStateManager::doCardModified()
     emit deckModified();
 }
 
-/**
- * @brief Handles updating state and emitting signals whenever the metadata is modified
- */
+/** @brief Handles updating state and emitting signals whenever the metadata is modified */
 void DeckStateManager::doMetadataModified()
 {
     setModified(true);

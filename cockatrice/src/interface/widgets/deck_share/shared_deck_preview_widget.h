@@ -2,6 +2,7 @@
  * @file shared_deck_preview_widget.h
  * @ingroup DeckShareWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef SHARED_DECK_PREVIEW_WIDGET_H

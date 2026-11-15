@@ -2,6 +2,7 @@
  * @file mana_devotion_widget.h
  * @ingroup DeckEditorAnalyticsWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef MANA_DEVOTION_WIDGET_H

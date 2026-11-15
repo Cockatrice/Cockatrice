@@ -2,6 +2,7 @@
  * @file event_processing_options.h
  * @ingroup GameLogicPlayers
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_EVENT_PROCESSING_OPTIONS_H

@@ -2,6 +2,7 @@
  * @file dlg_edit_avatar.h
  * @ingroup AccountDialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_EDITAVATAR_H

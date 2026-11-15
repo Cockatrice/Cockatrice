@@ -9,12 +9,14 @@ class QLabel;
 class QPushButton;
 class QWidget;
 
-/** @brief First-run account step. Does NOT embed DlgRegister's fields: they exist
- *         to be handed to ConnectionController's network registration flow, which
- *         this wizard has no visibility into. Reimplementing the fields here
- *         without that wiring would look functional and silently do nothing --
- *         worse than reuse. So: a friendly landing spot that opens the *existing*
- *         DlgRegister / connect flow via signals FirstRunWizard forwards. */
+/**
+ * @brief First-run account step. Does NOT embed DlgRegister's fields: they exist
+ *        to be handed to ConnectionController's network registration flow, which
+ *        this wizard has no visibility into. Reimplementing the fields here
+ *        without that wiring would look functional and silently do nothing --
+ *        worse than reuse. So: a friendly landing spot that opens the *existing*
+ *        DlgRegister / connect flow via signals FirstRunWizard forwards.
+ */
 class AccountSetupPage : public FirstRunWizardPage
 {
     Q_OBJECT

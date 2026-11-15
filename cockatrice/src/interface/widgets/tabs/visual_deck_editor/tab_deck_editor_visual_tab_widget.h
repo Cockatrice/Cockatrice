@@ -58,9 +58,7 @@ class TabDeckEditorVisualTabWidget : public QTabWidget
     Q_OBJECT
 
 public:
-    /**
-     * @brief Sub-tab order in the container; addNewTab() is called in this order.
-     */
+    /** @brief Sub-tab order in the container; addNewTab() is called in this order */
     enum TabIndex
     {
         VisualDeckView,
@@ -96,7 +94,7 @@ public:
     /** @brief Get the total number of tabs. */
     [[nodiscard]] int getTabCount() const;
 
-    VisualDeckEditorWidget *visualDeckView; ///< Visual deck editor widget.
+    VisualDeckEditorWidget *visualDeckView;             ///< Visual deck editor widget.
     DeckListStatisticsAnalyzer *statsAnalyzer;
     DeckAnalyticsWidget *deckAnalytics;                 ///< Deck analytics widget.
     VisualDatabaseDisplayWidget *visualDatabaseDisplay; ///< Database display widget.

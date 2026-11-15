@@ -2,6 +2,7 @@
  * @file card_menu.h
  * @ingroup GameMenusCards
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_CARD_MENU_H

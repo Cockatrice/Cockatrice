@@ -13,10 +13,11 @@ class QQuickWidget;
 class GradientFallbackWidget;
 class QStackedLayout;
 
-/** @brief Onboarding banner: a subtle, looping brand-shader animation, one of six
- *         per-page "motifs" driving the same prebaked fragment shader
- *         (onboarding/shaders/brand_banner.frag) with different uniform values, so
- *         every page feels distinct but unmistakably part of the same family.
+/**
+ * @brief Onboarding banner: a subtle, looping brand-shader animation, one of six
+ *        per-page "motifs" driving the same prebaked fragment shader
+ *        (onboarding/shaders/brand_banner.frag) with different uniform values, so
+ *        every page feels distinct but unmistakably part of the same family.
  *
  * Motif switches crossfade smoothly (see BrandBanner.qml's two stacked
  * ShaderEffect layers + Behavior on opacity) rather than cutting instantly
@@ -28,7 +29,8 @@ class QStackedLayout;
  * the platform's Qt Quick scenegraph can't initialize -- e.g. software
  * rendering only, or a CI/VM environment with no GPU -- so onboarding
  * never blocks or blanks out over a graphics driver problem. The fallback
- * is permanent for the lifetime of this widget once triggered. */
+ * is permanent for the lifetime of this widget once triggered.
+ */
 class BannerHost : public QWidget
 {
     Q_OBJECT

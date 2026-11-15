@@ -2,6 +2,7 @@
  * @file mana_symbol_widget.h
  * @ingroup CardExtraInfoWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef MANA_SYMBOL_WIDGET_H

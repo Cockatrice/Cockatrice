@@ -2,6 +2,7 @@
  * @file view_zone_logic.h
  * @ingroup GameLogicZones
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_VIEW_ZONE_LOGIC_H

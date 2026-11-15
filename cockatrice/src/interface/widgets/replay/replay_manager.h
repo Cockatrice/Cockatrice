@@ -11,9 +11,7 @@ class GameReplay;
 class QTimer;
 class GameEventContainer;
 
-/**
- * @brief This class handles all logic to do with playing back replays
- */
+/** @brief This class handles all logic to do with playing back replays */
 class ReplayManager : public QObject
 {
     Q_OBJECT

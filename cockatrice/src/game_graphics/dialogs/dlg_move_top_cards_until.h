@@ -2,6 +2,7 @@
  * @file dlg_move_top_cards_until.h
  * @ingroup GameDialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_MOVE_TOP_CARDS_UNTIL_H

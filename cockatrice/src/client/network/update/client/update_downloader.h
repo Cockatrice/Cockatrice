@@ -2,6 +2,7 @@
  * @file update_downloader.h
  * @ingroup ClientUpdate
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_UPDATEDOWNLOADER_H

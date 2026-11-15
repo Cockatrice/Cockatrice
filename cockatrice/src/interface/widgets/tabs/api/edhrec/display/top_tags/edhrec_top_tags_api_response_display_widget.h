@@ -2,6 +2,7 @@
  * @file edhrec_top_tags_api_response_display_widget.h
  * @ingroup ApiResponseDisplayWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef EDHREC_TOP_TAGS_API_RESPONSE_DISPLAY_WIDGET_H

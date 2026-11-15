@@ -30,12 +30,12 @@ class ICardDatabaseParser;
  */
 enum LoadStatus
 {
-    Ok,            /**< Database loaded successfully. */
-    VersionTooOld, /**< Database version is too old to load. */
-    Invalid,       /**< Database is invalid or unparsable. */
-    NotLoaded,     /**< Database has not been loaded. */
-    FileError,     /**< Error opening or reading the file. */
-    NoCards        /**< Database contains no cards. */
+    Ok,            ///< Database loaded successfully.
+    VersionTooOld, ///< Database version is too old to load.
+    Invalid,       ///< Database is invalid or unparsable.
+    NotLoaded,     ///< Database has not been loaded.
+    FileError,     ///< Error opening or reading the file.
+    NoCards        ///< Database contains no cards.
 };
 
 /**
@@ -172,13 +172,13 @@ private:
     bool saveToCache(const CardDatabaseData &data, const QByteArray &sourceHash);
 
 private:
-    CardDatabase *database;                         /**< Non-owning pointer to the target CardDatabase. */
-    ICardDatabasePathProvider *pathProvider;        /**< Pointer to the path provider. */
-    ICardSetPriorityController *priorityController; /**< Controller for reconstructing set state. */
-    QList<ICardDatabaseParser *> availableParsers;  /**< List of available parsers for different formats. */
+    CardDatabase *database;                         ///< Non-owning pointer to the target CardDatabase.
+    ICardDatabasePathProvider *pathProvider;        ///< Pointer to the path provider.
+    ICardSetPriorityController *priorityController; ///< Controller for reconstructing set state.
+    QList<ICardDatabaseParser *> availableParsers;  ///< List of available parsers for different formats.
 
-    QBasicMutex loadFromFileMutex;   /**< Mutex for single-file loading. */
-    QBasicMutex reloadDatabaseMutex; /**< Mutex for reloading entire database. */
+    QBasicMutex loadFromFileMutex;   ///< Mutex for single-file loading.
+    QBasicMutex reloadDatabaseMutex; ///< Mutex for reloading entire database.
 };
 
 #endif // COCKATRICE_CARD_DATABASE_LOADER_H

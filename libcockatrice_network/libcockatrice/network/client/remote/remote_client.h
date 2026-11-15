@@ -2,6 +2,7 @@
  * @file remote_client.h
  * @ingroup Client
  */
+
 //! \todo Document this file.
 
 #ifndef REMOTECLIENT_H

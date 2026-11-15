@@ -2,6 +2,7 @@
  * @file printing_selector_card_overlay_widget.h
  * @ingroup PrintingWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H

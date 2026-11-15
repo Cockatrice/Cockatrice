@@ -2,6 +2,7 @@
  * @file message_log_widget.h
  * @ingroup GameWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef MESSAGELOGWIDGET_H

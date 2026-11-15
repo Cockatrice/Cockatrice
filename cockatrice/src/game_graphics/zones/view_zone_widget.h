@@ -2,6 +2,7 @@
  * @file view_zone_widget.h
  * @ingroup GameGraphicsZones
  */
+
 //! \todo Document this file.
 #ifndef ZONEVIEWWIDGET_H
 #define ZONEVIEWWIDGET_H

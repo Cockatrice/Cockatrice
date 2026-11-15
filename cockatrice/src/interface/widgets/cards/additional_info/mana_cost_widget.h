@@ -2,6 +2,7 @@
  * @file mana_cost_widget.h
  * @ingroup CardExtraInfoWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef MANA_COST_WIDGET_H

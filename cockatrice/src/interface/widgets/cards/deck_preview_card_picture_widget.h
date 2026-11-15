@@ -3,6 +3,7 @@
  * @ingroup CardWidgets
  * @ingroup Lobby
  */
+
 //! \todo Document this file.
 
 #ifndef DECK_PREVIEW_CARD_PICTURE_WIDGET_H

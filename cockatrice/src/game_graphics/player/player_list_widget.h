@@ -2,6 +2,7 @@
  * @file player_list_widget.h
  * @ingroup GameWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef PLAYERLISTWIDGET_H

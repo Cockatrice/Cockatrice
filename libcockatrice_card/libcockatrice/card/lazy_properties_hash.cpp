@@ -37,9 +37,7 @@ bool readBlobLength(const QByteArray &blob, int &pos, quint32 &length)
     return true;
 }
 
-/**
- * @brief Compares the serialized bytes at @p pos with @p key without allocating a QString.
- */
+/** @brief Compares the serialized bytes at @p pos with @p key without allocating a QString */
 bool blobKeyEquals(const QByteArray &blob, int pos, quint32 length, const QString &key)
 {
     if (length != static_cast<quint32>(key.size()) * 2) {
@@ -57,9 +55,7 @@ bool blobKeyEquals(const QByteArray &blob, int pos, quint32 length, const QStrin
     return true;
 }
 
-/**
- * @brief Builds a QString from the serialized UTF-16BE bytes at @p pos.
- */
+/** @brief Builds a QString from the serialized UTF-16BE bytes at @p pos */
 QString blobString(const QByteArray &blob, int pos, quint32 length)
 {
     const int codeUnits = static_cast<int>(length / 2);

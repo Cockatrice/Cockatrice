@@ -470,17 +470,13 @@ QString DeckList::getDeckHash() const
     return cachedDeckHash;
 }
 
-/**
- * Invalidates the cached deckHash.
- */
+/** Invalidates the cached deckHash */
 void DeckList::refreshDeckHash()
 {
     cachedDeckHash = QString();
 }
 
-/**
- * Calls a given function on each card in the deck.
- */
+/** Calls a given function on each card in the deck */
 void DeckList::forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func) const
 {
     tree.forEachCard(func);

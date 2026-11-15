@@ -2,6 +2,7 @@
  * @file tab_visual_database_display.h
  * @ingroup Tabs
  */
+
 //! \todo Document this file.
 
 #ifndef TAB_VISUAL_DATABASE_DISPLAY_H

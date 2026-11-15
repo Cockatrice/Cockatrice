@@ -2,6 +2,7 @@
  * @file abstract_graphics_item.h
  * @ingroup GameGraphics
  */
+
 //! \todo Document this file.
 
 #ifndef ABSTRACTGRAPHICSITEM_H

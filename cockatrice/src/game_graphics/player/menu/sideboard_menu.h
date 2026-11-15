@@ -2,6 +2,7 @@
  * @file sideboard_menu.h
  * @ingroup GameMenusZones
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_SIDEBOARD_MENU_H

@@ -110,9 +110,7 @@ void LibraryEdgeMarker::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     painter->restore();
 }
 
-/**
- * @param parent the parent QGraphicsWidget containing the reveal zone
- */
+/** @param parent the parent QGraphicsWidget containing the reveal zone */
 ZoneViewZone::ZoneViewZone(ZoneViewZoneLogic *_logic, QGraphicsItem *parent)
     : SelectZone(_logic, parent), bRect(QRectF()), minRows(0), groupBy(CardList::NoSort), sortBy(CardList::NoSort)
 {

@@ -94,9 +94,7 @@ protected:
         loader = new CardPictureLoaderLocal(nullptr);
     }
 
-    /**
-     * @brief Writes a valid 1x1 PNG under the sandboxed pics path.
-     */
+    /** @brief Writes a valid 1x1 PNG under the sandboxed pics path */
     void writePngUnderPics(const QString &relativePath, const QColor &color = Qt::red)
     {
         const QString fullPath = picsPath() + "/" + relativePath;

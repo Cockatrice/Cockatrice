@@ -23,9 +23,7 @@
 
 class QWidget;
 
-/**
- * Creates the main layout and connects the signals that are common to all versions of this window
- */
+/** Creates the main layout and connects the signals that are common to all versions of this window */
 AbstractDlgDeckTextEdit::AbstractDlgDeckTextEdit(QWidget *parent) : QDialog(parent)
 {
     setObjectName("dlgDeckTextEdit");

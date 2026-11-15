@@ -827,9 +827,7 @@ void DeckListModel::cleanList()
     setDeckList(QSharedPointer<DeckList>(new DeckList()));
 }
 
-/**
- * @param _deck The deck.
- */
+/** @param _deck The deck */
 void DeckListModel::setDeckList(const QSharedPointer<DeckList> &_deck)
 {
     if (deckList != _deck) {

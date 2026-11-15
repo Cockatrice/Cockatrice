@@ -2,6 +2,7 @@
  * @file filter_card.h
  * @ingroup CardDatabaseModelFilters
  */
+
 //! \todo Document this file.
 
 #ifndef CARDFILTER_H
@@ -26,8 +27,7 @@ public:
         TypeEnd
     };
 
-    /* if you add an attribute here you also need to
-     * add its string representation in attrName */
+    /** if you add an attribute here you also need to add its string representation in attrName */
     enum Attr
     {
         AttrCmc = 0,

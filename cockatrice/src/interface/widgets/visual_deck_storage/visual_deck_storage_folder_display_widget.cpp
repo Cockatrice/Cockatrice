@@ -90,9 +90,7 @@ void VisualDeckStorageFolderDisplayWidget::scheduleReconcile()
     reconcileTimer->start();
 }
 
-/**
- * @brief Starts a new chunked scan of the source model, yielding to the event loop between chunks.
- */
+/** @brief Starts a new chunked scan of the source model, yielding to the event loop between chunks */
 void VisualDeckStorageFolderDisplayWidget::reconcile()
 {
     beginDeckPass();
@@ -306,9 +304,7 @@ void VisualDeckStorageFolderDisplayWidget::updateShowFolders(bool enabled)
     scheduleReconcile();
 }
 
-/**
- * @brief Hides the folder when it contains nothing visible, and reports the change upward.
- */
+/** @brief Hides the folder when it contains nothing visible, and reports the change upward */
 void VisualDeckStorageFolderDisplayWidget::refreshVisibility()
 {
     const bool shouldBeVisible = hasContent();
@@ -340,9 +336,7 @@ bool VisualDeckStorageFolderDisplayWidget::hasContent() const
     return false;
 }
 
-/**
- * @brief The direct child folder paths of this folder, sorted by name.
- */
+/** @brief The direct child folder paths of this folder, sorted by name */
 QStringList VisualDeckStorageFolderDisplayWidget::childFolderPaths() const
 {
     QStringList children;

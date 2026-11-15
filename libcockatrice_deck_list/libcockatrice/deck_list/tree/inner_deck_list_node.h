@@ -164,9 +164,7 @@ public:
         return true;
     }
 
-    /**
-     * @brief Delete all children of this node, recursively.
-     */
+    /** @brief Delete all children of this node, recursively */
     void clearTree();
 
     /**
@@ -230,9 +228,7 @@ public:
     QVector<QPair<int, int>> sort(Qt::SortOrder order = Qt::AscendingOrder);
 
 private:
-    /**
-     * @brief Snapshots the current children as (old index, node) pairs.
-     */
+    /** @brief Snapshots the current children as (old index, node) pairs */
     QVector<QPair<int, AbstractDecklistNode *>> indexedSnapshot() const;
 
     /**

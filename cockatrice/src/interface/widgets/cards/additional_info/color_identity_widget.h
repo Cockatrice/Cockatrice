@@ -2,6 +2,7 @@
  * @file color_identity_widget.h
  * @ingroup CardExtraInfoWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef COLOR_IDENTITY_WIDGET_H

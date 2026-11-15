@@ -2,6 +2,7 @@
  * @file game_view.h
  * @ingroup GameGraphics
  */
+
 //! \todo Document this file.
 
 #ifndef GAMEVIEW_H

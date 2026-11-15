@@ -244,9 +244,7 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
     }
 }
 
-/**
- * @brief Resets the fields that should be reset after a zone transition
- */
+/** @brief Resets the fields that should be reset after a zone transition */
 void CardItem::resetState(bool keepAnnotations)
 {
     state->resetState(keepAnnotations);

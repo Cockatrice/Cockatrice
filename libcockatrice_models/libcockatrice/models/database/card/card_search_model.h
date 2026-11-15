@@ -2,6 +2,7 @@
  * @file card_search_model.h
  * @ingroup CardDatabaseModels
  */
+
 //! \todo Document this file.
 
 #ifndef CARD_SEARCH_MODEL_H

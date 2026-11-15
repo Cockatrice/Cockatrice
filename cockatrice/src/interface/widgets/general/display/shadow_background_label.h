@@ -2,6 +2,7 @@
  * @file shadow_background_label.h
  * @ingroup PrintingWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef STYLEDLABEL_H

@@ -2,6 +2,7 @@
  * @file translate_counter_name.h
  * @ingroup GameGraphicsPlayers
  */
+
 //! \todo Document this file.
 
 #ifndef TRANSLATECOUNTERNAME_H

@@ -2,6 +2,7 @@
  * @file dlg_select_set_for_cards.h
  * @ingroup Dialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_SELECT_SET_FOR_CARDS_H

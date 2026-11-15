@@ -3,6 +3,7 @@
  * @ingroup LocalDeckStorageDialogs
  * @ingroup Lobby
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_LOAD_DECK_FROM_CLIPBOARD_H
@@ -21,9 +22,7 @@ class QPushButton;
 class QCheckBox;
 class QWidget;
 
-/**
- * Base class for dialog windows for actions that involve loading decks from text input.
- */
+/** Base class for dialog windows for actions that involve loading decks from text input */
 class AbstractDlgDeckTextEdit : public QDialog
 {
     Q_OBJECT
@@ -55,9 +54,7 @@ protected slots:
     virtual void actRefresh() = 0;
 };
 
-/**
- * Dialog window for the "Load deck from clipboard" action
- */
+/** Dialog window for the "Load deck from clipboard" action */
 class DlgLoadDeckFromClipboard : public AbstractDlgDeckTextEdit
 {
     Q_OBJECT
@@ -77,9 +74,7 @@ public:
     }
 };
 
-/**
- * Dialog window for the "Edit deck in clipboard" action
- */
+/** Dialog window for the "Edit deck in clipboard" action */
 class DlgEditDeckInClipboard : public AbstractDlgDeckTextEdit
 {
     Q_OBJECT

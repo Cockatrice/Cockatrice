@@ -74,9 +74,7 @@ void scrubStringValue(sentry_value_t holder, const char *key)
     sentry_value_set_by_key(holder, key, sentry_value_new_string(scrubCockatriceUrls(raw).c_str()));
 }
 
-/**
- * @brief Scrub trivially reachable string values inside a breadcrumb data object.
- */
+/** @brief Scrub trivially reachable string values inside a breadcrumb data object */
 int scrubDataEntry(const char *key, sentry_value_t value, void *userdata)
 {
     if (sentry_value_get_type(value) != SENTRY_VALUE_TYPE_STRING) {

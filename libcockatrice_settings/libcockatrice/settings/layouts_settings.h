@@ -2,6 +2,7 @@
  * @file layouts_settings.h
  * @ingroup CoreSettings
  */
+
 //! \todo Document this file.
 
 #ifndef LAYOUTSSETTINGS_H

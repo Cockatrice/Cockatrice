@@ -17,9 +17,7 @@ class QPoint;
 class QWidget;
 template <typename T> class QList;
 
-/**
- * @brief The card database table.
- */
+/** @brief The card database table */
 class CardDatabaseView : public QTreeView
 {
     Q_OBJECT

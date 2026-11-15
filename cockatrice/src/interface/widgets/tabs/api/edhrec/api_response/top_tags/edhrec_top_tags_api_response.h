@@ -2,6 +2,7 @@
  * @file edhrec_top_tags_api_response.h
  * @ingroup ApiResponses
  */
+
 //! \todo Document this file.
 
 #ifndef EDHREC_TOP_TAGS_API_RESPONSE_H

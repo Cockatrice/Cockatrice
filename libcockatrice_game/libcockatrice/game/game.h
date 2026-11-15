@@ -2,6 +2,7 @@
  * @file game.h
  * @ingroup GameLogic
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_GAME_H

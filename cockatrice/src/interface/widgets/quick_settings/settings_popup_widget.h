@@ -3,6 +3,7 @@
  * @ingroup Widgets
  * @ingroup Settings
  */
+
 //! \todo Document this file.
 
 #ifndef SETTINGS_POPUP_WIDGET_H

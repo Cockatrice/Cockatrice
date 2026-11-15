@@ -38,10 +38,10 @@ namespace DeckRoles
  */
 enum
 {
-    IsCardRole = Qt::UserRole + 1, /**< Indicates whether the item represents a card. */
-    DepthRole,                     /**< Depth level within the deck's grouping hierarchy. */
-    IsLegalRole,                   /**< Whether the card is legal in the current deck format. */
-    IsCustomZoneRole               /**< Whether the item represents a custom zone nested under a board zone. */
+    IsCardRole = Qt::UserRole + 1, ///< Indicates whether the item represents a card.
+    DepthRole,                     ///< Depth level within the deck's grouping hierarchy.
+    IsLegalRole,                   ///< Whether the card is legal in the current deck format.
+    IsCustomZoneRole               ///< Whether the item represents a custom zone nested under a board zone.
 };
 } // namespace DeckRoles
 
@@ -59,11 +59,11 @@ namespace DeckListModelColumns
  */
 enum
 {
-    CARD_AMOUNT = 0,           /**< The number of copies of the card. */
-    CARD_NAME = 1,             /**< The card's name. */
-    CARD_SET = 2,              /**< The set or expansion the card belongs to. */
-    CARD_COLLECTOR_NUMBER = 3, /**< Collector number of the card within the set. */
-    CARD_PROVIDER_ID = 4       /**< ID used by the external data provider (e.g., Scryfall). */
+    CARD_AMOUNT = 0,           ///< The number of copies of the card.
+    CARD_NAME = 1,             ///< The card's name.
+    CARD_SET = 2,              ///< The set or expansion the card belongs to.
+    CARD_COLLECTOR_NUMBER = 3, ///< Collector number of the card within the set.
+    CARD_PROVIDER_ID = 4       ///< ID used by the external data provider (e.g., Scryfall).
 };
 } // namespace DeckListModelColumns
 
@@ -81,9 +81,9 @@ namespace DeckListModelGroupCriteria
  */
 enum Type
 {
-    MAIN_TYPE, /**< Group cards by their main type (e.g., creature, instant). */
-    MANA_COST, /**< Group cards by their total mana cost. */
-    COLOR      /**< Group cards by their color identity. */
+    MAIN_TYPE, ///< Group cards by their main type (e.g., creature, instant).
+    MANA_COST, ///< Group cards by their total mana cost.
+    COLOR      ///< Group cards by their color identity.
 };
 static inline QString toString(Type t)
 {
@@ -125,7 +125,7 @@ static inline Type fromString(const QString &s)
 class DecklistModelCardNode : public AbstractDecklistCardNode
 {
 private:
-    DecklistCardNode *dataNode; /**< Pointer to the underlying data node. */
+    DecklistCardNode *dataNode; ///< Pointer to the underlying data node.
 
 public:
     /**
@@ -246,32 +246,26 @@ public slots:
     void setActiveFormat(const QString &_format);
 
 signals:
-    /**
-     * @brief Emitted whenever the deck hash changes due to modifications in the model.
-     */
+    /** @brief Emitted whenever the deck hash changes due to modifications in the model */
     void deckHashChanged();
 
-    /**
-     * @brief Emitted whenever the cards in the deck changes. This includes when the deck is replaced.
-     */
+    /** @brief Emitted whenever the cards in the deck changes. This includes when the deck is replaced */
     void cardsChanged();
 
     /**
      * @brief Emitted whenever a card is added to the deck, regardless of whether it's an entirely new card or an
-     * existing card that got incremented.
+     *        existing card that got incremented.
      * @param index The index of the card that got added.
      */
     void cardAddedAt(const QModelIndex &index);
 
     /**
      * @brief Emitted whenever a card is removed from the deck, regardless of whether a card node was removed or an
-     * existing card got decremented.
+     *        existing card got decremented.
      */
     void cardRemoved();
 
-    /**
-     * @brief Emitted whenever a card node is added or removed. This includes when the deck is replaced.
-     */
+    /** @brief Emitted whenever a card node is added or removed. This includes when the deck is replaced */
     void cardNodesChanged();
 
     /**
@@ -280,14 +274,10 @@ signals:
      */
     void cardNodeAddedAt(const QModelIndex &index);
 
-    /**
-     * @brief Emitted whenever a card node is removed.
-     */
+    /** @brief Emitted whenever a card node is removed */
     void cardNodeRemoved();
 
-    /**
-     * @brief Emitted whenever the deck in the model has been replaced with a new one
-     */
+    /** @brief Emitted whenever the deck in the model has been replaced with a new one */
     void deckReplaced();
 
 public:
@@ -375,9 +365,7 @@ public:
      */
     bool removeCardAtIndex(const QModelIndex &idx);
 
-    /**
-     * @brief Removes all cards and resets the model.
-     */
+    /** @brief Removes all cards and resets the model */
     void cleanList();
 
     [[nodiscard]] QSharedPointer<DeckList> getDeckList() const
@@ -393,23 +381,15 @@ public:
      */
     void forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func);
 
-    /**
-     * @brief Gets a list of all card nodes in the deck.
-     */
+    /** @brief Gets a list of all card nodes in the deck */
     [[nodiscard]] QList<const DecklistCardNode *> getCardNodes() const;
     [[nodiscard]] QList<const DecklistCardNode *> getCardNodesForZone(const QString &zoneName) const;
 
-    /**
-     * @brief Gets a deduplicated list of all card names that appear in the model
-     */
+    /** @brief Gets a deduplicated list of all card names that appear in the model */
     [[nodiscard]] QList<QString> getCardNames() const;
-    /**
-     * @brief Gets a deduplicated list of all CardRefs that appear in the model
-     */
+    /** @brief Gets a deduplicated list of all CardRefs that appear in the model */
     [[nodiscard]] QList<CardRef> getCardRefs() const;
-    /**
-     * @brief Gets a list of all zone names that appear in the model
-     */
+    /** @brief Gets a list of all zone names that appear in the model */
     [[nodiscard]] QList<QString> getZones() const;
 
     /**
@@ -421,12 +401,12 @@ public:
     [[nodiscard]] QStringList getCustomZoneNames(const QString &boardZoneName) const;
 
 private:
-    QSharedPointer<DeckList> deckList; /**< Pointer to the decklist providing the underlying data. */
-    InnerDecklistNode *root;           /**< Root node of the model tree. */
+    QSharedPointer<DeckList> deckList; ///< Pointer to the decklist providing the underlying data.
+    InnerDecklistNode *root;           ///< Root node of the model tree.
     DeckListModelGroupCriteria::Type activeGroupCriteria = DeckListModelGroupCriteria::MAIN_TYPE;
-    int lastKnownColumn;          /**< Last column used for sorting. */
-    Qt::SortOrder lastKnownOrder; /**< Last known sort order. */
-    QString displayLang = "en";   /**< Language code for localized card names in the display role. */
+    int lastKnownColumn;          ///< Last column used for sorting.
+    Qt::SortOrder lastKnownOrder; ///< Last known sort order.
+    QString displayLang = "en";   ///< Language code for localized card names in the display role.
 
     InnerDecklistNode *createNodeIfNeeded(const QString &name, InnerDecklistNode *parent);
     QModelIndex nodeToIndex(AbstractDecklistNode *node) const;

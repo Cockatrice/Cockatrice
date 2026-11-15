@@ -2,6 +2,7 @@
  * @file deck_editor_menu.h
  * @ingroup DeckEditors
  */
+
 //! \todo Document this file.
 
 #ifndef DECK_EDITOR_MENU_H

@@ -117,9 +117,7 @@ public:
      */
     static void deleteAllLocalOverrides(const ExactCard &card);
 
-    /**
-     * @brief Clears the in-memory QPixmap cache for all cards.
-     */
+    /** @brief Clears the in-memory QPixmap cache for all cards */
     static void clearPixmapCache();
 
 public slots:

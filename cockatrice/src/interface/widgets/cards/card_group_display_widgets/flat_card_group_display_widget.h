@@ -2,6 +2,7 @@
  * @file flat_card_group_display_widget.h
  * @ingroup DeckEditorCardGroupWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef FLAT_CARD_GROUP_DISPLAY_WIDGET_H

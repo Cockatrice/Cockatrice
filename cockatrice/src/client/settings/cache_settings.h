@@ -2,6 +2,7 @@
  * @file cache_settings.h
  * @ingroup Settings
  */
+
 //! \todo Document this file.
 
 #ifndef SETTINGSCACHE_H

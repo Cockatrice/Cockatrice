@@ -45,9 +45,7 @@ class SettingsSearchModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    /**
-     * @brief Custom data role for accessing the full entry
-     */
+    /** @brief Custom data role for accessing the full entry */
     enum Roles
     {
         EntryRole = Qt::UserRole + 1, ///< Full SettingsSearchEntry object

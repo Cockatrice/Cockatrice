@@ -2,6 +2,7 @@
  * @file visual_deck_editor_sample_hand_widget.h
  * @ingroup DeckEditorAnalyticsWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef VISUAL_DECK_EDITOR_SAMPLE_HAND_WIDGET_H

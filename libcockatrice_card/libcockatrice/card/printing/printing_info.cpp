@@ -29,9 +29,7 @@ bool PrintingInfo::operator==(const PrintingInfo &other) const
     return true;
 }
 
-/**
- * Gets the uuid property of the printing, or an empty string if the property isn't present
- */
+/** Gets the uuid property of the printing, or an empty string if the property isn't present */
 QString PrintingInfo::getUuid() const
 {
     return getProperty("uuid");

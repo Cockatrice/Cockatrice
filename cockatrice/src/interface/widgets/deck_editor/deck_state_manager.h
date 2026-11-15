@@ -63,14 +63,10 @@ public:
         return deckListModel;
     }
 
-    /**
-     * @brief Gets a view of the current deck.
-     */
+    /** @brief Gets a view of the current deck */
     const DeckList &getDeckList() const;
 
-    /**
-     * @brief Gets the underlying DeckList.
-     */
+    /** @brief Gets the underlying DeckList */
     QSharedPointer<DeckList> getDeckListShared() const
     {
         return deckList;
@@ -83,24 +79,16 @@ public:
      */
     LoadedDeck toLoadedDeck() const;
 
-    /**
-     * @brief Gets a view of the metadata in the DeckList
-     */
+    /** @brief Gets a view of the metadata in the DeckList */
     DeckList::Metadata const &getMetadata() const;
 
-    /**
-     * @brief Gets the deck's simplified name.
-     */
+    /** @brief Gets the deck's simplified name */
     QString getSimpleDeckName() const;
 
-    /**
-     * @brief Gets the deck hash.
-     */
+    /** @brief Gets the deck hash */
     QString getDeckHash() const;
 
-    /**
-     * @brief Checks if the deck has been modified since it was last saved
-     */
+    /** @brief Checks if the deck has been modified since it was last saved */
     bool isModified() const;
 
     /**
@@ -111,9 +99,7 @@ public:
      */
     void setModified(bool state);
 
-    /**
-     * @brief Checks if the deck state is as if it was a new deck
-     */
+    /** @brief Checks if the deck state is as if it was a new deck */
     bool isBlankNewDeck() const;
 
     /**
@@ -122,9 +108,7 @@ public:
      */
     void replaceDeck(const LoadedDeck &deck);
 
-    /**
-     * @brief Resets the deck to a blank new deck, resetting all history.
-     */
+    /** @brief Resets the deck to a blank new deck, resetting all history */
     void clearDeck();
 
     /**
@@ -336,9 +320,7 @@ private:
     void doMetadataModified();
 
 signals:
-    /**
-     * A modification has been made to the cards in the deck
-     */
+    /** A modification has been made to the cards in the deck */
     void cardModified();
 
     /**
@@ -347,24 +329,16 @@ signals:
      */
     void uniqueCardsChanged();
 
-    /**
-     * A modification has been made to the metadata in the deck
-     */
+    /** A modification has been made to the metadata in the deck */
     void metadataModified();
 
-    /**
-     * A modification has been made to the cards or metadata in the deck
-     */
+    /** A modification has been made to the cards or metadata in the deck */
     void deckModified();
 
-    /**
-     * The history has been greatly changed and needs to be reloaded.
-     */
+    /** The history has been greatly changed and needs to be reloaded */
     void historyChanged();
 
-    /**
-     * The deck has been completely changed.
-     */
+    /** The deck has been completely changed */
     void deckReplaced();
 
     /**

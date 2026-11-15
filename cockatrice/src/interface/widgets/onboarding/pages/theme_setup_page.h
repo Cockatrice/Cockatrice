@@ -12,10 +12,11 @@ class QGroupBox;
 class QuickSetupPanel;
 class QWidget;
 
-/** @brief First-run theme step. Reuses the same building blocks as Appearance
- *         settings and the Palette Editor (ThemeManager, PaletteConfig,
- *         PaletteGenerator, and the QuickSetupPanel widget itself) rather than
- *         reimplementing palette generation or preview here.
+/**
+ * @brief First-run theme step. Reuses the same building blocks as Appearance
+ *        settings and the Palette Editor (ThemeManager, PaletteConfig,
+ *        PaletteGenerator, and the QuickSetupPanel widget itself) rather than
+ *        reimplementing palette generation or preview here.
  *
  * Behavior specific to this page (deliberately not pushed down into
  * ThemeManager, to avoid changing app-wide behaviour for existing installs):
@@ -23,7 +24,8 @@ class QWidget;
  *    auto-generation only happen when the user actually changes a control.
  *  - If a theme+scheme the user selects has no saved palette and no shipped
  *    default, one is generated from the QuickSetupPanel's current accent so
- *    the preview doesn't fall back to a flat, unstyled look. */
+ *    the preview doesn't fall back to a flat, unstyled look.
+ */
 class ThemeSetupPage : public FirstRunWizardPage
 {
     Q_OBJECT

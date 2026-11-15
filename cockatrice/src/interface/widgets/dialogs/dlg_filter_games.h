@@ -2,6 +2,7 @@
  * @file dlg_filter_games.h
  * @ingroup RoomDialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_FILTER_GAMES_H

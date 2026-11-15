@@ -2,7 +2,6 @@
  * @file abstract_tab_deck_editor.h
  * @brief Defines the AbstractTabDeckEditor class, which provides a base for
  * deck editor tabs in the application.
- *
  */
 
 #ifndef TAB_GENERIC_DECK_EDITOR_H
@@ -250,8 +249,9 @@ protected slots:
     /** @brief Handles dock close events. */
     void closeEvent(QCloseEvent *event) override;
 
-    /** @brief Sets the deck for this tab.
-     *  @param _deck The deck object.
+    /**
+     * @brief Sets the deck for this tab.
+     * @param _deck The deck object.
      */
     virtual void setDeck(const LoadedDeck &_deck);
 
@@ -259,8 +259,9 @@ private:
     /** @brief Helper for editing decks from the clipboard. */
     void editDeckInClipboard(bool annotated);
 
-    /** @brief Helper for exporting decks to websites.
-     *  @param website Target website.
+    /**
+     * @brief Helper for exporting decks to websites.
+     * @param website Target website.
      */
     void exportToDecklistWebsite(DeckLoader::DecklistWebsite website);
 
@@ -273,9 +274,7 @@ protected:
         NEW_TAB    ///< Open deck in a new tab
     };
 
-    /**
-     * @brief The actions associated with managing a QDockWidget
-     */
+    /** @brief The actions associated with managing a QDockWidget */
     struct DockActions
     {
         QMenu *menu;        ///< The menu containing the actions
@@ -285,19 +284,21 @@ protected:
     };
 
     /**
-     * @brief registers a QDockWidget as a managed dock widget. Creates the associated actions and menu, adds them to
-     * the viewMenu, and connects those actions to the tab's slots.
+     * @brief registers a QDockWidget as a managed dock widget. Creates the associated actions and menu,
+	 *        adds them to the viewMenu, and connects those actions to the tab's slots.
      */
     void registerDockWidget(QMenu *_viewMenu, QDockWidget *widget, const QSize &defaultSize);
 
-    /** @brief Confirms deck open action based on settings and modified state.
-     *  @param openInSameTabIfBlank Whether to reuse same tab if blank.
-     *  @return Selected DeckOpenLocation.
+    /**
+     * @brief Confirms deck open action based on settings and modified state.
+     * @param openInSameTabIfBlank Whether to reuse same tab if blank.
+     * @return Selected DeckOpenLocation.
      */
     DeckOpenLocation confirmOpen(bool openInSameTabIfBlank = true);
 
-    /** @brief Creates a save confirmation message box.
-     *  @return Pointer to a QMessageBox.
+    /**
+     * @brief Creates a save confirmation message box.
+     * @return Pointer to a QMessageBox.
      */
     QMessageBox *createSaveConfirmationWindow();
 

@@ -2,6 +2,7 @@
  * @file deck_preview_tag_addition_widget.h
  * @ingroup VisualDeckPreviewWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef DECK_PREVIEW_TAG_ADDITION_WIDGET_H

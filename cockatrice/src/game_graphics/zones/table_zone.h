@@ -2,6 +2,7 @@
  * @file table_zone.h
  * @ingroup GameGraphicsZones
  */
+
 //! \todo Document this file.
 
 #ifndef TABLEZONE_H
@@ -44,9 +45,7 @@ signals:
     void sizeChanged();
 
 private:
-    /*
-    Margins between table edges and cards, paddings between cards
-    */
+    /** Margins between table edges and cards, paddings between cards */
     static const int MARGIN_LEFT = 20;
     static const int MARGIN_RIGHT = 15;
     static const int MARGIN_TOP = 10;
@@ -54,50 +53,34 @@ private:
     static const int PADDING_X = 35;
     static const int PADDING_Y = 30;
 
-    /*
-    Minimum width of the table zone including margins.
-    */
+    /** Minimum width of the table zone including margins */
     static const int MIN_WIDTH = MARGIN_LEFT + (5 * CardDimensions::WIDTH) + MARGIN_RIGHT;
 
-    /*
-    Offset sizes when cards are stacked on each other in the grid
-    */
+    /** Offset sizes when cards are stacked on each other in the grid */
     static const int STACKED_CARD_OFFSET_X = CardDimensions::WIDTH / 3;
     static const int STACKED_CARD_OFFSET_Y = PADDING_Y / 3;
 
-    /*
-    Width of the box line drawn in the margin around the active player's area
-    */
+    /** Width of the box line drawn in the margin around the active player's area */
     static const int BOX_LINE_WIDTH = 10;
 
-    /*
-    Default inactive mask and border gradient
-    */
+    /** Default inactive mask and border gradient */
     static const QColor BACKGROUND_COLOR;
     static const QColor FADE_MASK;
     static const QColor GRADIENT_COLOR;
     static const QColor GRADIENT_COLORLESS;
 
-    /*
-       Size and shape variables
-     */
+    /** Size and shape variables */
     int width;
     int height;
     int currentMinimumWidth;
 
-    /*
-    Internal cache for widths of stacks of cards by row and column.
-    */
+    /** Internal cache for widths of stacks of cards by row and column */
     QMap<int, int> cardStackWidth;
 
-    /*
-       Holds any custom background image for the TableZone
-     */
+    /** Holds any custom background image for the TableZone */
     QPixmap backgroundPixelMap;
 
-    /*
-       If this TableZone is currently active
-     */
+    /** If this TableZone is currently active */
     bool active = false;
     bool mirrored = false;
     bool playmatActive = false;
@@ -105,85 +88,69 @@ private:
     [[nodiscard]] bool isInverted() const;
 
 private slots:
-    /**
-       Loads in any found custom background and updates
-     */
+    /** Loads in any found custom background and updates */
     void updateBg();
 
 public slots:
     void onPlaymatChanged(bool active);
 
 public slots:
-    /**
-       Reorganizes CardItems in the TableZone
-     */
+    /** Reorganizes CardItems in the TableZone */
     void reorganizeCards() override;
     void setMirrored(bool isMirrored);
 
 public:
     /**
-       Constructs TableZone.
-
-       @param _p the Player
-       @param parent defaults to null
+     * Constructs TableZone
+     *
+     * @param _p the Player
+     * @param parent defaults to null
      */
     explicit TableZone(TableZoneLogic *_logic, bool mirrored, QGraphicsItem *parent = nullptr);
 
-    /**
-       @return a QRectF of the TableZone bounding box.
-     */
+    /** @return a QRectF of the TableZone bounding box */
     [[nodiscard]] QRectF boundingRect() const override;
 
     /**
-       Render the TableZone
-
-       @param painter
-       @param option
+     * Render the TableZone
+     *
+     * @param painter
+     * @param option
      */
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     /**
-       Flashes the table surface after a player loses life.
-
-       Wired up through the life counter so the battlefield glows when life drops.
+     * Flashes the table surface after a player loses life
+     *
+     * Wired up through the life counter so the battlefield glows when life drops
      */
     void triggerDamageShimmer();
 
-    /** @brief Decays the damage shimmer by one timer tick. */
+    /** @brief Decays the damage shimmer by one timer tick */
     bool animationEvent() override;
 
-    /**
-       Toggles the selected items as tapped.
-     */
+    /** Toggles the selected items as tapped */
     void toggleTapped();
 
-    /**
-       See HandleDropEventByGrid
-     */
+    /** See HandleDropEventByGrid */
     void
     handleDropEvent(const QList<CardDragItem *> &dragItems, CardZoneLogic *startZone, const QPoint &dropPoint) override;
 
-    /**
-       Handles the placement of cards
-     */
+    /** Handles the placement of cards */
     void
     handleDropEventByGrid(const QList<CardDragItem *> &dragItems, CardZoneLogic *startZone, const QPoint &gridPoint);
 
-    /**
-       @return CardItem from grid location
-     */
+    /** @return CardItem from grid location */
     [[nodiscard]] CardItem *getCardFromGrid(const QPoint &gridPoint) const;
 
-    /**
-       @return CardItem from coordinate location
-     */
+    /** @return CardItem from coordinate location */
     [[nodiscard]] CardItem *getCardFromCoords(const QPointF &point) const;
 
     QPointF closestGridPoint(const QPointF &point) override;
 
     /**
-       Resizes the TableZone in case CardItems are within or
-       outside of the TableZone constraints.
+     * Resizes the TableZone in case CardItems are within or
+     * outside of the TableZone constraints.
      */
     void resizeToContents();
 
@@ -231,20 +198,14 @@ private:
      */
     [[nodiscard]] std::optional<QPainterPath> hoveredCardHole() const;
 
-    /*
-    Calculates card stack widths so mapping functions work properly
-    */
+    /** Calculates card stack widths so mapping functions work properly */
     void computeCardStackWidths();
 
-    /*
-    Mapping functions for points to/from gridpoints.
-    */
+    /** Mapping functions for points to/from gridpoints */
     [[nodiscard]] QPointF mapFromGrid(QPoint gridPoint) const;
     [[nodiscard]] QPoint mapToGrid(const QPointF &mapPoint) const;
 
-    /*
-    Helper function to create a single key from a card stack location.
-    */
+    /** Helper function to create a single key from a card stack location */
     [[nodiscard]] int getCardStackMapKey(int x, int y) const
     {
         return x + (y * 1000);

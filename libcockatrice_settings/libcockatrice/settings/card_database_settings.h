@@ -3,6 +3,7 @@
  * @ingroup CardDatabase
  * @ingroup CardSettings
  */
+
 //! \todo Document this file.
 
 #ifndef CARDDATABASESETTINGS_H

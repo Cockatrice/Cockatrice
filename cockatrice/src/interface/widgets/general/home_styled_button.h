@@ -2,6 +2,7 @@
  * @file home_styled_button.h
  * @ingroup Widgets
  */
+
 //! \todo Document this file.
 
 #ifndef HOME_STYLED_BUTTON_H

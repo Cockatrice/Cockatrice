@@ -2,6 +2,7 @@
  * @file utility_menu.h
  * @ingroup GameMenusPlayers
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_UTILITY_MENU_H

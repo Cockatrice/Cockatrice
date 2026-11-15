@@ -2,6 +2,7 @@
  * @file pile_zone_logic.h
  * @ingroup GameLogicZones
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_PILE_ZONE_LOGIC_H

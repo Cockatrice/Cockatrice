@@ -3,6 +3,7 @@
  * @ingroup GameLogic
  * @ingroup Replay
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_REPLAY_H

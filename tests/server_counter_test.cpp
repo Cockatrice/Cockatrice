@@ -1,6 +1,7 @@
-/** @file server_counter_test.cpp
- *  @brief Tests for Server_Counter operations.
- *  @ingroup Tests
+/**
+ * @file server_counter_test.cpp
+ * @brief Tests for Server_Counter operations.
+ * @ingroup Tests
  */
 
 #include "libcockatrice/protocol/pb/color.pb.h"

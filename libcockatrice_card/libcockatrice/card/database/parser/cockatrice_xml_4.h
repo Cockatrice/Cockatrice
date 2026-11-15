@@ -57,9 +57,7 @@ public:
      */
     void parseFileInto(QIODevice &device, CardDatabaseData &data) override;
 
-    /**
-     * @brief Save sets and cards back to an XML4 file.
-     */
+    /** @brief Save sets and cards back to an XML4 file */
     bool saveToFile(FormatRulesNameMap _formats,
                     SetNameMap _sets,
                     CardNameMap cards,

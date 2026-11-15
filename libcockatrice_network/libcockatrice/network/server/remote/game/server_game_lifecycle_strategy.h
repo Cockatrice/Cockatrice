@@ -28,9 +28,7 @@ public:
     virtual StartAction onGameStarting(Server_Game *game) = 0;
 };
 
-/**
- * @brief Default lifecycle strategy that never intercepts the game start.
- */
+/** @brief Default lifecycle strategy that never intercepts the game start */
 class Server_DefaultLifecycleStrategy : public Server_GameLifecycleStrategy
 {
 public:

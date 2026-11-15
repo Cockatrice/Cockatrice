@@ -7,8 +7,8 @@
 class QWidget;
 
 /**
- * @brief This filter listens to the visibility changes of a target widget, emitting signals whenever the visibility of
- * that widget changes.
+ * @brief This filter listens to the visibility changes of a target widget,
+ *        emitting signals whenever the visibility of that widget changes.
  */
 class VisibilityChangeListener : public QObject
 {

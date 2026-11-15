@@ -3,6 +3,7 @@
  * @ingroup Core
  * @ingroup Replay
  */
+
 //! \todo Document this file.
 
 #ifndef REPLAY_WIDGET_H
@@ -38,9 +39,7 @@ public:
 
     [[nodiscard]] const QList<int> &getReplayTimeline() const;
 
-    /**
-     * @brief Index of the last replay event the game state has processed, or -1 before the first event.
-     */
+    /** @brief Index of the last replay event the game state has processed, or -1 before the first event */
     [[nodiscard]] int getLastProcessedEventIndex() const;
 
 public slots:

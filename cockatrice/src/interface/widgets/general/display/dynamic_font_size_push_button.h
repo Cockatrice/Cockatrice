@@ -2,6 +2,7 @@
  * @file dynamic_font_size_push_button.h
  * @ingroup PrintingWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef DYNAMICFONTSIZEPUSHBUTTON_H

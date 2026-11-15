@@ -3,6 +3,7 @@
  * @ingroup NetworkingWidgets
  * @ingroup Lobby
  */
+
 //! \todo Document this file.
 
 #ifndef CHATVIEW_H

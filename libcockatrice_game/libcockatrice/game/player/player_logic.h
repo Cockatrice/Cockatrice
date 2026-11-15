@@ -2,6 +2,7 @@
  * @file player.h
  * @ingroup GameLogicPlayers
  */
+
 //! \todo Document this file.
 
 #ifndef PLAYER_H
@@ -208,9 +209,7 @@ public:
         return counters;
     }
 
-    /**
-     * Gets the counter that represents the life total.
-     */
+    /** Gets the counter that represents the life total */
     CounterState *getLifeCounter() const;
 
     void setConceded(bool _conceded);

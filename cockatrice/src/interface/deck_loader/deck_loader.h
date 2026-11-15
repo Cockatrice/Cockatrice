@@ -2,6 +2,7 @@
  * @file deck_loader.h
  * @ingroup ImportExport
  */
+
 //! \todo Document this file.
 
 #ifndef DECK_LOADER_H
@@ -35,14 +36,10 @@ signals:
     void loadFinished(bool success);
 
 public:
-    /**
-     * Supported file extensions for decklist files
-     */
+    /** Supported file extensions for decklist files */
     static const QStringList ACCEPTED_FILE_EXTENSIONS;
 
-    /**
-     * For use with `QFileDialog::setNameFilters`
-     */
+    /** For use with `QFileDialog::setNameFilters` */
     static const QStringList FILE_NAME_FILTERS;
 
     enum DecklistWebsite

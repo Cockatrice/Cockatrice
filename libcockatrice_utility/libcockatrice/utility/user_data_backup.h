@@ -22,8 +22,10 @@
 namespace UserDataBackup
 {
 
-/** @brief Above this total, the client skips the automatic startup backup and asks for a manual copy.
- * Kept small on purpose: the copy runs synchronously on the UI thread at startup. */
+/**
+ * @brief Above this total, the client skips the automatic startup backup and asks for a manual copy.
+ * Kept small on purpose: the copy runs synchronously on the UI thread at startup.
+ */
 constexpr qint64 MAX_AUTO_BACKUP_BYTES = 200LL * 1024 * 1024;
 
 /**
@@ -70,14 +72,10 @@ bool backupAtRiskPaths(const QStringList &sourcePaths,
  */
 qint64 estimateBackupSize(const QStringList &sourcePaths, qint64 capBytes = MAX_AUTO_BACKUP_BYTES);
 
-/**
- * @brief Default backup root guaranteed to live outside the install directory.
- */
+/** @brief Default backup root guaranteed to live outside the install directory */
 QString defaultBackupRoot();
 
-/**
- * @brief Lists existing backup session directories under @p backupRoot, newest first.
- */
+/** @brief Lists existing backup session directories under @p backupRoot, newest first */
 QStringList listBackupSessions(const QString &backupRoot);
 
 /**

@@ -234,9 +234,7 @@ void PrintingSelectorCardOverlayWidget::updateCardAmounts(int mainboardAmount,
     updateVisibility();
 }
 
-/**
- * @brief Sets the visibility of the widgets depending on the amounts and whether the mouse is hovering over.
- */
+/** @brief Sets the visibility of the widgets depending on the amounts and whether the mouse is hovering over */
 void PrintingSelectorCardOverlayWidget::updateVisibility()
 {
     if (!allZonesCardAmountWidget) {
@@ -628,9 +626,7 @@ void PrintingSelectorCardOverlayWidget::refreshPreview()
     cardOverridePreviewLabel->show();
 }
 
-/**
- * @brief Hides the hover preview and forgets the currently highlighted printing.
- */
+/** @brief Hides the hover preview and forgets the currently highlighted printing */
 void PrintingSelectorCardOverlayWidget::hidePreview()
 {
     hoveredOverrideCard = ExactCard();

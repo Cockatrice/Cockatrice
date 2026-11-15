@@ -2,6 +2,7 @@
  * @file player_manager.h
  * @ingroup GameLogicPlayers
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_PLAYER_MANAGER_H

@@ -2,6 +2,7 @@
  * @file shortcuts_settings.h
  * @ingroup CoreSettings
  */
+
 //! \todo Document this file.
 
 #ifndef SHORTCUTSSETTINGS_H

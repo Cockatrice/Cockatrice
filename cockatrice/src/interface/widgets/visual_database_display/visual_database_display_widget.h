@@ -2,6 +2,7 @@
  * @file visual_database_display_widget.h
  * @ingroup VisualCardDatabaseWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef VISUAL_DATABASE_DISPLAY_WIDGET_H
@@ -66,9 +67,7 @@ public:
         return filterModel;
     }
 
-    /**
-     * @return False if the widget is in database display mode and true if it's in visual display mode
-     */
+    /** @return False if the widget is in database display mode and true if it's in visual display mode */
     bool isVisualDisplayMode() const;
 
 public slots:

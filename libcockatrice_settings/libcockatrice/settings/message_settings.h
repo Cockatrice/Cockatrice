@@ -2,6 +2,7 @@
  * @file message_settings.h
  * @ingroup NetworkSettings
  */
+
 //! \todo Document this file.
 
 #ifndef MESSAGESETTINGS_H

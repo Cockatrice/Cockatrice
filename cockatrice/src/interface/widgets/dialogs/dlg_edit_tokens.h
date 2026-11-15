@@ -2,6 +2,7 @@
  * @file dlg_edit_tokens.h
  * @ingroup GameDialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_EDIT_TOKENS_H

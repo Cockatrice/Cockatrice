@@ -28,11 +28,11 @@ class CardRelation : public QObject
 private:
     QString name;                ///< Name of the related card.
     CardRelationType attachType; ///< Type of attachment.
-    bool isCreateAllExclusion; ///< True if this relation should exclude multiple creations in "create all" operations.
-    bool isVariableCount;      ///< True if the number of creations is variable.
-    int defaultCount;          ///< Default number of cards created or involved.
-    bool isPersistent;         ///< True if this relation persists (i.e. is not destroyed) on zone change.
-    bool isFaceDown;           ///< True if this relation creates the tokens facedown
+    bool isCreateAllExclusion;   ///< True if this relation should exclude multiple creations in "create all" operations.
+    bool isVariableCount;        ///< True if the number of creations is variable.
+    int defaultCount;            ///< Default number of cards created or involved.
+    bool isPersistent;           ///< True if this relation persists (i.e. is not destroyed) on zone change.
+    bool isFaceDown;             ///< True if this relation creates the tokens facedown
 
 public:
     /**

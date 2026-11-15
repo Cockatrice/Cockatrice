@@ -2,6 +2,7 @@
  * @file user_info_connection.h
  * @ingroup Client
  */
+
 //! \todo Document this file.
 
 #ifndef USERCONNECTION_INFORMATION_H

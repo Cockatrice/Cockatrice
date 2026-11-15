@@ -165,9 +165,7 @@ void PrintingSelector::hideEvent(QHideEvent *event)
     QWidget::hideEvent(event);
 }
 
-/**
- * @return A map of uuid to amounts (main, side, tokens).
- */
+/** @return A map of uuid to amounts (main, side, tokens) */
 static QMap<QString, ZoneCounts> tallyUuidCounts(const DeckListModel *model, const QString &cardName)
 {
     QMap<QString, ZoneCounts> map;
@@ -206,9 +204,7 @@ void PrintingSelector::updateCardAmounts()
     emit cardAmountsChanged(map);
 }
 
-/**
- * @brief Updates the display by clearing the layout and loading new sets for the current card.
- */
+/** @brief Updates the display by clearing the layout and loading new sets for the current card */
 void PrintingSelector::updateDisplay()
 {
     deckChangeTimer->stop();
@@ -268,9 +264,7 @@ void PrintingSelector::setCard(const CardInfoPtr &newCard)
     flowWidget->repaint();
 }
 
-/**
- * @brief Loads and displays all sets for the current selected card.
- */
+/** @brief Loads and displays all sets for the current selected card */
 void PrintingSelector::getAllSetsForCurrentCard()
 {
     if (selectedCard.isNull()) {

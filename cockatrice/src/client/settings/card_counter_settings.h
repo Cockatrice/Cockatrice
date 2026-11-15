@@ -2,6 +2,7 @@
  * @file card_counter_settings.h
  * @ingroup GameSettings
  */
+
 //! \todo Document this file.
 
 #ifndef CARD_COUNTER_SETTINGS_H

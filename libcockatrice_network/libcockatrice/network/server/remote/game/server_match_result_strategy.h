@@ -23,9 +23,7 @@ public:
     virtual bool onGameFinished(Server_Game *game, int playing, Server_AbstractPlayer *lastPlayer) = 0;
 };
 
-/**
- * @brief Default match result strategy that never closes the game.
- */
+/** @brief Default match result strategy that never closes the game */
 class Server_NullMatchResultStrategy : public Server_MatchResultStrategy
 {
 public:

@@ -114,9 +114,7 @@ static QString getColorSortString(const CardInfo &c, bool appendAtEnd)
     }
 }
 
-/**
- * @brief returns the function that extracts the given property from the CardState.
- */
+/** @brief returns the function that extracts the given property from the CardState */
 std::function<QString(CardState *)> CardList::getExtractorFor(SortOption option)
 {
     switch (option) {

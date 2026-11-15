@@ -83,25 +83,19 @@ public:
      */
     void updateGameList(const ServerInfo_Game &game);
 
-    /**
-     * @brief Returns the index of the room column.
-     */
+    /** @brief Returns the index of the room column */
     int roomColIndex()
     {
         return 0;
     }
 
-    /**
-     * @brief Returns the index of the start time column.
-     */
+    /** @brief Returns the index of the start time column */
     int startTimeColIndex()
     {
         return 1;
     }
 
-    /**
-     * @brief Returns the map of game types per room.
-     */
+    /** @brief Returns the map of game types per room */
     const QMap<int, GameTypeMap> &getGameTypes()
     {
         return gameTypes;
@@ -148,24 +142,16 @@ public:
         return filters;
     }
 
-    /**
-     * @brief Sets all game filters at once.
-     */
+    /** @brief Sets all game filters at once */
     void setGameFilters(const GameFilterConfigs &_filters);
 
-    /**
-     * @brief Returns the number of games filtered out by the current filter.
-     */
+    /** @brief Returns the number of games filtered out by the current filter */
     [[nodiscard]] int getNumFilteredGames() const;
 
-    /**
-     * @brief Resets all filter parameters to default values.
-     */
+    /** @brief Resets all filter parameters to default values */
     void resetFilterParameters();
 
-    /**
-     * @brief Returns true if all filter parameters are set to their defaults.
-     */
+    /** @brief Returns true if all filter parameters are set to their defaults */
     [[nodiscard]] bool areFilterParametersSetToDefaults() const;
 
     /**
@@ -180,9 +166,7 @@ public:
      */
     void saveFilterParameters(const QMap<int, QString> &allGameTypes);
 
-    /**
-     * @brief Refreshes the proxy model (re-applies filters).
-     */
+    /** @brief Refreshes the proxy model (re-applies filters) */
     void refresh();
 
 protected:

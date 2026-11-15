@@ -58,9 +58,7 @@ void DeckPreviewColorIdentityFilterWidget::retranslateUi()
     toggleButton->setToolTip(tr("Color identity filter mode (AND/OR/NOT conjunctions of filters)"));
 }
 
-/**
- * @brief The colors that are currently toggled on.
- */
+/** @brief The colors that are currently toggled on */
 QSet<QChar> DeckPreviewColorIdentityFilterWidget::getActiveColors() const
 {
     QSet<QChar> activeColorSet;

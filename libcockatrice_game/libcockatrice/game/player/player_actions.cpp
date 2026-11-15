@@ -651,9 +651,7 @@ void PlayerActions::moveOneCardUntil(CardState *card)
     }
 }
 
-/**
- * @brief Immediately stops any ongoing `play top card to stack until...` process, resetting all variables involved.
- */
+/** @brief Immediately stops any ongoing `play top card to stack until...` process, resetting all variables involved */
 void PlayerActions::stopMoveTopCardsUntil()
 {
     moveTopCardTimer->stop();
@@ -1669,8 +1667,8 @@ void PlayerActions::actIncrementAllCardCounters(QList<CardState *> cardsToUpdate
 }
 
 /**
- * @brief returns true if the zone is a unwritable reveal zone view (eg a card reveal window). Will return false if zone
- * is nullptr.
+ * @brief returns true if the zone is a unwritable reveal zone view (eg a card reveal window).
+ *        Will return false if zone is nullptr.
  */
 static bool isUnwritableRevealZone(CardZoneLogic *zone)
 {

@@ -2,6 +2,7 @@
  * @file release_channel.h
  * @ingroup ClientUpdate
  */
+
 //! \todo Document this file.
 
 #ifndef RELEASECHANNEL_H

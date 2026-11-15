@@ -1,5 +1,6 @@
-/** @file qtwidgets_pch.h
- *  @brief Precompiled header for GUI targets (Cockatrice client, Oracle).
+/**
+ * @file qtwidgets_pch.h
+ * @brief Precompiled header for GUI targets (Cockatrice client, Oracle).
  *
  * Includes the Qt Core precompiled header plus the heavy Gui, Widgets and
  * Network layers that virtually every client translation unit re-parses.

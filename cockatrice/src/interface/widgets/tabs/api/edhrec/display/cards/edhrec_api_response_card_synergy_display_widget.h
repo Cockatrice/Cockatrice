@@ -2,6 +2,7 @@
  * @file edhrec_api_response_card_synergy_display_widget.h
  * @ingroup ApiResponseDisplayWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef EDHREC_API_RESPONSE_CARD_SYNERGY_DISPLAY_WIDGET_H

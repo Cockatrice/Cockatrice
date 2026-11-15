@@ -2,6 +2,7 @@
  * @file dlg_login_prompt.h
  * @ingroup ConnectionDialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_LOGIN_PROMPT_H

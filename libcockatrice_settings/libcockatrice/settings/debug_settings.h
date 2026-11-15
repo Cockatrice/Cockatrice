@@ -2,6 +2,7 @@
  * @file debug_settings.h
  * @ingroup CoreSettings
  */
+
 //! \todo Document this file.
 
 #ifndef DEBUG_SETTINGS_H

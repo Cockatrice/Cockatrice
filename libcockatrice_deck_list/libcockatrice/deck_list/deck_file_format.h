@@ -5,9 +5,7 @@
 namespace DeckFileFormat
 {
 
-/**
- * The deck file formats that Cockatrice supports.
- */
+/** The deck file formats that Cockatrice supports */
 enum Format
 {
     /**

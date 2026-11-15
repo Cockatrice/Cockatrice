@@ -2,6 +2,7 @@
  * @file phase.h
  * @ingroup GameLogic
  */
+
 //! \todo Document this file.
 
 #ifndef PHASE_H

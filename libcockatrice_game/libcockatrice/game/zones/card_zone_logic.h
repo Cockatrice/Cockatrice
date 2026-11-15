@@ -2,6 +2,7 @@
  * @file card_zone_logic.h
  * @ingroup GameLogicZones
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_CARD_ZONE_LOGIC_H

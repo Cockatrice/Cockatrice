@@ -2,6 +2,7 @@
  * @file move_top_cards_until_options.h
  * @ingroup GameLogicPlayers
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_MOVE_TOP_CARDS_UNTIL_OPTIONS_H

@@ -2,6 +2,7 @@
  * @file dlg_update.h
  * @ingroup ClientUpdateDialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_UPDATE_H

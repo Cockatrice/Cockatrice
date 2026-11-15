@@ -69,9 +69,7 @@ void DeckPreviewDeckTagsDisplayWidget::setConversionPromptHandler(const std::fun
     conversionPromptHandler = handler;
 }
 
-/**
- * Gets the filepath of all files (no directories) in target directory and all subdirectories
- */
+/** Gets the filepath of all files (no directories) in target directory and all subdirectories */
 static QStringList getAllFiles(const QString &filePath)
 {
     QStringList allFiles;
@@ -86,9 +84,7 @@ static QStringList getAllFiles(const QString &filePath)
     return allFiles;
 }
 
-/**
- * Gets all tags that appear in the deck folder
- */
+/** Gets all tags that appear in the deck folder */
 static QStringList findAllKnownTags()
 {
     QStringList allFiles = getAllFiles(SettingsCache::instance().paths().getDeckPath());

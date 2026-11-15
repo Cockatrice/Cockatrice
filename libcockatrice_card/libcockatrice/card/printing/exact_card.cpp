@@ -51,9 +51,7 @@ const CardInfo &ExactCard::getInfo() const
     return *card;
 }
 
-/**
- * The key used to identify this exact printing in the cache
- */
+/** The key used to identify this exact printing in the cache */
 QString ExactCard::getPixmapCacheKey() const
 {
     QString uuid = printing.getUuid();
@@ -61,25 +59,19 @@ QString ExactCard::getPixmapCacheKey() const
     return QLatin1String("card_") + card->getName() + suffix;
 }
 
-/**
- * Checks if the card is null or empty.
- */
+/** Checks if the card is null or empty */
 bool ExactCard::isEmpty() const
 {
     return card.isNull() || card->getName().isEmpty();
 }
 
-/**
- * Returns true if isEmpty() is false
- */
+/** Returns true if isEmpty() is false */
 ExactCard::operator bool() const
 {
     return !isEmpty();
 }
 
-/**
- * Gets the CardInfo to emit the pixmapUpdated signal
- */
+/** Gets the CardInfo to emit the pixmapUpdated signal */
 void ExactCard::emitPixmapUpdated() const
 {
     emit card->pixmapUpdated(printing);

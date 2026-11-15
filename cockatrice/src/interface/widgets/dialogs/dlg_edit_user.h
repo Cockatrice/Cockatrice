@@ -2,6 +2,7 @@
  * @file dlg_edit user.h
  * @ingroup NetworkDialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_EDITUSER_H

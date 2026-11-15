@@ -25,9 +25,7 @@
 namespace
 {
 
-/**
- * @brief Collects (board zone name, card node) pairs via forEachCard.
- */
+/** @brief Collects (board zone name, card node) pairs via forEachCard */
 struct BoardCardPair
 {
     QString boardZone;

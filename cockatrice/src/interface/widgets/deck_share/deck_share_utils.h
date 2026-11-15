@@ -2,6 +2,7 @@
  * @file deck_share_utils.h
  * @ingroup DeckShareWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef DECK_SHARE_UTILS_H
@@ -13,15 +14,11 @@
 class AbstractClient;
 class Response;
 
-/**
- * @brief Shared helpers for creating temporary deck shares.
- */
+/** @brief Shared helpers for creating temporary deck shares */
 namespace DeckShareUtils
 {
 
-/**
- * @brief The outcome of a successful share-create response.
- */
+/** @brief The outcome of a successful share-create response */
 struct ShareResponse
 {
     QString link;     ///< The share link that was copied to the clipboard.
@@ -41,9 +38,7 @@ QString buildShareLink(const AbstractClient *client, const QString &token);
  */
 QString copyShareLinkToClipboard(const QString &link);
 
-/**
- * @brief Formats the expiration timestamp for a share.
- */
+/** @brief Formats the expiration timestamp for a share */
 QString formatShareExpiry(const QDateTime &expiry);
 
 /**

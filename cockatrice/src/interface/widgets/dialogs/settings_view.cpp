@@ -80,9 +80,7 @@ static QScrollArea *makeScrollable(QWidget *widget)
     return scrollArea;
 }
 
-/**
- * @brief Returns the theme icon resources for each settings page, indexed by SettingsPage order
- */
+/** @brief Returns the theme icon resources for each settings page, indexed by SettingsPage order */
 static QStringList pageIconResources()
 {
     return {QStringLiteral("theme:config/general"),   QStringLiteral("theme:config/appearance"),

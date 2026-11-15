@@ -41,9 +41,7 @@ public:
 namespace DeckListModelCustomZones
 {
 
-/**
- * @brief Whether the given node is a custom zone (as opposed to a criteria group).
- */
+/** @brief Whether the given node is a custom zone (as opposed to a criteria group) */
 [[nodiscard]] bool isCustomZone(const AbstractDecklistNode *node);
 
 /**

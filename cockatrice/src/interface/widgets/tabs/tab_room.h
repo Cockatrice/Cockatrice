@@ -3,6 +3,7 @@
  * @ingroup RoomTabs
  * @ingroup Lobby
  */
+
 //! \todo Document this file.
 
 #ifndef TAB_ROOM_H

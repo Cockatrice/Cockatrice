@@ -4,8 +4,10 @@
 #include <QWidget>
 #include <qtmetamacros.h>
 
-/** @brief Row of dots showing progress through a fixed-length sequence of steps,
- *         in the style of a mobile/OS setup flow. Purely presentational. */
+/**
+ * @brief Row of dots showing progress through a fixed-length sequence of steps,
+ *        in the style of a mobile/OS setup flow. Purely presentational.
+ */
 class StepIndicatorWidget : public QWidget
 {
     Q_OBJECT

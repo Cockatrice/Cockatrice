@@ -2,6 +2,7 @@
  * @file arrow_target.h
  * @ingroup GameGraphics
  */
+
 //! \todo Document this file.
 
 #ifndef ARROWTARGET_H

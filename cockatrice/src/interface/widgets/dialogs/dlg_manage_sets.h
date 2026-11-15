@@ -2,6 +2,7 @@
  * @file dlg_manage_sets.h
  * @ingroup Dialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_MANAGE_SETS_H

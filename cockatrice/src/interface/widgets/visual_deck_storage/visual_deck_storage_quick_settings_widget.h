@@ -39,9 +39,7 @@ class VisualDeckStorageQuickSettingsWidget : public SettingsButtonWidget
     CardSizeWidget *cardSizeWidget;
 
 public:
-    /**
-     * The info to display in the deck preview's banner card tooltip.
-     */
+    /** The info to display in the deck preview's banner card tooltip */
     enum TooltipType
     {
         None,

@@ -2,6 +2,7 @@
  * @file filter_tree_model.h
  * @ingroup CardDatabaseModelFilters
  */
+
 //! \todo Document this file.
 
 #ifndef FILTERTREEMODEL_H

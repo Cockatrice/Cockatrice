@@ -3,6 +3,7 @@
  * @ingroup Replays
  * @ingroup Tabs
  */
+
 //! \todo Document this file.
 
 #ifndef TAB_REPLAYS_H

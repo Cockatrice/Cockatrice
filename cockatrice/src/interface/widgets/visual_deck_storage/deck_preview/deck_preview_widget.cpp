@@ -226,17 +226,13 @@ void DeckPreviewWidget::enterEvent(QEnterEvent *event)
     reloadIfModified();
 }
 
-/**
- * @brief The row of this deck in the source model, or -1 if it no longer exists.
- */
+/** @brief The row of this deck in the source model, or -1 if it no longer exists */
 int DeckPreviewWidget::row() const
 {
     return model->rowForFilePath(filePath);
 }
 
-/**
- * @brief The display name is given by the deck name, or the filename if the deck name is not set.
- */
+/** @brief The display name is given by the deck name, or the filename if the deck name is not set */
 QString DeckPreviewWidget::getDisplayName() const
 {
     const int r = row();
@@ -246,9 +242,7 @@ QString DeckPreviewWidget::getDisplayName() const
     return model->dataForRow(r).displayName;
 }
 
-/**
- * @brief Reloads the deck if the file's last modified time has increased since we last checked.
- */
+/** @brief Reloads the deck if the file's last modified time has increased since we last checked */
 void DeckPreviewWidget::reloadIfModified()
 {
     const int r = row();
@@ -259,9 +253,7 @@ void DeckPreviewWidget::reloadIfModified()
     model->reloadIfModified(r);
 }
 
-/**
- * @brief Syncs the contents of the child widgets with the current row's data.
- */
+/** @brief Syncs the contents of the child widgets with the current row's data */
 void DeckPreviewWidget::syncFromModel()
 {
     const int r = row();

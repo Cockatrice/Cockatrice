@@ -60,8 +60,8 @@ struct DeckLoadResult
 constexpr int LOAD_DRAIN_TIME_BUDGET_MS = 8;
 
 /**
- * @brief The path of \a path relative to the deck root, or empty if \a path
- * is not below it.
+ * @brief The path of \a path relative to the deck root,
+ *        or empty if \a path is not below it.
  */
 QString relativePathFromDeckRoot(const QString &path, const QString &deckPath)
 {
@@ -76,8 +76,8 @@ QString relativePathFromDeckRoot(const QString &path, const QString &deckPath)
 }
 
 /**
- * @brief The path of \a filePath relative to \a deckPath, or the bare file name
- * if \a filePath is not below \a deckPath.
+ * @brief The path of \a filePath relative to \a deckPath,
+ *        or the bare file name if \a filePath is not below \a deckPath.
  */
 QString relativeFilePathFor(const QString &filePath, const QString &deckPath)
 {
@@ -89,8 +89,8 @@ QString relativeFilePathFor(const QString &filePath, const QString &deckPath)
 }
 
 /**
- * @brief The directory of \a filePath relative to \a deckPath, or empty if the
- * file sits directly in the deck root.
+ * @brief The directory of \a filePath relative to \a deckPath,
+ *        or empty if the file sits directly in the deck root.
  */
 QString folderPathFor(const QString &filePath, const QString &deckPath)
 {
@@ -98,8 +98,8 @@ QString folderPathFor(const QString &filePath, const QString &deckPath)
 }
 
 /**
- * @brief Scans a deck directory on a worker thread, returning discovered deck
- * files and subfolder paths.
+ * @brief Scans a deck directory on a worker thread,
+ *        returning discovered deck files and subfolder paths.
  */
 DeckScanResult scanDeckDirectory(const QString &deckPath)
 {
@@ -210,9 +210,7 @@ int VisualDeckStorageModel::rowForFilePath(const QString &filePath) const
     return rowByFilePath.value(filePath, -1);
 }
 
-/**
- * @brief Rebuilds the file path -> row index from scratch after bulk changes.
- */
+/** @brief Rebuilds the file path -> row index from scratch after bulk changes */
 void VisualDeckStorageModel::reindexFilePaths()
 {
     rowByFilePath.clear();
@@ -372,9 +370,7 @@ void VisualDeckStorageModel::drainPendingLoads()
     }
 }
 
-/**
- * @brief Recomputes all derived metadata of a row from its loaded deck.
- */
+/** @brief Recomputes all derived metadata of a row from its loaded deck */
 void VisualDeckStorageModel::recomputeDeckMetadata(DeckPreviewData &data, bool recomputeColorIdentity)
 {
     const DeckList &deckList = data.deck.deckList;

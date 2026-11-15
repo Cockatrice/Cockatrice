@@ -2,6 +2,7 @@
  * @file pending_command.h
  * @ingroup Messages
  */
+
 //! \todo Document this file.
 
 #ifndef PENDING_COMMAND_H

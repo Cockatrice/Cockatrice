@@ -2,6 +2,7 @@
  * @file tab_server.h
  * @ingroup ServerTabs
  */
+
 //! \todo Document this file.
 
 #ifndef TAB_SERVER_H
@@ -69,8 +70,10 @@ private:
     bool shouldEmitUpdate = false;
     /** Room ids with a join command in flight, mapped to whether the tab should be focused once it opens. */
     QHash<int, bool> pendingRoomJoins;
-    /** Room ids for which a stale-membership heal (leave + rejoin) is currently in flight. Released as soon as the
-     *  rejoin has been answered, so a heal is attempted at most once per join. */
+    /**
+     * Room ids for which a stale-membership heal (leave + rejoin) is currently in flight. Released as soon as the
+     * rejoin has been answered, so a heal is attempted at most once per join.
+     */
     QSet<int> healedRoomJoins;
 
 public:

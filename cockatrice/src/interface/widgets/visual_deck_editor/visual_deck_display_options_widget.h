@@ -72,25 +72,19 @@ public:
      */
     explicit VisualDeckDisplayOptionsWidget(QWidget *parent);
 
-    /**
-     * @brief Gets the current display type (Overlap or Flat).
-     */
+    /** @brief Gets the current display type (Overlap or Flat) */
     DisplayType getDisplayType() const
     {
         return currentDisplayType;
     }
 
-    /**
-     * @brief Gets the currently active group-by criterion.
-     */
+    /** @brief Gets the currently active group-by criterion */
     QString getActiveGroupCriteria() const
     {
         return activeGroupCriteria;
     }
 
-    /**
-     * @brief Gets the currently active ordered sort criteria.
-     */
+    /** @brief Gets the currently active ordered sort criteria */
     QStringList getActiveSortCriteria() const
     {
         return activeSortCriteria;

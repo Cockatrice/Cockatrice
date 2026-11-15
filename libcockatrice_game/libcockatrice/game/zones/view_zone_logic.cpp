@@ -76,7 +76,6 @@ bool ZoneViewZoneLogic::prepareAddCard(int x)
     }
 
     // autoclose check is done both here and in removeCard
-
     if (cards.isEmpty() && !doInsert && getCloseEmptyCardView()) {
         emit closeView();
     }

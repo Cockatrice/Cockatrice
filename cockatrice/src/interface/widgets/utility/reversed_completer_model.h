@@ -2,6 +2,7 @@
  * @file reversed_completer_model.h
  * @ingroup UtilityWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef REVERSED_COMPLETER_MODEL_H

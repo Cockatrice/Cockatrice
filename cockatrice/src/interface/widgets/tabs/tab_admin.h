@@ -2,6 +2,7 @@
  * @file tab_admin.h
  * @ingroup ServerTabs
  */
+
 //! \todo Document this file.
 
 #ifndef TAB_ADMIN_H

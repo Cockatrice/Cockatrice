@@ -78,9 +78,7 @@ OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
     startRaiseServer();
 }
 
-/**
- * Migrates the oracle-specific settings from global.ini to oracle.ini
- */
+/** Migrates the oracle-specific settings from global.ini to oracle.ini */
 void OracleWizard::migrateOracleSettings()
 {
     QString filePath = SettingsCache::instance().getSettingsPath() + "global.ini";

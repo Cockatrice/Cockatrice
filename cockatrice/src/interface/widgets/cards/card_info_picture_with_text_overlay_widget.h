@@ -3,6 +3,7 @@
  * @ingroup CardWidgets
  * @ingroup DeckStorageWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef CARD_PICTURE_WITH_TEXT_OVERLAY_H

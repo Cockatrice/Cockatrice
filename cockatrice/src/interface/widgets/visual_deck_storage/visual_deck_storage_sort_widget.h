@@ -23,15 +23,11 @@ public:
     explicit VisualDeckStorageSortWidget(VisualDeckStorageWidget *parent);
     void retranslateUi();
 
-    /**
-     * @brief The currently selected sort order.
-     */
+    /** @brief The currently selected sort order */
     [[nodiscard]] VisualDeckStorageSortFilterProxyModel::SortOrder currentSortOrder() const;
 
 signals:
-    /**
-     * @brief Emitted when the user picks a different sort order.
-     */
+    /** @brief Emitted when the user picks a different sort order */
     void sortOrderChanged();
 
 private slots:

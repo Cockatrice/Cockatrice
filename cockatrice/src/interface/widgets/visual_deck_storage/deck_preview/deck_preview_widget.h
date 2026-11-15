@@ -41,9 +41,7 @@ public:
                                const QString &_filePath);
     void retranslateUi();
 
-    /**
-     * @brief The banner card picture; the parent widget wires its size to the card size setting.
-     */
+    /** @brief The banner card picture; the parent widget wires its size to the card size setting */
     DeckPreviewCardPictureWidget *bannerCardDisplayWidget;
 
     /** @brief The path of the deck file backing this preview. */
@@ -67,9 +65,7 @@ public slots:
      */
     void syncFromModel();
 
-    /**
-     * @brief Reloads the deck file if its modification time is newer than the stored one.
-     */
+    /** @brief Reloads the deck file if its modification time is newer than the stored one */
     void reloadIfModified();
     void refreshBannerCardToolTip();
     void updateColorIdentityVisibility(bool visible);

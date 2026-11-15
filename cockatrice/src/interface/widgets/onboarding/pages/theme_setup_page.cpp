@@ -32,8 +32,10 @@ class QWidget;
 
 namespace
 {
-/** @brief A theme's shipped identity accent, immune to any user- or auto-
- *         generated palette that may currently be masking appColor(). */
+/**
+ * @brief A theme's shipped identity accent, immune to any user- or auto-generated
+ *        palette that may currently be masking appColor().
+ */
 QColor themeIdentityAccent(const QString &themeDirPath, const QString &themeName)
 {
     for (const QString &scheme : {QStringLiteral("Light"), QStringLiteral("Dark")}) {

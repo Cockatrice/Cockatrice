@@ -3,6 +3,7 @@
  * @ingroup GameGraphics
  * @ingroup GameWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef PHASESTOOLBAR_H
@@ -88,9 +89,10 @@ public slots:
 private slots:
     void phaseButtonClicked();
 signals:
-    /** @name Intent signals
-     *  The view reports what the user asked for; GameEventHandler builds the commands.
-     *  @{
+    /**
+     * @name Intent signals
+     * The view reports what the user asked for; GameEventHandler builds the commands.
+     * @{
      */
     void setActivePhaseRequested(int phase);
     void nextTurnRequested();

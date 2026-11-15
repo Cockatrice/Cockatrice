@@ -123,9 +123,7 @@ void TabDeckEditor::refreshShortcuts()
     aResetLayout->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aResetLayout"));
 }
 
-/**
- * @brief Loads deck editor layout from settings or resets to default.
- */
+/** @brief Loads deck editor layout from settings or resets to default */
 void TabDeckEditor::loadLayout()
 {
     LayoutsSettings &layouts = SettingsCache::instance().layouts();
@@ -145,9 +143,7 @@ void TabDeckEditor::loadLayout()
     }
 }
 
-/**
- * @brief Resets all dock widgets to default layout.
- */
+/** @brief Resets all dock widgets to default layout */
 void TabDeckEditor::restartLayout()
 {
     // Show/hide and reset floating

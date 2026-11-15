@@ -2,6 +2,7 @@
  * @file printing_selector.h
  * @ingroup PrintingWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef PRINTING_SELECTOR_H
@@ -69,13 +70,9 @@ private slots:
     void updateCardAmounts();
 
 signals:
-    /**
-     * Requests the previous card in the list
-     */
+    /** Requests the previous card in the list */
     void prevCardRequested();
-    /**
-     * Requests the next card in the list
-     */
+    /** Requests the next card in the list */
     void nextCardRequested();
 
     /**

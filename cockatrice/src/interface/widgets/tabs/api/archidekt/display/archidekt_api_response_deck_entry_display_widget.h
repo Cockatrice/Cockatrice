@@ -75,9 +75,7 @@ public:
      */
     void onPreviewImageLoadFinished(QNetworkReply *reply);
 
-    /**
-     * @brief Updates the scaled preview image and adjusts layout accordingly.
-     */
+    /** @brief Updates the scaled preview image and adjusts layout accordingly */
     void updateScaledPreview();
 
     /**
@@ -87,9 +85,7 @@ public:
     void resizeEvent(QResizeEvent *event) override;
 
 public slots:
-    /**
-     * @brief Emits `requestNavigation` for the deck's URL.
-     */
+    /** @brief Emits `requestNavigation` for the deck's URL */
     void actRequestNavigationToDeck();
 
     /**

@@ -3,6 +3,7 @@
  * @ingroup Widgets
  * @ingroup DeckEditorAnalyticsWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef PERCENT_BAR_WIDGET_H

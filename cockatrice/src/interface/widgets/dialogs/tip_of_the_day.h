@@ -2,6 +2,7 @@
  * @file tip_of_the_day.h
  * @ingroup Dialogs
  */
+
 //! \todo Document this file.
 
 #ifndef TIP_OF_DAY_H

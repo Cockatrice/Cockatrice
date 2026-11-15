@@ -2,6 +2,7 @@
  * @file dlg_forgot_password_challenge.h
  * @ingroup AccountDialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_FORGOTPASSWORDCHALLENGE_H

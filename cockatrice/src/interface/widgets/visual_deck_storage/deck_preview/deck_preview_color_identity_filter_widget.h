@@ -25,23 +25,17 @@ public:
     explicit DeckPreviewColorIdentityFilterWidget(QWidget *parent = nullptr);
     void retranslateUi();
 
-    /**
-     * @brief The currently active color identity filter mode.
-     */
+    /** @brief The currently active color identity filter mode */
     [[nodiscard]] VisualDeckStorageSortFilterProxyModel::FilterMode getFilterMode() const
     {
         return filterMode;
     }
 
-    /**
-     * @brief The colors that are currently toggled on.
-     */
+    /** @brief The colors that are currently toggled on */
     [[nodiscard]] QSet<QChar> getActiveColors() const;
 
 signals:
-    /**
-     * Emitted when the set of active colors changed due to user interaction.
-     */
+    /** Emitted when the set of active colors changed due to user interaction */
     void activeColorsChanged();
 
     /**

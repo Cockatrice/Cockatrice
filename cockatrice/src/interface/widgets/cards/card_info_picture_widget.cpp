@@ -441,9 +441,7 @@ QMenu *CardInfoPictureWidget::createViewRelatedCardsMenu()
     return viewRelatedCards;
 }
 
-/**
- * Finds the single instance of the MainWindow in this application.
- */
+/** Finds the single instance of the MainWindow in this application */
 static MainWindow *findMainWindow()
 {
     for (auto widget : QApplication::topLevelWidgets()) {

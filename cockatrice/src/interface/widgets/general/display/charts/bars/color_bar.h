@@ -64,9 +64,7 @@ public:
         minRatioThreshold = treshold / 100.0;
     }
 
-    /**
-     * @brief Returns the recommended minimum size.
-     */
+    /** @brief Returns the recommended minimum size */
     QSize minimumSizeHint() const override;
 
 protected:
@@ -80,19 +78,13 @@ protected:
      */
     void paintEvent(QPaintEvent *event) override;
 
-    /**
-     * @brief Handles mouse hover entering.
-     */
+    /** @brief Handles mouse hover entering */
     void enterEvent(QEnterEvent *event) override;
 
-    /**
-     * @brief Handles mouse hover leaving.
-     */
+    /** @brief Handles mouse hover leaving */
     void leaveEvent(QEvent *event) override;
 
-    /**
-     * @brief Handles mouse movement to update contextual tooltips.
-     */
+    /** @brief Handles mouse movement to update contextual tooltips */
     void mouseMoveEvent(QMouseEvent *event) override;
 
 private:

@@ -2,6 +2,7 @@
  * @file hand_zone_logic.h
  * @ingroup GameLogicZones
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_HAND_ZONE_LOGIC_H

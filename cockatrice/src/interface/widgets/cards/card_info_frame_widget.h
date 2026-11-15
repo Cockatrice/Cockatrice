@@ -2,6 +2,7 @@
  * @file card_info_frame_widget.h
  * @ingroup CardWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef CARDFRAME_H

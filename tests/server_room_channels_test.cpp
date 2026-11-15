@@ -1,6 +1,7 @@
-/** @file server_room_channels_test.cpp
- *  @brief Tests for room chat channels: fan-out, privilege gating, whitelist, history replay and audit logging.
- *  @ingroup Tests
+/**
+ * @file server_room_channels_test.cpp
+ * @brief Tests for room chat channels: fan-out, privilege gating, whitelist, history replay and audit logging.
+ * @ingroup Tests
  */
 
 #include "libcockatrice/protocol/pb/response.pb.h"

@@ -3,6 +3,7 @@
  * @ingroup VisualDeckPreviewWidgets
  * @ingroup Dialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DECK_PREVIEW_TAG_DIALOG_H

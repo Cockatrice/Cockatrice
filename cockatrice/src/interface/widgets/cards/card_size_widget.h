@@ -4,6 +4,7 @@
  * @ingroup DeckEditorWidgets
  * @ingroup DeckStorageWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef CARD_SIZE_WIDGET_H

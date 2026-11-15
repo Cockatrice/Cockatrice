@@ -1,8 +1,9 @@
 /**
  * @file player_actions.h
- *  @ingroup GameLogicActions
+ * @ingroup GameLogicActions
  * @ingroup GameLogicPlayers
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_PLAYER_ACTIONS_H

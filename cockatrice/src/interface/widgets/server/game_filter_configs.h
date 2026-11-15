@@ -8,9 +8,7 @@
 #include <QStringList>
 #include <QTime>
 
-/**
- * @brief The possible game filter configs.
- */
+/** @brief The possible game filter configs */
 struct GameFilterConfigs
 {
     static constexpr int DEFAULT_MAX_PLAYERS_MIN = 1;

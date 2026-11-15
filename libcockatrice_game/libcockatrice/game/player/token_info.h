@@ -2,6 +2,7 @@
  * @file token_info.h
  * @ingroup GameLogicPlayers
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_TOKEN_INFO_H

@@ -2,6 +2,7 @@
  * @file dlg_view_log.h
  * @ingroup ServerLogDialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_VIEWLOG_H

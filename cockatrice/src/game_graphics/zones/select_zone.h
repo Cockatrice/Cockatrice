@@ -20,9 +20,7 @@ class CardItem;
 class CardZoneLogic;
 class QGraphicsItem;
 
-/**
- * A CardZone where the cards are laid out, with each card directly interactable by clicking.
- */
+/** A CardZone where the cards are laid out, with each card directly interactable by clicking */
 class SelectZone : public CardZone
 {
     Q_OBJECT

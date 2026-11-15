@@ -2,6 +2,7 @@
  * @file settings_manager.h
  * @ingroup Settings
  */
+
 //! \todo Document this file.
 
 #ifndef SETTINGSMANAGER_H

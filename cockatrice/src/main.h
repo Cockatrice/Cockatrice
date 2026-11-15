@@ -2,6 +2,7 @@
  * @file main.h
  * @ingroup Core
  */
+
 //! \todo Document this file.
 
 #ifndef MAIN_H

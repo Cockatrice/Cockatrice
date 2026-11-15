@@ -2,6 +2,7 @@
  * @file mana_curve_widget.h
  * @ingroup DeckEditorAnalyticsWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef MANA_CURVE_WIDGET_H

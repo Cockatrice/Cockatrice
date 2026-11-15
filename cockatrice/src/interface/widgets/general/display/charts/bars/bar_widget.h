@@ -3,6 +3,7 @@
  * @ingroup Widgets
  * @ingroup DeckEditorAnalyticsWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef BAR_WIDGET_H

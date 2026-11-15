@@ -3,6 +3,7 @@
  * @ingroup Core
  * @ingroup Tabs
  */
+
 //! \todo Document this file.
 
 #ifndef TAB_SUPERVISOR_H

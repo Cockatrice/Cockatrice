@@ -146,9 +146,7 @@ int AllZonesCardAmountWidget::getTokensboardAmount()
     return buttonBoxTokensboard->getAmount();
 }
 
-/**
- * @brief Checks if the amount is at least one in either the mainboard or sideboard or tokensboard.
- */
+/** @brief Checks if the amount is at least one in either the mainboard or sideboard or tokensboard */
 bool AllZonesCardAmountWidget::isNonZero()
 {
     return getMainboardAmount() > 0 || getSideboardAmount() > 0 || getTokensboardAmount() > 0;

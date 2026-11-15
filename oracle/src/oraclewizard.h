@@ -88,9 +88,7 @@ private:
     bool databaseSaved = false;
 
     void migrateOracleSettings();
-    /**
-     * @brief Starts the local socket the hosting Cockatrice client uses to bring this wizard forward.
-     */
+    /** @brief Starts the local socket the hosting Cockatrice client uses to bring this wizard forward */
     void startRaiseServer();
     /** @brief Shows, raises and activates the wizard window. */
     void raiseWizard();

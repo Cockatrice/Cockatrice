@@ -2,6 +2,7 @@
  * @file card_item.h
  * @ingroup GameGraphicsCards
  */
+
 //! \todo Document this file.
 
 #ifndef CARDITEM_H

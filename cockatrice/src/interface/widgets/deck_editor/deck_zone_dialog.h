@@ -45,14 +45,10 @@ public:
                             const std::function<QString(const QString &)> &_nameValidator = {},
                             bool _allowBoardSelection = true);
 
-    /**
-     * @brief The trimmed zone name entered by the user.
-     */
+    /** @brief The trimmed zone name entered by the user */
     [[nodiscard]] QString getZoneName() const;
 
-    /**
-     * @brief The internal name of the board zone selected in the combo.
-     */
+    /** @brief The internal name of the board zone selected in the combo */
     [[nodiscard]] QString getBoardName() const;
 
     /**
@@ -99,15 +95,10 @@ protected:
     void changeEvent(QEvent *event) override;
 
 private:
-    /**
-     * @brief Sets every user-visible string. Runs on construction and on runtime
-     * language changes.
-     */
+    /** @brief Sets every user-visible string. Runs on construction and on runtime language changes */
     void retranslateUi();
 
-    /**
-     * @brief Validates the current input, toggling Ok and the inline error label.
-     */
+    /** @brief Validates the current input, toggling Ok and the inline error label */
     void validateName();
 
     QLabel *nameLabel;

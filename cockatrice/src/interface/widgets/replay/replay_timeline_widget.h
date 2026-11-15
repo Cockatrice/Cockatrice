@@ -2,6 +2,7 @@
  * @file replay_timeline_widget.h
  * @ingroup Replay
  */
+
 //! \todo Document this file.
 
 #ifndef REPLAY_TIMELINE_WIDGET

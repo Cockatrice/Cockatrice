@@ -2,6 +2,7 @@
  * @file user_list_widget.h
  * @ingroup Lobby
  */
+
 //! \todo Document this file.
 
 #ifndef USERLIST_H

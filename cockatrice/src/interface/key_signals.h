@@ -3,6 +3,7 @@
  * @ingroup Core
  * @ingroup UI
  */
+
 //! \todo Document this file.
 
 #ifndef KEYSIGNALS_H

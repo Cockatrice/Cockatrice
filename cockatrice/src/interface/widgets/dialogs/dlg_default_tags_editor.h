@@ -3,6 +3,7 @@
  * @ingroup Dialogs
  * @ingroup DeckStorageWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_DEFAULT_TAGS_EDITOR_H

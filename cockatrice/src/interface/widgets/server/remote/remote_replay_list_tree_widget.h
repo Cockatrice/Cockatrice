@@ -4,6 +4,7 @@
  * @ingroup Replays
  * @ingroup NetworkingWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef REMOTEREPLAYLIST_TREEWIDGET_H

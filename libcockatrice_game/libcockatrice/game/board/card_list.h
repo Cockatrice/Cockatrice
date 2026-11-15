@@ -2,6 +2,7 @@
  * @file card_list.h
  * @ingroup GameLogicCards
  */
+
 //! \todo Document this file.
 
 #ifndef CARDLIST_H

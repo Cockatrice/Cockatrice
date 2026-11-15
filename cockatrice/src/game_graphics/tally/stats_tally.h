@@ -6,9 +6,7 @@
 
 class CardItem;
 
-/**
- * @brief Extracts and tallies stats from selected cards.
- */
+/** @brief Extracts and tallies stats from selected cards */
 namespace StatsTally
 {
 

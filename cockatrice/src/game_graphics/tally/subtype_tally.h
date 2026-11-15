@@ -7,9 +7,7 @@
 
 class CardItem;
 
-/**
- * @brief Extracts and tallies subtypes from selected cards.
- */
+/** @brief Extracts and tallies subtypes from selected cards */
 namespace SubtypeTally
 {
 /**

@@ -429,18 +429,14 @@ void DeckEditorDeckDockWidget::updateCard(const QModelIndex /*&current*/, const 
     }
 }
 
-/**
- * @brief Writes the contents of the name textBox to the DeckStateManager
- */
+/** @brief Writes the contents of the name textBox to the DeckStateManager */
 void DeckEditorDeckDockWidget::writeName()
 {
     QString name = nameEdit->text();
     deckStateManager->setName(name);
 }
 
-/**
- * @brief Writes the contents of the comments textBox to the DeckStateManager
- */
+/** @brief Writes the contents of the comments textBox to the DeckStateManager */
 void DeckEditorDeckDockWidget::writeComments()
 {
     QString comments = commentsEdit->toPlainText();
@@ -504,9 +500,7 @@ void DeckEditorDeckDockWidget::updateBannerCardComboBox()
     bannerCardComboBox->blockSignals(wasBlocked);
 }
 
-/**
- * @brief Writes the selected bannerCard to the DeckStateManager
- */
+/** @brief Writes the selected bannerCard to the DeckStateManager */
 void DeckEditorDeckDockWidget::writeBannerCard(int index)
 {
     auto [name, id] = bannerCardComboBox->itemData(index).value<QPair<QString, QString>>();
@@ -615,9 +609,7 @@ void DeckEditorDeckDockWidget::syncDisplayWidgetsToModel()
     deckTagsDisplayWidget->blockSignals(false);
 }
 
-/**
- * @brief Convenience method to get the underlying model instance from the DeckStateManager
- */
+/** @brief Convenience method to get the underlying model instance from the DeckStateManager */
 DeckListModel *DeckEditorDeckDockWidget::getModel() const
 {
     return deckStateManager->getModel();
@@ -692,9 +684,7 @@ void DeckEditorDeckDockWidget::recursiveExpand(const QModelIndex &sourceIndex)
     }
 }
 
-/**
- * @brief Fully expands all levels of the deck view
- */
+/** @brief Fully expands all levels of the deck view */
 void DeckEditorDeckDockWidget::expandAll()
 {
     deckView->expandRecursively(deckView->rootIndex());

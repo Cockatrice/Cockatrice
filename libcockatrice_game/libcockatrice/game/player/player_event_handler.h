@@ -77,8 +77,9 @@ public:
      */
     explicit PlayerEventHandler(PlayerLogic *player);
 
-    /** @name Event dispatch
-     *  @{
+    /**
+     * @name Event dispatch
+     * @{
      */
 
     /**
@@ -100,8 +101,9 @@ public:
 
     /** @} */
 
-    /** @name Chat and randomization events
-     *  @{
+    /**
+     * @name Chat and randomization events
+     * @{
      */
 
     /// Handle in-game chat messages from this player.
@@ -115,8 +117,9 @@ public:
 
     /** @} */
 
-    /** @name Arrow and targeting events
-     *  @{
+    /**
+     * @name Arrow and targeting events
+     * @{
      */
 
     /// Create a visual arrow between cards or players.
@@ -127,8 +130,9 @@ public:
 
     /** @} */
 
-    /** @name Token and card creation
-     *  @{
+    /**
+     * @name Token and card creation
+     * @{
      */
 
     /// Create a token card in a target zone.
@@ -136,8 +140,9 @@ public:
 
     /** @} */
 
-    /** @name Card attribute and counter updates
-     *  @{
+    /**
+     * @name Card attribute and counter updates
+     * @{
      */
 
     /**
@@ -163,8 +168,9 @@ public:
 
     /** @} */
 
-    /** @name Zone-level operations
-     *  @{
+    /**
+     * @name Zone-level operations
+     * @{
      */
 
     /// Log a zone dump (e.g. reveal graveyard/library contents).
@@ -193,8 +199,9 @@ public:
 
     /** @} */
 
-    /** @name Draw and reveal operations
-     *  @{
+    /**
+     * @name Draw and reveal operations
+     * @{
      */
 
     /// Draw one or more cards from the deck.
@@ -210,8 +217,9 @@ public:
 
     /** @} */
 
-    /** @name Zone configuration
-     *  @{
+    /**
+     * @name Zone configuration
+     * @{
      */
 
     /// Update zone visibility and reveal behavior.
@@ -221,8 +229,9 @@ public:
 
     void eventGameLogNotice(const Event_GameLogNotice &event);
 signals:
-    /** @name Logging signals
-     *  @{
+    /**
+     * @name Logging signals
+     * @{
      */
     void logSay(PlayerLogic *player, QString message);
     void logShuffle(PlayerLogic *player, CardZoneLogic *zone, int start, int end);

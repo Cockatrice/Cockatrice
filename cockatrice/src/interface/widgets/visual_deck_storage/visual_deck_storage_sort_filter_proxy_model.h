@@ -42,9 +42,7 @@ public:
     };
     Q_ENUM(SortOrder)
 
-    /**
-     * @brief How the color identity filter is applied.
-     */
+    /** @brief How the color identity filter is applied */
     enum FilterMode
     {
         ExactMatch,
@@ -66,20 +64,16 @@ public:
     void setColorFilter(FilterMode mode, const QSet<QChar> &colors);
     ///@}
 
-    /**
-     * @brief Sets the sort order and applies it immediately.
-     */
+    /** @brief Sets the sort order and applies it immediately */
     void setSortOrder(SortOrder order);
 
     /**
      * @brief Re-evaluates all matches against the current model data and
-     * re-applies filtering and sorting. Called after deck data changes.
+     *        re-applies filtering and sorting. Called after deck data changes.
      */
     void reapplyFilters();
 
-    /**
-     * @brief Re-applies the current sort order without touching the filters.
-     */
+    /** @brief Re-applies the current sort order without touching the filters */
     void resort();
 
 protected:

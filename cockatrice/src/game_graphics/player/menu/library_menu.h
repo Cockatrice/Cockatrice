@@ -2,6 +2,7 @@
  * @file library_menu.h
  * @ingroup GameMenusZones
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_LIBRARY_MENU_H

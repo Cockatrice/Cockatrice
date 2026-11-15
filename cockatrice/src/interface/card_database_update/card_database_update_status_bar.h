@@ -37,19 +37,13 @@ public:
     QString statusText() const;
 
 public slots:
-    /**
-     * @brief Shows the widget and resets it to the indeterminate state.
-     */
+    /** @brief Shows the widget and resets it to the indeterminate state */
     void updateStarted();
 
-    /**
-     * @brief Shows the progress of one update stage.
-     */
+    /** @brief Shows the progress of one update stage */
     void updateProgress(const CardUpdateProgress &progress);
 
-    /**
-     * @brief Hides the widget and clears the reported progress.
-     */
+    /** @brief Hides the widget and clears the reported progress */
     void updateFinished();
 
 protected:

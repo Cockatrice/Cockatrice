@@ -2,6 +2,7 @@
  * @file dlg_forgot_password_request.h
  * @ingroup AccountDialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_FORGOTPASSWORDREQUEST_H

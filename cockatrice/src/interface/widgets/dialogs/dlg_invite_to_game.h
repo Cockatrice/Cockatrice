@@ -2,6 +2,7 @@
  * @file dlg_invite_to_game.h
  * @ingroup RoomDialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_INVITE_TO_GAME_H

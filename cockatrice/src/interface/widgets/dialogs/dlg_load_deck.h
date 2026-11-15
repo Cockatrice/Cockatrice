@@ -3,6 +3,7 @@
  * @ingroup LocalDeckStorageDialogs
  * @ingroup Lobby
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_LOAD_DECK_H

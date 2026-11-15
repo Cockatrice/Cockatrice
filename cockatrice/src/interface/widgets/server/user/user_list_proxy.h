@@ -3,6 +3,7 @@
  * @ingroup UI
  * @ingroup Lobby
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_USERLISTPROXY_H

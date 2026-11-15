@@ -3,6 +3,7 @@
  * @ingroup CardExtraInfoWidgets
  * @ingroup PrintingWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef SET_NAME_AND_COLLECTORS_NUMBER_DISPLAY_WIDGET_H

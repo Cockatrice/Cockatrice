@@ -2,6 +2,7 @@
  * @file filter_string.h
  * @ingroup CardDatabaseModelFilters
  */
+
 //! \todo Document this file.
 
 #ifndef FILTER_STRING_H

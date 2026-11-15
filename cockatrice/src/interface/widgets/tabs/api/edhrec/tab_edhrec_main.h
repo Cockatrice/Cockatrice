@@ -2,6 +2,7 @@
  * @file tab_edhrec_main.h
  * @ingroup Tabs
  */
+
 //! \todo Document this file.
 
 #ifndef TAB_EDHREC_MAIN_H
@@ -38,7 +39,7 @@ public:
     [[nodiscard]] QString getTabText() const override
     {
         auto cardName = cardToQuery.isNull() ? QString() : cardToQuery->getName();
-        //: EDHRec is a website name, keep it as written. %1 is the card being looked up.
+        // EDHRec is a website name, keep it as written. %1 is the card being looked up.
         return tr("EDHRec: %1").arg(cardName);
     }
 

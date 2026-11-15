@@ -58,9 +58,7 @@ Qt::Orientations FlowLayout::expandingDirections() const
     return (flowDirection == Qt::Horizontal) ? Qt::Horizontal : Qt::Vertical;
 }
 
-/**
- * @brief Height-for-width is only meaningful for horizontal (wrapping) flow.
- */
+/** @brief Height-for-width is only meaningful for horizontal (wrapping) flow */
 bool FlowLayout::hasHeightForWidth() const
 {
     return flowDirection == Qt::Horizontal;
@@ -357,9 +355,7 @@ QSize FlowLayout::calculateMinimumSizeHorizontal() const
     return size;
 }
 
-/**
- * @brief Preferred size for vertical flow: all items in a single column (unconstrained).
- */
+/** @brief Preferred size for vertical flow: all items in a single column (unconstrained) */
 QSize FlowLayout::calculateSizeHintVertical() const
 {
     int maxWidth = 0;
@@ -380,9 +376,7 @@ QSize FlowLayout::calculateSizeHintVertical() const
     return QSize(maxWidth, totalHeight);
 }
 
-/**
- * @brief Minimum size for vertical flow: the largest single item.
- */
+/** @brief Minimum size for vertical flow: the largest single item */
 QSize FlowLayout::calculateMinimumSizeVertical() const
 {
     QSize size(0, 0);

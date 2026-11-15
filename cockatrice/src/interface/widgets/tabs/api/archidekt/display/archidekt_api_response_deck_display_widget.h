@@ -79,24 +79,16 @@ public:
      */
     void retranslateUi();
 
-    /**
-     * @brief Opens the deck in the deck editor.
-     */
+    /** @brief Opens the deck in the deck editor */
     void actOpenInDeckEditor();
 
-    /**
-     * @brief Clears all dynamically generated card zone display widgets.
-     */
+    /** @brief Clears all dynamically generated card zone display widgets */
     void clearAllDisplayWidgets();
 
-    /**
-     * @brief Handles model reset by clearing and reconstructing display widgets.
-     */
+    /** @brief Handles model reset by clearing and reconstructing display widgets */
     void decklistModelReset();
 
-    /**
-     * @brief Builds DeckCardZoneDisplayWidget instances from the current DeckListModel.
-     */
+    /** @brief Builds DeckCardZoneDisplayWidget instances from the current DeckListModel */
     void constructZoneWidgetsFromDeckListModel();
 
 private slots:
@@ -107,9 +99,9 @@ private slots:
     void onGroupCriteriaChange(const QString &activeGroupCriteria);
 
 private:
-    ArchidektApiResponseDeck response; ///< API deck data container
-    CardSizeWidget *cardSizeSlider;    ///< Slider for adjusting card sizes
-    QVBoxLayout *layout;               ///< Main vertical layout
+    ArchidektApiResponseDeck response;                        ///< API deck data container
+    CardSizeWidget *cardSizeSlider;                           ///< Slider for adjusting card sizes
+    QVBoxLayout *layout;                                      ///< Main vertical layout
     QWidget *navigationContainer;
     QHBoxLayout *navigationContainerLayout;
     QPushButton *homeButton;

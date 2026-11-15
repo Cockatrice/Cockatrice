@@ -2,6 +2,7 @@
  * @file card_menu_action_type.h
  * @ingroup GameLogicPlayers
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_CARD_MENU_ACTION_TYPE_H

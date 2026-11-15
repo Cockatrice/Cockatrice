@@ -2,6 +2,7 @@
  * @file grave_menu.h
  * @ingroup GameMenusZones
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_GRAVE_MENU_H

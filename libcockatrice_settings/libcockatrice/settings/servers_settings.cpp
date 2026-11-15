@@ -325,9 +325,7 @@ void ServersSettings::removeServer(QString servAddr)
     }
 }
 
-/**
- * Will only update fields with new values, ignores empty values
- */
+/** Will only update fields with new values, ignores empty values */
 bool ServersSettings::updateExistingServerWithoutLoss(QString saveName, QString serv, QString port, QString site)
 {
     QList<ServerEntry> servers = loadServers();

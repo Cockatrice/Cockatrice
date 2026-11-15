@@ -2,6 +2,7 @@
  * @file pile_zone.h
  * @ingroup GameGraphicsZones
  */
+
 //! \todo Document this file.
 
 #ifndef PILEZONE_H

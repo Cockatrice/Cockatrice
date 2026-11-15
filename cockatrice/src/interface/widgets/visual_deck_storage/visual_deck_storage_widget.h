@@ -57,9 +57,7 @@ public:
     }
 
 public slots:
-    /**
-     * @brief Starts scanning the deck folder and rebuilds the folder tree and previews.
-     */
+    /** @brief Starts scanning the deck folder and rebuilds the folder tree and previews */
     void createRootFolderWidget();
     void updateShowFolders(bool enabled);
     void updateTagsVisibility(bool visible);

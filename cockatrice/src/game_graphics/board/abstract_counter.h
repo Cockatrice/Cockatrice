@@ -2,6 +2,7 @@
  * @file abstract_counter.h
  * @ingroup GameGraphicsPlayers
  */
+
 //! \todo Document this file.
 
 #ifndef COUNTER_H

@@ -2,6 +2,7 @@
  * @file dlg_connect.h
  * @ingroup ConnectionDialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_CONNECT_H

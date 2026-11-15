@@ -2,6 +2,7 @@
  * @file tab_message.h
  * @ingroup MessagingTabs
  */
+
 //! \todo Document this file.
 
 #ifndef TAB_MESSAGE_H

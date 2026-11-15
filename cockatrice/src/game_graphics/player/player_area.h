@@ -2,6 +2,7 @@
  * @file player_area.h
  * @ingroup GameGraphicsPlayers
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_PLAYER_AREA_H
@@ -17,9 +18,7 @@
 
 class QGraphicsItem;
 
-/**
- * The entire graphical area belonging to a single player.
- */
+/** The entire graphical area belonging to a single player */
 class PlayerArea : public QObject, public QGraphicsItem
 {
     Q_OBJECT

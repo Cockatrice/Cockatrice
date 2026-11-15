@@ -2,6 +2,7 @@
  * @file tabbed_deck_view_container.h
  * @ingroup Lobby
  */
+
 //! \todo Document this file.
 
 #ifndef TABBED_DECK_VIEW_CONTAINER_H

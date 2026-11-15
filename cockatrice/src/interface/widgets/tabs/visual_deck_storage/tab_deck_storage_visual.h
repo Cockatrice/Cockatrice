@@ -2,6 +2,7 @@
  * @file tab_deck_storage_visual.h
  * @ingroup Tabs
  */
+
 //! \todo Document this file.
 
 #ifndef TAB_DECK_STORAGE_VISUAL_H
@@ -35,14 +36,10 @@ public:
         return tr("Visual Deck Storage");
     }
 
-    /**
-     * @brief Enters share-selection mode, optionally preselecting the given deck files.
-     */
+    /** @brief Enters share-selection mode, optionally preselecting the given deck files */
     void enterShareMode(const QStringList &preselectFiles = {});
 
-    /**
-     * @brief Leaves share-selection mode and clears the selection.
-     */
+    /** @brief Leaves share-selection mode and clears the selection */
     void exitShareMode();
 
     [[nodiscard]] bool isShareModeActive() const

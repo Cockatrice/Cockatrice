@@ -2,6 +2,7 @@
  * @file abstract_client.h
  * @ingroup Client
  */
+
 //! \todo Document this file.
 
 #ifndef ABSTRACTCLIENT_H

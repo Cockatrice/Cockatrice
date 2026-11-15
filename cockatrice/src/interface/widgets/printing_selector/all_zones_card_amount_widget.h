@@ -3,6 +3,7 @@
  * @ingroup CardExtraInfoWidgets
  * @ingroup PrintingWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef ALL_ZONES_CARD_AMOUNT_WIDGET_H

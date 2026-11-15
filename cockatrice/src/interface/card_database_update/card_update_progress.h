@@ -6,9 +6,7 @@
 #include <QtGlobal>
 #include <optional>
 
-/**
- * @brief One stage of the card database updater's progress protocol.
- */
+/** @brief One stage of the card database updater's progress protocol */
 enum class CardUpdateStage
 {
     Download, ///< downloading the source data
@@ -17,9 +15,7 @@ enum class CardUpdateStage
     Unknown,  ///< a stage the client does not recognize
 };
 
-/**
- * @brief One progress line read from the card database updater's stdout.
- */
+/** @brief One progress line read from the card database updater's stdout */
 struct CardUpdateProgress
 {
     /**
@@ -29,9 +25,7 @@ struct CardUpdateProgress
      */
     static std::optional<CardUpdateProgress> fromProtocolLine(const QByteArray &line);
 
-    /**
-     * @brief Protocol token of the stage ("download", "scan", "import" or "unknown"), for logging.
-     */
+    /** @brief Protocol token of the stage ("download", "scan", "import" or "unknown"), for logging */
     QString stageToken() const;
 
     CardUpdateStage stage = CardUpdateStage::Unknown;

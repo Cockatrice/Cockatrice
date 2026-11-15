@@ -2,6 +2,7 @@
  * @file card_info_comparator.h
  * @ingroup Cards
  */
+
 //! \todo Document this file.
 
 #ifndef CARD_INFO_COMPARATOR_H

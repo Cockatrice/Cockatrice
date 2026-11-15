@@ -1,6 +1,7 @@
-/** @file server_dump_zone_test.cpp
- *  @brief Tests for resolving a client's zone dump request against a zone's card count.
- *  @ingroup Tests
+/**
+ * @file server_dump_zone_test.cpp
+ * @brief Tests for resolving a client's zone dump request against a zone's card count.
+ * @ingroup Tests
  */
 
 #include <QList>

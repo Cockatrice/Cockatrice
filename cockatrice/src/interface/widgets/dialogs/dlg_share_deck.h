@@ -2,6 +2,7 @@
  * @file dlg_share_deck.h
  * @ingroup Dialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_SHARE_DECK_H

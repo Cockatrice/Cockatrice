@@ -2,6 +2,7 @@
  * @file network_settings.h
  * @ingroup NetworkSettings
  */
+
 //! \todo Document this file.
 
 #ifndef NETWORK_SETTINGS_H

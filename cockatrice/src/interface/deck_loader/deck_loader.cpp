@@ -284,9 +284,7 @@ static QString getDomainForWebsite(DeckLoader::DecklistWebsite website)
     }
 }
 
-/**
- * Converts the card to the String that represents it in the decklist export
- */
+/** Converts the card to the String that represents it in the decklist export */
 static QString toDecklistExportString(const DecklistCardNode *card)
 {
     QString cardString;
@@ -312,9 +310,7 @@ static QString toDecklistExportString(const DecklistCardNode *card)
     return cardString;
 }
 
-/**
- * Converts all cards in the list to their decklist export string and joins them into one string
- */
+/** Converts all cards in the list to their decklist export string and joins them into one string */
 static QString toDecklistExportString(const QList<const DecklistCardNode *> &cardNodes)
 {
     QString result;

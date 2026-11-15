@@ -2,6 +2,7 @@
  * @file card_completer_styler.h
  * @ingroup UtilityWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef CARD_COMPLETER_STYLER_H

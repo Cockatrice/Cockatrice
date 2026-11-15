@@ -3,6 +3,7 @@
  * @ingroup CardWigets
  * @ingroup DeckEditorWidgets
  */
+
 //! \todo Document this file.
 
 #ifndef CARD_PICTURE_ENLARGED_WIDGET_H

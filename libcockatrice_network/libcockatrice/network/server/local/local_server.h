@@ -2,6 +2,7 @@
  * @file local_server.h
  * @ingroup Server
  */
+
 //! \todo Document this file.
 
 #ifndef LOCALSERVER_H

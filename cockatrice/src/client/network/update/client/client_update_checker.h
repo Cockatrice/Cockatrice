@@ -2,6 +2,7 @@
  * @file client_update_checker.h
  * @ingroup ClientUpdate
  */
+
 //! \todo Document this file.
 
 #ifndef CLIENT_UPDATE_CHECKER_H
@@ -40,14 +41,10 @@ public:
     void check();
 
 signals:
-    /**
-     * Forwarded from UpdateChannel::finishedCheck
-     */
+    /** Forwarded from UpdateChannel::finishedCheck */
     void finishedCheck(bool needToUpdate, bool isCompatible, Release *release);
 
-    /**
-     * Forwarded from UpdateChannel::error
-     */
+    /** Forwarded from UpdateChannel::error */
     void error(const QString &errorString);
 };
 

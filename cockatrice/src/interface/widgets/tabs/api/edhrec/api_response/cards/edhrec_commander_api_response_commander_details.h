@@ -2,6 +2,7 @@
  * @file edhrec_commander_api_response_commander_details.h
  * @ingroup ApiResponses
  */
+
 //! \todo Document this file.
 
 #ifndef EDHREC_COMMANDER_API_RESPONSE_COMMANDER_DETAILS_H

@@ -3,6 +3,7 @@
  * @ingroup Core
  * @ingroup Widgets
  */
+
 //! \todo Document this file.
 
 #ifndef HOME_WIDGET_H

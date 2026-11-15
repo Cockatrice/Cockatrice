@@ -2,6 +2,7 @@
  * @file tapped_out_interface.h
  * @ingroup ApiInterfaces
  */
+
 //! \todo Document this file.
 
 #ifndef TAPPEDOUT_INTERFACE_H
@@ -24,7 +25,6 @@ class DeckList;
  * An http POST request is sent and the result is retrieved from the reply. Parsing
  * logic is implemented in TappedOutInterface::queryFinished().
  */
-
 class TappedOutInterface : public QObject
 {
     Q_OBJECT

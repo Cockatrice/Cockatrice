@@ -265,9 +265,7 @@ void TabReplays::handleConnected(const ServerInfo_User &userInfo)
     setRemoteEnabled(userInfo.user_level() & ServerInfo_User::IsRegistered);
 }
 
-/**
- * This is only responsible for handling the disconnect. The connect is already handled elsewhere
- */
+/** This is only responsible for handling the disconnect. The connect is already handled elsewhere */
 void TabReplays::handleConnectionChanged(ClientStatus status)
 {
     if (status == StatusDisconnected) {

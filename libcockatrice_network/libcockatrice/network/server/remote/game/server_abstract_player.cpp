@@ -222,9 +222,7 @@ shouldDestroyOnMove(const Server_Card *card, const Server_CardZone *startZone, c
     return true;
 }
 
-/**
- * @brief Determines whether the moved card should be face-down
- */
+/** @brief Determines whether the moved card should be face-down */
 static bool
 shouldBeFaceDown(const MoveCardStruct &cardStruct, const Server_CardZone *startZone, const Server_CardZone *targetZone)
 {
@@ -251,9 +249,7 @@ shouldBeFaceDown(const MoveCardStruct &cardStruct, const Server_CardZone *startZ
     return false;
 }
 
-/**
- * @brief Determines whether a set of moved cards is from the bottom of the deck
- */
+/** @brief Determines whether a set of moved cards is from the bottom of the deck */
 static bool shouldBeFromTheBottom(const Server_CardZone *startZone, const std::set<MoveCardStruct> &cardsToMove)
 {
     if (!startZone) {

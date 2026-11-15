@@ -6,9 +6,7 @@
 #include <QString>
 #include <QStringList>
 
-/**
- * @brief The card languages card search should run against.
- */
+/** @brief The card languages card search should run against */
 enum class SearchLanguageMode
 {
     English,  ///< Only search the English card names and texts.

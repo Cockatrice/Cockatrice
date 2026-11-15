@@ -2,6 +2,7 @@
  * @file dlg_startup_card_check.h
  * @ingroup CardDatabaseUpdateDialogs
  */
+
 //! \todo Document this file.
 
 #ifndef DLG_STARTUP_CARD_CHECK_H

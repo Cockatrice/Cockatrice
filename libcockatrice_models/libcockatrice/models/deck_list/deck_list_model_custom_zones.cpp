@@ -93,9 +93,7 @@ DecklistModelSubZoneNode *findSubZoneByName(InnerDecklistNode *root, const QStri
 namespace
 {
 
-/**
- * @brief Sorts a node's children and returns the (preSortRow, finalRow) mapping.
- */
+/** @brief Sorts a node's children and returns the (preSortRow, finalRow) mapping */
 QList<QPair<int, int>> plainSort(InnerDecklistNode *node, Qt::SortOrder order)
 {
     const QVector<QPair<int, int>> sortResult = node->sort(order);

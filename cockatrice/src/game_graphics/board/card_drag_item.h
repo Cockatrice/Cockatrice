@@ -2,6 +2,7 @@
  * @file card_drag_item.h
  * @ingroup GameGraphicsCards
  */
+
 //! \todo Document this file.
 
 #ifndef CARDDRAGITEM_H

@@ -2,6 +2,7 @@
  * @file card_set_comparator.h
  * @ingroup CardSets
  */
+
 //! \todo Document this file.
 
 #ifndef SET_PRIORITY_COMPARATOR_H
@@ -12,7 +13,7 @@
 class SetPriorityComparator
 {
 public:
-    /*
+    /**
      * Returns true if a has higher download priority than b
      * Enabled sets have priority over disabled sets
      * Both groups follow the user-defined order
@@ -30,7 +31,7 @@ public:
 class SetReleaseDateComparator
 {
 public:
-    /*
+    /**
      * Returns true if a has higher download priority than b
      * Enabled sets have priority over disabled sets
      * Both groups follow the user-defined order
@@ -48,7 +49,7 @@ public:
 class CardSetPriorityComparator
 {
 public:
-    /*
+    /**
      * Returns true if a has higher download priority than b
      * Enabled sets have priority over disabled sets
      * Both groups follow the user-defined order

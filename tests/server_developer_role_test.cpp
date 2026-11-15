@@ -1,6 +1,7 @@
-/** @file server_developer_role_test.cpp
- *  @brief Tests for the developer staff role authorization and dispatch.
- *  @ingroup Tests
+/**
+ * @file server_developer_role_test.cpp
+ * @brief Tests for the developer staff role authorization and dispatch.
+ * @ingroup Tests
  */
 
 #include "libcockatrice/protocol/pb/response.pb.h"

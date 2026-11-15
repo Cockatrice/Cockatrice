@@ -3,6 +3,7 @@
  * @ingroup UI
  * @brief Line edit with support for multiple trigger-based completers, e.g., @mention and [[card]].
  */
+
 //! \todo Document this file.
 
 #ifndef LINEEDITCOMPLETER_H
@@ -19,8 +20,8 @@ class QWidget;
 
 enum class CompleterTrigger
 {
-    Mention, //< "@" prefix, replaced in place with a trailing space.
-    Card     //< "[[" prefix, replaced with the completion plus a closing "]] ".
+    Mention, ///< "@" prefix, replaced in place with a trailing space.
+    Card     ///< "[[" prefix, replaced with the completion plus a closing "]] ".
 };
 
 struct CompleterInfo

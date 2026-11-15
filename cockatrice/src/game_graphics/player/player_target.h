@@ -2,6 +2,7 @@
  * @file player_target.h
  * @ingroup GameGraphicsPlayers
  */
+
 //! \todo Document this file.
 
 #ifndef PLAYERTARGET_H

@@ -26,15 +26,19 @@ public:
     {
     }
 
-    /** @brief Called before advancing past this page. Return false to block navigation;
-        the page itself is responsible for telling the user why. */
+    /**
+     * @brief Called before advancing past this page. Return false to block navigation;
+     *        the page itself is responsible for telling the user why.
+     */
     virtual bool validatePage()
     {
         return true;
     }
 
-    /** @brief Whether Next/Finish should currently be enabled. Pages doing async work
-        can flip this mid-step; emit completeChanged() when they do. */
+    /**
+     * @brief Whether Next/Finish should currently be enabled. Pages doing async work
+     *        can flip this mid-step; emit completeChanged() when they do.
+     */
     virtual bool isComplete() const
     {
         return true;
@@ -52,16 +56,19 @@ public:
         return {};
     }
 
-    /** @brief Override to replace the "Next"/"Finish" button text on this page.
-        Return an empty string to use the default label. */
+    /**
+     * @brief Override to replace the "Next"/"Finish" button text on this page.
+     *        Return an empty string to use the default label.
+     */
     virtual QString nextButtonText() const
     {
         return {};
     }
 
-    /** @brief Called when the user presses the Next button. Return true to allow
-        advancing to the next page, false to stay on this page (e.g. to
-        trigger an async action first). */
+    /**
+     * @brief Called when the user presses the Next button. Return true to allow advancing to
+     *        the next page, false to stay on this page (e.g. to trigger an async action first).
+     */
     virtual bool handleNextClick()
     {
         return true;

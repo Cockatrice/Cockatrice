@@ -49,9 +49,7 @@ public:
      */
     CardPictureLoaderLocal(QObject *parent, const QString &picsPath, const QString &customPicsPath);
 
-    /**
-     * @brief Returns every indexed file whose base name matches @p baseName.
-     */
+    /** @brief Returns every indexed file whose base name matches @p baseName */
     [[nodiscard]] QStringList indexedPaths(const QString &baseName) const;
 
     /**
@@ -82,9 +80,7 @@ private:
      */
     void refreshIndex();
 
-    /**
-     * @brief Keeps the watcher registered on exactly @p directories.
-     */
+    /** @brief Keeps the watcher registered on exactly @p directories */
     void updateWatchedDirectories(const QSet<QString> &directories);
 
     /**
@@ -105,9 +101,7 @@ private:
                                                   const QString &providerId) const;
 
 signals:
-    /**
-     * @brief Emitted after the custom folder index has been rebuilt.
-     */
+    /** @brief Emitted after the custom folder index has been rebuilt */
     void indexChanged();
 
 private slots:

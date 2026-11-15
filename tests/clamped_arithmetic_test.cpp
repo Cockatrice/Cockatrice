@@ -1,6 +1,7 @@
-/** @file clamped_arithmetic_test.cpp
- *  @brief Tests for shared helpers in clamped_arithmetic.h.
- *  @ingroup Tests
+/**
+ * @file clamped_arithmetic_test.cpp
+ * @brief Tests for shared helpers in clamped_arithmetic.h.
+ * @ingroup Tests
  */
 
 #include <gtest/gtest.h>

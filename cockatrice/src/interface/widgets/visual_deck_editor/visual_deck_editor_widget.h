@@ -2,6 +2,7 @@
  * @file visual_deck_editor_widget.h
  * @ingroup DeckEditors
  */
+
 //! \todo Document this file.
 
 #ifndef VISUAL_DECK_EDITOR_H

@@ -2,6 +2,7 @@
  * @file overlap_layout.h
  * @ingroup UI
  */
+
 //! \todo Document this file.
 
 #ifndef OVERLAP_LAYOUT_H

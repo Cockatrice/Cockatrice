@@ -270,9 +270,7 @@ ServerInfo_ReplayMatch const *RemoteReplayList_TreeModel::getEnclosingReplayMatc
     return &node->getMatchInfo();
 }
 
-/**
- * Deletes all items in the model
- */
+/** Deletes all items in the model */
 void RemoteReplayList_TreeModel::clearAll()
 {
     for (int i = 0; i < replayMatches.size(); ++i) {

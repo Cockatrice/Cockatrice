@@ -3,6 +3,7 @@
  * @ingroup Lobby
  * @ingroup GameSettings
  */
+
 //! \todo Document this file.
 
 #ifndef GAMEFILTERSSETTINGS_H

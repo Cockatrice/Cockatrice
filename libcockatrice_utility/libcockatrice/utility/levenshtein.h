@@ -2,6 +2,7 @@
  * @file levenshtein.h
  * @ingroup Core
  */
+
 //! \todo Document this file.
 
 #ifndef LEVENSHTEIN_H

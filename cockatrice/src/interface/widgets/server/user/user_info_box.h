@@ -2,6 +2,7 @@
  * @file user_info_box.h
  * @ingroup Lobby
  */
+
 //! \todo Document this file.
 
 #ifndef USERINFOBOX_H

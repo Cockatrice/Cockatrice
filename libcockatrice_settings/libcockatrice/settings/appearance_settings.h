@@ -2,6 +2,7 @@
  * @file appearance_settings.h
  * @ingroup CoreSettings
  */
+
 //! \todo Document this file.
 
 #ifndef APPEARANCE_SETTINGS_H

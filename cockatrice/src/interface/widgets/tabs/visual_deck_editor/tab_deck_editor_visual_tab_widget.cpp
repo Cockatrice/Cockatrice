@@ -136,9 +136,7 @@ void TabDeckEditorVisualTabWidget::addNewTab(QWidget *widget, const QString &tit
     this->addTab(widget, title);
 }
 
-/**
- * @brief Removes the currently selected tab.
- */
+/** @brief Removes the currently selected tab */
 void TabDeckEditorVisualTabWidget::removeCurrentTab()
 {
     int currentIndex = this->currentIndex();

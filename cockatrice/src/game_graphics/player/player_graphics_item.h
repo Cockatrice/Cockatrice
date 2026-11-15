@@ -2,6 +2,7 @@
  * @file player_graphics_item.h
  * @ingroup GameGraphicsPlayers
  */
+
 //! \todo Document this file.
 
 #ifndef COCKATRICE_PLAYER_GRAPHICS_ITEM_H

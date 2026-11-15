@@ -83,9 +83,10 @@ private:
     AbstractGame *game;
 
 public:
-    /** @name Construction
-     *  Lifecycle and ownership.
-     *  @{
+    /**
+     * @name Construction
+     * Lifecycle and ownership.
+     * @{
      */
 
     /**
@@ -100,12 +101,13 @@ public:
 
     /** @} */
 
-    /** @name Outgoing game commands
-     *  Commands initiated locally and sent to the server.
+    /**
+     * @name Outgoing game commands
+     * Commands initiated locally and sent to the server.
      *
      * These methods construct and send protobuf commands corresponding
      * to user actions in the UI.
-     *  @{
+     * @{
      */
 
     /** @brief Request advancing the game to the next turn. */
@@ -229,9 +231,10 @@ public:
 
     /** @} */
 
-    /** @name Incoming event processing
-     *  Entry points for server-sent events.
-     *  @{
+    /**
+     * @name Incoming event processing
+     * Entry points for server-sent events.
+     * @{
      */
 
     /**
@@ -250,9 +253,10 @@ public:
 
     /** @} */
 
-    /** @name Command preparation helpers
-     *  Internal helpers for building command containers.
-     *  @{
+    /**
+     * @name Command preparation helpers
+     * Internal helpers for building command containers.
+     * @{
      */
 
     /**
@@ -275,26 +279,24 @@ public:
 
     /** @} */
 
-    /** @name Spectator event handlers
-     *  Events originating from spectators.
-     *  @{
+    /**
+     * @name Spectator event handlers
+     * Events originating from spectators.
+     * @{
      */
 
-    /**
-     * @brief Handle a spectator chat message.
-     */
+    /** @brief Handle a spectator chat message */
     void eventSpectatorSay(const Event_GameSay &event, int eventPlayerId, const GameEventContext &context);
 
-    /**
-     * @brief Handle a spectator leaving the game.
-     */
+    /** @brief Handle a spectator leaving the game */
     void eventSpectatorLeave(const Event_Leave &event, int eventPlayerId, const GameEventContext &context);
 
     /** @} */
 
-    /** @name Game state event handlers
-     *  Events that affect global game state.
-     *  @{
+    /**
+     * @name Game state event handlers
+     * Events that affect global game state.
+     * @{
      */
 
     /**
@@ -336,9 +338,10 @@ public:
 
     /** @} */
 
-    /** @name Player lifecycle and property handlers
-     *  Events related to players joining, leaving, or changing state.
-     *  @{
+    /**
+     * @name Player lifecycle and property handlers
+     * Events related to players joining, leaving, or changing state.
+     * @{
      */
 
     /**
@@ -360,17 +363,16 @@ public:
     /** @brief Handle the local player being kicked from the game. */
     void eventKicked(const Event_Kicked &event, int eventPlayerId, const GameEventContext &context);
 
-    /**
-     * @brief Convert a leave reason enum to a human-readable string.
-     */
+    /** @brief Convert a leave reason enum to a human-readable string */
     QString getLeaveReason(Event_Leave::LeaveReason reason);
 
     /** @} */
 
 public slots:
-    /** @name Command dispatch slots
-     *  Low-level command transmission.
-     *  @{
+    /**
+     * @name Command dispatch slots
+     * Low-level command transmission.
+     * @{
      */
 
     /**
@@ -399,8 +401,9 @@ public slots:
     /** @} */
 
 signals:
-    /** @name Core state signals
-     *  @{
+    /**
+     * @name Core state signals
+     * @{
      */
 
     void emitUserEvent();
@@ -411,8 +414,9 @@ signals:
 
     /** @} */
 
-    /** @name Player and spectator signals
-     *  @{
+    /**
+     * @name Player and spectator signals
+     * @{
      */
 
     void addPlayerToAutoCompleteList(QString playerName);
@@ -424,8 +428,9 @@ signals:
 
     /** @} */
 
-    /** @name Game flow signals
-     *  @{
+    /**
+     * @name Game flow signals
+     * @{
      */
 
     void gameStopped();
@@ -440,9 +445,10 @@ signals:
 
     /** @} */
 
-    /** @name Logging signals
-     *  Signals consumed by MessageLogWidget.
-     *  @{
+    /**
+     * @name Logging signals
+     * Signals consumed by MessageLogWidget.
+     * @{
      */
 
     void logSpectatorSay(ServerInfo_User userInfo, QString message);

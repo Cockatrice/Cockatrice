@@ -4,6 +4,7 @@
  * @ingroup GameWidgets
  * @ingroup Lobby
  */
+
 //! \todo Document this file.
 
 #ifndef TAB_GAME_H
@@ -104,9 +105,7 @@ private:
     /** @brief Placeholder submenu shown when no card is selected; reused instead of reallocated. */
     QMenu *emptyCardMenu = nullptr;
 
-    /**
-     * @brief The actions associated with managing a QDockWidget
-     */
+    /** @brief The actions associated with managing a QDockWidget */
     struct DockActions
     {
         QMenu *menu;
