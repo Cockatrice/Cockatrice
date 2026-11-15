@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Max-Wilhelm Bruker   *
- *   brukie@laptop   *
+ *   Copyright (C) 2008 by Max-Wilhelm Bruker                              *
+ *   brukie@gmx.net                                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
