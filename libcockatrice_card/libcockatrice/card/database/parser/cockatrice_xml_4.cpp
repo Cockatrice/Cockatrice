@@ -226,6 +226,44 @@ void CockatriceXml4Parser::loadFormats(QXmlStreamReader &xml)
     }
 }
 
+struct SetElement
+{
+    QString shortName;
+    QString longName;
+    QString setType;
+    QDate releaseDate;
+    short priority; // uninitialized until a `<priority>` element is read, as before
+};
+
+/// Reads the child elements of one `<set>` element, up to its end tag, into the metadata a set needs.
+static SetElement parseSetElement(QXmlStreamReader &xml)
+{
+    SetElement set;
+    while (!xml.atEnd()) {
+        if (xml.readNext() == QXmlStreamReader::EndElement) {
+            break;
+        }
+
+        auto xmlName = xml.name().toString();
+        if (xmlName == "name") {
+            set.shortName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
+        } else if (xmlName == "longname") {
+            set.longName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
+        } else if (xmlName == "settype") {
+            set.setType = xml.readElementText(QXmlStreamReader::IncludeChildElements);
+        } else if (xmlName == "releasedate") {
+            set.releaseDate =
+                QDate::fromString(xml.readElementText(QXmlStreamReader::IncludeChildElements), Qt::ISODate);
+        } else if (xmlName == "priority") {
+            set.priority = xml.readElementText(QXmlStreamReader::IncludeChildElements).toShort();
+        } else if (!xmlName.isEmpty()) {
+            qCInfo(CockatriceXml4Log) << "Unknown set property" << xmlName << ", trying to continue anyway";
+            xml.skipCurrentElement();
+        }
+    }
+    return set;
+}
+
 void CockatriceXml4Parser::loadSetsFromXml(QXmlStreamReader &xml)
 {
     while (!xml.atEnd()) {
@@ -233,35 +271,10 @@ void CockatriceXml4Parser::loadSetsFromXml(QXmlStreamReader &xml)
             break;
         }
 
-        auto xmlName = xml.name().toString();
-        if (xmlName == "set") {
-            QString shortName, longName, setType;
-            QDate releaseDate;
-            short priority;
-            while (!xml.atEnd()) {
-                if (xml.readNext() == QXmlStreamReader::EndElement) {
-                    break;
-                }
-                xmlName = xml.name().toString();
-
-                if (xmlName == "name") {
-                    shortName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
-                } else if (xmlName == "longname") {
-                    longName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
-                } else if (xmlName == "settype") {
-                    setType = xml.readElementText(QXmlStreamReader::IncludeChildElements);
-                } else if (xmlName == "releasedate") {
-                    releaseDate =
-                        QDate::fromString(xml.readElementText(QXmlStreamReader::IncludeChildElements), Qt::ISODate);
-                } else if (xmlName == "priority") {
-                    priority = xml.readElementText(QXmlStreamReader::IncludeChildElements).toShort();
-                } else if (!xmlName.isEmpty()) {
-                    qCInfo(CockatriceXml4Log) << "Unknown set property" << xmlName << ", trying to continue anyway";
-                    xml.skipCurrentElement();
-                }
-            }
-
-            internalAddSet(shortName, longName, setType, releaseDate, static_cast<CardSet::Priority>(priority));
+        if (xml.name().toString() == "set") {
+            const SetElement set = parseSetElement(xml);
+            internalAddSet(set.shortName, set.longName, set.setType, set.releaseDate,
+                           static_cast<CardSet::Priority>(set.priority));
         }
     }
 }
