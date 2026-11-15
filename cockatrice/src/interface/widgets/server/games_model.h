@@ -30,15 +30,15 @@ class GamesModel : public QAbstractTableModel
 {
     Q_OBJECT
 private:
-    QList<ServerInfo_Game> gameList;  /**< List of games currently displayed. */
-    QMap<int, QString> rooms;         /**< Map of room IDs to room names. */
-    QMap<int, GameTypeMap> gameTypes; /**< Map of room IDs to available game types. */
-    QIcon lockIcon;                   /**< Themed lock for password-protected games. */
+    QList<ServerInfo_Game> gameList;  ///< List of games currently displayed. */
+    QMap<int, QString> rooms;         ///< Map of room IDs to room names. */
+    QMap<int, GameTypeMap> gameTypes; ///< Map of room IDs to available game types. */
+    QIcon lockIcon;                   ///< Themed lock for password-protected games. */
 
-    static const int NUM_COLS = 8; /**< Number of columns in the table. */
+    static const int NUM_COLS = 8; ///< Number of columns in the table. */
 
 public:
-    static const int SORT_ROLE = Qt::UserRole + 1; /**< Role used for sorting. */
+    static const int SORT_ROLE = Qt::UserRole + 1; ///< Role used for sorting. */
 
     /**
      * @brief Constructs a GamesModel.
@@ -114,7 +114,7 @@ class GamesProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
 private:
-    const UserListProxy *userListProxy; /**< Proxy for checking user ignore/buddy lists. */
+    const UserListProxy *userListProxy; ///< Proxy for checking user ignore/buddy lists. */
 
     // If adding any additional filters, make sure to update:
     // - GamesProxyModel()
