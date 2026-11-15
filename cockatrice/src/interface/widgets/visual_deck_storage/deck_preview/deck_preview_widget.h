@@ -22,7 +22,6 @@
 class QLabel;
 class QMenu;
 class QMouseEvent;
-class ColorIdentityWidget;
 class DeckPreviewCardPictureWidget;
 class DeckPreviewDeckBoxWidget;
 class DeckPreviewDeckTagsDisplayWidget;
@@ -109,7 +108,6 @@ private:
     VisualDeckStorageWidget *visualDeckStorageWidget;
     VisualDeckStorageModel *model;
     QVBoxLayout *layout;
-    ColorIdentityWidget *colorIdentityWidget;
     DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget;
     QLabel *bannerCardLabel;
     QComboBox *bannerCardComboBox;
