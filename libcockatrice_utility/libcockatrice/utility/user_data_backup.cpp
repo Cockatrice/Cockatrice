@@ -61,9 +61,11 @@ QString uniqueTargetPath(const QString &sessionDir, const QString &fileName)
     }
 }
 
-/// Copies one source into @p sessionDir. The created target is appended to
-/// @p locations even for a partial copy, so callers can point the user at what
-/// was salvaged. @returns whether the source was copied completely.
+/**
+ * Copies one source into @p sessionDir. The created target is appended to
+ * @p locations even for a partial copy, so callers can point the user at what
+ * was salvaged. @returns whether the source was copied completely.
+ */
 bool backupPath(const QString &sourcePath, const QString &sessionDir, QStringList &locations)
 {
     const QFileInfo source(sourcePath);
