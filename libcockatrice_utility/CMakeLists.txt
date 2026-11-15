@@ -28,6 +28,7 @@ set(UTILITY_HEADERS
     libcockatrice/utility/passwordhasher.h
     libcockatrice/utility/playmat_params.h
     libcockatrice/utility/qt_utils.h
+    libcockatrice/utility/raise_on_hover.h
     libcockatrice/utility/report_categories.h
     libcockatrice/utility/string_limits.h
     libcockatrice/utility/dice_limits.h
@@ -49,6 +50,14 @@ target_include_directories(libcockatrice_utility PUBLIC ${CMAKE_CURRENT_SOURCE_D
 find_package(OpenSSL REQUIRED)
 
 target_link_libraries(libcockatrice_utility PUBLIC libcockatrice_rng OpenSSL::Crypto ${QT_CORE_MODULE})
+
+# RaiseOnHover is a widget behaviour: it belongs beside QtUtils, but it needs the
+# Qt Widgets headers to compile, and the rest of this library is deliberately
+# Core-only so a headless build (servatrice, the oracle) never links widgets.
+if(WITH_CLIENT)
+  target_sources(libcockatrice_utility PRIVATE libcockatrice/utility/raise_on_hover.cpp)
+  target_link_libraries(libcockatrice_utility PRIVATE ${COCKATRICE_QT_VERSION_NAME}::Widgets)
+endif()
 
 set(ORACLE_LIBS)
 
