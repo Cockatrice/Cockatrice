@@ -1,6 +1,7 @@
-/** @file servatrice_in_memory_database_test.cpp
- *  @brief Tests for the in-memory server database shared between the main interface and its workers.
- *  @ingroup Tests
+/**
+ * @file servatrice_in_memory_database_test.cpp
+ * @brief Tests for the in-memory server database shared between the main interface and its workers.
+ * @ingroup Tests
  */
 
 #include "libcockatrice/server/dev/servatrice_in_memory_database_interface.h"

@@ -1,6 +1,7 @@
-/** @file client_login_status_test.cpp
- *  @brief The login response state machine must keep the session a forced password change needs.
- *  @ingroup Tests
+/**
+ * @file client_login_status_test.cpp
+ * @brief The login response state machine must keep the session a forced password change needs.
+ * @ingroup Tests
  */
 
 #include "abstract_client.h"

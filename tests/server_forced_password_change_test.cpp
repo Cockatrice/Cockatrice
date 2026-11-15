@@ -1,6 +1,7 @@
-/** @file server_forced_password_change_test.cpp
- *  @brief Tests for the restricted session a forced password change leaves behind at login.
- *  @ingroup Tests
+/**
+ * @file server_forced_password_change_test.cpp
+ * @brief Tests for the restricted session a forced password change leaves behind at login.
+ * @ingroup Tests
  */
 
 #include "libcockatrice/protocol/pb/response.pb.h"

@@ -1,6 +1,7 @@
-/** @file server_dev_smoke_test.cpp
- *  @brief End-to-end smoke test: a real `servatrice-dev` process driven by a real `RemoteClient`.
- *  @ingroup Tests
+/**
+ * @file server_dev_smoke_test.cpp
+ * @brief End-to-end smoke test: a real `servatrice-dev` process driven by a real `RemoteClient`.
+ * @ingroup Tests
  */
 
 #include "abstract_client.h"
@@ -131,7 +132,7 @@ protected:
         }
     }
 
-    /// @brief Waits for the child to publish the ephemeral port it listens on.
+    /** @brief Waits for the child to publish the ephemeral port it listens on */
     bool readListeningPort()
     {
         QElapsedTimer elapsed;
@@ -163,20 +164,20 @@ protected:
         return false;
     }
 
-    /// @brief Keeps the child's pipes drained so logging cannot block it mid-test.
+    /** @brief Keeps the child's pipes drained so logging cannot block it mid-test */
     void drainProcessOutput()
     {
         stdoutText.append(QString::fromLocal8Bit(process.readAllStandardOutput()));
         stderrText.append(QString::fromLocal8Bit(process.readAllStandardError()));
     }
 
-    /// @brief Waits for a client-side condition, giving up as soon as the child has exited.
+    /** @brief Waits for a client-side condition, giving up as soon as the child has exited */
     bool waitForClient(const std::function<bool()> &done, int timeoutMs)
     {
         return waitFor([&done, this] { return done() || process.state() == QProcess::NotRunning; }, timeoutMs);
     }
 
-    /// @brief Logs in as a guest, which is the only identity AuthenticationNone offers.
+    /** @brief Logs in as a guest, which is the only identity AuthenticationNone offers */
     bool login()
     {
         QObject::connect(client.get(), &RemoteClient::statusChanged, [this](ClientStatus status) {
@@ -197,13 +198,13 @@ protected:
         return waitForClient([this] { return loggedIn || !protocolFailure.isEmpty(); }, kProtocolTimeoutMs) && loggedIn;
     }
 
-    /// @brief Sends a session command and returns its response code.
+    /** @brief Sends a session command and returns its response code */
     Response::ResponseCode sendSessionCommand(const google::protobuf::Message &command)
     {
         return awaitResponse(AbstractClient::prepareSessionCommand(command));
     }
 
-    /// @brief Sends a room command and returns its response code.
+    /** @brief Sends a room command and returns its response code */
     Response::ResponseCode sendRoomCommand(const google::protobuf::Message &command, int roomId)
     {
         return awaitResponse(AbstractClient::prepareRoomCommand(command, roomId));

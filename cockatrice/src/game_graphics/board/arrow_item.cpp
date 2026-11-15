@@ -42,7 +42,7 @@ constexpr qreal kMsPerPixel = 0.8;
 constexpr qreal kGlowFadeDurationMs = 120.0;
 constexpr qreal kSheenHalfWidth = 14.0;
 
-/// @brief Ease-out cubic, for a natural "slow in / slow out" reveal.
+/** @brief Ease-out cubic, for a natural "slow in / slow out" reveal */
 qreal easeOutCubic(qreal t)
 {
     const qreal inverse = 1.0 - t;

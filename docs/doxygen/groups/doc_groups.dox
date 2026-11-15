@@ -1,8 +1,9 @@
-/** @file doc_groups.dox
- *  @brief Doxygen group definitions for Cockatrice.
+/**
+ * @file doc_groups.dox
+ * @brief Doxygen group definitions for Cockatrice.
  *
- *  This file defines the documentation groups and hierarchy used
- *  throughout the Cockatrice codebase. Reference these groups with @ingroup.
+ * This file defines the documentation groups and hierarchy used
+ * throughout the Cockatrice codebase. Reference these groups with @ingroup.
  */
 
 /* ------------------------------------------------------------------ */

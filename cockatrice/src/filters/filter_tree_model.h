@@ -36,7 +36,7 @@ public slots:
      * the terms are needed.
      */
     [[nodiscard]] QList<const CardFilter *> getFiltersOfType(CardFilter::Attr filterType) const;
-    /// @brief Copies every active filter into new CardFilter objects. The caller owns them.
+    /** @brief Copies every active filter into new CardFilter objects. The caller owns them */
     [[nodiscard]] QList<const CardFilter *> allFilters() const;
 
 private slots:

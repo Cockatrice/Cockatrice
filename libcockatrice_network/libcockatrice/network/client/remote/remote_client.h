@@ -67,15 +67,17 @@ signals:
                                                   unsigned int port,
                                                   const QString &_userName,
                                                   const QString &_email);
-    //! \brief Emitted once a scrypt verifier for the given account is known and
-    //! can be persisted instead of the plaintext password. The receiving side
-    //! should only store it for the connection it is currently negotiating, so
-    //! the hostname and user name are intentionally not part of the signal.
+    /**
+     * @brief Emitted once a scrypt verifier for the given account is known and
+     *        can be persisted instead of the plaintext password. The receiving side
+     *        should only store it for the connection it is currently negotiating, so
+     *        the hostname and user name are intentionally not part of the signal.
+     */
     void sigPasswordVerifierReady(const QString &verifier);
-    //! \brief Outcome of the password change the server demanded at login.
+    /** @brief Outcome of the password change the server demanded at login */
     void sigPasswordChangeSuccess();
     void sigPasswordChangeError(int responseCode);
-    //! \brief Request a password change; queued to the client thread like the other requests.
+    /** @brief Request a password change; queued to the client thread like the other requests */
     void sigChangePasswordToServer(const QString &oldPassword, const QString &newPassword);
 private slots:
     void slotConnected();
@@ -139,12 +141,11 @@ private:
     unsigned int lastPort;
     QString hashedPassword;
     bool passwordNeedsMigration;
-    //! \brief A previously stored "$scrypt$..." verifier used to authenticate
-    //! without the plaintext password.
+    /** @brief A previously stored "$scrypt$..." verifier used to authenticate without the plaintext password */
     QString storedVerifier;
-    //! \brief Verifier derived during the current login, persisted after success.
+    /** @brief Verifier derived during the current login, persisted after success */
     QString derivedVerifier;
-    //! \brief Verifier sent for migration, persisted once the server accepts it.
+    /** @brief Verifier sent for migration, persisted once the server accepts it */
     QString pendingVerifier;
 
     QString getSrvClientID(const QString &_hostname);
@@ -184,8 +185,7 @@ public:
     }
     void
     connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
-    //! \brief Provide a stored "$scrypt$..." verifier so the client can
-    //! authenticate without the plaintext password.
+    /** @brief Provide a stored "$scrypt$..." verifier so the client can authenticate without the plaintext password */
     void setStoredVerifier(const QString &verifier)
     {
         storedVerifier = verifier;
@@ -209,9 +209,11 @@ public:
                                                unsigned int port,
                                                const QString &_userName,
                                                const QString &_email);
-    //! \brief Change the password of the account that just logged in, following the
-    //! server's forced-password-change reply. Emits sigPasswordChangeSuccess or
-    //! sigPasswordChangeError when the server answers.
+    /**
+     * @brief Change the password of the account that just logged in, following the
+     *        server's forced-password-change reply. Emits sigPasswordChangeSuccess or
+     *        sigPasswordChangeError when the server answers.
+     */
     void changePasswordToServer(const QString &oldPassword, const QString &newPassword);
 };
 

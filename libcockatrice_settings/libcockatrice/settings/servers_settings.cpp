@@ -25,7 +25,7 @@ QString legacyKey(const char *field, int index)
         .arg(index);
 }
 
-//! Expects \a settings to be positioned on the server group.
+/** Expects \a settings to be positioned on the server group */
 QList<ServersSettings::ServerEntry> readServerArray(QSettings &settings)
 {
     QList<ServersSettings::ServerEntry> servers;
@@ -51,7 +51,7 @@ QList<ServersSettings::ServerEntry> readServerArray(QSettings &settings)
     return servers;
 }
 
-//! Expects \a settings to be positioned on the server group.
+/** Expects \a settings to be positioned on the server group */
 QList<ServersSettings::ServerEntry> readLegacyServers(QSettings &settings, int lastIndex)
 {
     QList<ServersSettings::ServerEntry> servers;

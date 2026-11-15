@@ -1,6 +1,7 @@
-/** @file deck_state_manager_test.cpp
- *  @brief Tests for DeckStateManager operations.
- *  @ingroup Tests
+/**
+ * @file deck_state_manager_test.cpp
+ * @brief Tests for DeckStateManager operations.
+ * @ingroup Tests
  */
 
 #include "libcockatrice/card/database/card_database.h"

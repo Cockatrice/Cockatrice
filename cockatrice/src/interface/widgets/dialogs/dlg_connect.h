@@ -53,7 +53,7 @@ public:
     {
         return passwordEdit->text();
     }
-    //! \brief Stored "$scrypt$..." verifier for challenge-response servers (never the plaintext password).
+    /** @brief Stored "$scrypt$..." verifier for challenge-response servers (never the plaintext password) */
     [[nodiscard]] QString getStoredVerifier() const
     {
         return storedVerifier;
@@ -99,10 +99,12 @@ private:
     QPushButton *btnConnect, *btnForgotPassword, *btnRefreshServers, *btnDeleteServer;
     QMap<QString, std::pair<QString, UserConnection_Information>> savedHostList;
     HandlePublicServers *hps;
-    //! \brief Saved "$scrypt$..." verifier as loaded for the selected profile, kept so that
-    //! re-ticking "Save password" after unticking restores it.
+    /**
+     * @brief Saved "$scrypt$..." verifier as loaded for the selected profile, kept so that
+     *        re-ticking "Save password" after unticking restores it.
+     */
     QString savedVerifier;
-    //! \brief Verifier in effect for this connection: empty while "Save password" is unticked.
+    /** @brief Verifier in effect for this connection: empty while "Save password" is unticked */
     QString storedVerifier;
     const QString placeHolderText = tr("Downloading...");
 };

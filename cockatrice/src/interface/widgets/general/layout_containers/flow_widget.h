@@ -54,8 +54,10 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private:
-    /// @brief Moves keyboard focus to an adjacent flow item for an arrow-key event.
-    /// @return True when the event was an arrow key and was handled.
+    /**
+     * @brief Moves keyboard focus to an adjacent flow item for an arrow-key event.
+     * @return True when the event was an arrow key and was handled.
+     */
     bool moveFocus(QKeyEvent *event);
 
     Qt::Orientation flowDirection;

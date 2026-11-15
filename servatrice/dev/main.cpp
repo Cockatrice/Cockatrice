@@ -1,5 +1,6 @@
-/** @file main.cpp
- *  @brief Servatrice dev server: the real server startup on an in-memory database.
+/**
+ * @file main.cpp
+ * @brief Servatrice dev server: the real server startup on an in-memory database.
  */
 
 #include "main.h"
