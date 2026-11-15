@@ -368,4 +368,16 @@ void VisualDeckStorageWidget::updateTagsVisibility(const bool visible)
 void VisualDeckStorageWidget::updateSelectionAnimationEnabled(const bool enabled)
 {
     deckPreviewSelectionAnimationEnabled = enabled;
+
+    // Pushed down the tree instead of every preview subscribing to the setting, so a
+    // folder of a thousand decks costs one connection. Previews created later read the
+    // flag when they are constructed.
+    if (folderWidget == nullptr) {
+        return;
+    }
+
+    const auto previews = folderWidget->findChildren<DeckPreviewWidget *>();
+    for (DeckPreviewWidget *preview : previews) {
+        preview->setSelectionAnimationEnabled(enabled);
+    }
 }

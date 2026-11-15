@@ -44,9 +44,13 @@ DeckPreviewCardPictureWidget::DeckPreviewCardPictureWidget(QWidget *parent,
         emit imageClicked(lastMouseEvent, this);
         emit imageSingleClicked();
     });
-    connect(&SettingsCache::instance().visualDeckStorage(),
-            &VisualDeckStorageSettings::visualDeckStorageSelectionAnimationChanged, this,
-            &CardInfoPictureWidget::setRaiseOnEnterEnabled);
+    // A host that raises a larger surface around the picture (the deck box) owns the
+    // animation gate itself, so only a picture that raises on its own follows the setting.
+    if (raiseOnEnter) {
+        connect(&SettingsCache::instance().visualDeckStorage(),
+                &VisualDeckStorageSettings::visualDeckStorageSelectionAnimationChanged, this,
+                &CardInfoPictureWidget::setRaiseOnEnterEnabled);
+    }
 }
 
 void DeckPreviewCardPictureWidget::mousePressEvent(QMouseEvent *event)
