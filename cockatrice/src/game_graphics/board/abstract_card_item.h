@@ -34,6 +34,13 @@ protected:
     CardState *state;
     int tapAngle;
     QColor bgColor;
+    /**
+     * @brief Rotates the card about its centre and reports the move to the scene.
+     *
+     * Tapping changes the card's scene footprint without changing its scale, so the
+     * footprint signal that keeps cached zones in step has to be emitted here too.
+     */
+    void setTapAngle(int angle);
 
 private:
     bool isHovered;

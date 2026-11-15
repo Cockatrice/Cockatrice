@@ -323,7 +323,12 @@ void AbstractCardItem::setHoverZoomed(bool _hoverZoomed)
     // fullscreen (or zoomed) boards don't overshoot while the fixed-size panel matches.
     qreal target = 1.0;
     if (_hoverZoomed) {
-        const qreal w = boundingRect().width();
+        // A tapped card is a quarter turn around: its on-screen width is its height, so the
+        // width has to come from the transformed rect. Using the untransformed width would
+        // make the zoom wider than the portrait hover picture, whose picture then leaves the
+        // zone hole the zoom cuts uncovered at the sides.
+        const QRectF rotatedFootprint = transform().mapRect(QRectF(QPointF(0, 0), boundingRect().size()));
+        const qreal w = rotatedFootprint.width();
         qreal viewScale = 1.0;
         if (scene() && !scene()->views().isEmpty()) {
             if (const auto *view = scene()->views().first()) {
@@ -471,18 +476,32 @@ void AbstractCardItem::cacheBgColor()
     }
 }
 
+void AbstractCardItem::setTapAngle(int angle)
+{
+    // A tap turns the card a quarter, so the footprint moves even though the scale does not.
+    // Zones cut the hover hole from the live outline but are cached: without this they keep
+    // the hole from before the rotation, which shows as an uncovered square under the card.
+    const QRectF oldFootprint = sceneBoundingRect();
+    tapAngle = angle;
+    setTransform(QTransform()
+                     .translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F)
+                     .rotate(tapAngle)
+                     .translate(-CardDimensions::WIDTH_HALF_F, -CardDimensions::HEIGHT_HALF_F));
+    const QRectF newFootprint = sceneBoundingRect();
+    if (scene()) {
+        scene()->update(oldFootprint.united(newFootprint));
+        emit hoverFootprintChanged(oldFootprint, newFootprint);
+    }
+    update();
+}
+
 void AbstractCardItem::onTappedChanged(bool newTapped, bool canAnimate)
 {
     emit tappedChanged(newTapped);
     if (SettingsCache::instance().cardsDisplay().getTapAnimation() && canAnimate) {
         static_cast<GameScene *>(scene())->registerAnimationItem(this);
     } else {
-        tapAngle = newTapped ? 90 : 0;
-        setTransform(QTransform()
-                         .translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F)
-                         .rotate(tapAngle)
-                         .translate(-CardDimensions::WIDTH_HALF_F, -CardDimensions::HEIGHT_HALF_F));
-        update();
+        setTapAngle(newTapped ? 90 : 0);
     }
 }
 

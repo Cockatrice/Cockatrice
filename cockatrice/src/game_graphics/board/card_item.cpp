@@ -529,12 +529,8 @@ bool CardItem::animationEvent()
         animationIncomplete = false;
     }
 
-    setTransform(QTransform()
-                     .translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F)
-                     .rotate(tapAngle)
-                     .translate(-CardDimensions::WIDTH_HALF_F, -CardDimensions::HEIGHT_HALF_F));
+    setTapAngle(tapAngle);
     setHoverZoomed(false);
-    update();
 
     return animationIncomplete;
 }
