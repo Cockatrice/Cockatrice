@@ -3,7 +3,6 @@
 #include "../../../../client/settings/cache_settings.h"
 #include "../../../../interface/widgets/dialogs/dlg_convert_deck_to_cod_format.h"
 #include "../../../deck_loader/deck_loader.h"
-#include "../../cards/additional_info/color_identity_widget.h"
 #include "../../cards/deck_preview_card_picture_widget.h"
 #include "../visual_deck_storage_model.h"
 #include "../visual_deck_storage_quick_settings_widget.h"
@@ -96,7 +95,6 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
     connect(deckBox, &DeckPreviewDeckBoxWidget::contextMenuRequested, this,
             [this] { createRightClickMenu()->popup(QCursor::pos()); });
 
-    colorIdentityWidget = new ColorIdentityWidget(this);
     deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this);
     connect(deckTagsDisplayWidget, &DeckPreviewDeckTagsDisplayWidget::tagsChanged, this, &DeckPreviewWidget::setTags);
     deckTagsDisplayWidget->setKnownTagsProvider(
@@ -132,7 +130,6 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
             &DeckPreviewWidget::refreshBannerCardToolTip);
 
     layout->addWidget(deckBox);
-    layout->addWidget(colorIdentityWidget);
     layout->addWidget(deckTagsDisplayWidget);
     layout->addWidget(bannerCardLabel);
     layout->addWidget(bannerCardComboBox);
@@ -153,7 +150,7 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
 
     // resizeEvent clamps every child to the tile's width, so collect them once here
     // to keep the resize handler from searching the widget tree on every layout pass.
-    fixedWidthChildren = {deckBox, colorIdentityWidget, deckTagsDisplayWidget, bannerCardLabel, bannerCardComboBox};
+    fixedWidthChildren = {deckBox, deckTagsDisplayWidget, bannerCardLabel, bannerCardComboBox};
 }
 
 void DeckPreviewWidget::retranslateUi()
@@ -279,17 +276,17 @@ void DeckPreviewWidget::syncFromModel()
     deckBox->cardPicture()->setCard(bannerCard);
     refreshBannerCardText();
     updateBannerCardComboBox(bannerCardRef.name);
-    colorIdentityWidget->setColorIdentity(data.colorIdentity);
+    deckBox->setColorIdentity(data.colorIdentity);
     deckTagsDisplayWidget->setTags(data.tags);
 }
 
 void DeckPreviewWidget::updateColorIdentityVisibility(bool visible)
 {
-    if (colorIdentityWidget == nullptr) {
+    if (deckBox == nullptr) {
         return;
     }
 
-    colorIdentityWidget->setVisible(visible);
+    deckBox->setColorIdentityVisible(visible);
 }
 
 void DeckPreviewWidget::updateBannerCardComboBoxVisibility(bool visible)

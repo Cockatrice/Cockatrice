@@ -1,8 +1,13 @@
 #include "deck_preview_deck_box_widget.h"
 
+#include "../../../../client/settings/cache_settings.h"
+#include "../../../pixel_map_generator.h"
 #include "../../../theme_manager.h"
+#include "../../cards/additional_info/color_identity_widget.h"
 #include "../../cards/card_info_picture_widget.h"
 #include "../../cards/deck_preview_card_picture_widget.h"
+#include "libcockatrice/settings/visual_deck_storage_settings.h"
+#include "libcockatrice/utility/color.h"
 #include "libcockatrice/utility/qt_utils.h"
 #include "libcockatrice/utility/raise_on_hover.h"
 
@@ -15,6 +20,8 @@
 #include <QPainterPath>
 #include <QPalette>
 #include <QPen>
+#include <QPixmap>
+#include <QPolygonF>
 #include <QResizeEvent>
 #include <QSizePolicy>
 #include <QStringList>
@@ -35,6 +42,22 @@ constexpr qreal LID_GAP_RATIO = 0.03;
 constexpr qreal BOTTOM_INSET_RATIO = 0.04;
 constexpr qreal CORNER_RADIUS_RATIO = 0.04;
 constexpr qreal NAME_FONT_RATIO = 0.048;
+
+/// The mana band under the name: one continuous strip split into equal colour
+/// segments. Its thickness is the tile's chip measurement, so it reads as a line
+/// rather than a row of discs.
+constexpr qreal MANA_BAND_HEIGHT_RATIO = 0.09;
+/// Share of the band's thickness the icon is inset by, so the ring around the rune
+/// keeps its proportion to the band at every card size. A fraction of the tile width
+/// would grow the ring while the band stays thin, and swallow the rune at 250 %.
+constexpr qreal MANA_ICON_INSET_RATIO = 0.11;
+/// How far a colour boundary leans over the band's full thickness. A share of the band
+/// keeps the angle constant at every card size, so the band never flattens into columns.
+constexpr qreal MANA_SEGMENT_SLANT_RATIO = 0.55;
+
+/// Each segment is the mana colour pulled down a step, so the icon's own light disc
+/// reads against it instead of merging with the lid.
+constexpr int MANA_BAND_DARKEN = 125;
 } // namespace
 
 DeckPreviewDeckBoxWidget::DeckPreviewDeckBoxWidget(QWidget *parent) : QWidget(parent)
@@ -56,6 +79,18 @@ DeckPreviewDeckBoxWidget::DeckPreviewDeckBoxWidget(QWidget *parent) : QWidget(pa
     // The name is painted with the theme's interface font, so a font change is a repaint.
     connect(themeManager, &ThemeManager::fontsChanged, this, [this] { update(); });
 
+    // The band answers two settings live: how many segments it has and how far it dims
+    // the unused ones. Both are paint-time decisions, but the segment count also moves
+    // the lid's bottom edge, so the artwork window is laid out again.
+    const auto relayout = [this] {
+        layoutPicture();
+        update();
+    };
+    connect(&SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::visualDeckStorageDrawUnusedColorIdentitiesChanged, this, relayout);
+    connect(&SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::visualDeckStorageUnusedColorIdentitiesOpacityChanged, this, relayout);
+
     setScaleFactor(scaleFactor);
 }
 
@@ -76,6 +111,32 @@ void DeckPreviewDeckBoxWidget::setCardCount(int count)
     }
     cardCount = count;
     updateAccessibleDescription();
+    update();
+}
+
+void DeckPreviewDeckBoxWidget::setColorIdentity(const QString &identity)
+{
+    if (colorIdentity == identity) {
+        return;
+    }
+    colorIdentity = identity;
+    updateAccessibleDescription();
+    // With the unused colours shown the band keeps all five segments whatever the
+    // identity is, so only a band that follows the identity can move the lid's bottom
+    // edge and the artwork window with it.
+    layoutPicture();
+    update();
+}
+
+void DeckPreviewDeckBoxWidget::setColorIdentityVisible(bool visible)
+{
+    if (colorIdentityVisible == visible) {
+        return;
+    }
+    colorIdentityVisible = visible;
+    updateAccessibleDescription();
+    // The lid grew or shrank, so the artwork window has to follow it before the repaint.
+    layoutPicture();
     update();
 }
 
@@ -105,9 +166,54 @@ QSize DeckPreviewDeckBoxWidget::sizeHint() const
     return CardInfoPictureWidget::sizeForScaleFactor(scaleFactor);
 }
 
-int DeckPreviewDeckBoxWidget::lidHeight() const
+int DeckPreviewDeckBoxWidget::nameRowHeight() const
 {
     return std::clamp(qRound(width() * LID_HEIGHT_RATIO), 14, 34);
+}
+
+int DeckPreviewDeckBoxWidget::lidPadding() const
+{
+    return std::max(4, qRound(width() * SIDE_INSET_RATIO));
+}
+
+int DeckPreviewDeckBoxWidget::manaBandHeight() const
+{
+    return std::clamp(qRound(width() * MANA_BAND_HEIGHT_RATIO), 10, 20);
+}
+
+QStringList DeckPreviewDeckBoxWidget::manaSymbols() const
+{
+    // The five colours are the band's whole vocabulary: the identity only says which of
+    // them the deck has, so any leftover without a mana icon is simply not shown.
+    static const QStringList wubrg = {QStringLiteral("W"), QStringLiteral("U"), QStringLiteral("B"),
+                                      QStringLiteral("R"), QStringLiteral("G")};
+
+    if (!colorIdentityVisible) {
+        return {};
+    }
+
+    if (SettingsCache::instance().visualDeckStorage().getVisualDeckStorageDrawUnusedColorIdentities()) {
+        return wubrg;
+    }
+
+    // With the unused colours hidden the band keeps its full width and shares it
+    // between the colours the deck has, so it stays one continuous line either way.
+    const QStringList identity = ColorIdentityWidget::parseColorIdentity(colorIdentity);
+    QStringList used;
+    for (const QString &symbol : wubrg) {
+        if (identity.contains(symbol)) {
+            used.append(symbol);
+        }
+    }
+    return used;
+}
+
+int DeckPreviewDeckBoxWidget::lidHeight() const
+{
+    const int nameRow = nameRowHeight();
+    // The band ends the lid: no padding under it, so the colour line itself is the
+    // boundary. A deck with nothing to draw keeps the single-row lid.
+    return nameRow + (manaSymbols().isEmpty() ? 0 : manaBandHeight());
 }
 
 int DeckPreviewDeckBoxWidget::sideInset() const
@@ -181,6 +287,14 @@ void DeckPreviewDeckBoxWidget::updateAccessibleDescription()
     if (cardCount >= 0) {
         parts << tr("%n card(s)", "", cardCount);
     }
+    // The identity used to be its own widget row and is now a painted band, so the tile
+    // is the only thing that still carries it. A hidden band carries nothing to read.
+    if (colorIdentityVisible) {
+        const QStringList identity = ColorIdentityWidget::parseColorIdentity(colorIdentity);
+        if (!identity.isEmpty()) {
+            parts << tr("Color identity: %1").arg(identity.join(QStringLiteral(" ")));
+        }
+    }
     setAccessibleDescription(parts.join(QStringLiteral(", ")));
 }
 
@@ -188,6 +302,81 @@ QColor DeckPreviewDeckBoxWidget::countColor() const
 {
     const QColor roleColor = themeManager->appColor(AppColor::Icon);
     return roleColor.isValid() ? roleColor : palette().color(QPalette::PlaceholderText);
+}
+
+void DeckPreviewDeckBoxWidget::paintManaBand(QPainter &painter) const
+{
+    const QStringList symbols = manaSymbols();
+    if (symbols.isEmpty()) {
+        return;
+    }
+
+    const VisualDeckStorageSettings &settings = SettingsCache::instance().visualDeckStorage();
+    const qreal unusedOpacity = settings.getVisualDeckStorageUnusedColorIdentitiesOpacity() / 100.0;
+    const QStringList usedSymbols = ColorIdentityWidget::parseColorIdentity(colorIdentity);
+
+    const int bandHeight = manaBandHeight();
+    const int inset = std::max(1, qRound(bandHeight * MANA_ICON_INSET_RATIO));
+    const int iconSide = std::max(1, bandHeight - 2 * inset);
+    // The boundaries lean, so each colour is a parallelogram rather than a column. The
+    // lean is a share of the band's thickness, which keeps the angle constant at every
+    // card size instead of flattening as the band gets thinner.
+    const qreal slant = std::max<qreal>(2.0, bandHeight * MANA_SEGMENT_SLANT_RATIO);
+    // The lid starts half a pixel in (the body outline is stroked on the half-pixel), so
+    // the band's own edges snap to the device grid to stay a crisp line.
+    const int top = qRound(0.5 + nameRowHeight());
+    const qreal bottom = top + bandHeight;
+    const qreal dpr = devicePixelRatioF();
+
+    painter.save();
+    painter.setPen(Qt::NoPen);
+    // The outer ends of the band are square against the box outline: the lean belongs to
+    // the boundaries between colours, not to the band's ends.
+    painter.setClipRect(rect());
+
+    for (int i = 0; i < symbols.size(); ++i) {
+        const QString &symbol = symbols.at(i);
+        const qreal x0 = i * qreal(width()) / symbols.size();
+        const qreal x1 = (i + 1) * qreal(width()) / symbols.size();
+        // Interior boundaries grow a hair to the right so the antialiased edges of two
+        // neighbours overlap instead of leaving a sliver of lid between them.
+        const qreal grow = i + 1 == symbols.size() ? 0.0 : 1.0;
+        // Only the boundaries between colours lean; the band's two ends stay square against
+        // the box outline, or the first and last colour would taper away into the lid.
+        const qreal leftTop = i == 0 ? 0.0 : x0 + slant;
+        const qreal leftBottom = i == 0 ? 0.0 : x0 - slant;
+        const qreal rightTop = i + 1 == symbols.size() ? width() : x1 + slant + grow;
+        const qreal rightBottom = i + 1 == symbols.size() ? width() : x1 - slant + grow;
+
+        QPolygonF segment;
+        segment << QPointF(leftTop, top) << QPointF(rightTop, top) << QPointF(rightBottom, bottom)
+                << QPointF(leftBottom, bottom);
+
+        // An unused colour fades as a whole, background and rune together, which is what
+        // the standalone colour identity row does.
+        painter.setOpacity(usedSymbols.contains(symbol) ? 1.0 : unusedOpacity);
+        painter.setBrush(GameSpecificColors::MTG::colorHelper(symbol).darker(MANA_BAND_DARKEN));
+        painter.drawPolygon(segment);
+
+        // Rasterize at the screen's pixel ratio: at a band's thickness a DPR-1 pixmap
+        // would be upscaled by the backing store and the rune inside the disc would smear.
+        QPixmap icon =
+            ManaSymbolPixmapGenerator::generatePixmap(symbol, QSize(qRound(iconSide * dpr), qRound(iconSide * dpr)));
+        if (!icon.isNull()) {
+            icon.setDevicePixelRatio(dpr);
+            painter.drawPixmap(QPointF((x0 + x1) / 2.0 - iconSide / 2.0, top + inset), icon);
+        }
+    }
+
+    // The black segment is only a few steps above the lid, so without an edge it reads as
+    // a gap with a skull floating in it. Hairlines in the page colour at the band's top and
+    // bottom keep it part of the line at every theme.
+    painter.setClipping(false);
+    painter.setOpacity(1.0);
+    const QColor seam = palette().color(QPalette::Window);
+    painter.fillRect(QRectF(0, top, width(), 1), seam);
+    painter.fillRect(QRectF(0, bottom - 1, width(), 1), seam);
+    painter.restore();
 }
 
 void DeckPreviewDeckBoxWidget::paintEvent(QPaintEvent *event)
@@ -253,6 +442,11 @@ void DeckPreviewDeckBoxWidget::paintEvent(QPaintEvent *event)
         painter.drawRoundedRect(QRectF(art).adjusted(-1, -1, 1, 1), grooveRadius, grooveRadius);
     }
 
+    // The band belongs to the lid, so it goes down before the cues that have to stay
+    // readable across it. The selection rim and the focus ring both run down the box's
+    // sides, and a band painted last would cut both of them where it meets the edge.
+    paintManaBand(painter);
+
     if (selected) {
         QColor glow = palette().color(QPalette::Highlight);
         glow.setAlpha(70);
@@ -273,7 +467,7 @@ void DeckPreviewDeckBoxWidget::paintEvent(QPaintEvent *event)
         painter.drawRoundedRect(focusRect, focusRadius, focusRadius);
     }
 
-    const int padding = std::max(4, qRound(width() * SIDE_INSET_RATIO));
+    const int padding = lidPadding();
     const QFont font = nameFont();
     const QFontMetrics metrics(font);
 
@@ -283,7 +477,9 @@ void DeckPreviewDeckBoxWidget::paintEvent(QPaintEvent *event)
         countWidth = metrics.horizontalAdvance(countText) + padding;
     }
 
-    const QRectF lidRect(body.left() + padding, body.top(), body.width() - 2 * padding - countWidth, lidHeight());
+    // The name and the count are centred in the name row, not in the whole lid: the row
+    // below them belongs to the mana strip.
+    const QRectF lidRect(body.left() + padding, body.top(), body.width() - 2 * padding - countWidth, nameRowHeight());
     painter.setFont(font);
     painter.setPen(palette().color(QPalette::ButtonText));
     painter.drawText(lidRect, Qt::AlignVCenter | Qt::AlignLeft,
@@ -294,7 +490,7 @@ void DeckPreviewDeckBoxWidget::paintEvent(QPaintEvent *event)
         countFont.setBold(false);
         painter.setFont(countFont);
         painter.setPen(countColor());
-        painter.drawText(QRectF(body.left(), body.top(), body.width() - padding, lidHeight()),
+        painter.drawText(QRectF(body.left(), body.top(), body.width() - padding, nameRowHeight()),
                          Qt::AlignVCenter | Qt::AlignRight, countText);
     }
 }
