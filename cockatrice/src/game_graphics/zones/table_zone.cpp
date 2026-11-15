@@ -177,7 +177,10 @@ std::optional<QPainterPath> TableZone::hoveredCardHole() const
         return std::nullopt;
     }
     CardItem *hovered = scene->getHoverZoomedCard();
-    if (!hovered) {
+    // The scene keeps the card it zoomed until the cursor leaves it, but the zoom can be
+    // dropped on its own (e.g. tapping cancels it). Cut no hole unless the zoom is actually
+    // up, or the zone keeps painting around a card that is back at its normal size.
+    if (!hovered || !hovered->getIsHoverZoomed()) {
         return std::nullopt;
     }
     // Cut out the card's painted outline, not its bounding rectangle: the rectangle's corners
