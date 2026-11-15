@@ -334,6 +334,17 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  command_flood_counter_test
+  SOURCES
+  ${VERSION_STRING_CPP}
+  command_flood_counter_test.cpp
+  LIBS
+  libcockatrice_network
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
   server_developer_role_test
   NO_SANITIZE
   SOURCES

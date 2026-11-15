@@ -1,6 +1,7 @@
 #ifndef SERVER_PROTOCOLHANDLER_H
 #define SERVER_PROTOCOLHANDLER_H
 
+#include "command_flood_counter.h"
 #include "server.h"
 #include "server_abstractuserinterface.h"
 
@@ -74,7 +75,8 @@ protected:
     }
 
 private:
-    QList<int> messageSizeOverTime, messageCountOverTime, commandCountOverTime;
+    QList<int> messageSizeOverTime, messageCountOverTime;
+    CommandFloodCounter commandFloodCounter;
     int timeRunning, lastDataReceived, lastActionReceived;
 
     virtual void transmitProtocolItem(const ServerMessage &item) = 0;

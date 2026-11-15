@@ -1,4 +1,5 @@
 set(HEADERS
+    command_flood_counter.h
     game/dump_zone_range.h
     game/server_abstract_participant.h
     game/server_abstract_player.h
@@ -29,6 +30,7 @@ set(HEADERS
 add_library(
   libcockatrice_network_server_remote STATIC
   ${HEADERS}
+  command_flood_counter.cpp
   game/dump_zone_range.cpp
   game/server_abstract_participant.cpp
   game/server_abstract_player.cpp
