@@ -68,7 +68,7 @@ jobs:
           add-paths: |
             cockatrice/cockatrice_en@source.ts
             oracle/oracle_en@source.ts
-          author: github-actions <github-actions@github.com>    # owner of the commit
+          author: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>    # owner of the commit
           body: ${{ steps.template.outputs.result }}
           branch: ci-update_translation_source
           commit-message: Update translation source strings

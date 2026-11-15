@@ -46,7 +46,7 @@ jobs:
           add-paths: |
             cockatrice/translations/*.ts
             oracle/translations/*.ts
-          author: github-actions <github-actions@github.com>    # owner of the commit
+          author: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>    # owner of the commit
           body: |
             Pulled all translated strings from [Transifex][1].
 
