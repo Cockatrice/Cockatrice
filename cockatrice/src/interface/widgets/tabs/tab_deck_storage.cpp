@@ -108,8 +108,10 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     connect(localDirView, &QTreeView::doubleClicked, this, &TabDeckStorage::actLocalDoubleClick);
 
     // Left side layout
-    /* put an invisible dummy QToolBar in the leftmost column so that the main toolbar is centered.
-     * Really ugly workaround, but I couldn't figure out the proper way to make it centered */
+    /**
+     * Put an invisible dummy QToolBar in the leftmost column so that the main toolbar is centered.
+     * Really ugly workaround, but I couldn't figure out the proper way to make it centered
+     */
     QToolBar *dummyToolBar = new QToolBar(this);
     QSizePolicy sizePolicy = dummyToolBar->sizePolicy();
     sizePolicy.setRetainSizeWhenHidden(true);

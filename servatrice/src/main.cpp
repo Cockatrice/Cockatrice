@@ -56,15 +56,13 @@
 
 SignalHandler *signalhandler;
 
-/* Prototypes */
-
+/** Prototypes */
 void testRNG();
 void testHash();
 void myMessageOutput(QtMsgType type, const QMessageLogContext &, const QString &msg);
 void myMessageOutput2(QtMsgType type, const QMessageLogContext &, const QString &msg);
 
-/* Implementations */
-
+/** Implementations */
 void testRNG()
 {
     const int n = 500000;

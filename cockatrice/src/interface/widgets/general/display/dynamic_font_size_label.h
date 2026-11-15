@@ -30,7 +30,7 @@ public:
 
     static float getWidgetMaximumFontSize(QWidget *widget, const QString &text);
 
-    /* This method overwrite stylesheet */
+    /** This method overwrite stylesheet */
     void setTextColor(QColor color);
     QColor getTextColor();
     void setTextAndColor(const QString &text, QColor color = QColor::Invalid);

@@ -122,10 +122,12 @@ void CardPictureLoaderWorkerWork::startNextPicDownload()
 
 void CardPictureLoaderWorkerWork::picDownloadFailed()
 {
-    /* Take advantage of short-circuiting here to call the nextUrl until one
-       is not available.  Only once nextUrl evaluates to false will this move
-       on to nextSet.  If the Urls for a particular card are empty, this will
-       effectively go through the sets for that card. */
+    /**
+     * Take advantage of short-circuiting here to call the nextUrl until one
+     * is not available.  Only once nextUrl evaluates to false will this move
+     * on to nextSet.  If the Urls for a particular card are empty, this will
+     * effectively go through the sets for that card.
+     */
     if (cardToDownload.nextUrl() || cardToDownload.nextSet()) {
         startNextPicDownload();
     } else {

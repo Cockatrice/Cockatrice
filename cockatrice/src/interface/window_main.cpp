@@ -395,7 +395,7 @@ void MainWindow::retranslateUi()
     settingsButton->setIcon(loadThemedIcon(QStringLiteral("icons/settings")));
     aExit->setText(tr("&Exit"));
 
-#if defined(__APPLE__) /* For OSX */
+#if defined(__APPLE__) /** For OSX */
     cockatriceMenu->setTitle(tr("A&ctions"));
 #else
     cockatriceMenu->setTitle(tr("&Cockatrice"));
@@ -507,7 +507,7 @@ void MainWindow::createActions()
     aShow = new QAction(this);
     connect(aShow, &QAction::triggered, this, &MainWindow::actShow);
 
-#if defined(__APPLE__) /* For OSX */
+#if defined(__APPLE__) /** For OSX */
     aSettings->setMenuRole(QAction::PreferencesRole);
     aExit->setMenuRole(QAction::QuitRole);
     aAbout->setMenuRole(QAction::AboutRole);
@@ -1282,7 +1282,7 @@ void MainWindow::cardDatabaseAllNewSetsEnabled()
     watcher->setFuture(QtConcurrent::run([cardDatabase] { cardDatabase->reloadCardDatabasesAndNotify(); }));
 }
 
-/* CARD UPDATER */
+/** CARD UPDATER */
 void MainWindow::actCheckCardUpdates()
 {
     createCardUpdateProcess();

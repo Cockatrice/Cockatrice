@@ -439,7 +439,8 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
     for (const QJsonValue &cardVal : cardsList) {
         QJsonObject card = cardVal.toObject();
 
-        /* Currently used layouts are:
+        /**
+         * Currently used layouts are:
          * augment, double_faced_token, flip, host, leveler, meld, normal, planar,
          * saga, scheme, split, token, transform, vanguard
          */

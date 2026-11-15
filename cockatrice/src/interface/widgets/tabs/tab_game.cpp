@@ -1606,7 +1606,8 @@ void TabGame::createMessageDock(bool bReplay)
         actCompleterChanged();
 
         if (game->getPlayerManager()->isSpectator()) {
-            /* Spectators can only talk if:
+            /**
+             * Spectators can only talk if:
              * (a) the game creator allows it
              * (b) the spectator is a moderator/administrator
              * (c) the spectator is a judge

@@ -76,13 +76,13 @@ QColor DynamicFontSizePushButton::getTextColor()
     return textColor;
 }
 
-/* Do not give any size hint as it it changes during paintEvent */
+/** Do not give any size hint as it it changes during paintEvent */
 QSize DynamicFontSizePushButton::minimumSizeHint() const
 {
     return QWidget::minimumSizeHint();
 }
 
-/* Do not give any size hint as it it changes during paintEvent */
+/** Do not give any size hint as it it changes during paintEvent */
 QSize DynamicFontSizePushButton::sizeHint() const
 {
     return QWidget::sizeHint();

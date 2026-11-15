@@ -93,9 +93,11 @@ static PrintingInfo findPrintingForSet(const ExactCard &card, const QString &set
 
 void CardPictureToLoad::populateSetUrls()
 {
-    /* currentSetUrls is a list, populated each time a new set is requested for a particular card
-       and Urls are removed from it as a download is attempted from each one.  Custom Urls for
-       a set are given higher priority, so should be placed first in the list. */
+    /**
+     * currentSetUrls is a list, populated each time a new set is requested for a particular card
+     * and Urls are removed from it as a download is attempted from each one.  Custom Urls for
+     * a set are given higher priority, so should be placed first in the list.
+     */
     currentSetUrls.clear();
 
     if (card && currentSet) {
@@ -259,11 +261,12 @@ static int parse(const QString &urlTemplate,
 
 QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
 {
-    /* This function takes Url templates and substitutes actual card details
-       into the url.  This is used for making Urls with follow a predictable format
-       for downloading images.  If information is requested by the template that is
-       not populated for this specific card/set combination, an empty string is returned.*/
-
+    /**
+     * This function takes Url templates and substitutes actual card details
+     * into the url.  This is used for making Urls with follow a predictable format
+     * for downloading images.  If information is requested by the template that is
+     * not populated for this specific card/set combination, an empty string is returned.
+     */
     CardSetPtr set = getCurrentSet();
 
     QMap<QString, QString> transformMap = QMap<QString, QString>();
@@ -314,7 +317,8 @@ QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
             if (!value.isEmpty()) {
                 transformedUrl.replace(prop, QUrl::toPercentEncoding(value));
             } else {
-                /* This means the template is requesting information that is not
+                /**
+                 * This means the template is requesting information that is not
                  * populated in this card, so it should return an empty string,
                  * indicating an invalid Url.
                  */

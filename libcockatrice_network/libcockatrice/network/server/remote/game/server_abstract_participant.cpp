@@ -206,7 +206,8 @@ Response::ResponseCode
 Server_AbstractParticipant::cmdGameSay(const Command_GameSay &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
     if (isSpectator()) {
-        /* Spectators can only talk if:
+        /**
+         * Spectators can only talk if:
          * (a) the game creator allows it
          * (b) the spectator is a moderator/administrator
          * (c) the spectator is a judge
