@@ -34,6 +34,9 @@ jobs:
           # Docs: https://github.com/transifex/cli#pulling-files-from-transifex
           args: pull --force --all
           token: ${{ secrets.TX_TOKEN }}
+        # Allow this step to fail for Dependabot PR's, they don't have access to the secret
+        # See https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-on-actions
+        continue-on-error: ${{ github.actor == 'dependabot[bot]' }}
 
       - name: "Create pull request"
         if: github.event_name != 'pull_request'
