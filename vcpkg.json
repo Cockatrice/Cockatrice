@@ -7,7 +7,7 @@
     "openssl",
     "protobuf",
     "pthreads",
-	"sentry-native",
+    "sentry-native",
     "zlib"
   ]
 }
