@@ -669,12 +669,12 @@ TEST_F(CardDatabaseCacheInvalidationTest, MarkAllSetsAsKnownDoesNotOverwriteSett
     CardSetList sets;
     sets.append(CardSet::newInstance(&controller, "XXX")); // no metadata: ignored
 
-    // Ignored sets keep their known state but are enabled.
+    // Ignored sets become known and enabled.
     sets.markAllAsKnownBatched(&controller);
     EXPECT_TRUE(controller.isEnabled("XXX")) << "unnamed set starts enabled";
 
     // disable the set
-    controller.setEnabled("XXX", false);
+    sets.at(0)->setEnabled(false);
 
     // set should still be disabled after batching
     sets.markAllAsKnownBatched(&controller);
