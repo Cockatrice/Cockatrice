@@ -429,7 +429,7 @@ QMenu *CardInfoPictureWidget::createViewRelatedCardsMenu()
     }
 
     for (const auto &relatedCard : relatedCards) {
-        const auto &relatedCardName = relatedCard.name;
+        const QString relatedCardName = relatedCard.name;
         QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
         connect(viewCard, &QAction::triggered, this, [this, &relatedCardName] {
             emit cardChanged(
