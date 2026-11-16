@@ -51,6 +51,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/utility/card_ref.h>
+#include <libcockatrice/utility/game_role_info.h>
 #include <libcockatrice/utility/qt_utils.h>
 #include <qnumeric.h>
 #include <string>
@@ -710,9 +711,9 @@ void UserInfoPopup::onGamesContextMenu(const QPoint &pos)
     }
 
     if (chosen == join) {
-        emit joinGameRequested(game.game_id(), game.room_id(), false);
+        emit joinGameRequested(game.game_id(), game.room_id(), {});
     } else if (spec && chosen == spec) {
-        emit joinGameRequested(game.game_id(), game.room_id(), true);
+        emit joinGameRequested(game.game_id(), game.room_id(), {.isSpectator = true});
     }
 }
 
