@@ -128,6 +128,41 @@ TEST(CardDatabaseTest, FindPrintingWithIdOnNullCardInfoReturnsEmpty)
     EXPECT_TRUE(db.query()->findPrintingWithId(nullptr, "card_Not a Card_fixture").isEmpty());
 }
 
+TEST(CardInfoTest, GetAllRelatedCardsConcatenatesForwardThenToMe)
+{
+    CardRelation forward{.name = "Forward"};
+    CardRelation reverse{.name = "Reverse"};
+    CardRelation reverse2Me{.name = "Reverse2Me"};
+
+    auto card = CardInfo::newInstance("Parent", "", false, {}, {forward}, {reverse}, {}, {});
+    card->addReverseRelatedCards2Me(reverse2Me);
+
+    const QList<CardRelation> all = card->getAllRelatedCards();
+    ASSERT_EQ(2, all.size());
+    EXPECT_EQ(forward, all.at(0));
+    EXPECT_EQ(reverse2Me, all.at(1));
+}
+
+TEST(CardRelationTest, CopyWithNameKeepsEveryOtherField)
+{
+    const CardRelation original{.name = "Original",
+                                .attachType = CardRelationType::AttachTo,
+                                .isCreateAllExclusion = true,
+                                .isVariableCount = true,
+                                .defaultCount = 3,
+                                .isPersistent = true,
+                                .isFaceDown = true};
+    const CardRelation copy = original.copyWithName("Other");
+
+    EXPECT_EQ("Other", copy.name);
+    EXPECT_EQ(original.attachType, copy.attachType);
+    EXPECT_EQ(original.isCreateAllExclusion, copy.isCreateAllExclusion);
+    EXPECT_EQ(original.isVariableCount, copy.isVariableCount);
+    EXPECT_EQ(original.defaultCount, copy.defaultCount);
+    EXPECT_EQ(original.isPersistent, copy.isPersistent);
+    EXPECT_EQ(original.isFaceDown, copy.isFaceDown);
+}
+
 TEST(CardDatabaseTest, Xml4LocalizedDataRoundTrip)
 {
     NoopCardSetPriorityController controller;
