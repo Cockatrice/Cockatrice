@@ -131,8 +131,10 @@ void CardSetList::markAllAsKnownBatched(ICardSetPriorityController *controller)
         if (!set->getIsKnown()) {
             set->setIsKnownInMemory(true);
             set->setEnabledInMemory(set->getIsKnownIgnored());
-            saveData.append({set->getShortName(), static_cast<unsigned int>(set->getSortKey()), set->getEnabled(),
-                             set->getIsKnown()});
+            saveData.append({.shortName = set->getShortName(),
+                             .sortKey = static_cast<unsigned int>(set->getSortKey()),
+                             .enabled = set->getEnabled(),
+                             .isKnown = set->getIsKnown()});
         }
     }
 
