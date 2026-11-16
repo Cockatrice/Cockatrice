@@ -111,10 +111,8 @@ private:
 
     QScopedPointer<Server_MatchResultStrategy> matchResultStrategy;
 
-    void createGameStateChangedEvent(Event_GameStateChanged *event,
-                                     Server_AbstractParticipant *recipient,
-                                     bool omniscient,
-                                     bool withUserInfo);
+    Event_GameStateChanged
+    createGameStateChangedEvent(Server_AbstractParticipant *recipient, bool omniscient, bool withUserInfo) const;
     QList<Server_AbstractParticipant *> getParticipantsInSeatOrder() const;
     void reseatPlayers(const QList<Server_AbstractParticipant *> &orderedParticipants, bool randomized);
     void storeGameInformation();
