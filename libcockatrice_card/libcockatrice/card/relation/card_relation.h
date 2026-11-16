@@ -31,6 +31,14 @@ struct CardRelation
     bool isFaceDown = false;           ///< True if this relation creates the tokens facedown
 
     /**
+     * @brief Returns true if the two relations are equal.
+     * Two relations are equal if all their fields are equal.
+     *
+     * @return True if the two relations are equal
+     */
+    bool operator==(const CardRelation &) const = default;
+
+    /**
      * @brief Returns true if the card is attached to another.
      *
      * @return True if attached, false otherwise.
