@@ -303,7 +303,11 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         exclude = true;
                     }
 
-                    CardRelation relation = {cardName, attach, exclude, variable, count};
+                    CardRelation relation{.name = cardName,
+                                          .attachType = attach,
+                                          .isCreateAllExclusion = exclude,
+                                          .isVariableCount = variable,
+                                          .defaultCount = count};
                     if (xmlName == "reverse-related") {
                         reverseRelatedCards << relation;
                     } else {
