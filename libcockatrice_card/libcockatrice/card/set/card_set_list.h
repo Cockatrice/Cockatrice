@@ -66,7 +66,6 @@ public:
      * @brief Marks all sets as known and adjusts their enabled state, persisting in one flush.
      *
      * Unknown, non-ignored sets become known and disabled.
-     * Ignored-known sets are enabled if they were previously disabled.
      * Only changed sets are written; when nothing is unknown no flush happens at all.
      * @param controller The set priority controller to persist the records with.
      */
