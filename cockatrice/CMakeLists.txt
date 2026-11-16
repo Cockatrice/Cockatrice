@@ -473,6 +473,7 @@ set(cockatrice_SOURCES
     src/interface/intents/intent_open_shared_deck.h
     src/interface/intents/url_parser.cpp
     src/interface/intents/url_parser.h
+    src/interface/widgets/server/game_join_roles.h
     src/interface/widgets/server/user/user_games_model.cpp
     src/interface/widgets/server/user/user_games_model.h
     src/interface/widgets/server/user/user_info_popup.cpp

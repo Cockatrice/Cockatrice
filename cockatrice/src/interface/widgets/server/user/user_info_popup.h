@@ -16,6 +16,7 @@
 #include <qtmetamacros.h>
 #include <utility>
 
+struct GameJoinRoles;
 class AbstractClient;
 class QLabel;
 class QPushButton;
@@ -172,7 +173,7 @@ signals:
     void closeRequested();
 
     /** Emitted when the user requests joining or spectating a game in the list. */
-    void joinGameRequested(int gameId, int roomId, bool asSpectator);
+    void joinGameRequested(int gameId, int roomId, const GameJoinRoles &roles);
 
     // ── Action signals — connect to UserContextMenu::exec*() ──────────────────
     void chatRequested(const QString &userName);

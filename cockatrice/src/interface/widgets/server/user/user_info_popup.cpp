@@ -4,6 +4,7 @@
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/theme_manager.h"
 #include "../../interface/widgets/tabs/tab_supervisor.h"
+#include "../game_join_roles.h"
 #include "libcockatrice/card/database/card_database_querier.h"
 #include "libcockatrice/card/printing/exact_card.h"
 #include "libcockatrice/protocol/pb/serverinfo_game.pb.h"
@@ -710,9 +711,9 @@ void UserInfoPopup::onGamesContextMenu(const QPoint &pos)
     }
 
     if (chosen == join) {
-        emit joinGameRequested(game.game_id(), game.room_id(), false);
+        emit joinGameRequested(game.game_id(), game.room_id(), {});
     } else if (spec && chosen == spec) {
-        emit joinGameRequested(game.game_id(), game.room_id(), true);
+        emit joinGameRequested(game.game_id(), game.room_id(), {.asSpectator = true});
     }
 }
 

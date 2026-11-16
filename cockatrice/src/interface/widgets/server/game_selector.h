@@ -11,6 +11,7 @@
 // moc-generated code needs the complete type.
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
+struct GameJoinRoles;
 class QTreeView;
 class GamesModel;
 class GamesProxyModel;
@@ -229,23 +230,21 @@ private:
 
     /**
      * @brief Performs the join or spectate action for the currently selected game.
-     * @param asSpectator True to join as a spectator, false to join as a player.
-     * @param asJudge True to join as a judge, false to join as a player.
+     * @param roles Roles to join the game with.
      *
      * Handles password prompts, overrides, and sending the join command to the server.
      */
-    void joinGame(bool asSpectator = false, bool asJudge = false);
+    void joinGame(const GameJoinRoles &roles);
 
     /**
      * @brief Performs the join or spectate action for a specific game.
      * @param game The game to join.
-     * @param asSpectator True to join as a spectator, false to join as a player.
-     * @param asJudge True to join as a judge, false to join as a player.
+     * @param roles Roles to join the game with.
      *
      * Unlike the selection-based overload, this does not depend on the game being
      * visible in the filtered game list.
      */
-    void joinGame(const ServerInfo_Game &game, bool asSpectator = false, bool asJudge = false);
+    void joinGame(const ServerInfo_Game &game, const GameJoinRoles &roles);
 
 public:
     /**
@@ -287,13 +286,13 @@ public:
     /**
      * @brief Finds a game by ID and joins or spectates it.
      * @param gameId The ID of the game to join.
-     * @param asSpectator True to join as a spectator, false to join as a player.
+     * @param roles The roles to join the game as.
      * @return True if the game was found and joined, false otherwise.
      *
      * Unlike the selection-based overload, this does not depend on the game
      * being visible in the filtered game list.
      */
-    bool joinGameById(int gameId, bool asSpectator = false);
+    bool joinGameById(int gameId, const GameJoinRoles &roles);
 };
 
 #endif

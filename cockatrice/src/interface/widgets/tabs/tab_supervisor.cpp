@@ -13,6 +13,7 @@
 #include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../main.h"
+#include "../server/game_join_roles.h"
 #include "abstract_tab_deck_editor.h"
 #include "api/archidekt/tab_archidekt.h"
 #include "api/edhrec/tab_edhrec.h"
@@ -1136,12 +1137,12 @@ void TabSupervisor::replayLeft(TabGame *tab)
 
 void TabSupervisor::joinReportGame(const int gameId, const int roomId)
 {
-    joinGameByIntent(gameId, roomId, true);
+    joinGameByIntent(gameId, roomId, {.asSpectator = true});
 }
 
-void TabSupervisor::joinGameFromUserCard(const int gameId, const int roomId, const bool asSpectator)
+void TabSupervisor::joinGameFromUserCard(const int gameId, const int roomId, const GameJoinRoles &roles)
 {
-    joinGameByIntent(gameId, roomId, asSpectator);
+    joinGameByIntent(gameId, roomId, roles);
 }
 
 /**
@@ -1151,7 +1152,7 @@ void TabSupervisor::joinGameFromUserCard(const int gameId, const int roomId, con
  * room first, then retries the game, so callers do not have to care whether the
  * room happens to be on screen.
  */
-void TabSupervisor::joinGameByIntent(const int gameId, const int roomId, const bool asSpectator)
+void TabSupervisor::joinGameByIntent(const int gameId, const int roomId, const GameJoinRoles &roles)
 {
     auto *remoteClient = qobject_cast<RemoteClient *>(client);
     if (!remoteClient) {
@@ -1164,7 +1165,7 @@ void TabSupervisor::joinGameByIntent(const int gameId, const int roomId, const b
     ctx->roomContext.serverContext.port = QString::number(remoteClient->peerPort());
     ctx->roomContext.roomId = roomId;
     ctx->gameId = gameId;
-    ctx->asSpectator = asSpectator;
+    ctx->roles = roles;
 
     auto *joinGameIntent = new IntentJoinServerGame(this, remoteClient, std::move(ctx));
     joinGameIntent->setParent(this);
