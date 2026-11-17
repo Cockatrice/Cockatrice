@@ -345,8 +345,8 @@ TEST_F(DeckListModelCopyLimits, CopiesAcrossPrintingsSideboardAndNestedZonesShar
     addCard("Same card");
     auto deck = newDeck();
     auto *tree = deck->getTree();
-    auto *first = tree->addCard("Same card", 2, DECK_ZONE_MAIN, -1, "ONE", "1", "printing-one");
-    auto *second = tree->addCard("Same card", 2, DECK_ZONE_SIDE, -1, "TWO", "2", "printing-two");
+    auto *first = tree->addCard("Same card", 2, DECK_ZONE_MAIN, -1, {"ONE", "1", "printing-one"});
+    auto *second = tree->addCard("Same card", 2, DECK_ZONE_SIDE, -1, {"TWO", "2", "printing-two"});
     auto *custom = tree->addCustomZone(DECK_ZONE_MAIN, "Removal");
     auto *nested = new InnerDecklistNode("Nested", custom);
     auto *third = new DecklistCardNode("Same card", 1, nested, -1);

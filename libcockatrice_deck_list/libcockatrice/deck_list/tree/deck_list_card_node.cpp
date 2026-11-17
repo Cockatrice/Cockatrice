@@ -5,8 +5,6 @@
 class InnerDecklistNode;
 
 DecklistCardNode::DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent)
-    : AbstractDecklistCardNode(_parent), name(other->getName()), number(other->getNumber()),
-      cardSetShortName(other->getCardSetShortName()), cardSetNumber(other->getCardCollectorNumber()),
-      cardProviderId(other->getCardProviderId())
+    : AbstractDecklistCardNode(_parent), name(other->getName()), number(other->getNumber()), printing(other->printing)
 {
 }
