@@ -80,6 +80,7 @@
 #include <QFileInfo>
 #include <QFlags>
 #include <QFutureWatcher>
+#include <QHBoxLayout>
 #include <QIODevice>
 #include <QLocalSocket>
 #include <QMenu>
@@ -143,6 +144,22 @@ const QString MainWindow::appName = "Cockatrice";
 const QStringList MainWindow::fileNameFilters = QStringList() << QObject::tr("Cockatrice card database (*.xml)")
                                                               << QObject::tr("All files (*.*)");
 inline Q_LOGGING_CATEGORY(MainWindowLog, "main_window");
+
+namespace
+{
+/** Corner buttons of the tab bar share one look: flat, icon-only, pointer-only. */
+QToolButton *createCornerToolButton(QWidget *parent)
+{
+    auto *button = new QToolButton(parent);
+    button->setAutoRaise(true);
+    button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    button->setIconSize(QSize(16, 16));
+    button->setCursor(Qt::PointingHandCursor);
+    button->setFocusPolicy(Qt::NoFocus);
+    button->setStyleSheet(QStringLiteral("QToolButton { border: none; background: transparent; padding: 4px; }"));
+    return button;
+}
+} // namespace
 
 /**
  * Replaces the tab-specific menus that are shown in the menuBar.
@@ -292,6 +309,8 @@ void MainWindow::actSettings()
     auto *generalPage = qobject_cast<GeneralSettingsPage *>(dlg.page(DlgSettings::GeneralPage));
     connect(generalPage, &GeneralSettingsPage::cardDatabaseUpdateRequested, this, &MainWindow::actCheckCardUpdates);
     dlg.exec();
+    // The channel may have changed while the dialog was up.
+    syncPendingClientUpdateChannel();
 }
 
 void MainWindow::actExit()
@@ -339,6 +358,24 @@ void MainWindow::actTips()
 void MainWindow::actUpdate()
 {
     DlgUpdate dlg(this);
+    connect(&dlg, &DlgUpdate::checkFinished, this, &MainWindow::checkClientUpdatesFinished);
+    connect(&dlg, &DlgUpdate::notesShown, this, &MainWindow::onClientUpdateNotesShown);
+    dlg.exec();
+}
+
+void MainWindow::actOpenPendingClientUpdate()
+{
+    syncPendingClientUpdateChannel();
+    if (pendingClientUpdate == nullptr) {
+        // Nothing was fetched for the selected channel, so the click does the check itself.
+        actUpdate();
+        return;
+    }
+
+    // The startup check already fetched this release; reuse it.
+    DlgUpdate dlg(this, pendingClientUpdate, pendingClientUpdateCompatible);
+    connect(&dlg, &DlgUpdate::checkFinished, this, &MainWindow::checkClientUpdatesFinished);
+    connect(&dlg, &DlgUpdate::notesShown, this, &MainWindow::onClientUpdateNotesShown);
     dlg.exec();
 }
 
@@ -393,6 +430,7 @@ void MainWindow::retranslateUi()
     settingsButton->setToolTip(tr("Settings"));
     settingsButton->setAccessibleName(tr("Settings"));
     settingsButton->setIcon(loadThemedIcon(QStringLiteral("icons/settings")));
+    updateClientUpdateButton();
     aExit->setText(tr("&Exit"));
 
 #if defined(__APPLE__) /* For OSX */
@@ -414,7 +452,6 @@ void MainWindow::retranslateUi()
     helpMenu->setTitle(tr("&Help"));
     aAbout->setText(tr("&About Cockatrice"));
     aTips->setText(tr("&Tip of the Day"));
-    aUpdate->setText(tr("Check for Client Updates"));
     aCheckCardUpdates->setText(tr("Check for Card Updates..."));
     aCheckCardUpdatesBackground->setText(tr("Check for Card Updates (Automatic)"));
     aStatusBar->setText(tr("Show Status Bar"));
@@ -628,18 +665,20 @@ MainWindow::MainWindow(QWidget *parent)
 
     setCentralWidget(tabSupervisor);
 
-    // Unobtrusive settings entry in the tab bar corner: flat icon-only button that blends into the tab
-    // bar until hovered, mirroring the menu action for discoverability
-    settingsButton = new QToolButton(tabSupervisor);
-    settingsButton->setAutoRaise(true);
-    settingsButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    settingsButton->setIconSize(QSize(16, 16));
-    settingsButton->setCursor(Qt::PointingHandCursor);
-    settingsButton->setFocusPolicy(Qt::NoFocus);
-    settingsButton->setStyleSheet(
-        QStringLiteral("QToolButton { border: none; background: transparent; padding: 4px; }"));
+    settingsButton = createCornerToolButton(tabSupervisor);
     connect(settingsButton, &QToolButton::clicked, this, &MainWindow::actSettings);
-    tabSupervisor->setCornerWidget(settingsButton, Qt::TopRightCorner);
+
+    // Shown only while a release is pending, left of the settings button.
+    clientUpdateButton = createCornerToolButton(tabSupervisor);
+    clientUpdateButton->setObjectName("clientUpdateButton");
+    clientUpdateButton->setVisible(false);
+    connect(clientUpdateButton, &QToolButton::clicked, this, &MainWindow::actOpenPendingClientUpdate);
+
+    auto *cornerWidget = new QWidget(tabSupervisor);
+    auto *cornerLayout = QtUtils::makeLayout<QHBoxLayout>(cornerWidget, 0);
+    cornerLayout->addWidget(clientUpdateButton);
+    cornerLayout->addWidget(settingsButton);
+    tabSupervisor->setCornerWidget(cornerWidget, Qt::TopRightCorner);
 
     retranslateUi();
 
@@ -1575,12 +1614,65 @@ void MainWindow::actCheckClientUpdates()
     checker->check();
 }
 
-void MainWindow::checkClientUpdatesFinished(bool needToUpdate, bool /* isCompatible */, Release * /* release */)
+void MainWindow::checkClientUpdatesFinished(bool needToUpdate, bool isCompatible, Release *release)
 {
-    if (needToUpdate) {
-        DlgUpdate dlg(this);
-        dlg.exec();
+    setPendingClientUpdate(needToUpdate ? release : nullptr, isCompatible);
+    // Drop a release fetched on the channel the user has since left.
+    syncPendingClientUpdateChannel();
+}
+
+void MainWindow::setPendingClientUpdate(Release *release, bool isCompatible)
+{
+    pendingClientUpdate = release;
+    pendingClientUpdateCompatible = isCompatible;
+    updateClientUpdateButton();
+}
+
+void MainWindow::onClientUpdateNotesShown(Release *release)
+{
+    if (release == nullptr) {
+        return;
     }
+
+    SettingsCache::instance().updates().setLastSeenReleaseNotes(release->getName());
+    // Still pending; only the unread mark is gone.
+    updateClientUpdateButton();
+}
+
+void MainWindow::syncPendingClientUpdateChannel()
+{
+    if (pendingClientUpdate == nullptr) {
+        return;
+    }
+
+    Release *channelRelease = SettingsCache::instance().getUpdateReleaseChannel()->getLastRelease();
+    if (channelRelease != pendingClientUpdate) {
+        qCInfo(MainWindowLog) << "Update glyph cleared: the pending release no longer belongs to the selected channel";
+        setPendingClientUpdate(nullptr, false);
+    }
+}
+
+void MainWindow::updateClientUpdateButton()
+{
+    const bool pending = pendingClientUpdate != nullptr;
+    clientUpdateButton->setVisible(pending);
+    // The glyph is pointer-only, so mirror the state onto the Help menu action.
+    aUpdate->setText(pending ? tr("Check for Client Updates (Update Available!)") : tr("Check for Client Updates"));
+
+    QString description = tr("Check the release channel for client updates");
+    IconTint tint = IconTint::primary();
+    if (pending) {
+        const QString name = pendingClientUpdate->getName();
+        description = tr("Client update '%1' is available").arg(name);
+        // Amber while the notes are unread; neutral once the dialog has shown them.
+        if (SettingsCache::instance().updates().getLastSeenReleaseNotes() != name) {
+            tint = IconTint(AppColor::Marked, IconEmphasis::Primary);
+        }
+    }
+
+    clientUpdateButton->setToolTip(description);
+    clientUpdateButton->setAccessibleName(description);
+    clientUpdateButton->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_to_bottom"), tint));
 }
 
 void MainWindow::actCheckCommanderBracketDefinitionUpdates()

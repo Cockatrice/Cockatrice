@@ -70,6 +70,11 @@ int UpdatesSettings::getUpdateReleaseChannelIndex() const
     return getValue("updateReleaseChannel", QString(), QString(), 0).toInt();
 }
 
+QString UpdatesSettings::getLastSeenReleaseNotes() const
+{
+    return getValue("lastSeenReleaseNotes", QString(), QString(), QString()).toString();
+}
+
 void UpdatesSettings::setCheckUpdatesOnStartup(bool value)
 {
     setValue(value, "startupUpdateCheck");
@@ -118,4 +123,9 @@ void UpdatesSettings::setCardDatabaseUpdateTrayNotification(bool value)
 void UpdatesSettings::setUpdateReleaseChannelIndex(int value)
 {
     setValue(value, "updateReleaseChannel");
+}
+
+void UpdatesSettings::setLastSeenReleaseNotes(const QString &value)
+{
+    setValue(value, "lastSeenReleaseNotes");
 }
