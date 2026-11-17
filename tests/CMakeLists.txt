@@ -495,6 +495,15 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  release_notes_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_notes.cpp
+  release_notes_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/cockatrice/src
+)
+cockatrice_add_test(
+  NAME
   metrics_registry_test
   SOURCES
   ${CMAKE_SOURCE_DIR}/servatrice/src/metrics_registry.cpp

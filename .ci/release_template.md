@@ -69,9 +69,11 @@ Remove empty headers when done.
  -->
 
 <!-- Highlights of the release -->
+<!-- app-notes:start -->
 ### 🔖 Highlights:
 ### ✨ New Features:
 ### 🐛 Fixed Bugs / Resolved Issues:
+<!-- app-notes:end -->
 
 <!-- Complete list of changes (foldable) -->
 <details>
