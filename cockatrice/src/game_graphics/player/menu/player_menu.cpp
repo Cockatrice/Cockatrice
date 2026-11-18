@@ -104,9 +104,9 @@ QMenu *PlayerMenu::updateCardMenu(CardState *card)
 
     // If is spectator (as spectators don't need card menus), return
     // only update the menu if the card is actually selected
-    if ((player->getLogic()->getGame()->getPlayerManager()->isSpectator() &&
-         !player->getLogic()->getGame()->getPlayerManager()->isJudge()) ||
-        cardItem == nullptr || player->getGameScene()->getActiveCard() != cardItem) {
+    const GameRoleInfo &roles = player->getLogic()->getGame()->getPlayerManager()->getLocalRoles();
+    if ((roles.isSpectator && !roles.isJudge) || cardItem == nullptr ||
+        player->getGameScene()->getActiveCard() != cardItem) {
         return nullptr;
     }
 

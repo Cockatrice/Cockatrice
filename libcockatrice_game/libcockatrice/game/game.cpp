@@ -25,7 +25,8 @@ Game::Game(QObject *_parent,
     gameMetaInfo->setRoomGameTypes(_roomGameTypes);
     gameState = new GameState(this, 0, event.host_id(), isLocalGame, _clients, false, event.resuming(), -1, false);
     connect(gameMetaInfo, &GameMetaInfo::startedChanged, gameState, &GameState::onStartedChanged);
-    playerManager = new PlayerManager(this, event.player_id(), event.judge(), event.spectator(), interfaceSettings,
-                                      cardPreferences);
+
+    GameRoleInfo roles = {.isJudge = event.judge(), .isSpectator = event.spectator()};
+    playerManager = new PlayerManager(this, event.player_id(), roles, interfaceSettings, cardPreferences);
     gameMetaInfo->setStarted(false);
 }

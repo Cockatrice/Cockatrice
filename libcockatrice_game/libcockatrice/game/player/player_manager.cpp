@@ -11,13 +11,11 @@
 
 PlayerManager::PlayerManager(AbstractGame *_game,
                              int _localPlayerId,
-                             bool _localPlayerIsJudge,
-                             bool localPlayerIsSpectator,
+                             const GameRoleInfo &localRoles,
                              IInterfaceSettingsProvider *_interfaceSettings,
                              ICardPreferenceProvider *_cardPreferences)
     : QObject(_game), game(_game), players(QMap<int, PlayerLogic *>()), localPlayerId(_localPlayerId),
-      localPlayerIsJudge(_localPlayerIsJudge), localPlayerIsSpectator(localPlayerIsSpectator),
-      interfaceSettings(_interfaceSettings), cardPreferences(_cardPreferences)
+      localRoles(localRoles), interfaceSettings(_interfaceSettings), cardPreferences(_cardPreferences)
 {
 }
 
@@ -55,7 +53,7 @@ bool PlayerManager::isLocalPlayer(int playerId)
 PlayerLogic *PlayerManager::addPlayer(int playerId, const ServerInfo_User &info)
 {
     auto *newPlayer = new PlayerLogic(info, playerId, isLocalPlayer(playerId) || game->getGameState()->getIsLocalGame(),
-                                      isJudge(), getGame(), interfaceSettings, cardPreferences);
+                                      getLocalRoles().isJudge, getGame(), interfaceSettings, cardPreferences);
     connect(newPlayer, &PlayerLogic::concededChanged, this, &PlayerManager::onPlayerConceded);
     players.insert(playerId, newPlayer);
     emit playerAdded(newPlayer);
