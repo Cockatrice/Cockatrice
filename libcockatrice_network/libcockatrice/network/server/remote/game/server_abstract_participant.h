@@ -2,11 +2,11 @@
 #define ABSTRACT_PARTICIPANT_H
 
 #include "../serverinfo_user_container.h"
-#include "role_info.h"
 #include "server_arrowtarget.h"
 
 #include <QMutex>
 #include <libcockatrice/protocol/pb/response.pb.h>
+#include <libcockatrice/utility/game_role_info.h>
 #include <qtmetamacros.h>
 
 class Server_Game;
@@ -64,7 +64,7 @@ protected:
     Server_AbstractUserInterface *userInterface;
     int pingTime;
     int playerId;
-    RoleInfo roleInfo;
+    GameRoleInfo roleInfo;
     virtual void getPlayerProperties(ServerInfo_PlayerProperties &result);
     mutable QMutex playerMutex;
 
@@ -72,7 +72,7 @@ public:
     Server_AbstractParticipant(Server_Game *_game,
                                int _playerId,
                                const ServerInfo_User &_userInfo,
-                               const RoleInfo &_roleInfo,
+                               const GameRoleInfo &_roleInfo,
                                Server_AbstractUserInterface *_handler);
     ~Server_AbstractParticipant() override;
     virtual void prepareDestroy()

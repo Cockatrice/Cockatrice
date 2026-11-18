@@ -1,5 +1,4 @@
 #include "game/game_config.h"
-#include "game/role_info.h"
 #include "game/server_abstract_participant.h"
 #include "game/server_game.h"
 #include "server_abstractuserinterface.h"
@@ -14,6 +13,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pb/session_event.pb.h>
 #include <libcockatrice/rng/rng_abstract.h>
+#include <libcockatrice/utility/game_role_info.h>
 
 RNG_Abstract *rng = nullptr; // this needs to be defined due to other functions in server
 
@@ -129,9 +129,9 @@ TEST_F(PlayerOrderTest, JoinOrderIsSeatOrder)
     Server_Game game(config, &room);
     ResponseContainer rc(0);
 
-    game.addPlayer(&uiA, rc, RoleInfo{}, false);
-    game.addPlayer(&uiB, rc, RoleInfo{}, false);
-    game.addPlayer(&uiC, rc, RoleInfo{}, false);
+    game.addPlayer(&uiA, rc, GameRoleInfo{}, false);
+    game.addPlayer(&uiB, rc, GameRoleInfo{}, false);
+    game.addPlayer(&uiC, rc, GameRoleInfo{}, false);
 
     EXPECT_EQ(participantNamesInOrder(game), QStringList({"A", "B", "C"}));
     EXPECT_EQ(participantIdsInOrder(game), QList<int>({0, 1, 2}));
@@ -164,9 +164,9 @@ TEST_F(PlayerOrderTest, ReorderPlayerSeats)
     Server_Game game(config, &room);
     ResponseContainer rc(0);
 
-    game.addPlayer(&uiA, rc, RoleInfo{}, false);
-    game.addPlayer(&uiB, rc, RoleInfo{}, false);
-    game.addPlayer(&uiC, rc, RoleInfo{}, false);
+    game.addPlayer(&uiA, rc, GameRoleInfo{}, false);
+    game.addPlayer(&uiB, rc, GameRoleInfo{}, false);
+    game.addPlayer(&uiC, rc, GameRoleInfo{}, false);
 
     game.reorderPlayerSeats({"C", "A", "B"});
 
@@ -210,9 +210,9 @@ TEST_F(PlayerOrderTest, ReorderPlayerSeatsKeepsPlayerCount)
     Server_Game game(config, &room);
     ResponseContainer rc(0);
 
-    game.addPlayer(&uiA, rc, RoleInfo{}, false);
-    game.addPlayer(&uiB, rc, RoleInfo{}, false);
-    game.addPlayer(&uiC, rc, RoleInfo{}, false);
+    game.addPlayer(&uiA, rc, GameRoleInfo{}, false);
+    game.addPlayer(&uiB, rc, GameRoleInfo{}, false);
+    game.addPlayer(&uiC, rc, GameRoleInfo{}, false);
 
     // listing only a subset appends the remaining players in their current order
     game.reorderPlayerSeats({"C"});
@@ -248,9 +248,9 @@ TEST_F(PlayerOrderTest, ShufflePlayerSeatsIsAPermutation)
     Server_Game game(config, &room);
     ResponseContainer rc(0);
 
-    game.addPlayer(&uiA, rc, RoleInfo{}, false);
-    game.addPlayer(&uiB, rc, RoleInfo{}, false);
-    game.addPlayer(&uiC, rc, RoleInfo{}, false);
+    game.addPlayer(&uiA, rc, GameRoleInfo{}, false);
+    game.addPlayer(&uiB, rc, GameRoleInfo{}, false);
+    game.addPlayer(&uiC, rc, GameRoleInfo{}, false);
 
     // fisher-yates on [A, B, C]: rand(0, 2) -> 1 (take B), rand(0, 1) -> 0 (take A), rand(0, 0) -> 0 (take C)
     auto *scriptedRng = new ScriptedRng;
