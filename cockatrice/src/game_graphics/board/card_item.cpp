@@ -295,7 +295,7 @@ void CardItem::deleteDragItem()
 
 void CardItem::drawArrow(const QColor &arrowColor)
 {
-    if (owner->getGame()->getPlayerManager()->isSpectator()) {
+    if (owner->getGame()->getPlayerManager()->getLocalRoles().isSpectator) {
         return;
     }
 
@@ -335,7 +335,7 @@ void CardItem::drawArrow(const QColor &arrowColor)
 
 void CardItem::drawAttachArrow()
 {
-    if (owner->getGame()->getPlayerManager()->isSpectator()) {
+    if (owner->getGame()->getPlayerManager()->getLocalRoles().isSpectator) {
         return;
     }
 

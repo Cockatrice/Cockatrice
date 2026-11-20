@@ -13,6 +13,7 @@
 #include <QObject>
 #include <QString>
 #include <libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h>
+#include <libcockatrice/utility/game_role_info.h>
 #include <qtmetamacros.h>
 
 class AbstractGame;
@@ -27,29 +28,22 @@ class PlayerManager : public QObject
 public:
     PlayerManager(AbstractGame *_game,
                   int _localPlayerId,
-                  bool _localPlayerIsJudge,
-                  bool localPlayerIsSpectator,
+                  const GameRoleInfo &localRoles,
                   IInterfaceSettingsProvider *interfaceSettings = nullptr,
                   ICardPreferenceProvider *cardPreferences = nullptr);
 
     AbstractGame *game;
     QMap<int, PlayerLogic *> players;
     int localPlayerId;
-    bool localPlayerIsJudge;
-    bool localPlayerIsSpectator;
+    GameRoleInfo localRoles;
     QMap<int, ServerInfo_User> spectators;
     // Borrowed settings providers forwarded to each PlayerLogic (owned by the application).
     IInterfaceSettingsProvider *interfaceSettings;
     ICardPreferenceProvider *cardPreferences;
 
-    [[nodiscard]] bool isSpectator() const
+    [[nodiscard]] const GameRoleInfo &getLocalRoles() const
     {
-        return localPlayerIsSpectator;
-    }
-
-    [[nodiscard]] bool isJudge() const
-    {
-        return localPlayerIsJudge;
+        return localRoles;
     }
 
     [[nodiscard]] int getLocalPlayerId() const
