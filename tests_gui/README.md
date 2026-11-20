@@ -12,16 +12,16 @@ git submodule update --init external/qttesting      # once
 cmake -S . -B build/debug -DCMAKE_BUILD_TYPE=Debug -DWITH_SERVER=0 -DWITH_GUI_TEST=ON
 cmake --build build/debug -j 24
 
-./Testing/run_test.sh --all                        # headless, offscreen
-./Testing/run_test.sh Testing/smoke_test.xml       # one file
-./Testing/run_test.sh --visual Testing/smoke_test.xml   # shows the window
+./tests_gui/run_test.sh --all                                # headless, offscreen
+./tests_gui/run_test.sh tests_gui/smoke_test.xml             # one file
+./tests_gui/run_test.sh --visual tests_gui/smoke_test.xml    # shows the window
 ```
 
-`WITH_GUI_TEST` is on by default. Without the submodule the build configures with a
-warning and no harness. `COCKATRICE_BIN` points the runner at another build, and
-`TEST_TIMEOUT` (seconds, default 180) bounds a single test, because a failing event
-inside a modal dialog can leave the process alive. The client also hard-exits a few
-seconds after playback returns, whatever the result.
+`WITH_GUI_TEST` is off by default, passing `-DWITH_GUI_TEST=ON` to cmake will include them.
+Without the submodule, the build configures with a warning and no harness. 
+`COCKATRICE_BIN` points the runner at another build, and `TEST_TIMEOUT` (seconds, default 180)
+bounds a single test, because a failing event inside a modal dialog can leave the process alive.
+The client also hard-exits a few seconds after playback returns, whatever the result.
 
 The tests are **not** part of `ctest`. They need a card database and a developer's
 settings, so they stay a local loop for now.
@@ -48,27 +48,27 @@ settings, so they stay a local loop for now.
 A test is an `<events>` list. Widgets are named by their path from the main window, e.g.
 `MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu`. Useful commands:
 
-| Command | Arguments | Effect |
-|---------|-----------|--------|
-| `activate` | action or menu name | triggers a QAction (menus are opened first) |
-| `key` | Qt key code | presses that key on the focused widget |
-| `pause` | milliseconds | sleeps, letting the UI settle (no events are processed) |
-| `process_events` | milliseconds | runs the event loop, so timers and network replies are handled |
-| `clickCard` | `card,zone` | double click the card found in that zone (plays it from hand) |
-| `flipCard` | `card,zone` | right-click → *Turn Over* |
-| `cardAction` | `card,zone,label` | right-click → first menu entry whose label contains `label` (submenus included) |
-| `moveCard` | `card,srcZone,dstZone` | drags the card onto the destination zone |
-| `drawArrow` | `srcCard,srcZone,dstCard,dstZone` | right-drag an arrow between two cards |
-| `createToken` | `name,color,pt` | creates a token as the active local player |
-| `selectItem` | `item label` | selects the tree/list entry with that label |
-| `typeText` | `text` | types text one key event at a time |
-| `expectProperty` | `property,value` | fails playback unless the widget property matches |
-| `screenshot` | `path` | saves an image of the addressed widget; `$VAR` expands from the environment |
-| `dumpTree` | `path` | writes the addressed widget's subtree with the paths tests address |
-| `resize` | `WIDTHxHEIGHT` | resizes the addressed widget's window |
-| `selectRow` | `row[/row…][,column]` | selects a row of an item view through its selection model |
-| `clickRow` | `row[/row…][,column]` | left-clicks a cell, so the view's own handlers run |
-| `doubleClickRow` | `row[/row…][,column]` | double-clicks a cell |
+| Command          | Arguments                         | Effect                                                                          |
+| ---------------- | --------------------------------- | ------------------------------------------------------------------------------- |
+| `activate`       | action or menu name               | triggers a QAction (menus are opened first)                                     |
+| `key`            | Qt key code                       | presses that key on the focused widget                                          |
+| `pause`          | milliseconds                      | sleeps, letting the UI settle (no events are processed)                         |
+| `process_events` | milliseconds                      | runs the event loop, so timers and network replies are handled                  |
+| `clickCard`      | `card,zone`                       | double click the card found in that zone (plays it from hand)                   |
+| `flipCard`       | `card,zone`                       | right-click → *Turn Over*                                                       |
+| `cardAction`     | `card,zone,label`                 | right-click → first menu entry whose label contains `label` (submenus included) |
+| `moveCard`       | `card,srcZone,dstZone`            | drags the card onto the destination zone                                        |
+| `drawArrow`      | `srcCard,srcZone,dstCard,dstZone` | right-drag an arrow between two cards                                           |
+| `createToken`    | `name,color,pt`                   | creates a token as the active local player                                      |
+| `selectItem`     | `item label`                      | selects the tree/list entry with that label                                     |
+| `typeText`       | `text`                            | types text one key event at a time                                              |
+| `expectProperty` | `property,value`                  | fails playback unless the widget property matches                               |
+| `screenshot`     | `path`                            | saves an image of the addressed widget; `$VAR` expands from the environment     |
+| `dumpTree`       | `path`                            | writes the addressed widget's subtree with the paths tests address              |
+| `resize`         | `WIDTHxHEIGHT`                    | resizes the addressed widget's window                                           |
+| `selectRow`      | `row[/row…][,column]`             | selects a row of an item view through its selection model                       |
+| `clickRow`       | `row[/row…][,column]`             | left-clicks a cell, so the view's own handlers run                              |
+| `doubleClickRow` | `row[/row…][,column]`             | double-clicks a cell |
 
 The card, item and property commands are `pqCockatriceEventPlayer`
 (`cockatrice/src/game_graphics/pq_cockatrice_event_player.h`). They resolve cards by name
@@ -138,7 +138,7 @@ which resolves some hidden-page paths but not all of them.
 Record the tree in the same playback that clicks, and copy paths from that dump:
 
 ```bash
-./Testing/run_test.sh Testing/screenshot_test.xml
+./tests_gui/run_test.sh tests_gui/screenshot_test.xml
 less build/screenshots/widget-tree.txt
 ```
 
