@@ -14,4 +14,7 @@ message Command_DeckUpload {
     reserved 5, 6, 8;
     reserved "banner_card_name", "banner_card_provider", "tags";
     optional string color_identity = 7;
+    // Stable per-deck identity for two-way collection sync. Sent on first
+    // synced upload, echoed back in ServerInfo_DeckStorage_File afterwards.
+    optional string guid = 9;
 }
