@@ -320,18 +320,19 @@ QList<Server_AbstractParticipant *> Server_Game::getParticipantsInSeatOrder() co
     return ordered;
 }
 
-void Server_Game::createGameStateChangedEvent(Event_GameStateChanged *event,
-                                              Server_AbstractParticipant *recipient,
-                                              bool omniscient,
-                                              bool withUserInfo)
+Event_GameStateChanged Server_Game::createGameStateChangedEvent(Server_AbstractParticipant *recipient,
+                                                                bool omniscient,
+                                                                bool withUserInfo) const
 {
-    event->set_seconds_elapsed(secondsElapsed);
+    Event_GameStateChanged event;
+
+    event.set_seconds_elapsed(secondsElapsed);
     if (gameStarted) {
-        event->set_game_started(true);
-        event->set_active_player_id(0);
-        event->set_active_phase(0);
+        event.set_game_started(true);
+        event.set_active_player_id(0);
+        event.set_active_phase(0);
     } else {
-        event->set_game_started(false);
+        event.set_game_started(false);
     }
 
     // Emit the player list in seat order so every client (including old ones
@@ -339,19 +340,20 @@ void Server_Game::createGameStateChangedEvent(Event_GameStateChanged *event,
     // ids are stable; only this ordering changes on shuffle/reorder.
     QList<Server_AbstractParticipant *> ordered = getParticipantsInSeatOrder();
     for (Server_AbstractParticipant *participant : ordered) {
-        participant->getInfo(event->add_player_list(), recipient, omniscient, withUserInfo);
+        participant->getInfo(event.add_player_list(), recipient, omniscient, withUserInfo);
     }
 
     if (recipient != nullptr) {
-        event->set_local_player_id(recipient->getPlayerId());
+        event.set_local_player_id(recipient->getPlayerId());
     }
+
+    return event;
 }
 
 void Server_Game::sendGameStateToPlayers()
 {
     // game state information for replay and omniscient spectators
-    Event_GameStateChanged omniscientEvent;
-    createGameStateChangedEvent(&omniscientEvent, nullptr, true, true);
+    Event_GameStateChanged omniscientEvent = createGameStateChangedEvent(nullptr, true, true);
 
     GameEventContainer *replayCont = prepareGameEvent(omniscientEvent, -1);
     replayCont->set_seconds_elapsed(secondsElapsed - startTimeOfThisGame);
@@ -362,8 +364,7 @@ void Server_Game::sendGameStateToPlayers()
     // If spectators are not omniscient, we need an additional createGameStateChangedEvent call, otherwise we can use
     // the data we used for the replay. All spectators are equal, so we don't need to make a createGameStateChangedEvent
     // call for each one.
-    Event_GameStateChanged spectatorNormalEvent;
-    createGameStateChangedEvent(&spectatorNormalEvent, nullptr, false, true);
+    Event_GameStateChanged spectatorNormalEvent = createGameStateChangedEvent(nullptr, false, true);
 
     // send game state info to clients according to their role in the game
     for (auto *participant : participants.values()) {
@@ -375,8 +376,7 @@ void Server_Game::sendGameStateToPlayers()
                 gec = prepareGameEvent(spectatorNormalEvent, -1);
             }
         } else {
-            Event_GameStateChanged event;
-            createGameStateChangedEvent(&event, participant, participant->isJudge(), true);
+            Event_GameStateChanged event = createGameStateChangedEvent(participant, participant->isJudge(), true);
 
             gec = prepareGameEvent(event, -1);
         }
@@ -440,8 +440,7 @@ void Server_Game::doStartGameIfReady(bool forceStartGame)
         getInfo(*gameInfo);
         gameInfo->set_started(false);
 
-        Event_GameStateChanged omniscientEvent;
-        createGameStateChangedEvent(&omniscientEvent, nullptr, true, true);
+        Event_GameStateChanged omniscientEvent = createGameStateChangedEvent(nullptr, true, true);
 
         GameEventContainer *replayCont = prepareGameEvent(omniscientEvent, -1);
         replayCont->set_seconds_elapsed(0);
