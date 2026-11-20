@@ -1521,9 +1521,11 @@ void TabGame::createPlayerListDock(bool bReplay)
         connect(playerListWidget, SIGNAL(openMessageDialog(QString, bool)), this,
                 SIGNAL(openMessageDialog(QString, bool)));
     }
+    playerListWidget->setObjectName("playerListWidget");
     playerListWidget->setFocusPolicy(Qt::NoFocus);
 
     auto *playerListBox = new QWidget(this);
+    playerListBox->setObjectName("playerListBox");
     auto *vbox = QtUtils::makeLayout<QVBoxLayout>(playerListBox, 0);
 
     vbox->addWidget(playerListWidget);
