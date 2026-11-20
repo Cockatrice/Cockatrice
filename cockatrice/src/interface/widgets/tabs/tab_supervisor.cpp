@@ -81,6 +81,7 @@
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
+#include <libcockatrice/utility/game_role_info.h>
 #include <libcockatrice/utility/qt_utils.h>
 #include <memory>
 #include <qnamespace.h>
@@ -1136,12 +1137,12 @@ void TabSupervisor::replayLeft(TabGame *tab)
 
 void TabSupervisor::joinReportGame(const int gameId, const int roomId)
 {
-    joinGameByIntent(gameId, roomId, true);
+    joinGameByIntent(gameId, roomId, {.isSpectator = true});
 }
 
-void TabSupervisor::joinGameFromUserCard(const int gameId, const int roomId, const bool asSpectator)
+void TabSupervisor::joinGameFromUserCard(const int gameId, const int roomId, const GameRoleInfo &roles)
 {
-    joinGameByIntent(gameId, roomId, asSpectator);
+    joinGameByIntent(gameId, roomId, roles);
 }
 
 /**
@@ -1151,7 +1152,7 @@ void TabSupervisor::joinGameFromUserCard(const int gameId, const int roomId, con
  * room first, then retries the game, so callers do not have to care whether the
  * room happens to be on screen.
  */
-void TabSupervisor::joinGameByIntent(const int gameId, const int roomId, const bool asSpectator)
+void TabSupervisor::joinGameByIntent(const int gameId, const int roomId, const GameRoleInfo &roles)
 {
     auto *remoteClient = qobject_cast<RemoteClient *>(client);
     if (!remoteClient) {
@@ -1164,7 +1165,7 @@ void TabSupervisor::joinGameByIntent(const int gameId, const int roomId, const b
     ctx->roomContext.serverContext.port = QString::number(remoteClient->peerPort());
     ctx->roomContext.roomId = roomId;
     ctx->gameId = gameId;
-    ctx->asSpectator = asSpectator;
+    ctx->roles = roles;
 
     auto *joinGameIntent = new IntentJoinServerGame(this, remoteClient, std::move(ctx));
     joinGameIntent->setParent(this);

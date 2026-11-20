@@ -769,9 +769,9 @@ void UserListWidget::connectPopupSignals()
     // needed. The popup closes here because that intent switches tabs, which
     // would otherwise strand it on a list that is no longer on screen.
     connect(userInfoPopup, &UserInfoPopup::joinGameRequested, this,
-            [this](const int gameId, const int roomId, const bool asSpectator) {
+            [this](const int gameId, const int roomId, const GameRoleInfo &roles) {
                 hidePopup(true);
-                tabSupervisor->joinGameFromUserCard(gameId, roomId, asSpectator);
+                tabSupervisor->joinGameFromUserCard(gameId, roomId, roles);
             });
 }
 
