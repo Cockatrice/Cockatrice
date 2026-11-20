@@ -19,12 +19,12 @@
 #include <libcockatrice/utility/qt_utils.h>
 #include <qtmetamacros.h>
 
-class QFrame;
 class QLabel;
 class QMenu;
 class QMouseEvent;
 class ColorIdentityWidget;
 class DeckPreviewCardPictureWidget;
+class DeckPreviewDeckBoxWidget;
 class DeckPreviewDeckTagsDisplayWidget;
 class VisualDeckStorageModel;
 class VisualDeckStorageWidget;
@@ -42,12 +42,20 @@ public:
     void retranslateUi();
 
     /**
-     * @brief The banner card picture; the parent widget wires its size to the card size setting.
+     * @brief The deck box; the parent widget wires its size to the card size setting.
      */
-    DeckPreviewCardPictureWidget *bannerCardDisplayWidget;
+    DeckPreviewDeckBoxWidget *deckBox;
 
     /** @brief The path of the deck file backing this preview. */
     QString filePath;
+
+    /**
+     * @brief Forwards the VDS animation setting to the box's hover lift.
+     *
+     * Pushed down by the storage widget's folder tree instead of every preview
+     * subscribing to the setting, so a thousand decks cost one connection.
+     */
+    void setSelectionAnimationEnabled(bool enabled);
 
     void setShareSelectable(bool selectable);
     void setShareSelected(bool selected);
@@ -81,7 +89,6 @@ public slots:
 protected:
     void enterEvent(QEnterEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
-    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     [[nodiscard]] int row() const;
@@ -106,14 +113,12 @@ private:
     DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget;
     QLabel *bannerCardLabel;
     QComboBox *bannerCardComboBox;
-    QList<QWidget *> fixedWidthChildren; ///< Children clamped to the picture width on resize.
-    int lastKnownBannerWidth = -1;       ///< The picture width last applied to the children.
-    QFrame *selectionFrame = nullptr;
+    QList<QWidget *> fixedWidthChildren; ///< Children clamped to the tile width on resize.
+    int lastKnownTileWidth = -1;         ///< The tile width last applied to the children.
     bool shareSelectable = false;
     bool shareSelected = false;
 
     void updateSelectionStyle();
-    void updateSelectionFrameGeometry();
 };
 
 class NoScrollFilter : public QObject

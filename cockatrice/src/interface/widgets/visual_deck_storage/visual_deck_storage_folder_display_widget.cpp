@@ -5,6 +5,7 @@
 #include "../cards/deck_preview_card_picture_widget.h"
 #include "../general/display/banner_widget.h"
 #include "../general/layout_containers/flow_widget.h"
+#include "deck_preview/deck_preview_deck_box_widget.h"
 #include "deck_preview/deck_preview_widget.h"
 #include "visual_deck_storage_model.h"
 #include "visual_deck_storage_quick_settings_widget.h"
@@ -234,8 +235,8 @@ DeckPreviewWidget *VisualDeckStorageFolderDisplayWidget::createDeckPreviewWidget
             &VisualDeckStorageWidget::shareSelectionChanged);
     deckPreviewWidget->setShareSelectable(visualDeckStorageWidget->isShareSelectable());
     connect(visualDeckStorageWidget->settings(), &VisualDeckStorageQuickSettingsWidget::cardSizeChanged,
-            deckPreviewWidget->bannerCardDisplayWidget, &CardInfoPictureWidget::setScaleFactor);
-    deckPreviewWidget->bannerCardDisplayWidget->setScaleFactor(visualDeckStorageWidget->settings()->getCardSize());
+            deckPreviewWidget->deckBox, &DeckPreviewDeckBoxWidget::setScaleFactor);
+    deckPreviewWidget->deckBox->setScaleFactor(visualDeckStorageWidget->settings()->getCardSize());
     deckWidgets.insert(filePath, deckPreviewWidget);
     return deckPreviewWidget;
 }

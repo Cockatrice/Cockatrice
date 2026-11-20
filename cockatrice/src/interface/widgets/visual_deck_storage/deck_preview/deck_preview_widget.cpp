@@ -9,11 +9,13 @@
 #include "../visual_deck_storage_quick_settings_widget.h"
 #include "../visual_deck_storage_tag_filter_widget.h"
 #include "../visual_deck_storage_widget.h"
+#include "deck_preview_deck_box_widget.h"
 #include "deck_preview_deck_tags_display_widget.h"
 #include "libcockatrice/card/database/card_database_querier.h"
 #include "libcockatrice/card/printing/exact_card.h"
 #include "libcockatrice/deck_list/deck_list.h"
 #include "libcockatrice/deck_list/tree/deck_list_card_node.h"
+#include "libcockatrice/deck_list/tree/inner_deck_list_node.h"
 #include "libcockatrice/utility/card_ref.h"
 
 #include <QAbstractItemModel>
@@ -21,7 +23,6 @@
 #include <QCursor>
 #include <QDebug>
 #include <QFileInfo>
-#include <QFrame>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
@@ -49,6 +50,24 @@
 #include <qnamespace.h>
 #include <utility>
 
+namespace
+{
+/**
+ * @brief The number of mainboard cards in @p deckList.
+ *
+ * Sideboards and tokens are not part of the deck you would play, so the box label
+ * counts the mainboard only.
+ */
+int countMainboardCards(const DeckList &deckList)
+{
+    int count = 0;
+    for (const DecklistCardNode *node : deckList.getCardNodes({QStringLiteral(DECK_ZONE_MAIN)})) {
+        count += node->getNumber();
+    }
+    return count;
+}
+} // namespace
+
 DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
                                      VisualDeckStorageWidget *_visualDeckStorageWidget,
                                      VisualDeckStorageModel *_model,
@@ -58,15 +77,24 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    auto *pictureWidget =
-        new DeckPreviewCardPictureWidget(this, false, visualDeckStorageWidget->deckPreviewSelectionAnimationEnabled);
-    pictureWidget->setFontSize(24);
-    connect(pictureWidget, &DeckPreviewCardPictureWidget::imageClicked, this, &DeckPreviewWidget::imageClickedEvent);
-    connect(pictureWidget, &DeckPreviewCardPictureWidget::imageSingleClicked, this,
-            &DeckPreviewWidget::imageSingleClicked);
-    connect(pictureWidget, &DeckPreviewCardPictureWidget::imageDoubleClicked, this,
+    deckBox = new DeckPreviewDeckBoxWidget(this);
+    deckBox->setRaiseOnEnterEnabled(visualDeckStorageWidget->deckPreviewSelectionAnimationEnabled);
+
+    // The artwork handles clicks inside the window; the lid and body margins are
+    // part of the same deck, so they report the same intent.
+    DeckPreviewCardPictureWidget *picture = deckBox->cardPicture();
+    connect(picture, &DeckPreviewCardPictureWidget::imageClicked, this, &DeckPreviewWidget::imageClickedEvent);
+    connect(picture, &DeckPreviewCardPictureWidget::imageSingleClicked, this, &DeckPreviewWidget::imageSingleClicked);
+    connect(picture, &DeckPreviewCardPictureWidget::imageDoubleClicked, this,
             &DeckPreviewWidget::imageDoubleClickedEvent);
-    bannerCardDisplayWidget = pictureWidget;
+    connect(deckBox, &DeckPreviewDeckBoxWidget::clicked, this, &DeckPreviewWidget::imageSingleClicked);
+    connect(deckBox, &DeckPreviewDeckBoxWidget::doubleClicked, this, [this] {
+        if (!isShareSelectable()) {
+            emit deckLoadRequested(filePath);
+        }
+    });
+    connect(deckBox, &DeckPreviewDeckBoxWidget::contextMenuRequested, this,
+            [this] { createRightClickMenu()->popup(QCursor::pos()); });
 
     colorIdentityWidget = new ColorIdentityWidget(this);
     deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this);
@@ -103,7 +131,7 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
     connect(visualDeckStorageWidget->settings(), &VisualDeckStorageQuickSettingsWidget::deckPreviewTooltipChanged, this,
             &DeckPreviewWidget::refreshBannerCardToolTip);
 
-    layout->addWidget(bannerCardDisplayWidget);
+    layout->addWidget(deckBox);
     layout->addWidget(colorIdentityWidget);
     layout->addWidget(deckTagsDisplayWidget);
     layout->addWidget(bannerCardLabel);
@@ -123,19 +151,9 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
     retranslateUi();
     syncFromModel();
 
-    // resizeEvent clamps every child to the picture's width, so collect them once here
+    // resizeEvent clamps every child to the tile's width, so collect them once here
     // to keep the resize handler from searching the widget tree on every layout pass.
-    fixedWidthChildren = {bannerCardDisplayWidget, colorIdentityWidget, deckTagsDisplayWidget, bannerCardLabel,
-                          bannerCardComboBox};
-
-    // Child of the banner widget so the frame tracks the banner's selection animation
-    // (which animates the banner's position) instead of staying at a stale static offset.
-    selectionFrame = new QFrame(bannerCardDisplayWidget);
-    selectionFrame->setAttribute(Qt::WA_TransparentForMouseEvents);
-    selectionFrame->setStyleSheet(QStringLiteral(
-        "QFrame { border: 2px solid palette(highlight); border-radius: 4px; background: transparent; }"));
-    selectionFrame->setVisible(false);
-    bannerCardDisplayWidget->installEventFilter(this);
+    fixedWidthChildren = {deckBox, colorIdentityWidget, deckTagsDisplayWidget, bannerCardLabel, bannerCardComboBox};
 }
 
 void DeckPreviewWidget::retranslateUi()
@@ -143,31 +161,27 @@ void DeckPreviewWidget::retranslateUi()
     bannerCardLabel->setText(tr("Banner Card"));
 }
 
+void DeckPreviewWidget::setSelectionAnimationEnabled(bool enabled)
+{
+    deckBox->setRaiseOnEnterEnabled(enabled);
+}
+
 void DeckPreviewWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    if (bannerCardDisplayWidget == nullptr) {
+    if (deckBox == nullptr) {
         return;
     }
 
-    const int width = bannerCardDisplayWidget->width();
-    if (width == lastKnownBannerWidth) {
+    const int width = deckBox->width();
+    if (width == lastKnownTileWidth) {
         return;
     }
-    lastKnownBannerWidth = width;
+    lastKnownTileWidth = width;
 
     for (QWidget *widget : fixedWidthChildren) {
         widget->setMaximumWidth(width);
     }
-    updateSelectionFrameGeometry();
-}
-
-bool DeckPreviewWidget::eventFilter(QObject *watched, QEvent *event)
-{
-    if (watched == bannerCardDisplayWidget && (event->type() == QEvent::Resize || event->type() == QEvent::Move)) {
-        updateSelectionFrameGeometry();
-    }
-    return QWidget::eventFilter(watched, event);
 }
 
 void DeckPreviewWidget::setShareSelectable(bool selectable)
@@ -199,23 +213,9 @@ bool DeckPreviewWidget::isShareSelectable() const
     return shareSelectable;
 }
 
-void DeckPreviewWidget::updateSelectionFrameGeometry()
-{
-    if (selectionFrame == nullptr || bannerCardDisplayWidget == nullptr) {
-        return;
-    }
-    // Frame is a child of the banner, so it is positioned in banner coordinates and
-    // tracks the banner's selection animation automatically. A small inset keeps the
-    // highlight visible around the card art without occluding it.
-    selectionFrame->setGeometry(bannerCardDisplayWidget->rect().adjusted(1, 1, -1, -1));
-    selectionFrame->raise();
-}
-
 void DeckPreviewWidget::updateSelectionStyle()
 {
-    if (selectionFrame != nullptr) {
-        selectionFrame->setVisible(shareSelectable && isShareSelected());
-    }
+    deckBox->setSelected(shareSelectable && isShareSelected());
 }
 
 void DeckPreviewWidget::enterEvent(QEnterEvent *event)
@@ -276,7 +276,7 @@ void DeckPreviewWidget::syncFromModel()
     const ExactCard bannerCard =
         bannerCardRef.name.isEmpty() ? ExactCard() : CardDatabaseManager::query()->getCard(bannerCardRef);
 
-    bannerCardDisplayWidget->setCard(bannerCard);
+    deckBox->cardPicture()->setCard(bannerCard);
     refreshBannerCardText();
     updateBannerCardComboBox(bannerCardRef.name);
     colorIdentityWidget->setColorIdentity(data.colorIdentity);
@@ -321,12 +321,16 @@ void DeckPreviewWidget::updateTagsVisibility(bool visible)
 }
 
 /**
- * Refreshes the banner card text.
+ * Refreshes the deck box label.
  * This also calls `refreshBannerCardToolTip`, since those two often need to be updated together.
  */
 void DeckPreviewWidget::refreshBannerCardText()
 {
-    bannerCardDisplayWidget->setOverlayText(getDisplayName());
+    deckBox->setDeckName(getDisplayName());
+
+    const int r = row();
+    deckBox->setCardCount(
+        r == -1 || !model->dataForRow(r).loadSucceeded ? -1 : countMainboardCards(model->dataForRow(r).deck.deckList));
 
     refreshBannerCardToolTip();
 }
@@ -336,10 +340,10 @@ void DeckPreviewWidget::refreshBannerCardToolTip()
     auto type = visualDeckStorageWidget->settings()->getDeckPreviewTooltip();
     switch (type) {
         case VisualDeckStorageQuickSettingsWidget::TooltipType::None:
-            bannerCardDisplayWidget->setToolTip("");
+            deckBox->setToolTip("");
             break;
         case VisualDeckStorageQuickSettingsWidget::TooltipType::Filepath:
-            bannerCardDisplayWidget->setToolTip(filePath);
+            deckBox->setToolTip(filePath);
             break;
     }
 }
@@ -419,7 +423,7 @@ void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
         return;
     }
     model->setBannerCard(r, cardRef);
-    bannerCardDisplayWidget->setCard(CardDatabaseManager::query()->getCard(cardRef));
+    deckBox->cardPicture()->setCard(CardDatabaseManager::query()->getCard(cardRef));
 }
 
 void DeckPreviewWidget::imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)
