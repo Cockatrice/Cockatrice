@@ -168,6 +168,9 @@ The following flags (with their non-default values) can be passed to `cmake`:
 > doxygen Doxyfile
 > ```
 
+> [!TIP]
+> For a local <kbd>Servatrice</kbd> with no database, or a seeded MySQL development stack with real accounts and moderation fixtures, see [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
+
 
 # Run
 

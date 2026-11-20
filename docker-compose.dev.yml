@@ -1,0 +1,27 @@
+services:
+  mysql:
+    image: mysql:8.4
+    command:
+      - --sql_mode=
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: servatrice
+      MYSQL_USER: servatrice
+      MYSQL_PASSWORD: password
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - cockatrice-dev-mysql:/var/lib/mysql
+      - ./servatrice/servatrice.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./servatrice/dev/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -proot --silent"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+volumes:
+  cockatrice-dev-mysql:
