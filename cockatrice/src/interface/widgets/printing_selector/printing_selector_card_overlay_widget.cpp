@@ -404,8 +404,8 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
         if (relatedCards.isEmpty()) {
             relatedMenu->setDisabled(true);
         } else {
-            for (const CardRelation *rel : relatedCards) {
-                const QString &relatedCardName = rel->getName();
+            for (const CardRelation &rel : relatedCards) {
+                const QString &relatedCardName = rel.name;
                 QAction *relatedCard = relatedMenu->addAction(relatedCardName);
                 connect(relatedCard, &QAction::triggered, this,
                         [this, relatedCardName] { host->showRelatedCard(relatedCardName); });

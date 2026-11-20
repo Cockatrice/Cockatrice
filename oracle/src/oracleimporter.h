@@ -17,12 +17,12 @@
 #include <QString>
 #include <QStringList>
 #include <libcockatrice/card/card_info.h>
+#include <libcockatrice/card/relation/card_relation.h>
 #include <memory>
 #include <qnamespace.h>
 #include <qtmetamacros.h>
 #include <utility>
 
-class CardRelation;
 class QRegularExpression;
 class TagDatabase;
 
@@ -247,7 +247,7 @@ private:
                         const QString &text,
                         bool isToken,
                         QHash<QString, QString> properties,
-                        const QList<CardRelation *> &relatedCards,
+                        const QList<CardRelation> &relatedCards,
                         const PrintingInfo &printingInfo);
 
     /**

@@ -16,10 +16,10 @@
 #include <qtmetamacros.h>
 
 class CardItem;
-class CardRelation;
 class CardState;
 class PlayerActions;
 class QWidget;
+struct CardRelation;
 struct MoveTopCardsUntilOptions;
 
 class PlayerDialogs : public QObject
@@ -53,7 +53,7 @@ public slots:
                                             bool faceDown);
     void onDrawBottomCardsDialogRequested(int defaultNumberBottomCards, int maxCards);
     void onRollDieDialogRequested();
-    void onCreateRelatedFromRelationDialogRequested(const CardState *sourceCard, const CardRelation *cardRelation);
+    void onCreateRelatedFromRelationDialogRequested(const CardState *sourceCard, const CardRelation &cardRelation);
     void onCreateTokenDialogRequested(const QStringList &predefinedTokens);
     void onMoveCardXCardsFromTopDialogRequested(int defaultNumberTopCardsToPlaceBelow, int deckSize);
     void onSetPTDialogRequested(const QString &oldPT);

@@ -128,30 +128,39 @@ TEST(CardDatabaseTest, FindPrintingWithIdOnNullCardInfoReturnsEmpty)
     EXPECT_TRUE(db.query()->findPrintingWithId(nullptr, "card_Not a Card_fixture").isEmpty());
 }
 
-TEST(CardInfoTest, ClearDirectRelationsDropsRawPointers)
+TEST(CardInfoTest, GetAllRelatedCardsConcatenatesForwardThenToMe)
 {
-    auto *forward = new CardRelation("Child");
-    auto *reverse = new CardRelation("Parent");
-    auto *toMe = new CardRelation("Child");
+    CardRelation forward{.name = "Forward"};
+    CardRelation reverse{.name = "Reverse"};
+    CardRelation reverse2Me{.name = "Reverse2Me"};
 
-    auto card = CardInfo::newInstance("Parent", "", false, QHash<QString, QString>(), {forward}, {reverse},
-                                      SetToPrintingsMap(), CardInfo::UiAttributes());
-    card->addReverseRelatedCards2Me(toMe);
-    ASSERT_EQ(1, card->getRelatedCards().size());
-    ASSERT_EQ(1, card->getReverseRelatedCards().size());
-    ASSERT_EQ(1, card->getReverseRelatedCards2Me().size());
-    ASSERT_EQ(2, card->getAllRelatedCards().size());
+    auto card = CardInfo::newInstance("Parent", "", false, {}, {forward}, {reverse}, {}, {});
+    card->addReverseRelatedCards2Me(reverse2Me);
 
-    card->clearDirectRelations();
+    const QList<CardRelation> all = card->getAllRelatedCards();
+    ASSERT_EQ(2, all.size());
+    EXPECT_EQ(forward, all.at(0));
+    EXPECT_EQ(reverse2Me, all.at(1));
+}
 
-    EXPECT_TRUE(card->getRelatedCards().isEmpty());
-    EXPECT_TRUE(card->getReverseRelatedCards().isEmpty());
-    EXPECT_TRUE(card->getReverseRelatedCards2Me().isEmpty());
-    EXPECT_TRUE(card->getAllRelatedCards().isEmpty());
+TEST(CardRelationTest, CopyWithNameKeepsEveryOtherField)
+{
+    const CardRelation original{.name = "Original",
+                                .attachType = CardRelationType::AttachTo,
+                                .isCreateAllExclusion = true,
+                                .isVariableCount = true,
+                                .defaultCount = 3,
+                                .isPersistent = true,
+                                .isFaceDown = true};
+    const CardRelation copy = original.copyWithName("Other");
 
-    delete forward;
-    delete reverse;
-    delete toMe;
+    EXPECT_EQ("Other", copy.name);
+    EXPECT_EQ(original.attachType, copy.attachType);
+    EXPECT_EQ(original.isCreateAllExclusion, copy.isCreateAllExclusion);
+    EXPECT_EQ(original.isVariableCount, copy.isVariableCount);
+    EXPECT_EQ(original.defaultCount, copy.defaultCount);
+    EXPECT_EQ(original.isPersistent, copy.isPersistent);
+    EXPECT_EQ(original.isFaceDown, copy.isFaceDown);
 }
 
 TEST(CardDatabaseTest, Xml4LocalizedDataRoundTrip)

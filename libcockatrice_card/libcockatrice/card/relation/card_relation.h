@@ -3,12 +3,11 @@
 
 #include "card_relation_type.h"
 
-#include <QObject>
 #include <QString>
 #include <qtmetamacros.h>
 
 /**
- * @class CardRelation
+ * @struct CardRelation
  * @ingroup Cards
  *
  * @brief Represents a relationship between two cards.
@@ -21,65 +20,30 @@
  * Relations may also define metadata such as whether multiple creations
  * are possible, whether the relation is persistent, and default counts.
  */
-class CardRelation : public QObject
+struct CardRelation
 {
-    Q_OBJECT
-
-private:
-    QString name;                ///< Name of the related card.
-    CardRelationType attachType; ///< Type of attachment.
-    bool isCreateAllExclusion; ///< True if this relation should exclude multiple creations in "create all" operations.
-    bool isVariableCount;      ///< True if the number of creations is variable.
-    int defaultCount;          ///< Default number of cards created or involved.
-    bool isPersistent;         ///< True if this relation persists (i.e. is not destroyed) on zone change.
-    bool isFaceDown;           ///< True if this relation creates the tokens facedown
-
-public:
-    /**
-     * @brief Constructs a CardRelation with optional parameters.
-     *
-     * @param _name Name of the related card.
-     * @param _attachType Type of attachment.
-     * @param _isCreateAllExclusion Whether this relation excludes mass creation.
-     * @param _isVariableCount Whether the count is variable.
-     * @param _defaultCount Default number for creations or transformations.
-     * @param _isPersistent Whether the relation persists across zone changes.
-     * @param _isFaceDown Whether the relation creates the token face down
-     */
-    explicit CardRelation(const QString &_name = QString(),
-                          CardRelationType _attachType = CardRelationType::DoesNotAttach,
-                          bool _isCreateAllExclusion = false,
-                          bool _isVariableCount = false,
-                          int _defaultCount = 1,
-                          bool _isPersistent = false,
-                          bool _isFaceDown = false);
+    QString name;                                                  ///< Name of the related card.
+    CardRelationType attachType = CardRelationType::DoesNotAttach; ///< Type of attachment.
+    bool isCreateAllExclusion = false; ///< True if this relation should be excluded from "create all" operation.
+    bool isVariableCount = false;      ///< True if the number of creations is variable.
+    int defaultCount = 1;              ///< Default number of cards created or involved.
+    bool isPersistent = false;         ///< True if this relation persists (i.e. is not destroyed) on zone change.
+    bool isFaceDown = false;           ///< True if this relation creates the tokens facedown
 
     /**
-     * @brief Returns the name of the related card.
+     * @brief Returns true if the two relations are equal.
+     * Two relations are equal if all their fields are equal.
      *
-     * @return Name as QString reference.
+     * @return True if the two relations are equal
      */
-    [[nodiscard]] inline const QString &getName() const
-    {
-        return name;
-    }
-
-    /**
-     * @brief Returns the type of attachment.
-     *
-     * @return Enum value representing the attachment type.
-     */
-    [[nodiscard]] CardRelationType getAttachType() const
-    {
-        return attachType;
-    }
+    bool operator==(const CardRelation &) const = default;
 
     /**
      * @brief Returns true if the card is attached to another.
      *
      * @return True if attached, false otherwise.
      */
-    [[nodiscard]] bool getDoesAttach() const
+    [[nodiscard]] bool doesAttach() const
     {
         return attachType != CardRelationType::DoesNotAttach;
     }
@@ -89,7 +53,7 @@ public:
      *
      * @return True if it transforms, false otherwise.
      */
-    [[nodiscard]] bool getDoesTransform() const
+    [[nodiscard]] bool doesTransform() const
     {
         return attachType == CardRelationType::TransformInto;
     }
@@ -109,62 +73,17 @@ public:
      *
      * @return True if creation is allowed, false if constrained by attachment.
      */
-    [[nodiscard]] bool getCanCreateAnother() const
+    [[nodiscard]] bool canCreateAnother() const
     {
-        return !getDoesAttach();
+        return !doesAttach();
     }
 
     /**
-     * @brief Returns whether this relation is excluded from "create all" operations.
-     *
-     * @return True if excluded, false otherwise.
+     * Creates a copy of the relation, but with a new name
+     * @param newName The new name
+     * @return A new CardRelation
      */
-    [[nodiscard]] bool getIsCreateAllExclusion() const
-    {
-        return isCreateAllExclusion;
-    }
-
-    /**
-     * @brief Returns whether the relation count is variable.
-     *
-     * @return True if variable, false otherwise.
-     */
-    [[nodiscard]] bool getIsVariable() const
-    {
-        return isVariableCount;
-    }
-
-    /**
-     * @brief Returns the default count of related cards.
-     *
-     * @return Integer representing default number.
-     */
-    [[nodiscard]] int getDefaultCount() const
-    {
-        return defaultCount;
-    }
-
-    /**
-     * @brief Returns whether the relation is persistent.
-     *
-     * Persistent relations are not destroyed on zone changes.
-     *
-     * @return True if persistent, false otherwise.
-     */
-    [[nodiscard]] bool getIsPersistent() const
-    {
-        return isPersistent;
-    }
-
-    /**
-     * @brief Returns whether the relation creates the token facedown.
-     *
-     * @return True if facedown, false otherwise.
-     */
-    [[nodiscard]] bool getIsFaceDown() const
-    {
-        return isFaceDown;
-    }
+    [[nodiscard]] CardRelation copyWithName(const QString &newName) const;
 };
 
 #endif // COCKATRICE_CARD_RELATION_H
