@@ -108,41 +108,42 @@ jobs:
         id: create_release
         shell: bash
         env:
+          BODY_PATH: ${{ steps.prepare.outputs.body_path }}
           GH_TOKEN: ${{ github.token }}
-          tag_name: ${{ steps.configure.outputs.tag }}
-          target: ${{ steps.configure.outputs.sha }}
-          release_name: ${{ steps.prepare.outputs.title }}
-          body_path: ${{ steps.prepare.outputs.body_path }}
-          prerelease: ${{ steps.prepare.outputs.is_beta }}
+          PRERELEASE: ${{ steps.prepare.outputs.beta }}
+          RELEASE_NAME: ${{ steps.prepare.outputs.title }}
+          TAG_NAME: ${{ steps.configure.outputs.tag }}
+          TARGET: ${{ steps.configure.outputs.sha }}
         run: |
           # A release for this tag may already exist: a maintainer can save a draft in
           # the GitHub UI before pushing the tag, or an earlier run may have left one.
           # Never touch a published release, and never overwrite a draft that already
           # has a body (generated notes or a maintainer's edits) - only fill in an
           # empty draft. Prints "<isDraft> <body length>"; empty when there is none.
-          release_state="$(gh release view "$tag_name" --json isDraft,body \
+          release_state="$(gh release view "$TAG_NAME" --json isDraft,body \
             --template '{{.isDraft}} {{len (or .body "")}}' 2>/dev/null || true)"
 
+          # A stable release is explicitly marked as latest: the automatic choice is
+          # based on the publish date and version, which a delayed draft or a beta
+          # would decide for us.
+          args=()
+          [[ "$PRERELEASE" == "true" ]] && args+=(--prerelease)
+          [[ "$PRERELEASE" == "false" ]] && args+=(--latest)
+
           if [[ -z "$release_state" ]]; then
-            args=()
-            [[ $prerelease == yes ]] && args+=(--prerelease)
-
-            gh release create "$tag_name" --verify-tag --draft "${args[@]}" \
-              --target "$target" \
-              --title "$release_name" \
-              --notes-file "$body_path"
+            gh release create "$TAG_NAME" --verify-tag --draft "${args[@]}" \
+              --target "$TARGET" \
+              --title "$RELEASE_NAME" \
+              --notes-file "$BODY_PATH"
           elif [[ "$release_state" == "true 0" ]]; then
-            echo "Filling in the empty draft release $tag_name"
-            args=(--prerelease=false)
-            [[ $prerelease == yes ]] && args=(--prerelease)
-
-            gh release edit "$tag_name" "${args[@]}" \
-              --title "$release_name" \
-              --notes-file "$body_path"
+            echo "Filling in the empty draft release $TAG_NAME"
+            gh release edit "$TAG_NAME" "${args[@]}" \
+              --title "$RELEASE_NAME" \
+              --notes-file "$BODY_PATH"
           elif [[ "$release_state" == true* ]]; then
-            echo "::warning::Draft release $tag_name already has a body, leaving it untouched"
+            echo "::warning::Draft release $TAG_NAME already has a body, leaving it untouched"
           else
-            echo "::warning::Release $tag_name is already published, leaving it untouched"
+            echo "::warning::Release $TAG_NAME is already published, leaving it untouched"
           fi
 
   vcpkg-baseline:
@@ -245,7 +246,7 @@ jobs:
     continue-on-error: ${{ matrix.allow-failure == 'yes' }}
     timeout-minutes: 70
     env:
-      CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}    # directory for caching docker image and ccache
+      CACHE_DIR: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}    # directory for caching docker image and ccache
       CCACHE_EVICTION_AGE: 7d
       # The bound is sized against the repository's 10 GB cache quota
       # (https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy),
@@ -315,7 +316,7 @@ jobs:
       # is slower, which is accepted because a tag is rare and only pull requests gate.
       COCKATRICE_DEBUG_INFO_LEVEL: ${{ github.ref_type != 'tag' && '1' || '' }}
       CMAKE_GENERATOR: 'Ninja'
-      NAME: ${{ matrix.distro }}${{ matrix.version }}
+      BUILD_REFERENCE: ${{ matrix.distro }}${{ matrix.version }}
       IMAGE_SUFFIX: ${{ matrix.variant }}
       # Which build the suite runs in, decided once per leg here so the steps' if: conditions
       # and their shells cannot drift apart. A step's own env is not visible to its if:, which
@@ -345,7 +346,7 @@ jobs:
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: ccache-${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}
-          path: ${{ env.CACHE }}/.ccache
+          path: ${{ env.CACHE_DIR }}/.ccache
 
       - name: "Build ${{ matrix.distro }} ${{ matrix.version }} Docker image"
         shell: bash
@@ -510,7 +511,7 @@ jobs:
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: ${{ steps.restore_ccache.outputs.cache-primary-key }}
-          path: ${{ env.CACHE }}/.ccache
+          path: ${{ env.CACHE_DIR }}/.ccache
 
       - name: "Upload artifact"
         id: upload_artifact
@@ -623,7 +624,7 @@ jobs:
     continue-on-error: ${{ matrix.allow-failure == 'yes' }}
     timeout-minutes: 70
     env:
-      CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}    # directory for caching docker image and ccache
+      CACHE_DIR: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}${{ matrix.variant }}    # directory for caching docker image and ccache
       CCACHE_EVICTION_AGE: 7d
       # These legs do not keep a compiler cache: they run once a day (and on tags) and gate
       # nothing, so their share of the 10 GB quota goes to the pull-request legs instead.
@@ -632,7 +633,7 @@ jobs:
       PERSIST_CCACHE: 'false'
       CCACHE_SIZE: ${{ matrix.ccache_size || '600M' }}
       CMAKE_GENERATOR: 'Ninja'
-      NAME: ${{ matrix.distro }}${{ matrix.version }}
+      BUILD_REFERENCE: ${{ matrix.distro }}${{ matrix.version }}
       IMAGE_SUFFIX: ${{ matrix.variant }}
       # The shared steps below gate on these, so they have to be derived here too. Left
       # undefined they silently skipped the build the leg exists for: the coverage leg
