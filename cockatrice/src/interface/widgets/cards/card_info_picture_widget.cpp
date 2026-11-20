@@ -431,7 +431,7 @@ QMenu *CardInfoPictureWidget::createViewRelatedCardsMenu()
     for (const auto &relatedCard : relatedCards) {
         const QString relatedCardName = relatedCard.name;
         QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
-        connect(viewCard, &QAction::triggered, this, [this, &relatedCardName] {
+        connect(viewCard, &QAction::triggered, this, [this, relatedCardName] {
             emit cardChanged(
                 CardDatabaseManager::query()->getCard({relatedCardName, exactCard.getPrinting().getUuid()}));
         });
