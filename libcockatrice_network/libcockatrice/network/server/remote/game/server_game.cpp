@@ -41,7 +41,6 @@
 #include "libcockatrice/protocol/pb/serverinfo_replay_match.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "libcockatrice/protocol/pb/session_event.pb.h"
-#include "role_info.h"
 #include "server_abstract_player.h"
 #include "server_abstractuserinterface.h"
 #include "server_arrow.h"
@@ -80,6 +79,7 @@
 #include <libcockatrice/protocol/pb/event_set_active_player.pb.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/rng/rng_abstract.h>
+#include <libcockatrice/utility/game_role_info.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <qlogging.h>
 #include <qnamespace.h>
@@ -631,7 +631,7 @@ void Server_Game::stopGameIfFinished()
 
 Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user,
                                               const QString &_password,
-                                              const RoleInfo &roleInfo,
+                                              const GameRoleInfo &roleInfo,
                                               bool overrideRestrictions)
 {
     Server_DatabaseInterface *databaseInterface = room->getServer()->getDatabaseInterface();
@@ -700,7 +700,7 @@ bool Server_Game::containsUser(const QString &userName) const
 
 void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface,
                             ResponseContainer &rc,
-                            const RoleInfo &roleInfo,
+                            const GameRoleInfo &roleInfo,
                             bool broadcastUpdate)
 {
     QMutexLocker locker(&gameMutex);

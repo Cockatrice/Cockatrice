@@ -1,6 +1,5 @@
 #include "server_room.h"
 
-#include "game/role_info.h"
 #include "game/server_game.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
 #include "libcockatrice/protocol/pb/room_event.pb.h"
@@ -33,6 +32,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room_channel.pb.h>
+#include <libcockatrice/utility/game_role_info.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <qlogging.h>
 #include <qnamespace.h>
@@ -373,7 +373,7 @@ Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGam
 
     QMutexLocker gameLocker(&game->gameMutex);
 
-    RoleInfo roleInfo{.isJudge = cmd.join_as_judge(), .isSpectator = cmd.spectator()};
+    GameRoleInfo roleInfo{.isJudge = cmd.join_as_judge(), .isSpectator = cmd.spectator()};
     Response::ResponseCode result = game->checkJoin(
         userInterface->getUserInfo(), QString::fromStdString(cmd.password()), roleInfo, cmd.override_restrictions());
     if (result == Response::RespOk) {

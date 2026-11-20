@@ -4,7 +4,6 @@
  */
 
 #include "game/game_config.h"
-#include "game/role_info.h"
 #include "game/server_game.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
 #include "libcockatrice/server/dev/servatrice_in_memory_database_interface.h"
@@ -16,6 +15,7 @@
 #include <gtest/gtest.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/rng/rng_abstract.h>
+#include <libcockatrice/utility/game_role_info.h>
 #include <string>
 
 RNG_Abstract *rng = nullptr; // referenced by the server_remote library

@@ -62,7 +62,7 @@
 Server_AbstractParticipant::Server_AbstractParticipant(Server_Game *_game,
                                                        int _playerId,
                                                        const ServerInfo_User &_userInfo,
-                                                       const RoleInfo &_roleInfo,
+                                                       const GameRoleInfo &_roleInfo,
                                                        Server_AbstractUserInterface *_userInterface)
     : ServerInfo_User_Container(_userInfo), game(_game), userInterface(_userInterface), pingTime(0),
       playerId(_playerId), roleInfo(_roleInfo)

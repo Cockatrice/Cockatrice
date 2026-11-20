@@ -1148,7 +1148,7 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
 
     auto *game = new Server_Game(config, room);
 
-    RoleInfo roleInfo{.isJudge = asJudge, .isSpectator = asSpectator};
+    GameRoleInfo roleInfo{.isJudge = asJudge, .isSpectator = asSpectator};
     game->addPlayer(this, rc, roleInfo, false);
     room->addGame(game);
 
