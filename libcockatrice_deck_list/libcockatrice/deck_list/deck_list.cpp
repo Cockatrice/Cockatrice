@@ -428,28 +428,23 @@ int DeckList::getSideboardSize() const
 DecklistCardNode *DeckList::addCard(const QString &cardName,
                                     const QString &zoneName,
                                     int position,
-                                    const QString &cardSetName,
-                                    const QString &cardSetCollectorNumber,
-                                    const QString &cardProviderId,
+                                    const PrintingRef &printing,
                                     bool formatLegal)
 {
-    return addCards(cardName, 1, zoneName, position, cardSetName, cardSetCollectorNumber, cardProviderId, formatLegal);
+    return addCards(cardName, 1, zoneName, position, printing, formatLegal);
 }
 
 DecklistCardNode *DeckList::addCards(const QString &cardName,
                                      int amount,
                                      const QString &zoneName,
                                      int position,
-                                     const QString &cardSetName,
-                                     const QString &cardSetCollectorNumber,
-                                     const QString &cardProviderId,
+                                     const PrintingRef &printing,
                                      bool formatLegal)
 {
     if (amount <= 0) {
         return nullptr;
     }
-    auto node = tree.addCard(cardName, amount, zoneName, position, cardSetName, cardSetCollectorNumber, cardProviderId,
-                             formatLegal);
+    auto node = tree.addCard(cardName, amount, zoneName, position, printing, formatLegal);
     refreshDeckHash();
     return node;
 }

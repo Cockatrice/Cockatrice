@@ -54,7 +54,7 @@ TEST(MoxfieldImport, SignatureSpellIsAddedToMainWithoutReplacingCommanderBanner)
 TEST(MoxfieldImport, QuantityAwareDeckInsertionRetainsCountAndPrinting)
 {
     DeckList deck;
-    auto *card = deck.addCards("Island", 2, DECK_ZONE_MAIN, -1, "ABC", "4", "id");
+    auto *card = deck.addCards("Island", 2, DECK_ZONE_MAIN, -1, {"ABC", "4", "id"});
     ASSERT_NE(card, nullptr);
     EXPECT_EQ(card->getNumber(), 2);
     EXPECT_EQ(card->getCardProviderId(), "id");

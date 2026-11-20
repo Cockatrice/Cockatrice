@@ -185,16 +185,13 @@ DecklistCardNode *DecklistNodeTree::addCard(const QString &cardName,
                                             int amount,
                                             const QString &zoneName,
                                             int position,
-                                            const QString &cardSetName,
-                                            const QString &cardSetCollectorNumber,
-                                            const QString &cardProviderId,
+                                            const PrintingRef &printing,
                                             const bool formatLegal)
 {
     amount = qMin(amount, MAX_DECK_SIZE - totalCards);
     totalCards += amount;
     auto *zoneNode = getZoneObjFromName(zoneName);
-    auto *node = new DecklistCardNode(cardName, amount, zoneNode, position, cardSetName, cardSetCollectorNumber,
-                                      cardProviderId, formatLegal);
+    auto *node = new DecklistCardNode(cardName, amount, zoneNode, position, printing, formatLegal);
     return node;
 }
 

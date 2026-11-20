@@ -167,10 +167,10 @@ bool InnerDecklistNode::compareName(AbstractDecklistNode *other) const
 int InnerDecklistNode::readCardElement(QXmlStreamReader *xml, int remainingBudget)
 {
     const int amount = qMin(xml->attributes().value("number").toString().toInt(), remainingBudget);
-    new DecklistCardNode(xml->attributes().value("name").toString(), amount, this, -1,
-                         xml->attributes().value("setShortName").toString(),
-                         xml->attributes().value("collectorNumber").toString(),
-                         xml->attributes().value("uuid").toString());
+    PrintingRef printing{.setCode = xml->attributes().value("setShortName").toString(),
+                         .collectorNumber = xml->attributes().value("collectorNumber").toString(),
+                         .providerId = xml->attributes().value("uuid").toString()};
+    new DecklistCardNode(xml->attributes().value("name").toString(), amount, this, -1, printing);
     return amount;
 }
 

@@ -198,7 +198,8 @@ bool parse(QTextStream &in,
         QString zoneName = sideboard ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
 
         // make new entry in decklist
-        tree.addCard(cardName, amount, zoneName, -1, setCode, collectorNumber);
+        PrintingRef printing{.setCode = setCode, .collectorNumber = collectorNumber};
+        tree.addCard(cardName, amount, zoneName, -1, printing);
     }
 
     return true;

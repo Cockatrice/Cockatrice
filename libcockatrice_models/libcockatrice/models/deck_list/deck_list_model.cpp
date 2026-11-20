@@ -601,9 +601,11 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
         // Determine the correct index
         int insertRow = findSortedInsertRow(cardParent, cardInfo);
         int deckInsertRow = customZoneNeedsAppend ? -1 : insertRow;
+        PrintingRef printing{.setCode = cardSetName,
+                             .collectorNumber = printingInfo.getProperty("num"),
+                             .providerId = printingInfo.getProperty("uuid")};
 
-        auto *decklistCard = deckList->addCard(cardInfo->getName(), zoneName, deckInsertRow, cardSetName,
-                                               printingInfo.getProperty("num"), printingInfo.getProperty("uuid"));
+        auto *decklistCard = deckList->addCard(cardInfo->getName(), zoneName, deckInsertRow, printing);
 
         beginInsertRows(parentIndex, insertRow, insertRow);
         cardNode = new DecklistModelCardNode(decklistCard, cardParent, insertRow);

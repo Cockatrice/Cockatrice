@@ -142,7 +142,7 @@ public:
                 QString providerId = cardData.value("scryfall_id").toString();
 
                 deckList.setBannerCard({commanderName, providerId});
-                deckList.addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
+                deckList.addCard(commanderName, DECK_ZONE_MAIN, -1, {setName, collectorNumber, providerId});
             }
         }
 
@@ -161,7 +161,7 @@ public:
             const QString set = card.value("set").toString().toUpper();
             const QString collectorNumber = card.value("cn").toString();
             const QString providerId = card.value("scryfall_id").toString();
-            deckList.addCards(name, quantity, DECK_ZONE_MAIN, -1, set, collectorNumber, providerId);
+            deckList.addCards(name, quantity, DECK_ZONE_MAIN, -1, {set, collectorNumber, providerId});
         }
 
         return deckList;
@@ -239,7 +239,7 @@ public:
             QString providerId = maybeboardCard.value("scryfallId").toString();
 
             for (int x = 0; x < maybeboardCard.value("quantity").toInt(); x++) {
-                deckList.addCard(cardName, DECK_ZONE_MAYBEBOARD, -1, setName, collectorNumber, providerId);
+                deckList.addCard(cardName, DECK_ZONE_MAYBEBOARD, -1, {setName, collectorNumber, providerId});
             }
         }
         for (const auto &commanderCard : commanderList) {
@@ -250,7 +250,7 @@ public:
             QString providerId = commanderCard.value("scryfallId").toString();
 
             deckList.setBannerCard({commanderName, providerId});
-            deckList.addCard(commanderName, DECK_ZONE_MAIN, -1, setName, collectorNumber, providerId);
+            deckList.addCard(commanderName, DECK_ZONE_MAIN, -1, {setName, collectorNumber, providerId});
         }
 
         return deckList;

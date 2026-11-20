@@ -1,6 +1,7 @@
 #ifndef COCKATRICE_DECKLIST_NODE_TREE_H
 #define COCKATRICE_DECKLIST_NODE_TREE_H
 
+#include "printing_ref.h"
 #include "tree/deck_list_card_node.h"
 #include "tree/inner_deck_list_node.h"
 
@@ -78,9 +79,7 @@ public:
                               int amount,
                               const QString &zoneName,
                               int position,
-                              const QString &cardSetName = QString(),
-                              const QString &cardSetCollectorNumber = QString(),
-                              const QString &cardProviderId = QString(),
+                              const PrintingRef &printing = {},
                               const bool formatLegal = true);
     bool deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNode = nullptr);
 

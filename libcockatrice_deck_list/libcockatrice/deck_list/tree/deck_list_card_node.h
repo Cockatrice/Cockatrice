@@ -15,6 +15,7 @@
 #include "abstract_deck_list_card_node.h"
 
 #include <QString>
+#include <libcockatrice/deck_list/printing_ref.h>
 #include <libcockatrice/utility/card_ref.h>
 #include <utility>
 
@@ -50,12 +51,10 @@ class InnerDecklistNode;
  */
 class DecklistCardNode : public AbstractDecklistCardNode
 {
-    QString name;             ///< Display name of the card.
-    int number;               ///< Quantity of this card in the deck.
-    QString cardSetShortName; ///< Short set code (e.g., "NEO").
-    QString cardSetNumber;    ///< Collector number within the set.
-    QString cardProviderId;   ///< External provider identifier (e.g., UUID).
-    bool formatLegal;         ///< Format legality
+    QString name;         ///< Display name of the card.
+    int number;           ///< Quantity of this card in the deck.
+    PrintingRef printing; ///< The card's printing.
+    bool formatLegal;     ///< Format legality
 
 public:
     /**
@@ -65,9 +64,7 @@ public:
      * @param _number Quantity of this card (default = 1).
      * @param _parent Parent node in the tree (zone or group). May be nullptr.
      * @param position Index to insert into parent’s children. -1 = append.
-     * @param _cardSetShortName Short set code (e.g., "NEO").
-     * @param _cardSetNumber Collector number within the set.
-     * @param _cardProviderId External provider ID (e.g., UUID).
+     * @param _printing The printing of the card
      * @param _formatLegality If the card is legal in the format
      *
      * On construction, if a parent is provided, this node is inserted into
@@ -77,13 +74,10 @@ public:
                               int _number = 1,
                               InnerDecklistNode *_parent = nullptr,
                               int position = -1,
-                              QString _cardSetShortName = QString(),
-                              QString _cardSetNumber = QString(),
-                              QString _cardProviderId = QString(),
+                              const PrintingRef &_printing = {},
                               bool _formatLegality = true)
-        : AbstractDecklistCardNode(_parent, position), name(std::move(_name)), number(_number),
-          cardSetShortName(std::move(_cardSetShortName)), cardSetNumber(std::move(_cardSetNumber)),
-          cardProviderId(std::move(_cardProviderId)), formatLegal(_formatLegality)
+        : AbstractDecklistCardNode(_parent, position), name(std::move(_name)), number(_number), printing(_printing),
+          formatLegal(_formatLegality)
     {
     }
 
@@ -124,37 +118,37 @@ public:
     /** @return The provider identifier for this card. */
     [[nodiscard]] QString getCardProviderId() const override
     {
-        return cardProviderId;
+        return printing.providerId;
     }
 
     /** @param _providerId Set the provider identifier for this card. */
     void setCardProviderId(const QString &_providerId) override
     {
-        cardProviderId = _providerId;
+        printing.providerId = _providerId;
     }
 
     /** @return The short set code (e.g., "NEO"). */
     [[nodiscard]] QString getCardSetShortName() const override
     {
-        return cardSetShortName;
+        return printing.setCode;
     }
 
     /** @param _cardSetShortName Set the short set code. */
     void setCardSetShortName(const QString &_cardSetShortName) override
     {
-        cardSetShortName = _cardSetShortName;
+        printing.setCode = _cardSetShortName;
     }
 
     /** @return The collector number of this card within its set. */
     [[nodiscard]] QString getCardCollectorNumber() const override
     {
-        return cardSetNumber;
+        return printing.collectorNumber;
     }
 
     /** @param _cardSetNumber Set the collector number. */
     void setCardCollectorNumber(const QString &_cardSetNumber) override
     {
-        cardSetNumber = _cardSetNumber;
+        printing.collectorNumber = _cardSetNumber;
     }
 
     /** @return The format legality of the card. */
@@ -183,7 +177,7 @@ public:
      */
     [[nodiscard]] CardRef toCardRef() const
     {
-        return {name, cardProviderId};
+        return {name, printing.providerId};
     }
 };
 

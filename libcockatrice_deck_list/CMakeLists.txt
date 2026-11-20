@@ -11,6 +11,7 @@ set(HEADERS
     libcockatrice/deck_list/deck_list_plain_text_parser.h
     libcockatrice/deck_list/loaded_deck.h
     libcockatrice/deck_list/playmat_resolver.h
+    libcockatrice/deck_list/printing_ref.h
     libcockatrice/deck_list/sideboard_plan.h
 )
 
