@@ -16,8 +16,8 @@
 #include <qtmetamacros.h>
 
 class CardInfoPictureEnlargedWidget;
-class QPropertyAnimation;
 class QTimer;
+class RaiseOnHover;
 
 inline Q_LOGGING_CATEGORY(CardInfoPictureWidgetLog, "card_info_picture_widget");
 
@@ -96,13 +96,11 @@ private:
     /// Last drawn artwork rect, in widget coordinates; empty until the first paint.
     QRect artRectCache;
     bool hoverToZoomEnabled;
-    bool raiseOnEnter;
 
     CardInfoPictureEnlargedWidget *enlargedPixmapWidget = nullptr;
 
     QTimer *hoverTimer;
-    QPropertyAnimation *animation;
-    QPoint originalPos; // Store the original position
+    RaiseOnHover *raiseOnHover = nullptr;
 
     QMenu *createRightClickMenu();
     QMenu *createViewRelatedCardsMenu();
