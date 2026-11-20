@@ -103,6 +103,7 @@ private slots:
     void actAbout();
     void actTips();
     void actUpdate();
+    void actOpenPendingClientUpdate();
     void actViewLog();
     void actOpenSettingsFolder();
 #ifdef WITH_GUI_TEST
@@ -124,6 +125,7 @@ private slots:
     void cardDatabaseAllNewSetsEnabled();
 
     void checkClientUpdatesFinished(bool needToUpdate, bool isCompatible, Release *release);
+    void clientUpdateNotesShown(Release *release);
     void actCheckCommanderBracketDefinitionUpdates();
 
     void actOpenCustomFolder();
@@ -180,12 +182,40 @@ private:
     /** @brief Posts a tray notification when the status bar cannot show progress. */
     void notifyCardUpdateFinishedFromTray(bool success);
 
+    /**
+     * @brief Remembers the release the update glyph stands for, or clears it when @p release is null.
+     *
+     * The release channel owns the pointer for the lifetime of the application, so it stays valid
+     * while the glyph is showing.
+     */
+    void setPendingClientUpdate(Release *release, bool isCompatible);
+
+    /**
+     * @brief Repaints the update glyph for the current pending release.
+     *
+     * An unseen release's notes paint the glyph in the theme's marked tone, the way an unread
+     * badge would; once the dialog showed the notes the glyph returns to the neutral ink, so it
+     * still marks "an update exists" without claiming something new is waiting.
+     */
+    void updateClientUpdateButton();
+
+    /**
+     * @brief Drops the pending release when it no longer belongs to the selected update channel.
+     *
+     * The glyph offers the build its release carries, so after a channel switch in Settings it
+     * would otherwise keep advertising — and downloading — the channel the user just left.
+     */
+    void syncPendingClientUpdateChannel();
+
     void startLocalGame(const LocalGameOptions &options);
 
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *tabsMenu, *helpMenu, *trayIconMenu;
     QAction *aAbout, *aSettings, *aShow, *aExit;
     QToolButton *settingsButton = nullptr;
+    QToolButton *clientUpdateButton = nullptr;
+    Release *pendingClientUpdate = nullptr;
+    bool pendingClientUpdateCompatible = false;
     QAction *aConnect, *aDisconnect, *aRegister, *aForgotPassword, *aSinglePlayer, *aWatchReplay, *aFullScreen;
     QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet,
         *aReloadCardDatabase;

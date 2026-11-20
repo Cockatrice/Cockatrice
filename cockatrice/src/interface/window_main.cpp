@@ -80,6 +80,7 @@
 #include <QFileInfo>
 #include <QFlags>
 #include <QFutureWatcher>
+#include <QHBoxLayout>
 #include <QIODevice>
 #include <QLocalSocket>
 #include <QMenu>
@@ -292,6 +293,9 @@ void MainWindow::actSettings()
     auto *generalPage = qobject_cast<GeneralSettingsPage *>(dlg.page(DlgSettings::GeneralPage));
     connect(generalPage, &GeneralSettingsPage::cardDatabaseUpdateRequested, this, &MainWindow::actCheckCardUpdates);
     dlg.exec();
+    // The channel may have changed while the dialog was up; its release is not the one the user
+    // selected any more.
+    syncPendingClientUpdateChannel();
 }
 
 void MainWindow::actExit()
@@ -339,6 +343,25 @@ void MainWindow::actTips()
 void MainWindow::actUpdate()
 {
     DlgUpdate dlg(this);
+    connect(&dlg, &DlgUpdate::checkFinished, this, &MainWindow::checkClientUpdatesFinished);
+    connect(&dlg, &DlgUpdate::notesShown, this, &MainWindow::clientUpdateNotesShown);
+    dlg.exec();
+}
+
+void MainWindow::actOpenPendingClientUpdate()
+{
+    syncPendingClientUpdateChannel();
+    if (pendingClientUpdate == nullptr) {
+        // Nothing was fetched for the selected channel, so the click does the check itself.
+        actUpdate();
+        return;
+    }
+
+    // The startup check already fetched this release, so the dialog renders it without a
+    // second request.
+    DlgUpdate dlg(this, pendingClientUpdate, pendingClientUpdateCompatible);
+    connect(&dlg, &DlgUpdate::checkFinished, this, &MainWindow::checkClientUpdatesFinished);
+    connect(&dlg, &DlgUpdate::notesShown, this, &MainWindow::clientUpdateNotesShown);
     dlg.exec();
 }
 
@@ -393,6 +416,7 @@ void MainWindow::retranslateUi()
     settingsButton->setToolTip(tr("Settings"));
     settingsButton->setAccessibleName(tr("Settings"));
     settingsButton->setIcon(loadThemedIcon(QStringLiteral("icons/settings")));
+    updateClientUpdateButton();
     aExit->setText(tr("&Exit"));
 
 #if defined(__APPLE__) /* For OSX */
@@ -414,7 +438,6 @@ void MainWindow::retranslateUi()
     helpMenu->setTitle(tr("&Help"));
     aAbout->setText(tr("&About Cockatrice"));
     aTips->setText(tr("&Tip of the Day"));
-    aUpdate->setText(tr("Check for Client Updates"));
     aCheckCardUpdates->setText(tr("Check for Card Updates..."));
     aCheckCardUpdatesBackground->setText(tr("Check for Card Updates (Automatic)"));
     aStatusBar->setText(tr("Show Status Bar"));
@@ -639,7 +662,26 @@ MainWindow::MainWindow(QWidget *parent)
     settingsButton->setStyleSheet(
         QStringLiteral("QToolButton { border: none; background: transparent; padding: 4px; }"));
     connect(settingsButton, &QToolButton::clicked, this, &MainWindow::actSettings);
-    tabSupervisor->setCornerWidget(settingsButton, Qt::TopRightCorner);
+
+    // A download glyph appears here, left of the settings button, only while an update is
+    // pending: the silent counterpart to the modal updater this replaced.
+    clientUpdateButton = new QToolButton(tabSupervisor);
+    clientUpdateButton->setObjectName("clientUpdateButton");
+    clientUpdateButton->setAutoRaise(true);
+    clientUpdateButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    clientUpdateButton->setIconSize(QSize(16, 16));
+    clientUpdateButton->setCursor(Qt::PointingHandCursor);
+    clientUpdateButton->setFocusPolicy(Qt::NoFocus);
+    // No stylesheet here: autoRaise alone gives the native hover and pressed panel, which a
+    // "background: transparent" rule would suppress for the one widget that must feel clickable.
+    clientUpdateButton->setVisible(false);
+    connect(clientUpdateButton, &QToolButton::clicked, this, &MainWindow::actOpenPendingClientUpdate);
+
+    auto *cornerWidget = new QWidget(tabSupervisor);
+    auto *cornerLayout = QtUtils::makeLayout<QHBoxLayout>(cornerWidget, 0);
+    cornerLayout->addWidget(clientUpdateButton);
+    cornerLayout->addWidget(settingsButton);
+    tabSupervisor->setCornerWidget(cornerWidget, Qt::TopRightCorner);
 
     retranslateUi();
 
@@ -1575,12 +1617,75 @@ void MainWindow::actCheckClientUpdates()
     checker->check();
 }
 
-void MainWindow::checkClientUpdatesFinished(bool needToUpdate, bool /* isCompatible */, Release * /* release */)
+void MainWindow::checkClientUpdatesFinished(bool needToUpdate, bool isCompatible, Release *release)
 {
-    if (needToUpdate) {
-        DlgUpdate dlg(this);
-        dlg.exec();
+    setPendingClientUpdate(needToUpdate ? release : nullptr, isCompatible);
+    // The check may have run on the channel the user left before it finished; a glyph for a
+    // release that no longer matches the selection must not appear at all.
+    syncPendingClientUpdateChannel();
+}
+
+void MainWindow::setPendingClientUpdate(Release *release, bool isCompatible)
+{
+    pendingClientUpdate = release;
+    pendingClientUpdateCompatible = isCompatible;
+    updateClientUpdateButton();
+}
+
+void MainWindow::clientUpdateNotesShown(Release *release)
+{
+    if (release == nullptr) {
+        return;
     }
+
+    SettingsCache::instance().updates().setLastSeenReleaseNotes(release->getName());
+    // The same release is still pending; only its unread mark is gone.
+    updateClientUpdateButton();
+}
+
+void MainWindow::syncPendingClientUpdateChannel()
+{
+    if (pendingClientUpdate == nullptr) {
+        return;
+    }
+
+    Release *channelRelease = SettingsCache::instance().getUpdateReleaseChannel()->getLastRelease();
+    if (channelRelease != pendingClientUpdate) {
+        qCInfo(MainWindowLog) << "Update glyph cleared: the pending release no longer belongs to the selected channel";
+        setPendingClientUpdate(nullptr, false);
+    }
+}
+
+void MainWindow::updateClientUpdateButton()
+{
+    clientUpdateButton->setVisible(pendingClientUpdate != nullptr);
+
+    // The corner glyph is pointer-only, so the same state is mirrored onto the Help menu action:
+    // keyboard and screen-reader users learn about the pending release from there.
+    aUpdate->setText(pendingClientUpdate == nullptr ? tr("Check for Client Updates")
+                                                    : tr("Check for Client Updates (update available)"));
+
+    if (pendingClientUpdate == nullptr) {
+        const QString description = tr("Check the release channel for client updates");
+        clientUpdateButton->setToolTip(description);
+        clientUpdateButton->setAccessibleName(description);
+        clientUpdateButton->setIcon(loadThemedIcon(QStringLiteral("icons/arrow_to_bottom"), IconTint::primary()));
+        return;
+    }
+
+    // Unread notes carry the theme's marked tone, the amber an unread badge would use, and the
+    // tooltip says so: the hue alone must not be the only carrier of that meaning. The copy stays
+    // action-neutral because whether the release can be downloaded or only linked is the dialog's
+    // call. Once the notes have been shown the glyph keeps only "an update exists".
+    const bool unread = SettingsCache::instance().updates().getLastSeenReleaseNotes() != pendingClientUpdate->getName();
+    const QString description =
+        unread ? tr("Client update %1 is available; its release notes are new").arg(pendingClientUpdate->getName())
+               : tr("Client update %1 is available; open the update details").arg(pendingClientUpdate->getName());
+    clientUpdateButton->setToolTip(description);
+    clientUpdateButton->setAccessibleName(description);
+    clientUpdateButton->setIcon(unread ? loadThemedIcon(QStringLiteral("icons/arrow_to_bottom"),
+                                                        IconTint(AppColor::Marked, IconEmphasis::Primary))
+                                       : loadThemedIcon(QStringLiteral("icons/arrow_to_bottom"), IconTint::primary()));
 }
 
 void MainWindow::actCheckCommanderBracketDefinitionUpdates()
