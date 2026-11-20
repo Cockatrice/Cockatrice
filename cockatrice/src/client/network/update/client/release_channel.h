@@ -31,7 +31,7 @@ public:
     ~Release() = default;
 
 private:
-    QString name, descriptionUrl, downloadUrl, commitHash;
+    QString name, descriptionUrl, downloadUrl, commitHash, changelog;
     QDate publishDate;
     bool compatibleVersionFound = false;
 
@@ -57,6 +57,10 @@ protected:
     {
         publishDate = _publishDate;
     }
+    void setChangelog(QString _changelog)
+    {
+        changelog = std::move(_changelog);
+    }
 
 public:
     [[nodiscard]] QString getName() const
@@ -78,6 +82,10 @@ public:
     [[nodiscard]] QDate getPublishDate() const
     {
         return publishDate;
+    }
+    [[nodiscard]] QString getChangelog() const
+    {
+        return changelog;
     }
     [[nodiscard]] bool isCompatibleVersionFound() const
     {

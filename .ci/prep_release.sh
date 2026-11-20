@@ -48,13 +48,10 @@ if [[ $no_beta ]]; then
   fi
   body="${body//--REPLACE-WITH-RELEASE-TITLE--/$title}"
 else
-  body="--REPLACE-WITH-COMMIT-COUNT-- commits have been included over the previous --REPLACE-WITH-PREVIOUS-RELEASE-TYPE--
-
-<details>
-<summary><b>show changes</b></summary>
-
---REPLACE-WITH-GENERATED-LIST--
-</details>"
+  body="$(cat ".ci/release_template_beta.md")"
+  if [[ ! $body ]]; then
+    echo "::warning file=$0::could not find beta release template"
+  fi
 fi
 
 # add git log to release notes
