@@ -322,7 +322,7 @@ void TabGame::resetForRewind()
 
 void TabGame::emitUserEvent()
 {
-    bool globalEvent = !game->getPlayerManager()->isSpectator() ||
+    bool globalEvent = !game->getPlayerManager()->getLocalRoles().isSpectator ||
                        SettingsCache::instance().userInterface().getSpectatorNotificationsEnabled();
     emit userEvent(globalEvent);
     updatePlayerListDockTitle();
@@ -566,7 +566,8 @@ void TabGame::updateTimeElapsedLabel(const QString newTime)
 
 void TabGame::adminLockChanged(bool lock)
 {
-    bool v = !(game->getPlayerManager()->isSpectator() && !game->getGameMetaInfo()->spectatorsCanChat() && lock);
+    bool v = !(game->getPlayerManager()->getLocalRoles().isSpectator && !game->getGameMetaInfo()->spectatorsCanChat() &&
+               lock);
     sayLabel->setVisible(v);
     sayEdit->setVisible(v);
 }
@@ -725,7 +726,7 @@ void TabGame::updateTurnOrderAction()
 bool TabGame::leaveGame()
 {
     if (!game->getGameState()->isGameClosed()) {
-        if (!game->getPlayerManager()->isSpectator()) {
+        if (!game->getPlayerManager()->getLocalRoles().isSpectator) {
             tabSupervisor->setCurrentWidget(this);
             if (!QtUtils::confirm(this, tr("Leave game"), tr("Are you sure you want to leave this game?"),
                                   QMessageBox::No)) {
@@ -874,7 +875,7 @@ PlayerLogic *TabGame::addPlayer(PlayerLogic *newPlayer)
 
     if (game->getGameState()->getIsLocalGame() ||
         (game->getPlayerManager()->isLocalPlayer(newPlayer->getPlayerInfo()->getId()) &&
-         !game->getPlayerManager()->isSpectator())) {
+         !game->getPlayerManager()->getLocalRoles().isSpectator)) {
         if (game->getGameState()->getIsLocalGame()) {
             newPlayer->getPlayerInfo()->setLocal(true);
         }
@@ -1605,13 +1606,13 @@ void TabGame::createMessageDock(bool bReplay)
 
         actCompleterChanged();
 
-        if (game->getPlayerManager()->isSpectator()) {
+        if (game->getPlayerManager()->getLocalRoles().isSpectator) {
             /* Spectators can only talk if:
              * (a) the game creator allows it
              * (b) the spectator is a moderator/administrator
              * (c) the spectator is a judge
              */
-            bool isModOrJudge = !tabSupervisor->getAdminLocked() || game->getPlayerManager()->isJudge();
+            bool isModOrJudge = !tabSupervisor->getAdminLocked() || game->getPlayerManager()->getLocalRoles().isJudge;
             if (!isModOrJudge && !game->getGameMetaInfo()->spectatorsCanChat()) {
                 sayLabel->hide();
                 sayEdit->hide();

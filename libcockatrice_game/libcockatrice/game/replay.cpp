@@ -18,6 +18,6 @@ Replay::Replay(QObject *_parent,
 {
     gameState = new GameState(this, 0, -1, isLocalGame, {}, false, false, -1, false);
     connect(gameMetaInfo, &GameMetaInfo::startedChanged, gameState, &GameState::onStartedChanged);
-    playerManager = new PlayerManager(this, -1, false, true, interfaceSettings, cardPreferences);
+    playerManager = new PlayerManager(this, -1, {.isSpectator = true}, interfaceSettings, cardPreferences);
     loadReplay(_replay);
 }

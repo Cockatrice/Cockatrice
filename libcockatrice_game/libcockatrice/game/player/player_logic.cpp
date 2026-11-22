@@ -57,8 +57,8 @@ void PlayerLogic::initializeZones()
     addZone(new PileZoneLogic(this, ZoneNames::SIDEBOARD, false, false, false, this));
     addZone(new TableZoneLogic(this, ZoneNames::TABLE, true, false, true, this));
     addZone(new StackZoneLogic(this, ZoneNames::STACK, true, false, true, this));
-    bool visibleHand = playerInfo->getLocalOrJudge() ||
-                       (game->getPlayerManager()->isSpectator() && game->getGameMetaInfo()->spectatorsOmniscient());
+    bool visibleHand = playerInfo->getLocalOrJudge() || (game->getPlayerManager()->getLocalRoles().isSpectator &&
+                                                         game->getGameMetaInfo()->spectatorsOmniscient());
     addZone(new HandZoneLogic(this, ZoneNames::HAND, false, false, visibleHand, this));
 }
 
@@ -152,7 +152,7 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
                 switch (zoneInfo.type()) {
                     case ServerInfo_Zone::PrivateZone:
                         contentsKnown =
-                            playerInfo->getLocalOrJudge() || (game->getPlayerManager()->isSpectator() &&
+                            playerInfo->getLocalOrJudge() || (game->getPlayerManager()->getLocalRoles().isSpectator &&
                                                               game->getGameMetaInfo()->spectatorsOmniscient());
                         break;
 
