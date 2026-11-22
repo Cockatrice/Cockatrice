@@ -659,8 +659,44 @@ TEST_F(CardDatabaseCacheInvalidationTest, MarkAllSetsAsKnownIsBatched)
     EXPECT_TRUE(controller.isKnown("BBB"));
     EXPECT_FALSE(controller.isEnabled("AAA"));
     EXPECT_FALSE(controller.isEnabled("BBB"));
-    // Ignored sets keep their known state but are enabled.
+    // Ignored sets become known and enabled.
     EXPECT_TRUE(controller.isEnabled("XXX"));
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, MarkAllSetsAsKnownDoesNotOverwriteSettings)
+{
+    SeededSetPriorityController controller;
+    CardSetList sets;
+    sets.append(CardSet::newInstance(&controller, "XXX")); // no metadata: ignored
+
+    // Ignored sets become known and enabled.
+    sets.markAllAsKnownBatched(&controller);
+    EXPECT_TRUE(controller.isEnabled("XXX")) << "unnamed set starts enabled";
+
+    // disable the set
+    sets.at(0)->setEnabled(false);
+
+    // set should still be disabled after batching
+    sets.markAllAsKnownBatched(&controller);
+    EXPECT_FALSE(controller.isEnabled("XXX")) << "unnamed set should still be disabled after marking";
+}
+
+TEST_F(CardDatabaseCacheInvalidationTest, EnableAllUnknownSetsDoesNotOverwriteSettings)
+{
+    SeededSetPriorityController controller;
+    CardSetList sets;
+    sets.append(CardSet::newInstance(&controller, "XXX")); // no metadata: ignored
+
+    // Ignored sets become known and enabled.
+    sets.markAllAsKnownBatched(&controller);
+    EXPECT_TRUE(controller.isEnabled("XXX")) << "unnamed set starts enabled";
+
+    // disable the set
+    sets.at(0)->setEnabled(false);
+
+    // set should still be disabled after batching
+    sets.enableAllUnknownBatched(&controller);
+    EXPECT_FALSE(controller.isEnabled("XXX")) << "unnamed set should still be disabled after marking";
 }
 
 TEST_F(CardDatabaseCacheInvalidationTest, ReloadReleasesPreviousSnapshot)
