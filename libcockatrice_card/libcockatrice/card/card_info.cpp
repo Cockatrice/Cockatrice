@@ -46,8 +46,8 @@ CardInfo::CardInfo(const QString &_name,
                    const QString &_text,
                    bool _isToken,
                    const QHash<QString, QString> &_properties,
-                   const QList<CardRelation *> &_relatedCards,
-                   const QList<CardRelation *> &_reverseRelatedCards,
+                   const QList<CardRelation> &_relatedCards,
+                   const QList<CardRelation> &_reverseRelatedCards,
                    SetToPrintingsMap _sets,
                    const UiAttributes _uiAttributes,
                    QMap<QString, QString> _localizedNames,
@@ -66,8 +66,8 @@ CardInfo::CardInfo(const QString &_name,
                    const QString &_text,
                    bool _isToken,
                    const QByteArray &_propertiesBlob,
-                   const QList<CardRelation *> &_relatedCards,
-                   const QList<CardRelation *> &_reverseRelatedCards,
+                   const QList<CardRelation> &_relatedCards,
+                   const QList<CardRelation> &_reverseRelatedCards,
                    SetToPrintingsMap _sets,
                    const UiAttributes _uiAttributes,
                    QString _simpleName,
@@ -101,8 +101,8 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   const QString &_text,
                                   bool _isToken,
                                   const QHash<QString, QString> &_properties,
-                                  const QList<CardRelation *> &_relatedCards,
-                                  const QList<CardRelation *> &_reverseRelatedCards,
+                                  const QList<CardRelation> &_relatedCards,
+                                  const QList<CardRelation> &_reverseRelatedCards,
                                   SetToPrintingsMap _sets,
                                   const UiAttributes _uiAttributes,
                                   QMap<QString, QString> _localizedNames,
@@ -125,8 +125,8 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   const QString &_text,
                                   bool _isToken,
                                   QByteArray _propertiesBlob,
-                                  const QList<CardRelation *> &_relatedCards,
-                                  const QList<CardRelation *> &_reverseRelatedCards,
+                                  const QList<CardRelation> &_relatedCards,
+                                  const QList<CardRelation> &_reverseRelatedCards,
                                   SetToPrintingsMap _sets,
                                   const UiAttributes _uiAttributes,
                                   QString _simpleName,
@@ -282,17 +282,7 @@ QChar CardInfo::getColorChar() const
 
 void CardInfo::resetReverseRelatedCards2Me()
 {
-    for (CardRelation *cardRelation : this->getReverseRelatedCards2Me()) {
-        cardRelation->deleteLater();
-    }
-    reverseRelatedCardsToMe = QList<CardRelation *>();
-}
-
-void CardInfo::clearDirectRelations()
-{
-    relatedCards = QList<CardRelation *>();
-    reverseRelatedCards = QList<CardRelation *>();
-    reverseRelatedCardsToMe = QList<CardRelation *>();
+    reverseRelatedCardsToMe.clear();
 }
 
 // Back-compatibility methods. Remove ASAP

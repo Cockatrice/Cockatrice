@@ -1,14 +1,8 @@
 #include "card_relation.h"
 
-CardRelation::CardRelation(const QString &_name,
-                           CardRelationType _attachType,
-                           bool _isCreateAllExclusion,
-                           bool _isVariableCount,
-                           int _defaultCount,
-                           bool _isPersistent,
-                           bool _isFaceDown)
-    : name(_name), attachType(_attachType), isCreateAllExclusion(_isCreateAllExclusion),
-      isVariableCount(_isVariableCount), defaultCount(_defaultCount), isPersistent(_isPersistent),
-      isFaceDown(_isFaceDown)
+CardRelation CardRelation::copyWithName(const QString &newName) const
 {
+    CardRelation rel(*this);
+    rel.name = newName;
+    return rel;
 }

@@ -214,7 +214,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
                                     const QString &text,
                                     bool isToken,
                                     QHash<QString, QString> properties,
-                                    const QList<CardRelation *> &relatedCards,
+                                    const QList<CardRelation> &relatedCards,
                                     const PrintingInfo &printingInfo)
 {
     // Workaround for card name weirdness
@@ -590,7 +590,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
             collectForeignData(normalizeCardName(name), currentSet, card, false);
         } else {
             // relations
-            QList<CardRelation *> relatedCards;
+            QList<CardRelation> relatedCards;
 
             // add other face for split cards as card relation
             if (!getJsonString(card, "side").isEmpty()) {
@@ -605,12 +605,13 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
                     static const QRegularExpression meldNameRegex{"then meld them into ([^\\.]*)"};
                     QString additionalName = meldNameRegex.match(text).captured(1);
                     if (!additionalName.isNull()) {
-                        relatedCards.append(new CardRelation(additionalName, CardRelationType::TransformInto));
+                        relatedCards.append({.name = additionalName, .attachType = CardRelationType::TransformInto});
                     }
                 } else {
                     for (const QString &additionalName : name.split(" // ")) {
                         if (additionalName != faceName) {
-                            relatedCards.append(new CardRelation(additionalName, CardRelationType::TransformInto));
+                            relatedCards.append(
+                                {.name = additionalName, .attachType = CardRelationType::TransformInto});
                         }
                     }
                 }
@@ -624,8 +625,13 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
                 QJsonArray spellbook = givenRelated.value("spellbook").toArray();
                 if (!spellbook.isEmpty()) {
                     for (const QJsonValue &spbkVal : spellbook) {
-                        relatedCards.append(new CardRelation(spbkVal.toString(), CardRelationType::DoesNotAttach, false,
-                                                             false, 1, true));
+                        CardRelation relation{.name = spbkVal.toString(),
+                                              .attachType = CardRelationType::DoesNotAttach,
+                                              .isCreateAllExclusion = false,
+                                              .isVariableCount = false,
+                                              .defaultCount = 1,
+                                              .isPersistent = true};
+                        relatedCards.append(relation);
                     }
                 }
             }

@@ -23,7 +23,6 @@
 #include <libcockatrice/filters/filter_string.h>
 #include <qtmetamacros.h>
 
-class CardRelation;
 class QAction;
 class QTimer;
 template <typename T> class QList;
@@ -46,6 +45,8 @@ class PendingCommand;
 class PlayerLogic;
 class QAction;
 struct ArrowData;
+struct CardRelation;
+
 class PlayerActions : public QObject
 {
     Q_OBJECT
@@ -140,7 +141,7 @@ signals:
     void requestDrawBottomCardsDialog(int defaultNumberBottomCards, int maxCards);
     void requestRollDieDialog();
     void requestCreateTokenDialog(const QStringList &predefinedTokens);
-    void requestCreateRelatedFromRelationDialog(const CardState *sourceCard, const CardRelation *cardRelation);
+    void requestCreateRelatedFromRelationDialog(const CardState *sourceCard, const CardRelation &cardRelation);
     void requestMoveCardXCardsFromTopDialog(int defaultNumberTopCardsToPlaceBelow, int deckSize);
     void requestSetPTDialog(const QString &oldPT);
     void requestSetAnnotationDialog(const QString &oldAnnotation);
@@ -169,9 +170,9 @@ public slots:
     void actRequestCreateTokenDialog(const QStringList &predefinedTokens);
     void actCreateToken(TokenInfo tokenToCreate);
     void actCreateAnotherToken();
-    void actRequestCreateRelatedFromRelationDialog(const CardState *sourceCard, const CardRelation *cardRelation);
-    bool createRelatedFromRelation(const CardState *sourceCard, const CardRelation *cardRelation, int variableCount);
-    void onRelatedCardCreated(const CardState *sourceCard, const CardRelation *cardRelation);
+    void actRequestCreateRelatedFromRelationDialog(const CardState *sourceCard, const CardRelation &cardRelation);
+    bool createRelatedFromRelation(const CardState *sourceCard, const CardRelation &cardRelation, int variableCount);
+    void onRelatedCardCreated(const CardState *sourceCard, const CardRelation &cardRelation);
     void setLastRelatedCreationSucceeded(bool succeeded)
     {
         lastRelatedCreationSucceeded = succeeded;

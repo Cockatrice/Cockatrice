@@ -1096,14 +1096,14 @@ void CardHoverWidget::buildTokenTab(CardItem *card, bool canModify)
 
     bool anyToken = false;
     if (canModify && !exactCard.isEmpty()) {
-        QList<CardRelation *> relatedCards = exactCard.getInfo().getAllRelatedCards();
+        QList<CardRelation> relatedCards = exactCard.getInfo().getAllRelatedCards();
         bool hasMulti = relatedCards.size() > 1;
         int known = 0;
-        for (CardRelation *relation : relatedCards) {
+        for (const CardRelation &relation : relatedCards) {
             ExactCard related =
-                CardDatabaseManager::query()->getCardFromSameSet(relation->getName(), exactCard.getPrinting());
+                CardDatabaseManager::query()->getCardFromSameSet(relation.name, exactCard.getPrinting());
             if (!related) {
-                related = CardDatabaseManager::query()->getCard({relation->getName()});
+                related = CardDatabaseManager::query()->getCard({relation.name});
             }
             if (!related) {
                 continue;
@@ -1115,7 +1115,7 @@ void CardHoverWidget::buildTokenTab(CardItem *card, bool canModify)
             QString relatedName = related.getInfo().getPowTough().isEmpty()
                                       ? related.getName()
                                       : related.getInfo().getPowTough() + " " + related.getName();
-            CardRelation *captured = relation;
+            CardRelation captured = relation;
             CardItem *source = card;
             layout->addWidget(createSmallButton(
                 tr("Token: ") + relatedName,
@@ -1158,10 +1158,10 @@ void CardHoverWidget::addRelatedViewButtons(QVBoxLayout *layout)
     if (exactCard.isEmpty()) {
         return;
     }
-    QList<CardRelation *> relatedCards = exactCard.getInfo().getAllRelatedCards();
+    QList<CardRelation> relatedCards = exactCard.getInfo().getAllRelatedCards();
     bool anyKnown = false;
-    for (const CardRelation *relation : relatedCards) {
-        if (CardDatabaseManager::query()->getCardInfo(relation->getName())) {
+    for (const CardRelation &relation : relatedCards) {
+        if (CardDatabaseManager::query()->getCardInfo(relation.name)) {
             anyKnown = true;
             break;
         }
@@ -1172,8 +1172,8 @@ void CardHoverWidget::addRelatedViewButtons(QVBoxLayout *layout)
     QWidget *page = layout == tokenPageLayout ? tokenPage : contentStack;
 
     layout->addWidget(createSectionHeader(tr("Related cards"), page));
-    for (const CardRelation *relation : relatedCards) {
-        QString name = relation->getName();
+    for (const CardRelation &relation : relatedCards) {
+        QString name = relation.name;
         if (!CardDatabaseManager::query()->getCardInfo(name)) {
             continue;
         }

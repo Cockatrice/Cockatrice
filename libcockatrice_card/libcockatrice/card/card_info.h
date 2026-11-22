@@ -4,6 +4,7 @@
 #include "format/format_legality_rules.h"
 #include "lazy_properties_hash.h"
 #include "printing/printing_info.h"
+#include "relation/card_relation.h"
 
 #include <QByteArray>
 #include <QChar>
@@ -25,7 +26,6 @@ inline Q_LOGGING_CATEGORY(CardInfoLog, "card_info");
 
 class CardInfo;
 class CardSet;
-class CardRelation;
 
 using CardInfoPtr = QSharedPointer<CardInfo>;
 using CardSetPtr = QSharedPointer<CardSet>;
@@ -85,13 +85,14 @@ private:
 
     LazyPropertiesHash properties; ///< Key-value store of dynamic card properties.
 
-    QList<CardRelation *> relatedCards;            ///< Forward references to related cards.
-    QList<CardRelation *> reverseRelatedCards;     ///< Cards that refer back to this card.
-    QList<CardRelation *> reverseRelatedCardsToMe; ///< Cards that consider this card as related.
-    SetToPrintingsMap setsToPrintings;             ///< Mapping from set names to printing variations.
-    UiAttributes uiAttributes;                     ///< Attributes that affect display and game logic
-    QString setsNames;                             ///< Cached, human-readable list of set names.
-    QSet<QString> altNames;                        ///< Cached set of alternate names, used when searching
+    QList<CardRelation> relatedCards;            ///< Forward references to related cards.
+    QList<CardRelation> reverseRelatedCards;     ///< Cards that refer back to this card.
+    QList<CardRelation> reverseRelatedCardsToMe; ///< Cards that consider this card as related.
+
+    SetToPrintingsMap setsToPrintings; ///< Mapping from set names to printing variations.
+    UiAttributes uiAttributes;         ///< Attributes that affect display and game logic
+    QString setsNames;                 ///< Cached, human-readable list of set names.
+    QSet<QString> altNames;            ///< Cached set of alternate names, used when searching
     ///@}
 
 public:
@@ -113,8 +114,8 @@ public:
                       const QString &_text,
                       bool _isToken,
                       const QHash<QString, QString> &_properties,
-                      const QList<CardRelation *> &_relatedCards,
-                      const QList<CardRelation *> &_reverseRelatedCards,
+                      const QList<CardRelation> &_relatedCards,
+                      const QList<CardRelation> &_reverseRelatedCards,
                       SetToPrintingsMap _sets,
                       UiAttributes _uiAttributes,
                       QMap<QString, QString> _localizedNames = {},
@@ -145,8 +146,8 @@ public:
                       const QString &_text,
                       bool _isToken,
                       const QByteArray &_propertiesBlob,
-                      const QList<CardRelation *> &_relatedCards,
-                      const QList<CardRelation *> &_reverseRelatedCards,
+                      const QList<CardRelation> &_relatedCards,
+                      const QList<CardRelation> &_reverseRelatedCards,
                       SetToPrintingsMap _sets,
                       UiAttributes _uiAttributes,
                       QString _simpleName,
@@ -201,8 +202,8 @@ public:
                                    const QString &_text,
                                    bool _isToken,
                                    const QHash<QString, QString> &_properties,
-                                   const QList<CardRelation *> &_relatedCards,
-                                   const QList<CardRelation *> &_reverseRelatedCards,
+                                   const QList<CardRelation> &_relatedCards,
+                                   const QList<CardRelation> &_reverseRelatedCards,
                                    SetToPrintingsMap _sets,
                                    UiAttributes _uiAttributes,
                                    QMap<QString, QString> _localizedNames = {},
@@ -240,8 +241,8 @@ public:
                                    const QString &_text,
                                    bool _isToken,
                                    QByteArray _propertiesBlob,
-                                   const QList<CardRelation *> &_relatedCards,
-                                   const QList<CardRelation *> &_reverseRelatedCards,
+                                   const QList<CardRelation> &_relatedCards,
+                                   const QList<CardRelation> &_reverseRelatedCards,
                                    SetToPrintingsMap _sets,
                                    UiAttributes _uiAttributes,
                                    QString _simpleName,
@@ -420,35 +421,25 @@ public:
     //@}
 
     /** @name Related Cards Accessors */ //@{
-    [[nodiscard]] const QList<CardRelation *> &getRelatedCards() const
+    [[nodiscard]] const QList<CardRelation> &getRelatedCards() const
     {
         return relatedCards;
     }
-    [[nodiscard]] const QList<CardRelation *> &getReverseRelatedCards() const
+    [[nodiscard]] const QList<CardRelation> &getReverseRelatedCards() const
     {
         return reverseRelatedCards;
     }
-    [[nodiscard]] const QList<CardRelation *> &getReverseRelatedCards2Me() const
+    [[nodiscard]] const QList<CardRelation> &getReverseRelatedCards2Me() const
     {
         return reverseRelatedCardsToMe;
     }
-    [[nodiscard]] QList<CardRelation *> getAllRelatedCards() const
+    [[nodiscard]] QList<CardRelation> getAllRelatedCards() const
     {
-        QList<CardRelation *> result;
-        result.append(getRelatedCards());
-        result.append(getReverseRelatedCards2Me());
-        return result;
+        return getRelatedCards() + getReverseRelatedCards2Me();
     }
     void resetReverseRelatedCards2Me();
-    /**
-     * @brief Clears the raw relation lists without deleting the CardRelation objects.
-     *
-     * Callers that schedule the relations for deletion (e.g. CardDatabase::removeCard())
-     * must use this to drop the now-dangling pointers from this CardInfo, which may
-     * outlive them through external shared pointers.
-     */
-    void clearDirectRelations();
-    void addReverseRelatedCards2Me(CardRelation *cardRelation)
+
+    void addReverseRelatedCards2Me(const CardRelation &cardRelation)
     {
         reverseRelatedCardsToMe.append(cardRelation);
     }

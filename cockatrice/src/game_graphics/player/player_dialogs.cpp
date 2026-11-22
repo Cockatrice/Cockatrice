@@ -203,22 +203,22 @@ void PlayerDialogs::onRollDieDialogRequested()
 }
 
 void PlayerDialogs::onCreateRelatedFromRelationDialogRequested(const CardState *sourceCard,
-                                                               const CardRelation *cardRelation)
+                                                               const CardRelation &cardRelation)
 {
-    if (sourceCard == nullptr || cardRelation == nullptr) {
+    if (sourceCard == nullptr) {
         playerActions->setLastRelatedCreationSucceeded(false);
         return;
     }
 
-    int variableCount = cardRelation->getDefaultCount();
+    int variableCount = cardRelation.defaultCount;
 
-    if (cardRelation->getIsVariable()) {
+    if (cardRelation.isVariableCount) {
         bool ok;
 
         emit requestDialogSemaphore(true);
 
         variableCount = QInputDialog::getInt(dialogParent(), tr("Create tokens"), tr("Number:"),
-                                             cardRelation->getDefaultCount(), 1, MAX_TOKENS_PER_DIALOG, 1, &ok);
+                                             cardRelation.defaultCount, 1, MAX_TOKENS_PER_DIALOG, 1, &ok);
 
         emit requestDialogSemaphore(false);
 

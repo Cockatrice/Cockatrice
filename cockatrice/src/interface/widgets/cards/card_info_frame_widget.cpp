@@ -143,7 +143,7 @@ void CardInfoFrameWidget::setViewMode(int mode)
 static bool hasTransformation(const CardInfo &info)
 {
     for (const auto &cardRelation : info.getAllRelatedCards()) {
-        if (cardRelation->getDoesTransform()) {
+        if (cardRelation.doesTransform()) {
             return true;
         }
     }
@@ -190,8 +190,8 @@ void CardInfoFrameWidget::viewTransformation()
     if (exactCard) {
         const auto &cardRelations = exactCard.getInfo().getAllRelatedCards();
         for (const auto &cardRelation : cardRelations) {
-            if (cardRelation->getDoesTransform()) {
-                setCard(cardRelation->getName());
+            if (cardRelation.doesTransform()) {
+                setCard(cardRelation.name);
                 break;
             }
         }
