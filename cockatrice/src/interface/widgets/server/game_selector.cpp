@@ -52,6 +52,7 @@
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/game_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/utility/game_role_info.h>
 #include <libcockatrice/utility/qt_utils.h>
 #include <qlogging.h>
 #include <qnamespace.h>
@@ -532,29 +533,29 @@ void GameSelector::checkResponse(const Response &response)
 
 void GameSelector::actJoin()
 {
-    joinGame();
+    joinGame({});
 }
 
 void GameSelector::actJoinAsJudge()
 {
     if (!(tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge)) {
-        joinGame();
+        joinGame({});
     } else {
-        joinGame(false, true);
+        joinGame({.isJudge = true, .isSpectator = false});
     }
 }
 
 void GameSelector::actJoinAsSpectator()
 {
-    joinGame(true);
+    joinGame({.isSpectator = true});
 }
 
 void GameSelector::actJoinAsJudgeSpectator()
 {
     if (!(tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge)) {
-        joinGame(true);
+        joinGame({.isSpectator = true});
     } else {
-        joinGame(true, true);
+        joinGame({.isJudge = true, .isSpectator = true});
     }
 }
 
@@ -614,17 +615,17 @@ void GameSelector::customContextMenu(const QPoint &point)
     menu.exec(gameListView->mapToGlobal(point));
 }
 
-void GameSelector::joinGame(const bool asSpectator, const bool asJudge)
+void GameSelector::joinGame(const GameRoleInfo &roles)
 {
     QModelIndex ind = gameListView->currentIndex();
     if (!ind.isValid()) {
         return;
     }
 
-    joinGame(gameListModel->getGame(ind.data(Qt::UserRole).toInt()), asSpectator, asJudge);
+    joinGame(gameListModel->getGame(ind.data(Qt::UserRole).toInt()), roles);
 }
 
-void GameSelector::joinGame(const ServerInfo_Game &game, const bool asSpectator, const bool asJudge)
+void GameSelector::joinGame(const ServerInfo_Game &game, const GameRoleInfo &roles)
 {
     if (tabSupervisor->switchToGameTabIfAlreadyExists(game.game_id())) {
         return;
@@ -635,14 +636,14 @@ void GameSelector::joinGame(const ServerInfo_Game &game, const bool asSpectator,
     // Joining a full game without override privileges silently becomes a
     // spectator join, so ask first instead of surprising the player.
     const bool gameFull = game.player_count() == game.max_players();
-    if (gameFull && !asSpectator && !asJudge && !overrideRestrictions) {
+    if (gameFull && !roles.isSpectator && !roles.isJudge && !overrideRestrictions) {
         if (!QtUtils::confirm(this, tr("Join game"), tr("The game is full. Join as a spectator instead?"),
                               QMessageBox::No)) {
             return;
         }
     }
 
-    bool spectator = asSpectator || gameFull;
+    bool spectator = roles.isSpectator || gameFull;
 
     QString password;
     if (game.with_password() && !(spectator && !game.spectators_need_password()) && !overrideRestrictions) {
@@ -663,7 +664,7 @@ void GameSelector::joinGame(const ServerInfo_Game &game, const bool asSpectator,
     cmd.set_password(password.toStdString());
     cmd.set_spectator(spectator);
     cmd.set_override_restrictions(overrideRestrictions);
-    cmd.set_join_as_judge(asJudge);
+    cmd.set_join_as_judge(roles.isJudge);
 
     TabRoom *r = tabSupervisor->getRoomTabs().value(game.room_id());
     if (!r) {
@@ -678,7 +679,7 @@ void GameSelector::joinGame(const ServerInfo_Game &game, const bool asSpectator,
     disableButtons();
 }
 
-bool GameSelector::joinGameById(const int gameId, const bool asSpectator)
+bool GameSelector::joinGameById(const int gameId, const GameRoleInfo &roles)
 {
     for (int row = 0; row < gameListModel->rowCount(); ++row) {
         const ServerInfo_Game &game = gameListModel->getGame(row);
@@ -686,7 +687,7 @@ bool GameSelector::joinGameById(const int gameId, const bool asSpectator)
             continue;
         }
 
-        joinGame(game, asSpectator);
+        joinGame(game, roles);
         return true;
     }
 
