@@ -659,7 +659,7 @@ TEST_F(CardDatabaseCacheInvalidationTest, MarkAllSetsAsKnownIsBatched)
     EXPECT_TRUE(controller.isKnown("BBB"));
     EXPECT_FALSE(controller.isEnabled("AAA"));
     EXPECT_FALSE(controller.isEnabled("BBB"));
-    // Ignored sets keep their known state but are enabled.
+    // Ignored sets become known and enabled.
     EXPECT_TRUE(controller.isEnabled("XXX"));
 }
 
