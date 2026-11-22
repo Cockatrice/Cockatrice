@@ -96,8 +96,20 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
         return;
     }
 
-    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter || event->key() == Qt::Key_Space) {
-        for (auto &info : completers) {
+    // Card completion doesn't autocomplete on spaces, so that card names with spaces can still be typed
+    auto getAcceptCompletionKeys = [](CompleterTrigger trigger) -> QSet<int> {
+        switch (trigger) {
+            case CompleterTrigger::Mention:
+                return {Qt::Key_Return, Qt::Key_Enter, Qt::Key_Space};
+            case CompleterTrigger::Card:
+                return {Qt::Key_Return, Qt::Key_Enter};
+        }
+        return {};
+    };
+
+    for (auto &info : completers) {
+        QSet<int> keys = getAcceptCompletionKeys(info.trigger);
+        if (keys.contains(event->key())) {
             if (info.completer->popup()->isVisible()) {
                 event->ignore();
                 const QModelIndex currentIndex = info.completer->popup()->currentIndex();
