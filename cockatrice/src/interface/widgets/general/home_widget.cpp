@@ -129,9 +129,6 @@ void HomeWidget::retranslateUi()
     edhrecButton->setText(tr("Browse EDHRec"));
     archidektButton->setText(tr("Browse Archidekt"));
     replayButton->setText(tr("View Replays"));
-    if (exitButton) {
-        exitButton->setText(tr("Quit"));
-    }
 
     switch (connectionStatus) {
         case StatusDisconnected:
@@ -319,7 +316,7 @@ QGroupBox *HomeWidget::createButtons()
     logoLabel->setAlignment(Qt::AlignCenter);
     boxLayout->addWidget(logoLabel);
     updateLogoOverlay();
-    boxLayout->addSpacing(25);
+    boxLayout->addSpacing(15);
 
     connectButton = new HomeStyledButton(QString(), gradientColors);
     connectButton->setObjectName("homeConnectButton");
@@ -352,12 +349,6 @@ QGroupBox *HomeWidget::createButtons()
     replayButton->setObjectName("homeViewReplaysButton");
     connect(replayButton, &QPushButton::clicked, tabSupervisor, [this] { tabSupervisor->actTabReplays(true); });
     boxLayout->addWidget(replayButton);
-    if (qobject_cast<MainWindow *>(tabSupervisor->parentWidget())) {
-        exitButton = new HomeStyledButton(QString(), gradientColors);
-        connect(exitButton, &QPushButton::clicked, qobject_cast<MainWindow *>(tabSupervisor->parentWidget()),
-                &MainWindow::actExit);
-        boxLayout->addWidget(exitButton);
-    }
 
     box->setLayout(boxLayout);
     return box;

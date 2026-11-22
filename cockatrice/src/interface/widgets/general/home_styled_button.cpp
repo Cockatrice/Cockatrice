@@ -65,7 +65,7 @@ QString HomeStyledButton::generateButtonStylesheet(const QPair<QColor, QColor> &
 
     return QString(R"(
         QPushButton {
-            padding: 30px;
+            padding: 15px;
             color: white;
             border: 2px solid %1;
             border-radius: 20px;

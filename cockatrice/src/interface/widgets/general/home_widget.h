@@ -59,7 +59,6 @@ private:
     HomeStyledButton *edhrecButton = nullptr;
     HomeStyledButton *archidektButton = nullptr;
     HomeStyledButton *replayButton = nullptr;
-    HomeStyledButton *exitButton = nullptr;
     ClientStatus connectionStatus = StatusDisconnected;
 
     void setRandomCard(ExactCard &newCard);
