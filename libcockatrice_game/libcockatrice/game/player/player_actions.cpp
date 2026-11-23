@@ -120,9 +120,9 @@ void PlayerActions::playCard(CardState *card, bool faceDown)
     }
 
     Command_MoveCard cmd;
-    cmd.set_start_player_id(card->getZone()->getPlayer()->getPlayerInfo()->getId());
+    cmd.set_start_player_id(card->getZone()->getPlayer()->getPlayerInfo().id);
     cmd.set_start_zone(card->getZone()->getName().toStdString());
-    cmd.set_target_player_id(player->getPlayerInfo()->getId());
+    cmd.set_target_player_id(player->getPlayerInfo().id);
     CardToMove *cardToMove = cmd.mutable_cards_to_move()->add_card();
     cardToMove->set_card_id(card->getId());
 
@@ -173,9 +173,9 @@ void PlayerActions::playCardToTable(const CardState *card, bool faceDown)
     }
 
     Command_MoveCard cmd;
-    cmd.set_start_player_id(card->getZone()->getPlayer()->getPlayerInfo()->getId());
+    cmd.set_start_player_id(card->getZone()->getPlayer()->getPlayerInfo().id);
     cmd.set_start_zone(card->getZone()->getName().toStdString());
-    cmd.set_target_player_id(player->getPlayerInfo()->getId());
+    cmd.set_target_player_id(player->getPlayerInfo().id);
     CardToMove *cardToMove = cmd.mutable_cards_to_move()->add_card();
     cardToMove->set_card_id(card->getId());
 
@@ -213,7 +213,7 @@ void PlayerActions::attachCards(CardState *startCard, const CardState *targetCar
     Command_AttachCard cmd;
     cmd.set_start_zone(ZoneNames::TABLE);
     cmd.set_card_id(startCard->getId());
-    cmd.set_target_player_id(targetCard->getZone()->getPlayer()->getPlayerInfo()->getId());
+    cmd.set_target_player_id(targetCard->getZone()->getPlayer()->getPlayerInfo().id);
     cmd.set_target_zone(targetCard->getZone()->getName().toStdString());
     cmd.set_target_card_id(targetCard->getId());
     sendGameCommand(cmd);
@@ -499,7 +499,7 @@ void PlayerActions::cmdSetTopCard(Command_MoveCard &cmd)
     cmd.set_start_zone(ZoneNames::DECK);
     auto *cardToMove = cmd.mutable_cards_to_move()->add_card();
     cardToMove->set_card_id(0);
-    cmd.set_target_player_id(player->getPlayerInfo()->getId());
+    cmd.set_target_player_id(player->getPlayerInfo().id);
 }
 
 void PlayerActions::cmdSetBottomCard(Command_MoveCard &cmd)
@@ -509,7 +509,7 @@ void PlayerActions::cmdSetBottomCard(Command_MoveCard &cmd)
     cmd.set_start_zone(ZoneNames::DECK);
     auto *cardToMove = cmd.mutable_cards_to_move()->add_card();
     cardToMove->set_card_id(lastCard);
-    cmd.set_target_player_id(player->getPlayerInfo()->getId());
+    cmd.set_target_player_id(player->getPlayerInfo().id);
 }
 
 void PlayerActions::actMoveTopCardToGrave()
@@ -588,7 +588,7 @@ void PlayerActions::moveTopCardsTo(int number, const QString &targetZone, bool f
 
     Command_MoveCard cmd;
     cmd.set_start_zone(ZoneNames::DECK);
-    cmd.set_target_player_id(player->getPlayerInfo()->getId());
+    cmd.set_target_player_id(player->getPlayerInfo().id);
     cmd.set_target_zone(targetZone.toStdString());
     cmd.set_x(0);
     cmd.set_y(0);
@@ -702,7 +702,7 @@ void PlayerActions::actMoveTopCardToPlayFaceDown()
     CardToMove *cardToMove = cmd.mutable_cards_to_move()->add_card();
     cardToMove->set_card_id(0);
     cardToMove->set_face_down(true);
-    cmd.set_target_player_id(player->getPlayerInfo()->getId());
+    cmd.set_target_player_id(player->getPlayerInfo().id);
     cmd.set_target_zone(ZoneNames::TABLE);
     cmd.set_x(-1);
     cmd.set_y(0);
@@ -786,7 +786,7 @@ void PlayerActions::moveBottomCardsTo(int number, const QString &targetZone, boo
 
     Command_MoveCard cmd;
     cmd.set_start_zone(ZoneNames::DECK);
-    cmd.set_target_player_id(player->getPlayerInfo()->getId());
+    cmd.set_target_player_id(player->getPlayerInfo().id);
     cmd.set_target_zone(targetZone.toStdString());
     cmd.set_x(0);
     cmd.set_y(0);
@@ -856,7 +856,7 @@ void PlayerActions::actDrawBottomCards(int number)
 
     Command_MoveCard cmd;
     cmd.set_start_zone(ZoneNames::DECK);
-    cmd.set_target_player_id(player->getPlayerInfo()->getId());
+    cmd.set_target_player_id(player->getPlayerInfo().id);
     cmd.set_target_zone(ZoneNames::HAND);
     cmd.set_x(0);
     cmd.set_y(0);
@@ -898,7 +898,7 @@ void PlayerActions::actMoveBottomCardToPlayFaceDown()
     cardToMove->set_card_id(lastCard);
     cardToMove->set_face_down(true);
 
-    cmd.set_target_player_id(player->getPlayerInfo()->getId());
+    cmd.set_target_player_id(player->getPlayerInfo().id);
     cmd.set_target_zone(ZoneNames::TABLE);
     cmd.set_x(-1);
     cmd.set_y(0);
@@ -1162,7 +1162,7 @@ bool PlayerActions::createRelatedFromRelation(const CardState *sourceCard,
     CardRelationType attachType;
     // do not attempt to attach to another player's cards, this causes the card to attempt to attach to the same
     // cardid on the local player's field instead, which is an entirely different card!
-    if (player->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getPlayerInfo().isLocalOrJudge()) {
         attachType = cardRelation.attachType;
     } else {
         attachType = CardRelationType::DoesNotAttach;
@@ -1298,20 +1298,20 @@ void PlayerActions::actMoveCardXCardsFromTop(QList<CardState *> selectedCards, i
         idList.add_card()->set_card_id(i->getId());
     }
 
-    int startPlayerId = selectedCards[0]->getZone()->getPlayer()->getPlayerInfo()->getId();
+    int startPlayerId = selectedCards[0]->getZone()->getPlayer()->getPlayerInfo().id;
     QString startZone = selectedCards[0]->getZone()->getName();
 
     auto *cmd = new Command_MoveCard;
     cmd->set_start_player_id(startPlayerId);
     cmd->set_start_zone(startZone.toStdString());
     cmd->mutable_cards_to_move()->CopyFrom(idList);
-    cmd->set_target_player_id(player->getPlayerInfo()->getId());
+    cmd->set_target_player_id(player->getPlayerInfo().id);
     cmd->set_target_zone(ZoneNames::DECK);
     cmd->set_x(number);
     cmd->set_y(0);
     commandList.append(cmd);
 
-    if (player->getPlayerInfo()->local) {
+    if (player->getPlayerInfo().local) {
         sendGameCommand(prepareGameCommand(commandList));
     } else {
         player->getGame()->getGameEventHandler()->sendGameCommand(prepareGameCommand(commandList));
@@ -1320,7 +1320,7 @@ void PlayerActions::actMoveCardXCardsFromTop(QList<CardState *> selectedCards, i
 
 void PlayerActions::actIncPT(QList<CardState *> selectedCards, int deltaP, int deltaT)
 {
-    int playerid = player->getPlayerInfo()->getId();
+    int playerid = player->getPlayerInfo().id;
 
     QList<const ::google::protobuf::Message *> commandList;
     for (auto card : selectedCards) {
@@ -1343,8 +1343,8 @@ void PlayerActions::actIncPT(QList<CardState *> selectedCards, int deltaP, int d
         cmd->set_attr_value(newpt.toStdString());
         commandList.append(cmd);
 
-        if (player->getPlayerInfo()->getLocal()) {
-            playerid = card->getZone()->getPlayer()->getPlayerInfo()->getId();
+        if (player->getPlayerInfo().local) {
+            playerid = card->getZone()->getPlayer()->getPlayerInfo().id;
         }
     }
 
@@ -1353,7 +1353,7 @@ void PlayerActions::actIncPT(QList<CardState *> selectedCards, int deltaP, int d
 
 void PlayerActions::actResetPT(QList<CardState *> selectedCards)
 {
-    int playerid = player->getPlayerInfo()->getId();
+    int playerid = player->getPlayerInfo().id;
     QList<const ::google::protobuf::Message *> commandList;
     for (auto card : selectedCards) {
         QString ptString;
@@ -1374,8 +1374,8 @@ void PlayerActions::actResetPT(QList<CardState *> selectedCards)
         cmd->set_attr_value(ptString.toStdString());
         commandList.append(cmd);
 
-        if (player->getPlayerInfo()->getLocal()) {
-            playerid = card->getZone()->getPlayer()->getPlayerInfo()->getId();
+        if (player->getPlayerInfo().local) {
+            playerid = card->getZone()->getPlayer()->getPlayerInfo().id;
         }
     }
 
@@ -1399,7 +1399,7 @@ void PlayerActions::actRequestSetPTDialog(QList<CardState *> selectedCards)
 
 void PlayerActions::actSetPT(QList<CardState *> selectedCards, const QString &pt)
 {
-    int playerid = player->getPlayerInfo()->getId();
+    int playerid = player->getPlayerInfo().id;
 
     const auto ptList = CardState::parsePT(pt);
     bool empty = ptList.isEmpty();
@@ -1429,8 +1429,8 @@ void PlayerActions::actSetPT(QList<CardState *> selectedCards, const QString &pt
         cmd->set_attr_value(newpt.toStdString());
         commandList.append(cmd);
 
-        if (player->getPlayerInfo()->local) {
-            playerid = card->getZone()->getPlayer()->getPlayerInfo()->getId();
+        if (player->getPlayerInfo().local) {
+            playerid = card->getZone()->getPlayer()->getPlayerInfo().id;
         }
     }
 
@@ -1863,7 +1863,7 @@ void PlayerActions::cardMenuAction(QList<CardState *> selectedCards, CardMenuAct
                     auto *cmd = new Command_RevealCards;
                     cmd->set_zone_name(card->getZone()->getName().toStdString());
                     cmd->add_card_id(card->getId());
-                    cmd->set_player_id(player->getPlayerInfo()->getId());
+                    cmd->set_player_id(player->getPlayerInfo().id);
                     commandList.append(cmd);
                     break;
                 }
@@ -1896,7 +1896,7 @@ void PlayerActions::cardMenuAction(QList<CardState *> selectedCards, CardMenuAct
             return;
         }
 
-        int startPlayerId = startPlayer->getPlayerInfo()->getId();
+        int startPlayerId = startPlayer->getPlayerInfo().id;
         QString startZone = zone->getName();
 
         ListOfCardsToMove idList;
@@ -1910,7 +1910,7 @@ void PlayerActions::cardMenuAction(QList<CardState *> selectedCards, CardMenuAct
                 cmd->set_start_player_id(startPlayerId);
                 cmd->set_start_zone(startZone.toStdString());
                 cmd->mutable_cards_to_move()->CopyFrom(idList);
-                cmd->set_target_player_id(player->getPlayerInfo()->getId());
+                cmd->set_target_player_id(player->getPlayerInfo().id);
                 cmd->set_target_zone(ZoneNames::DECK);
                 cmd->set_x(0);
                 cmd->set_y(0);
@@ -1932,7 +1932,7 @@ void PlayerActions::cardMenuAction(QList<CardState *> selectedCards, CardMenuAct
                 cmd->set_start_player_id(startPlayerId);
                 cmd->set_start_zone(startZone.toStdString());
                 cmd->mutable_cards_to_move()->CopyFrom(idList);
-                cmd->set_target_player_id(player->getPlayerInfo()->getId());
+                cmd->set_target_player_id(player->getPlayerInfo().id);
                 cmd->set_target_zone(ZoneNames::DECK);
                 cmd->set_x(-1);
                 cmd->set_y(0);
@@ -1954,7 +1954,7 @@ void PlayerActions::cardMenuAction(QList<CardState *> selectedCards, CardMenuAct
                 cmd->set_start_player_id(startPlayerId);
                 cmd->set_start_zone(startZone.toStdString());
                 cmd->mutable_cards_to_move()->CopyFrom(idList);
-                cmd->set_target_player_id(player->getPlayerInfo()->getId());
+                cmd->set_target_player_id(player->getPlayerInfo().id);
                 cmd->set_target_zone(ZoneNames::HAND);
                 cmd->set_x(0);
                 cmd->set_y(0);
@@ -1966,7 +1966,7 @@ void PlayerActions::cardMenuAction(QList<CardState *> selectedCards, CardMenuAct
                 cmd->set_start_player_id(startPlayerId);
                 cmd->set_start_zone(startZone.toStdString());
                 cmd->mutable_cards_to_move()->CopyFrom(idList);
-                cmd->set_target_player_id(player->getPlayerInfo()->getId());
+                cmd->set_target_player_id(player->getPlayerInfo().id);
                 cmd->set_target_zone(ZoneNames::GRAVE);
                 cmd->set_x(0);
                 cmd->set_y(0);
@@ -1978,7 +1978,7 @@ void PlayerActions::cardMenuAction(QList<CardState *> selectedCards, CardMenuAct
                 cmd->set_start_player_id(startPlayerId);
                 cmd->set_start_zone(startZone.toStdString());
                 cmd->mutable_cards_to_move()->CopyFrom(idList);
-                cmd->set_target_player_id(player->getPlayerInfo()->getId());
+                cmd->set_target_player_id(player->getPlayerInfo().id);
                 cmd->set_target_zone(ZoneNames::EXILE);
                 cmd->set_x(0);
                 cmd->set_y(0);
@@ -1991,7 +1991,7 @@ void PlayerActions::cardMenuAction(QList<CardState *> selectedCards, CardMenuAct
                     auto *cmd = new Command_MoveCard;
                     cmd->set_start_player_id(startPlayerId);
                     cmd->set_start_zone(startZone.toStdString());
-                    cmd->set_target_player_id(player->getPlayerInfo()->getId());
+                    cmd->set_target_player_id(player->getPlayerInfo().id);
                     cmd->set_target_zone(ZoneNames::TABLE);
                     cmd->set_x(-1);
 
@@ -2018,7 +2018,7 @@ void PlayerActions::cardMenuAction(QList<CardState *> selectedCards, CardMenuAct
         }
     }
 
-    if (player->getPlayerInfo()->getLocal()) {
+    if (player->getPlayerInfo().local) {
         sendGameCommand(prepareGameCommand(commandList));
     } else {
         player->getGame()->getGameEventHandler()->sendGameCommand(prepareGameCommand(commandList));
@@ -2028,10 +2028,10 @@ void PlayerActions::cardMenuAction(QList<CardState *> selectedCards, CardMenuAct
 PendingCommand *PlayerActions::prepareGameCommand(const google::protobuf::Message &cmd)
 {
 
-    if (player->getPlayerInfo()->getJudge() && !player->getPlayerInfo()->getLocal()) {
+    if (player->getPlayerInfo().judge && !player->getPlayerInfo().local) {
         Command_Judge base;
         GameCommand *c = base.add_game_command();
-        base.set_target_id(player->getPlayerInfo()->getId());
+        base.set_target_id(player->getPlayerInfo().id);
         c->GetReflection()->MutableMessage(c, cmd.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(cmd);
         return player->getGame()->getGameEventHandler()->prepareGameCommand(base);
     } else {
@@ -2041,9 +2041,9 @@ PendingCommand *PlayerActions::prepareGameCommand(const google::protobuf::Messag
 
 PendingCommand *PlayerActions::prepareGameCommand(const QList<const ::google::protobuf::Message *> &cmdList)
 {
-    if (player->getPlayerInfo()->getJudge() && !player->getPlayerInfo()->getLocal()) {
+    if (player->getPlayerInfo().judge && !player->getPlayerInfo().local) {
         Command_Judge base;
-        base.set_target_id(player->getPlayerInfo()->getId());
+        base.set_target_id(player->getPlayerInfo().id);
         for (int i = 0; i < cmdList.size(); ++i) {
             GameCommand *c = base.add_game_command();
             c->GetReflection()
@@ -2068,9 +2068,9 @@ void PlayerActions::moveCards(CardZoneLogic *startZone,
     }
 
     Command_MoveCard cmd;
-    cmd.set_start_player_id(startZone->getPlayer()->getPlayerInfo()->getId());
+    cmd.set_start_player_id(startZone->getPlayer()->getPlayerInfo().id);
     cmd.set_start_zone(startZone->getName().toStdString());
-    cmd.set_target_player_id(targetZone->getPlayer()->getPlayerInfo()->getId());
+    cmd.set_target_player_id(targetZone->getPlayer()->getPlayerInfo().id);
     cmd.set_target_zone(targetZone->getName().toStdString());
     cmd.set_x(x);
     cmd.set_y(y);
@@ -2100,7 +2100,7 @@ PendingCommand *PlayerActions::prepareZoneDump(CardZoneLogic *zone, int numberCa
     }
 
     Command_DumpZone cmd;
-    cmd.set_player_id(zone->getPlayer()->getPlayerInfo()->getId());
+    cmd.set_player_id(zone->getPlayer()->getPlayerInfo().id);
     cmd.set_zone_name(zone->getName().toStdString());
     cmd.set_number_cards(numberCards);
     if (auto *viewLogic = qobject_cast<ZoneViewZoneLogic *>(zone)) {
@@ -2129,18 +2129,18 @@ void PlayerActions::actToggleTapped(const QString &zoneName, const QList<CardSta
 
 void PlayerActions::sendGameCommand(const google::protobuf::Message &command)
 {
-    if (player->getPlayerInfo()->getJudge() && !player->getPlayerInfo()->getLocal()) {
+    if (player->getPlayerInfo().judge && !player->getPlayerInfo().local) {
         Command_Judge base;
         GameCommand *c = base.add_game_command();
-        base.set_target_id(player->getPlayerInfo()->getId());
+        base.set_target_id(player->getPlayerInfo().id);
         c->GetReflection()->MutableMessage(c, command.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(command);
-        player->getGame()->getGameEventHandler()->sendGameCommand(base, player->getPlayerInfo()->getId());
+        player->getGame()->getGameEventHandler()->sendGameCommand(base, player->getPlayerInfo().id);
     } else {
-        player->getGame()->getGameEventHandler()->sendGameCommand(command, player->getPlayerInfo()->getId());
+        player->getGame()->getGameEventHandler()->sendGameCommand(command, player->getPlayerInfo().id);
     }
 }
 
 void PlayerActions::sendGameCommand(PendingCommand *pend)
 {
-    player->getGame()->getGameEventHandler()->sendGameCommand(pend, player->getPlayerInfo()->getId());
+    player->getGame()->getGameEventHandler()->sendGameCommand(pend, player->getPlayerInfo().id);
 }

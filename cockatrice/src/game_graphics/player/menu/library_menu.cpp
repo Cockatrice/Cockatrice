@@ -112,7 +112,7 @@ void LibraryMenu::createDrawActions()
 {
     PlayerActions *playerActions = player->getLogic()->getPlayerActions();
 
-    if (player->getLogic()->getPlayerInfo()->local || player->getLogic()->getPlayerInfo()->judge) {
+    if (player->getLogic()->getPlayerInfo().local || player->getLogic()->getPlayerInfo().judge) {
         aDrawCard = new QAction(this);
         connect(aDrawCard, &QAction::triggered, playerActions, &PlayerActions::actDrawCard);
         aDrawCards = new QAction(this);
@@ -130,7 +130,7 @@ void LibraryMenu::createShuffleActions()
 {
     PlayerActions *playerActions = player->getLogic()->getPlayerActions();
 
-    if (player->getLogic()->getPlayerInfo()->local || player->getLogic()->getPlayerInfo()->judge) {
+    if (player->getLogic()->getPlayerInfo().local || player->getLogic()->getPlayerInfo().judge) {
         aShuffle = new QAction(this);
         connect(aShuffle, &QAction::triggered, playerActions, &PlayerActions::actShuffle);
         aShuffleTopCards = new QAction(this);
@@ -144,7 +144,7 @@ void LibraryMenu::createMoveActions()
 {
     PlayerActions *playerActions = player->getLogic()->getPlayerActions();
 
-    if (player->getLogic()->getPlayerInfo()->local || player->getLogic()->getPlayerInfo()->judge) {
+    if (player->getLogic()->getPlayerInfo().local || player->getLogic()->getPlayerInfo().judge) {
         aMoveTopToPlay = new QAction(this);
         connect(aMoveTopToPlay, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardToPlay);
         aMoveTopToPlayFaceDown = new QAction(this);
@@ -200,7 +200,7 @@ void LibraryMenu::createViewActions()
 {
     PlayerActions *playerActions = player->getLogic()->getPlayerActions();
 
-    if (player->getLogic()->getPlayerInfo()->local || player->getLogic()->getPlayerInfo()->judge) {
+    if (player->getLogic()->getPlayerInfo().local || player->getLogic()->getPlayerInfo().judge) {
         aViewLibrary = new QAction(this);
         connect(aViewLibrary, &QAction::triggered, playerActions, &PlayerActions::actViewLibrary);
 
@@ -224,7 +224,7 @@ void LibraryMenu::retranslateUi()
 {
     setTitle(tr("&Library"));
 
-    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo().isLocalOrJudge()) {
         aViewLibrary->setText(tr("&View library"));
         aViewTopCards->setText(tr("View &top cards of library..."));
         aViewBottomCards->setText(tr("View bottom cards of library..."));
@@ -285,8 +285,8 @@ void LibraryMenu::populateRevealLibraryMenuWithActivePlayers()
         if (other == player->getLogic()) {
             continue;
         }
-        QAction *a = mRevealLibrary->addAction(other->getPlayerInfo()->getName());
-        a->setData(other->getPlayerInfo()->getId());
+        QAction *a = mRevealLibrary->addAction(other->getPlayerInfo().getName());
+        a->setData(other->getPlayerInfo().id);
         connect(a, &QAction::triggered, this, &LibraryMenu::onRevealLibraryTriggered);
     }
 }
@@ -300,8 +300,8 @@ void LibraryMenu::populateLendLibraryMenuWithActivePlayers()
         if (other == player->getLogic()) {
             continue;
         }
-        QAction *a = mLendLibrary->addAction(other->getPlayerInfo()->getName());
-        a->setData(other->getPlayerInfo()->getId());
+        QAction *a = mLendLibrary->addAction(other->getPlayerInfo().getName());
+        a->setData(other->getPlayerInfo().id);
         connect(a, &QAction::triggered, this, &LibraryMenu::onLendLibraryTriggered);
     }
 }
@@ -321,8 +321,8 @@ void LibraryMenu::populateRevealTopCardMenuWithActivePlayers()
         if (other == player->getLogic()) {
             continue;
         }
-        QAction *a = mRevealTopCard->addAction(other->getPlayerInfo()->getName());
-        a->setData(other->getPlayerInfo()->getId());
+        QAction *a = mRevealTopCard->addAction(other->getPlayerInfo().getName());
+        a->setData(other->getPlayerInfo().id);
         connect(a, &QAction::triggered, this, &LibraryMenu::onRevealTopCardTriggered);
     }
 }

@@ -88,7 +88,7 @@ void PlayerEventHandler::eventShuffle(const Event_Shuffle &event)
                 viewLogic->requestClose();
             }
         } else {
-            qWarning() << zone->getName() << "of" << player->getPlayerInfo()->getName() << "holds empty zoneview!";
+            qWarning() << zone->getName() << "of" << player->getPlayerInfo().getName() << "holds empty zoneview!";
         }
     }
 
@@ -115,8 +115,8 @@ void PlayerEventHandler::eventRollDie(const Event_RollDie &event)
 
 void PlayerEventHandler::eventCreateArrow(const Event_CreateArrow &event)
 {
-    auto data = QSharedPointer<ArrowData>::create(ArrowData::fromProto(
-        event.arrow_info(), player->getPlayerInfo()->getId(), player->getPlayerInfo()->getLocal()));
+    auto data = QSharedPointer<ArrowData>::create(
+        ArrowData::fromProto(event.arrow_info(), player->getPlayerInfo().id, player->getPlayerInfo().local));
 
     const auto &playerList = player->getGame()->getPlayerManager()->getPlayers();
     PlayerLogic *startPlayer = playerList.value(data->startPlayerId);
@@ -148,7 +148,7 @@ void PlayerEventHandler::eventCreateArrow(const Event_CreateArrow &event)
 
 void PlayerEventHandler::eventDeleteArrow(const Event_DeleteArrow &event)
 {
-    emit player->arrowDeleted(player->getPlayerInfo()->getId(), event.arrow_id());
+    emit player->arrowDeleted(player->getPlayerInfo().id, event.arrow_id());
 }
 
 void PlayerEventHandler::eventCreateToken(const Event_CreateToken &event)

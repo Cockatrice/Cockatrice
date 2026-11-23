@@ -41,9 +41,9 @@ PlayerLogic::PlayerLogic(const ServerInfo_User &info,
                          AbstractGame *_parent,
                          IInterfaceSettingsProvider *interfaceSettings,
                          ICardPreferenceProvider *cardPreferences)
-    : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
-      playerEventHandler(new PlayerEventHandler(this)),
-      playerActions(new PlayerActions(this, interfaceSettings, cardPreferences)), active(false), conceded(false),
+    : QObject(_parent), game(_parent), playerEventHandler(new PlayerEventHandler(this)),
+      playerActions(new PlayerActions(this, interfaceSettings, cardPreferences)),
+      playerInfo({.userInfo = info, .id = _id, .local = _local, .judge = _judge}), active(false), conceded(false),
       zoneId(0), dialogSemaphore(false)
 {
     initializeZones();
@@ -57,22 +57,20 @@ void PlayerLogic::initializeZones()
     addZone(new PileZoneLogic(this, ZoneNames::SIDEBOARD, false, false, false, this));
     addZone(new TableZoneLogic(this, ZoneNames::TABLE, true, false, true, this));
     addZone(new StackZoneLogic(this, ZoneNames::STACK, true, false, true, this));
-    bool visibleHand = playerInfo->getLocalOrJudge() || (game->getPlayerManager()->getLocalRoles().isSpectator &&
-                                                         game->getGameMetaInfo()->spectatorsOmniscient());
+    bool visibleHand = playerInfo.isLocalOrJudge() || (game->getPlayerManager()->getLocalRoles().isSpectator &&
+                                                       game->getGameMetaInfo()->spectatorsOmniscient());
     addZone(new HandZoneLogic(this, ZoneNames::HAND, false, false, visibleHand, this));
 }
 
 PlayerLogic::~PlayerLogic()
 {
-    qCInfo(PlayerLog) << "Player destructor:" << getPlayerInfo()->getName();
+    qCInfo(PlayerLog) << "Player destructor:" << getPlayerInfo().getName();
 
     QMapIterator<QString, CardZoneLogic *> i(zones);
     while (i.hasNext()) {
         delete i.next().value();
     }
     zones.clear();
-
-    delete getPlayerInfo()->userInfo;
 }
 
 void PlayerLogic::clear()
@@ -95,7 +93,7 @@ void PlayerLogic::setConceded(bool _conceded)
         if (conceded) {
             clear();
         }
-        emit concededChanged(getPlayerInfo()->getId(), conceded);
+        emit concededChanged(getPlayerInfo().id, conceded);
     }
 }
 
@@ -152,8 +150,8 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
                 switch (zoneInfo.type()) {
                     case ServerInfo_Zone::PrivateZone:
                         contentsKnown =
-                            playerInfo->getLocalOrJudge() || (game->getPlayerManager()->getLocalRoles().isSpectator &&
-                                                              game->getGameMetaInfo()->spectatorsOmniscient());
+                            playerInfo.isLocalOrJudge() || (game->getPlayerManager()->getLocalRoles().isSpectator &&
+                                                            game->getGameMetaInfo()->spectatorsOmniscient());
                         break;
 
                     case ServerInfo_Zone::PublicZone:
@@ -241,7 +239,7 @@ void PlayerLogic::processCardAttachment(const ServerInfo_Player &info)
     const int arrowListSize = info.arrow_list_size();
     for (int i = 0; i < arrowListSize; ++i) {
         emit arrowCreateRequested(QSharedPointer<ArrowData>::create(
-            ArrowData::fromProto(info.arrow_list(i), getPlayerInfo()->getId(), getPlayerInfo()->getLocal())));
+            ArrowData::fromProto(info.arrow_list(i), getPlayerInfo().id, getPlayerInfo().local)));
     }
 }
 
@@ -364,7 +362,7 @@ void PlayerLogic::updateZones()
 
 void PlayerLogic::setGameStarted()
 {
-    if (playerInfo->local) {
+    if (playerInfo.local) {
         emit resetTopCardMenuActions();
     }
     setConceded(false);

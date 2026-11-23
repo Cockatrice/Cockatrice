@@ -135,7 +135,7 @@ void GameEventHandler::processGameEventContainer(const GameEventContainer &cont,
             auto id = cont.forced_by_judge();
             PlayerLogic *judgep = game->getPlayerManager()->getPlayers().value(id, nullptr);
             if (judgep) {
-                emit setContextJudgeName(judgep->getPlayerInfo()->getName());
+                emit setContextJudgeName(judgep->getPlayerInfo().getName());
             } else if (game->getPlayerManager()->getSpectators().contains(id)) {
                 emit setContextJudgeName(
                     QString::fromStdString(game->getPlayerManager()->getSpectators().value(id).name()));
@@ -421,7 +421,7 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
             if (prop.has_playmat_params()) {
                 player->setPlaymatFromProperties(prop);
             }
-            if (player->getPlayerInfo()->getLocal()) {
+            if (player->getPlayerInfo().local) {
                 emit localPlayerDeckSelected(player, playerId, playerInfo);
             } else {
                 if (!game->getGameMetaInfo()->proto().share_decklists_on_load()) {
@@ -509,8 +509,8 @@ void GameEventHandler::eventPlayerPropertiesChanged(const Event_PlayerProperties
     switch (contextType) {
         case GameEventContext::READY_START: {
             bool ready = prop.ready_start();
-            if (player->getPlayerInfo()->getLocal()) {
-                emit localPlayerReadyStateChanged(player->getPlayerInfo()->getId(), ready);
+            if (player->getPlayerInfo().local) {
+                emit localPlayerReadyStateChanged(player->getPlayerInfo().id, ready);
             }
             if (ready) {
                 emit logReadyStart(player);
@@ -549,13 +549,13 @@ void GameEventHandler::eventPlayerPropertiesChanged(const Event_PlayerProperties
             if (game->getGameMetaInfo()->proto().share_decklists_on_load() && deckSelect.has_deck_list() &&
                 eventPlayerId != game->getPlayerManager()->getLocalPlayerId()) {
                 emit remotePlayerDeckSelected(QString::fromStdString(deckSelect.deck_list()), eventPlayerId,
-                                              player->getPlayerInfo()->getName());
+                                              player->getPlayerInfo().getName());
             }
             break;
         }
         case GameEventContext::SET_SIDEBOARD_LOCK: {
-            if (player->getPlayerInfo()->getLocal()) {
-                emit localPlayerSideboardLocked(player->getPlayerInfo()->getId(), prop.sideboard_locked());
+            if (player->getPlayerInfo().local) {
+                emit localPlayerSideboardLocked(player->getPlayerInfo().id, prop.sideboard_locked());
             }
             emit logSideboardLockSet(player, prop.sideboard_locked());
             break;
@@ -673,7 +673,7 @@ void GameEventHandler::eventPlayerOrderChanged(const Event_PlayerOrderChanged &e
     const auto &players = game->getPlayerManager()->getPlayers();
     for (const QString &name : playerNames) {
         for (auto it = players.constBegin(); it != players.constEnd(); ++it) {
-            if (it.value() && it.value()->getPlayerInfo()->getName() == name) {
+            if (it.value() && it.value()->getPlayerInfo().getName() == name) {
                 seatOrder.append(it.key());
                 break;
             }

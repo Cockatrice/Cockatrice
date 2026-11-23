@@ -17,6 +17,7 @@
 #include "libcockatrice/deck_list/deck_list.h"
 #include "libcockatrice/utility/card_ref.h"
 #include "libcockatrice/utility/playmat_params.h"
+#include "player_info.h"
 
 #include <QColor>
 #include <QList>
@@ -35,6 +36,7 @@
 // IWYU pragma: keep
 // ServerInfo_Card appears inside QList<...> in signal and slot
 // signatures, which the moc-generated code needs to be complete.
+
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 
 class CounterState;
@@ -42,6 +44,7 @@ class QWidget;
 class ServerInfo_PlayerProperties;
 struct ArrowData;
 struct LoadedDeck;
+struct PlayerInfo;
 template <class T> class QSharedPointer;
 
 inline Q_LOGGING_CATEGORY(PlayerLog, "player");
@@ -49,7 +52,6 @@ class AbstractCardItem;
 class AbstractGame;
 class ICardPreferenceProvider;
 class IInterfaceSettingsProvider;
-class PlayerInfo;
 class PlayerEventHandler;
 class PlayerActions;
 class ServerInfo_Card;
@@ -135,9 +137,14 @@ public:
         return playerEventHandler;
     }
 
-    [[nodiscard]] PlayerInfo *getPlayerInfo() const
+    [[nodiscard]] const PlayerInfo &getPlayerInfo() const
     {
         return playerInfo;
+    }
+
+    void setLocal(bool local)
+    {
+        playerInfo.local = local;
     }
 
     void setDeck(const DeckList &_deck);
@@ -249,9 +256,10 @@ public:
 
 private:
     AbstractGame *game;
-    PlayerInfo *playerInfo;
     PlayerEventHandler *playerEventHandler;
     PlayerActions *playerActions;
+
+    PlayerInfo playerInfo;
 
     bool active;
     bool conceded;

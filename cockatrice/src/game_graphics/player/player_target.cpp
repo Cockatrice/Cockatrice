@@ -137,7 +137,7 @@ PlayerTarget::PlayerTarget(PlayerLogic *_owner, QGraphicsItem *parentItem)
 {
     setCacheMode(DeviceCoordinateCache);
 
-    const std::string &bmp = _owner->getPlayerInfo()->getUserInfo()->avatar_bmp();
+    const std::string &bmp = _owner->getPlayerInfo().userInfo.avatar_bmp();
     if (!fullPixmap.loadFromData((const uchar *)bmp.data(), static_cast<uint>(bmp.size()))) {
         fullPixmap = QPixmap();
     }
@@ -157,7 +157,7 @@ QRectF PlayerTarget::boundingRect() const
 
 void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    const ServerInfo_User *const info = owner->getPlayerInfo()->getUserInfo();
+    const ServerInfo_User &info = owner->getPlayerInfo().userInfo;
 
     const qreal border = 2;
 
@@ -172,11 +172,11 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     // in the key — otherwise two players without a custom avatar (and the same
     // user level) would share one cached pawn.
     const QString cacheKey = "avatar" + QString::number(translatedSize.width()) + "_" +
-                             QString::number(translatedSize.height()) + "_" + QString::number(info->user_level()) +
-                             "_" + QString::number(fullPixmap.cacheKey()) + "_" +
-                             QString::fromStdString(info->privlevel()).toLower() + "_" +
-                             QString::fromStdString(info->pawn_colors().left_side()) + "_" +
-                             QString::fromStdString(info->pawn_colors().right_side());
+                             QString::number(translatedSize.height()) + "_" + QString::number(info.user_level()) + "_" +
+                             QString::number(fullPixmap.cacheKey()) + "_" +
+                             QString::fromStdString(info.privlevel()).toLower() + "_" +
+                             QString::fromStdString(info.pawn_colors().left_side()) + "_" +
+                             QString::fromStdString(info.pawn_colors().right_side());
     if (!QPixmapCache::find(cacheKey, &cachedPixmap)) {
         cachedPixmap = QPixmap(translatedSize.width(), translatedSize.height());
 
@@ -193,9 +193,9 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
 
         if (fullPixmap.isNull()) {
             int sideLength = translatedSize.height();
-            QPixmap tempPixmap = UserLevelPixmapGenerator::generatePixmap(
-                sideLength, UserLevelFlags(info->user_level()), info->pawn_colors(), false,
-                QString::fromStdString(info->privlevel()));
+            QPixmap tempPixmap = UserLevelPixmapGenerator::generatePixmap(sideLength, UserLevelFlags(info.user_level()),
+                                                                          info.pawn_colors(), false,
+                                                                          QString::fromStdString(info.privlevel()));
             int x = (translatedSize.width() - sideLength) / 2;
             int y = 0;
             tempPainter.drawPixmap(x, y, tempPixmap);
@@ -222,7 +222,7 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     painter->save();
     resetPainterTransform(painter);
 
-    QString name = QString::fromStdString(info->name());
+    QString name = QString::fromStdString(info.name());
     if (name.size() > 13) {
         name = name.mid(0, 10) + "...";
     }

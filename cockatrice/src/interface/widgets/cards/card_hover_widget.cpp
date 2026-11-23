@@ -795,7 +795,7 @@ bool CardHoverWidget::canModifyCurrentCard() const
     if (!currentCard || !currentCard->getOwner() || !currentPlayer) {
         return false;
     }
-    if (!currentPlayer->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (!currentPlayer->getLogic()->getPlayerInfo().isLocalOrJudge()) {
         return false;
     }
     // A revealed zone we cannot write to is read-only even for its owner.
@@ -1009,8 +1009,8 @@ void CardHoverWidget::buildMoveTab(const QList<CardState *> &cardList, const QSt
                 if (other == player->getLogic()) {
                     continue;
                 }
-                QString name = other->getPlayerInfo()->getName();
-                int id = other->getPlayerInfo()->getId();
+                QString name = other->getPlayerInfo().getName();
+                int id = other->getPlayerInfo().id;
                 grid.addButton(createGridButton(
                     name, semanticActionIcon(QStringLiteral("icons/player"), AppColor::Informational),
                     [actions, cardList, id]() {

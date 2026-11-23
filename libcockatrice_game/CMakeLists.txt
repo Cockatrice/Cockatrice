@@ -47,7 +47,6 @@ add_library(
   libcockatrice/game/phase.cpp
   libcockatrice/game/player/player_actions.cpp
   libcockatrice/game/player/player_event_handler.cpp
-  libcockatrice/game/player/player_info.cpp
   libcockatrice/game/player/player_logic.cpp
   libcockatrice/game/player/player_manager.cpp
   libcockatrice/game/replay.cpp

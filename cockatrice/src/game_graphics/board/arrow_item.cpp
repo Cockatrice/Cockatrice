@@ -341,12 +341,11 @@ void ArrowItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 // ArrowDragItem
 
 ArrowDragItem::ArrowDragItem(PlayerLogic *_owner, ArrowTarget *_startItem, const QColor &_color, int _deleteInPhase)
-    : ArrowItem(QSharedPointer<ArrowData>::create(ArrowData{.creatorId = _owner->getPlayerInfo()->getId(),
-                                                            .isLocalCreator = true,
-                                                            .id = -1,
-                                                            .color = _color}),
-                _startItem,
-                nullptr),
+    : ArrowItem(
+          QSharedPointer<ArrowData>::create(
+              ArrowData{.creatorId = _owner->getPlayerInfo().id, .isLocalCreator = true, .id = -1, .color = _color}),
+          _startItem,
+          nullptr),
       player(_owner), deleteInPhase(_deleteInPhase)
 {
 }
@@ -439,17 +438,17 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
         ArrowData arrow;
         arrow.color = data->color;
-        arrow.startPlayerId = startZone->getPlayer()->getPlayerInfo()->getId();
+        arrow.startPlayerId = startZone->getPlayer()->getPlayerInfo().id;
         arrow.startZone = startZone->getName();
         arrow.startCardId = startCard->getId();
 
         if (auto *targetCard = qgraphicsitem_cast<CardItem *>(targetItem)) {
             CardZoneLogic *targetZone = targetCard->getZone();
-            arrow.targetPlayerId = targetZone->getPlayer()->getPlayerInfo()->getId();
+            arrow.targetPlayerId = targetZone->getPlayer()->getPlayerInfo().id;
             arrow.targetZone = targetZone->getName();
             arrow.targetCardId = targetCard->getId();
         } else if (auto *targetPlayer = qgraphicsitem_cast<PlayerTarget *>(targetItem)) {
-            arrow.targetPlayerId = targetPlayer->getOwner()->getPlayerInfo()->getId();
+            arrow.targetPlayerId = targetPlayer->getOwner()->getPlayerInfo().id;
         } else {
             cancel();
             return;
@@ -474,13 +473,12 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 // ArrowAttachItem
 ArrowAttachItem::ArrowAttachItem(ArrowTarget *_startItem)
-    : ArrowItem(
-          QSharedPointer<ArrowData>::create(ArrowData{.creatorId = _startItem->getOwner()->getPlayerInfo()->getId(),
-                                                      .isLocalCreator = true,
-                                                      .id = -1,
-                                                      .color = Qt::green}),
-          _startItem,
-          nullptr),
+    : ArrowItem(QSharedPointer<ArrowData>::create(ArrowData{.creatorId = _startItem->getOwner()->getPlayerInfo().id,
+                                                            .isLocalCreator = true,
+                                                            .id = -1,
+                                                            .color = Qt::green}),
+                _startItem,
+                nullptr),
       player(_startItem->getOwner())
 {
 }

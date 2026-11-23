@@ -76,7 +76,7 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, CardItem *_card, bool _shortcuts
         if (playerToAdd == player->getLogic()) {
             continue;
         }
-        playersInfo.append(qMakePair(playerToAdd->getPlayerInfo()->getName(), playerToAdd->getPlayerInfo()->getId()));
+        playersInfo.append(qMakePair(playerToAdd->getPlayerInfo().getName(), playerToAdd->getPlayerInfo().id));
     }
 
     connect(player->getLogic()->getGame()->getPlayerManager(), &PlayerManager::playerRemoved, this,
@@ -152,7 +152,7 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, CardItem *_card, bool _shortcuts
     }
 
     bool revealedCard = false;
-    bool writeableCard = player->getLogic()->getPlayerInfo()->getLocalOrJudge();
+    bool writeableCard = player->getLogic()->getPlayerInfo().isLocalOrJudge();
     if (auto *view = qobject_cast<ZoneViewZoneLogic *>(card->getZone())) {
         if (view->getRevealZone()) {
             if (view->getWriteableRevealZone()) {
@@ -192,7 +192,7 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, CardItem *_card, bool _shortcuts
 void CardMenu::removePlayer(PlayerLogic *playerToRemove)
 {
     for (auto it = playersInfo.begin(); it != playersInfo.end();) {
-        if (it->second == playerToRemove->getPlayerInfo()->getId()) {
+        if (it->second == playerToRemove->getPlayerInfo().id) {
             it = playersInfo.erase(it);
         } else {
             ++it;

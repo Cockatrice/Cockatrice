@@ -411,7 +411,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             if (view->getRevealZone() && !view->getWriteableRevealZone()) {
                 return;
             }
-        } else if (!owner->getPlayerInfo()->getLocalOrJudge()) {
+        } else if (!owner->getPlayerInfo().isLocalOrJudge()) {
             return;
         }
 
@@ -447,7 +447,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void CardItem::playCard(bool faceDown)
 {
     // Do nothing if the card is pending deletion or belongs to another player
-    if (owner == nullptr || !owner->getPlayerInfo()->getLocalOrJudge()) {
+    if (owner == nullptr || !owner->getPlayerInfo().isLocalOrJudge()) {
         return;
     }
 
