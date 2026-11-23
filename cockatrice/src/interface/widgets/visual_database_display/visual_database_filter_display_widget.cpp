@@ -55,10 +55,12 @@ QSize FilterDisplayWidget::sizeHint() const
 
 void FilterDisplayWidget::mousePressEvent(QMouseEvent *event)
 {
+    // Call the base class before emitting: listeners may delete this widget, so nothing may
+    // touch `this` or `event` after filterClicked() is emitted.
+    QWidget::mousePressEvent(event);
     if (event->button() == Qt::LeftButton) {
         emit filterClicked();
     }
-    QWidget::mousePressEvent(event);
 }
 
 void FilterDisplayWidget::loadFilter()

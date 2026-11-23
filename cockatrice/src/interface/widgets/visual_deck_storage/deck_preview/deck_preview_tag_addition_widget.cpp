@@ -47,10 +47,13 @@ QSize DeckPreviewTagAdditionWidget::sizeHint() const
 
 void DeckPreviewTagAdditionWidget::mousePressEvent(QMouseEvent *event)
 {
+    // Let the base class handle the event first: tagClicked() can open a modal dialog whose
+    // nested event loop (or the tag refresh that follows it) may delete this widget, so
+    // nothing may touch `this` or `event` after the signal has been emitted.
+    QWidget::mousePressEvent(event);
     if (event->button() == Qt::LeftButton) {
         emit tagClicked();
     }
-    QWidget::mousePressEvent(event);
 }
 
 void DeckPreviewTagAdditionWidget::paintEvent(QPaintEvent *event)

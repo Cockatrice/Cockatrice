@@ -54,8 +54,11 @@ void DeckPreviewDeckTagsDisplayWidget::refreshTags()
     }
 
     auto tagAdditionWidget = new DeckPreviewTagAdditionWidget(this, tr("Edit tags ..."));
+    // Queued so the modal tag dialog (and its nested event loop) runs after the mouse press
+    // has been fully delivered, instead of inside the clicked widget's mousePressEvent. The
+    // dialog may end up deleting the clicked widget via refreshTags() or a preview rebuild.
     connect(tagAdditionWidget, &DeckPreviewTagAdditionWidget::tagClicked, this,
-            &DeckPreviewDeckTagsDisplayWidget::openTagEditDlg);
+            &DeckPreviewDeckTagsDisplayWidget::openTagEditDlg, Qt::QueuedConnection);
     flowWidget->addWidget(tagAdditionWidget);
 }
 
