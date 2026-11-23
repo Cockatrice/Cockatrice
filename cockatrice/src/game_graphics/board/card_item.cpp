@@ -89,6 +89,15 @@ void CardItem::prepareDelete()
         owner = nullptr;
     }
 
+    // The item outlives this call until the deferred delete runs. If the user is pressing on it, the scene would keep
+    // routing mouse events here; release the grab and any in-flight drag so nothing touches the cleared owner.
+    if (QGraphicsScene *sc = scene()) {
+        if (sc->mouseGrabberItem() == this) {
+            ungrabMouse();
+        }
+    }
+    deleteDragItem();
+
     const QList<CardState *> &attachedStates = state->getAttachedCards();
     while (!attachedStates.isEmpty()) {
         auto *attachedItem = qobject_cast<CardItem *>(attachedStates.first()->parent());
@@ -295,6 +304,9 @@ void CardItem::deleteDragItem()
 
 void CardItem::drawArrow(const QColor &arrowColor)
 {
+    if (owner == nullptr) {
+        return; // card is pending deletion
+    }
     if (owner->getGame()->getPlayerManager()->getLocalRoles().isSpectator) {
         return;
     }
@@ -335,6 +347,9 @@ void CardItem::drawArrow(const QColor &arrowColor)
 
 void CardItem::drawAttachArrow()
 {
+    if (owner == nullptr) {
+        return; // card is pending deletion
+    }
     if (owner->getGame()->getPlayerManager()->getLocalRoles().isSpectator) {
         return;
     }
@@ -366,6 +381,11 @@ void CardItem::drawAttachArrow()
 
 void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
+    // prepareDelete() clears the owner while the item still sits in the scene awaiting its deferred delete (e.g. the
+    // card was moved or destroyed by a server event mid-press). Ignore input for such a card.
+    if (owner == nullptr) {
+        return;
+    }
     if (event->buttons().testFlag(Qt::RightButton)) {
         if ((event->screenPos() - event->buttonDownScreenPos(Qt::RightButton)).manhattanLength() <
             2 * QApplication::startDragDistance()) {
@@ -426,8 +446,8 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void CardItem::playCard(bool faceDown)
 {
-    // Do nothing if the card belongs to another player
-    if (!owner->getPlayerInfo()->getLocalOrJudge()) {
+    // Do nothing if the card is pending deletion or belongs to another player
+    if (owner == nullptr || !owner->getPlayerInfo()->getLocalOrJudge()) {
         return;
     }
 
