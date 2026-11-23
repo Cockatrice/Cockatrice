@@ -33,7 +33,7 @@ void HomeStyledButton::applyInterfaceDefaultFont()
     // Family comes from the InterfaceDefault theme role; the 34px size and
     // bold weight previously carried by the stylesheet stay caller-side.
     QFont buttonFont = themeManager->appFont(AppFont::InterfaceDefault);
-    buttonFont.setPixelSize(34);
+    buttonFont.setPixelSize(30);
     buttonFont.setWeight(QFont::Bold);
     setFont(buttonFont);
 }
@@ -65,10 +65,9 @@ QString HomeStyledButton::generateButtonStylesheet(const QPair<QColor, QColor> &
 
     return QString(R"(
         QPushButton {
-            padding: 30px;
-            color: white;
-            border: 2px solid %1;
-            border-radius: 20px;
+            padding: 10px 22px;
+            border: 1px solid %1;
+            border-radius: 15px;
             background: qlineargradient(x1:0, y1:1, x2:0, y2:0,
                                         stop:0 %2, stop:1 %3);
         }
@@ -81,8 +80,7 @@ QString HomeStyledButton::generateButtonStylesheet(const QPair<QColor, QColor> &
                                         stop:0 %6, stop:1 %7);
         }
         QPushButton:disabled {
-            color: #aaaaaa;
-            border: 2px solid #888888;
+            border: 1px solid #888888;
             background: qlineargradient(x1:0, y1:1, x2:0, y2:0,
                                         stop:0 %8, stop:1 %9);
         }
@@ -120,7 +118,7 @@ void HomeStyledButton::paintEvent(QPaintEvent *event)
     path.addText(center, font(), text());
     path.setFillRule(Qt::WindingFill);
 
-    QPen pen(Qt::black, 4.0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    QPen pen(Qt::black, 2.0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
     painter.strokePath(path, pen);
-    painter.fillPath(path, Qt::white);
+    painter.fillPath(path, isEnabled() ? Qt::white : QColor("#aaaaaa"));
 }

@@ -129,9 +129,6 @@ void HomeWidget::retranslateUi()
     edhrecButton->setText(tr("Browse EDHRec"));
     archidektButton->setText(tr("Browse Archidekt"));
     replayButton->setText(tr("View Replays"));
-    if (exitButton) {
-        exitButton->setText(tr("Quit"));
-    }
 
     switch (connectionStatus) {
         case StatusDisconnected:
@@ -319,45 +316,50 @@ QGroupBox *HomeWidget::createButtons()
     logoLabel->setAlignment(Qt::AlignCenter);
     boxLayout->addWidget(logoLabel);
     updateLogoOverlay();
-    boxLayout->addSpacing(25);
+    boxLayout->addSpacing(10);
 
     connectButton = new HomeStyledButton(QString(), gradientColors);
     connectButton->setObjectName("homeConnectButton");
     boxLayout->addWidget(connectButton);
+    boxLayout->addSpacing(2);
 
     visualDeckEditorButton = new HomeStyledButton(QString(), gradientColors);
     visualDeckEditorButton->setObjectName("homeCreateNewDeckButton");
     connect(visualDeckEditorButton, &QPushButton::clicked, tabSupervisor,
             [this] { tabSupervisor->openDeckInNewTab(LoadedDeck()); });
     boxLayout->addWidget(visualDeckEditorButton);
+    boxLayout->addSpacing(2);
+
     visualDeckStorageButton = new HomeStyledButton(QString(), gradientColors);
     visualDeckStorageButton->setObjectName("homeBrowseDecksButton");
     connect(visualDeckStorageButton, &QPushButton::clicked, tabSupervisor,
             [this] { tabSupervisor->actTabVisualDeckStorage(true); });
     boxLayout->addWidget(visualDeckStorageButton);
+    boxLayout->addSpacing(2);
+
     visualDatabaseDisplayButton = new HomeStyledButton(QString(), gradientColors);
     visualDatabaseDisplayButton->setObjectName("homeBrowseCardDatabaseButton");
     connect(visualDatabaseDisplayButton, &QPushButton::clicked, tabSupervisor,
             &TabSupervisor::addVisualDatabaseDisplayTab);
     boxLayout->addWidget(visualDatabaseDisplayButton);
+    boxLayout->addSpacing(2);
+
     edhrecButton = new HomeStyledButton(QString(), gradientColors);
     edhrecButton->setObjectName("homeBrowseEdhrecButton");
     connect(edhrecButton, &QPushButton::clicked, tabSupervisor, &TabSupervisor::addEdhrecMainTab);
     boxLayout->addWidget(edhrecButton);
+    boxLayout->addSpacing(2);
+
     archidektButton = new HomeStyledButton(QString(), gradientColors);
     archidektButton->setObjectName("homeBrowseArchidektButton");
     connect(archidektButton, &QPushButton::clicked, tabSupervisor, &TabSupervisor::addArchidektTab);
     boxLayout->addWidget(archidektButton);
+    boxLayout->addSpacing(2);
+
     replayButton = new HomeStyledButton(QString(), gradientColors);
     replayButton->setObjectName("homeViewReplaysButton");
     connect(replayButton, &QPushButton::clicked, tabSupervisor, [this] { tabSupervisor->actTabReplays(true); });
     boxLayout->addWidget(replayButton);
-    if (qobject_cast<MainWindow *>(tabSupervisor->parentWidget())) {
-        exitButton = new HomeStyledButton(QString(), gradientColors);
-        connect(exitButton, &QPushButton::clicked, qobject_cast<MainWindow *>(tabSupervisor->parentWidget()),
-                &MainWindow::actExit);
-        boxLayout->addWidget(exitButton);
-    }
 
     box->setLayout(boxLayout);
     return box;
