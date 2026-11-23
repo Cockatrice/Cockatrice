@@ -193,6 +193,59 @@ QVariant SettingsManager::getValue(const QString &name,
     return value;
 }
 
+bool SettingsManager::containsValue(const QString &name) const
+{
+    auto settings = getSettings();
+
+    if (!defaultGroup.isEmpty()) {
+        settings.beginGroup(defaultGroup);
+    }
+
+    if (!defaultSubGroup.isEmpty()) {
+        settings.beginGroup(defaultSubGroup);
+    }
+
+    const bool present = settings.contains(name);
+
+    if (!defaultSubGroup.isEmpty()) {
+        settings.endGroup();
+    }
+
+    if (!defaultGroup.isEmpty()) {
+        settings.endGroup();
+    }
+
+    return present;
+}
+
+bool SettingsManager::containsValue(const QString &name, const QString &group, const QString &subGroup) const
+{
+    auto settings = getSettings();
+
+    QString effectiveGroup = group.isEmpty() ? defaultGroup : group;
+    QString effectiveSubGroup = subGroup.isEmpty() ? defaultSubGroup : subGroup;
+
+    if (!effectiveGroup.isEmpty()) {
+        settings.beginGroup(effectiveGroup);
+    }
+
+    if (!effectiveSubGroup.isEmpty()) {
+        settings.beginGroup(effectiveSubGroup);
+    }
+
+    const bool present = settings.contains(name);
+
+    if (!effectiveSubGroup.isEmpty()) {
+        settings.endGroup();
+    }
+
+    if (!effectiveGroup.isEmpty()) {
+        settings.endGroup();
+    }
+
+    return present;
+}
+
 QSettings::Status SettingsManager::batchWrite(std::function<void(QSettings &)> batchWriteFunction)
 {
     auto settings = getSettings();

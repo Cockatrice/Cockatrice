@@ -14,6 +14,7 @@
 #include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/download_settings.h>
+#include <libcockatrice/settings/feature_intro_settings.h>
 #include <libcockatrice/settings/game_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/network_settings.h>
@@ -866,6 +867,79 @@ TEST_F(SettingsDefaultsTest, Paths_PathsInsideDir_MatchesExactBaseAndNormalizesD
     ASSERT_EQ(offenders.size(), 2);
     ASSERT_TRUE(offenders.contains(base));
     ASSERT_TRUE(offenders.contains(base + "/decks"));
+}
+
+// --- FeatureIntroSettings ---
+
+TEST_F(SettingsDefaultsTest, FeatureIntro_GlobalEnabled_Default)
+{
+    FeatureIntroSettings s(settingsPath, nullptr);
+    ASSERT_TRUE(s.getGlobalEnabled());
+}
+
+TEST_F(SettingsDefaultsTest, FeatureIntro_GlobalEnabled_SetAndGet)
+{
+    FeatureIntroSettings s(settingsPath, nullptr);
+    s.setGlobalEnabled(false);
+    ASSERT_FALSE(s.getGlobalEnabled());
+}
+
+TEST_F(SettingsDefaultsTest, FeatureIntro_ShownRevision_DefaultsToUnseen)
+{
+    FeatureIntroSettings s(settingsPath, nullptr);
+    s.setState("a", FeatureIntroState{.decision = FeatureIntroDecision::Pending, .revision = 2});
+    // Never displayed: the glyph stays in the marked tone.
+    ASSERT_EQ(s.getState("a")->shownRevision, 0);
+
+    s.setShownRevision("a", 2);
+    ASSERT_EQ(s.getState("a")->shownRevision, 2);
+}
+
+TEST_F(SettingsDefaultsTest, FeatureIntro_UnknownState_IsUnset)
+{
+    FeatureIntroSettings s(settingsPath, nullptr);
+    ASSERT_FALSE(s.getState("unknown-feature").has_value());
+    ASSERT_TRUE(s.getKnownIds().isEmpty());
+}
+
+TEST_F(SettingsDefaultsTest, FeatureIntro_State_RoundTrips)
+{
+    FeatureIntroSettings s(settingsPath, nullptr);
+    s.setState("cards-hover-panel",
+               FeatureIntroState{.decision = FeatureIntroDecision::Declined, .revision = 2, .decidedAt = 1234});
+
+    const auto state = s.getState("cards-hover-panel");
+    ASSERT_TRUE(state.has_value());
+    ASSERT_EQ(state->decision, FeatureIntroDecision::Declined);
+    ASSERT_EQ(state->revision, 2);
+    ASSERT_EQ(state->decidedAt, 1234);
+    ASSERT_EQ(s.getKnownIds(), QStringList{"cards-hover-panel"});
+}
+
+TEST_F(SettingsDefaultsTest, FeatureIntro_SetStates_WritesAllEntries)
+{
+    FeatureIntroSettings s(settingsPath, nullptr);
+    s.setStates({{"a", FeatureIntroState{.decision = FeatureIntroDecision::Baseline, .revision = 1}},
+                 {"b", FeatureIntroState{.decision = FeatureIntroDecision::Pending, .revision = 1}}});
+
+    ASSERT_EQ(s.getState("a")->decision, FeatureIntroDecision::Baseline);
+    ASSERT_EQ(s.getState("b")->decision, FeatureIntroDecision::Pending);
+}
+
+TEST_F(SettingsDefaultsTest, FeatureIntro_ClearState_RemovesEntry)
+{
+    FeatureIntroSettings s(settingsPath, nullptr);
+    s.setState("a", FeatureIntroState{.decision = FeatureIntroDecision::Accepted, .revision = 1});
+    s.clearState("a");
+    ASSERT_FALSE(s.getState("a").has_value());
+}
+
+TEST_F(SettingsDefaultsTest, SettingsManager_ContainsValue_OnlyAfterWrite)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_FALSE(s.containsValue("hoverZoomTrigger"));
+    s.setHoverZoomTrigger(CardsDisplaySettings::HoverPanelTriggerOff);
+    ASSERT_TRUE(s.containsValue("hoverZoomTrigger"));
 }
 
 } // namespace
