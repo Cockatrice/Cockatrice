@@ -397,23 +397,6 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
         game->getPlayerManager()->setLocalPlayerId(event.local_player_id());
     }
 
-    QSet<int> authoritativePlayerIds;
-    for (int i = 0; i < playerListSize; ++i) {
-        const ServerInfo_PlayerProperties &prop = event.player_list(i).properties();
-        if (!prop.spectator()) {
-            authoritativePlayerIds.insert(prop.player_id());
-        }
-    }
-
-    // Players whose seats were shuffled away from the previous game are no longer
-    // part of the authoritative list and must be removed.
-    for (int stalePlayerId : game->getPlayerManager()->getPlayers().keys()) {
-        if (!authoritativePlayerIds.contains(stalePlayerId)) {
-            game->getPlayerManager()->removePlayer(stalePlayerId);
-            emit playerLeft(stalePlayerId);
-        }
-    }
-
     QVector<QPair<int, QPair<QString, QString>>> opponentDecksToDisplay;
 
     for (int i = 0; i < playerListSize; ++i) {

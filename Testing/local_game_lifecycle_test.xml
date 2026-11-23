@@ -17,6 +17,12 @@
     <event widget="MainWindow/localGameDialog/generalGroupBox/numberPlayersEdit" command="set_int" arguments="2" />
     <event widget="MainWindow/localGameDialog" command="key" arguments="16777220" />
 
+    <!-- Both local seats must exist in the lobby. Join-time Event_GameStateChanged
+         messages are snapshots, so a client that treats one as authoritative
+         deletes the seats that joined later. -->
+    <event widget="MainWindow" command="process_events" arguments="2500" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/playerListDock/playerListBox/playerListWidget" command="expectProperty" arguments="topLevelItemCount,2" />
+
     <!-- ===== Phase 2: Player 1 loads deck from clipboard ===== -->
     <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_0/qt_tabwidget_stackedwidget/deckViewContainer/loadFromClipboardButton" command="activate" arguments="" />
     <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_0/qt_tabwidget_stackedwidget/deckViewContainer/dlgDeckTextEdit/contentsEdit" command="keyEvent" arguments="6,65,67108864,,0,1" />
@@ -57,6 +63,9 @@
     <event widget="MainWindow" command="key" arguments="32" />
     <event widget="MainWindow" command="key" arguments="32" />
     <event widget="MainWindow" command="key" arguments="32" />
+
+    <!-- Both seats must survive the game start as well. -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/playerListDock/playerListBox/playerListWidget" command="expectProperty" arguments="topLevelItemCount,2" />
 
     <!-- ===== Phase 4: Advance through all 11 phases via phasesMenu activate ===== -->
     <!-- Using activate on phasesMenu triggers aNextPhaseAction which:
