@@ -82,10 +82,12 @@ void DeckPreviewTagDisplayWidget::mousePressEvent(QMouseEvent *event)
     // Only announce a change when the state was actually toggled, so a click that falls
     // through the switch (e.g. a button the widget does not react to) does not drive a
     // full tag-filter update and layout pass for nothing.
+    // The base class runs before the signal: listeners may rebuild the tag chips and delete
+    // this widget, so nothing may touch `this` or `event` after tagClicked() is emitted.
+    QWidget::mousePressEvent(event);
     if (state != previousState) {
         emit tagClicked();
     }
-    QWidget::mousePressEvent(event);
 }
 
 void DeckPreviewTagDisplayWidget::paintEvent(QPaintEvent *event)
