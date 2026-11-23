@@ -27,6 +27,7 @@
 #include <libcockatrice/settings/debug_settings.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/download_settings.h>
+#include <libcockatrice/settings/feature_intro_settings.h>
 #include <libcockatrice/settings/game_filters_settings.h>
 #include <libcockatrice/settings/game_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
@@ -193,6 +194,7 @@ SettingsCache::SettingsCache()
     appearanceSettings = new AppearanceSettings(settingsPath, this);
     networkSettings = new NetworkSettings(settingsPath, this);
     commanderBracketSettings = new CommanderBracketSettings(settingsPath, this);
+    featureIntroSettings = new FeatureIntroSettings(settingsPath, this);
 
     // Forward ICardDatabasePathProvider signal from PathsSettings
     connect(pathsSettings, &PathsSettings::cardDatabasePathChanged, this,

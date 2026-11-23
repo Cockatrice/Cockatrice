@@ -33,6 +33,7 @@ class CommanderBracketSettings;
 class DebugSettings;
 class DeckEditorSettings;
 class DownloadSettings;
+class FeatureIntroSettings;
 class GameFiltersSettings;
 class GameSettings;
 class InterfaceSettings;
@@ -86,6 +87,7 @@ private:
     AppearanceSettings *appearanceSettings = nullptr;
     NetworkSettings *networkSettings = nullptr;
     CommanderBracketSettings *commanderBracketSettings = nullptr;
+    FeatureIntroSettings *featureIntroSettings = nullptr;
 
     QString themeName;
 
@@ -161,6 +163,10 @@ public:
     [[nodiscard]] CommanderBracketSettings &commanderBrackets() const
     {
         return *commanderBracketSettings;
+    }
+    [[nodiscard]] FeatureIntroSettings &featureIntros() const
+    {
+        return *featureIntroSettings;
     }
 
     [[nodiscard]] bool getIsPortableBuild() const
