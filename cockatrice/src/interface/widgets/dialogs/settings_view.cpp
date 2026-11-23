@@ -446,6 +446,15 @@ void SettingsView::flashWidget(QWidget *widget)
     group->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
+void SettingsView::openSetting(SettingsPage page, const QString &query)
+{
+    setTab(page);
+    // Setting the text is the whole navigation: textChanged switches to search mode
+    // and selects the first matching row.
+    searchEdit->setText(query);
+    searchEdit->setFocus();
+}
+
 void SettingsView::onSearchTextChanged(const QString &text)
 {
     searchModel->setFilterString(text);

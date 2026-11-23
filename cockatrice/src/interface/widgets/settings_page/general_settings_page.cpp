@@ -28,6 +28,7 @@
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/download_settings.h>
+#include <libcockatrice/settings/feature_intro_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
@@ -209,6 +210,15 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     connect(&showTipsOnStartup, &QCheckBox::clicked, &settings.personal(), &PersonalSettings::setShowTipsOnStartup);
 
+    // Feature introductions: one switch for the passive and in-place asks alike.
+    informAboutNewFeatures.setChecked(settings.featureIntros().getGlobalEnabled());
+    connect(&informAboutNewFeatures, &QCheckBox::clicked, this,
+            [](bool checked) { SettingsCache::instance().featureIntros().setGlobalEnabled(checked); });
+
+    whatsNewButton = new QPushButton;
+    whatsNewButton->setObjectName(QStringLiteral("whatsNewButton"));
+    connect(whatsNewButton, &QPushButton::clicked, this, &GeneralSettingsPage::whatsNewRequested);
+
     // startup destination
     for (int i = 0; i < 8; ++i) {
         startupTabSelector.addItem(""); // texts set in retranslateUi
@@ -256,12 +266,14 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     auto *startupGrid = new QGridLayout;
     startupGrid->addWidget(&showTipsOnStartup, 0, 0, 1, 2);
-    startupGrid->addWidget(&startupTabLabel, 1, 0);
-    startupGrid->addWidget(&startupTabSelector, 1, 1);
-    startupGrid->addWidget(&startupServerLabel, 2, 0);
-    startupGrid->addWidget(&startupServerSelector, 2, 1);
-    startupGrid->addWidget(&startupRoomLabel, 3, 0);
-    startupGrid->addWidget(startupRoomNameEdit, 3, 1);
+    startupGrid->addWidget(&informAboutNewFeatures, 1, 0, 1, 2);
+    startupGrid->addWidget(whatsNewButton, 1, 2);
+    startupGrid->addWidget(&startupTabLabel, 2, 0);
+    startupGrid->addWidget(&startupTabSelector, 2, 1);
+    startupGrid->addWidget(&startupServerLabel, 3, 0);
+    startupGrid->addWidget(&startupServerSelector, 3, 1);
+    startupGrid->addWidget(&startupRoomLabel, 4, 0);
+    startupGrid->addWidget(startupRoomNameEdit, 4, 1);
 
     updateStartupServerControlsVisibility();
 
@@ -620,6 +632,8 @@ void GeneralSettingsPage::retranslateUi()
 
     startupGroupBox->setTitle(tr("Startup settings"));
     showTipsOnStartup.setText(tr("Show tips on startup"));
+    informAboutNewFeatures.setText(tr("Tell me about new features the first time I use them"));
+    whatsNewButton->setText(tr("What's new…"));
     startupTabLabel.setText(tr("Startup tab:"));
     startupTabSelector.setItemText(StartupTab::StartupTabHome, tr("Home"));
     startupTabSelector.setItemText(StartupTab::StartupTabVisualDeckStorage, tr("Visual Deck Storage"));
