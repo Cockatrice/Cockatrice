@@ -27,7 +27,10 @@
 #include <QVariant>
 #include <functional>
 #include <gtest/gtest.h>
+#include <libcockatrice/rng/rng_abstract.h>
 #include <memory>
+
+RNG_Abstract *rng = nullptr; // referenced by the server_remote library
 
 namespace
 {
