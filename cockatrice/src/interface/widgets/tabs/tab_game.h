@@ -124,7 +124,7 @@ private:
     void processLocalPlayerDeckSelect(PlayerLogic *localPlayer, int playerId, ServerInfo_Player playerInfo);
     void loadDeckForLocalPlayer(PlayerLogic *localPlayer, int playerId, ServerInfo_Player playerInfo);
     void processLocalPlayerReady(int playerId, ServerInfo_Player playerInfo);
-    void createZoneForPlayer(PlayerLogic *newPlayer, int playerId);
+    void assignZoneIdForPlayer(PlayerLogic *newPlayer, int playerId);
 
     void startGame(bool resuming);
     void stopGame();

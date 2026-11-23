@@ -884,7 +884,7 @@ PlayerLogic *TabGame::addPlayer(PlayerLogic *newPlayer)
 
     gameMenu->insertMenu(playersSeparator, view->getPlayerMenu()->getPlayerMenu());
 
-    createZoneForPlayer(newPlayer, newPlayer->getPlayerInfo()->getId());
+    assignZoneIdForPlayer(newPlayer, newPlayer->getPlayerInfo()->getId());
 
     return newPlayer;
 }
@@ -996,23 +996,20 @@ void TabGame::processLocalPlayerReadyStateChanged(int playerId, bool ready)
     deckViewContainers.value(playerId)->playerDeckView->setReadyStart(ready);
 }
 
-void TabGame::createZoneForPlayer(PlayerLogic *newPlayer, int playerId)
+void TabGame::assignZoneIdForPlayer(PlayerLogic *newPlayer, int playerId)
 {
-    if (!game->getPlayerManager()->getSpectators().contains(playerId)) {
+    if (game->getPlayerManager()->getSpectators().contains(playerId)) {
+        return;
+    }
 
-        // Loop for each player, the idea is to have one assigned zone for each non-spectator player
-        for (int i = 1; i <= game->getPlayerManager()->getPlayerCount(); ++i) {
-            bool aPlayerHasThisZone = false;
-            for (auto &player : game->getPlayerManager()->getPlayers()) {
-                if (player->getZoneId() == i) {
-                    aPlayerHasThisZone = true;
-                    break;
-                }
-            }
-            if (!aPlayerHasThisZone) {
-                newPlayer->setZoneId(i);
-                break;
-            }
+    // Loop for each player, the idea is to have one assigned zone for each non-spectator player
+    for (int i = 1; i <= game->getPlayerManager()->getPlayerCount(); ++i) {
+        auto players = game->getPlayerManager()->getPlayers();
+        bool zoneIdTaken =
+            std::any_of(players.cbegin(), players.cend(), [i](const auto &player) { return player->getZoneId() == i; });
+        if (!zoneIdTaken) {
+            newPlayer->setZoneId(i);
+            return;
         }
     }
 }
