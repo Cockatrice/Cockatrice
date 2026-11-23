@@ -16,8 +16,9 @@ class QObject;
  * @brief What the user decided about one feature introduction.
  *
  * Pending is the only state that can still show an invitation. Baseline means the
- * feature predates the user's install (or already shipped to them) and must never
- * be announced. Skipped means the feature was already configured explicitly.
+ * entry was never news for this install: a clean install (everything was always
+ * there) or a build that does not contain the feature. Skipped means the feature was
+ * already configured explicitly.
  */
 enum class FeatureIntroDecision
 {

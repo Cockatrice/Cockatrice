@@ -10,9 +10,9 @@ namespace
  * Both triggers used to be opt-in and are now `Hover` by default, which is the
  * exact shape that goes unnoticed: the feature is already on, so nothing tells
  * the user it exists and nothing tells them how to get the old hover behavior
- * back. `introducedIn` names the line the work landed in, not the beta it first
- * appeared in, so users already on a `3.2.0` prerelease are baselined while users
- * arriving from `3.1.x` are invited.
+ * back. `introducedIn` names the line the work landed in, and the entry is
+ * announced once to any install that has never seen it — including one already on
+ * a `3.2.0` prerelease — while a clean install stays quiet.
  */
 FeatureIntro hoverCardPanelIntro()
 {

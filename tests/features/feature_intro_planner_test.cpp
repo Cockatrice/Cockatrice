@@ -68,24 +68,36 @@ TEST(FeatureIntroPlanner, UpdateFromBeforeFeature_QueuesIt)
     ASSERT_EQ(state->revision, 1);
 }
 
-TEST(FeatureIntroPlanner, UpdateFromAfterFeature_Baselines)
+TEST(FeatureIntroPlanner, UpdateFromAfterFeature_StillAnnounces)
 {
     const QVector<FeatureIntro> catalog = {entry("cards-hover-panel", "3.2.0")};
 
     const FeatureIntroPlan plan = planFeatureIntros(catalog, states(), {}, "3.3.0", "3.4.0");
 
-    ASSERT_TRUE(plan.due.isEmpty());
-    ASSERT_EQ(writtenState(plan, "cards-hover-panel")->decision, FeatureIntroDecision::Baseline);
+    ASSERT_EQ(plan.due, QStringList{"cards-hover-panel"});
+    ASSERT_EQ(writtenState(plan, "cards-hover-panel")->decision, FeatureIntroDecision::Pending);
 }
 
-TEST(FeatureIntroPlanner, RestartOnTheSameVersion_Baselines)
+TEST(FeatureIntroPlanner, RestartWithAnUnseenEntry_AnnouncesIt)
 {
     const QVector<FeatureIntro> catalog = {entry("cards-hover-panel", "3.2.0")};
 
     const FeatureIntroPlan plan = planFeatureIntros(catalog, states(), {}, "3.2.0", "3.2.0");
 
-    ASSERT_TRUE(plan.due.isEmpty());
-    ASSERT_EQ(writtenState(plan, "cards-hover-panel")->decision, FeatureIntroDecision::Baseline);
+    ASSERT_EQ(plan.due, QStringList{"cards-hover-panel"});
+    ASSERT_EQ(writtenState(plan, "cards-hover-panel")->decision, FeatureIntroDecision::Pending);
+}
+
+TEST(FeatureIntroPlanner, EntryAddedMidReleaseLine_AnnouncesIt)
+{
+    // A 3.2.0 install updating to 3.2.1 must still hear about an entry that lands
+    // in the 3.2 line: the store has never seen it, and the build contains it.
+    const QVector<FeatureIntro> catalog = {entry("cards-hover-panel", "3.2.0")};
+
+    const FeatureIntroPlan plan = planFeatureIntros(catalog, states(), {}, "3.2.0", "3.2.1");
+
+    ASSERT_EQ(plan.due, QStringList{"cards-hover-panel"});
+    ASSERT_EQ(writtenState(plan, "cards-hover-panel")->decision, FeatureIntroDecision::Pending);
 }
 
 TEST(FeatureIntroPlanner, ReleaseWithoutTheFeature_Baselines)
@@ -107,11 +119,24 @@ TEST(FeatureIntroPlanner, PrereleaseSuffixDoesNotHideTheUpdate)
     ASSERT_EQ(plan.due, QStringList{"cards-hover-panel"});
 }
 
-TEST(FeatureIntroPlanner, UnparsablePreviousVersion_Baselines)
+TEST(FeatureIntroPlanner, UnparsablePreviousVersion_IsIgnored)
 {
+    // Only the running build decides whether the feature exists; a previous
+    // version that cannot be parsed no longer hides a new entry.
     const QVector<FeatureIntro> catalog = {entry("cards-hover-panel", "3.2.0")};
 
     const FeatureIntroPlan plan = planFeatureIntros(catalog, states(), {}, "development", "3.2.0");
+
+    ASSERT_EQ(plan.due, QStringList{"cards-hover-panel"});
+    ASSERT_EQ(writtenState(plan, "cards-hover-panel")->decision, FeatureIntroDecision::Pending);
+}
+
+TEST(FeatureIntroPlanner, UnparsableCurrentVersion_Baselines)
+{
+    // Without a version to compare against, queueing would repeat on every launch.
+    const QVector<FeatureIntro> catalog = {entry("cards-hover-panel", "3.2.0")};
+
+    const FeatureIntroPlan plan = planFeatureIntros(catalog, states(), {}, "3.1.0", "development");
 
     ASSERT_TRUE(plan.due.isEmpty());
     ASSERT_EQ(writtenState(plan, "cards-hover-panel")->decision, FeatureIntroDecision::Baseline);

@@ -35,8 +35,10 @@ struct FeatureIntroPlan
  *
  * - An install with no previous version is new, so every entry is `Baseline`:
  *   a feature that was always there is not news.
- * - An update from before @c introducedIn to at or after it is `Pending`, so the
- *   entry may invite the user the next time they reach the feature.
+ * - An install that already ran is asked about every entry it has never seen, as
+ *   long as this build contains the feature (@c introducedIn at or before the
+ *   running version). Adding a catalog entry is the decision to announce it once,
+ *   which is what covers a change that lands mid-release-line.
  * - An entry the user already configured is `Skipped` and never invites them.
  * - A revision bump re-queues an existing decision exactly once: the write records
  *   the new revision, so the following run finds nothing to do.

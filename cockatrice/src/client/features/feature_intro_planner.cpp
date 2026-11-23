@@ -19,25 +19,28 @@ QVersionNumber numericVersion(const QString &version)
 /**
  * @brief Whether a feature introduced in @a introducedIn is news for this install.
  *
- * A clean install has no previous version and is not news to anyone. An update is
- * news only when the feature landed after the version the user ran and before or
- * at the version they now run.
+ * A clean install has no previous version and is not news to anyone: everything it
+ * contains was always there. An install that already ran is asked about every entry
+ * whose feature this build contains, whether or not the previous version did.
+ * Adding a catalog entry is therefore the decision to announce it once, which is
+ * what makes a change that lands mid-release-line visible instead of only to users
+ * who cross that line.
  */
-bool isNewForInstall(const QString &previousVersion, const QString &introducedIn, const QString &currentVersion)
+bool isNewsForInstall(const QString &previousVersion, const QString &introducedIn, const QString &currentVersion)
 {
     if (previousVersion.isEmpty()) {
         return false;
     }
 
-    const QVersionNumber previous = numericVersion(previousVersion);
     const QVersionNumber introduced = numericVersion(introducedIn);
-    if (previous.isNull() || introduced.isNull()) {
+    const QVersionNumber current = numericVersion(currentVersion);
+    if (introduced.isNull() || current.isNull()) {
         // An unparsable version would otherwise compare as "older than everything"
         // and queue the entry on every launch.
         return false;
     }
 
-    return previous < introduced && introduced <= numericVersion(currentVersion);
+    return introduced <= current;
 }
 } // namespace
 
@@ -62,7 +65,7 @@ FeatureIntroPlan planFeatureIntros(const QVector<FeatureIntro> &catalog,
             state.revision = entry.revision;
             if (configured) {
                 state.decision = FeatureIntroDecision::Skipped;
-            } else if (isNewForInstall(previousVersion, entry.introducedIn, currentVersion)) {
+            } else if (isNewsForInstall(previousVersion, entry.introducedIn, currentVersion)) {
                 state.decision = FeatureIntroDecision::Pending;
             } else {
                 state.decision = FeatureIntroDecision::Baseline;

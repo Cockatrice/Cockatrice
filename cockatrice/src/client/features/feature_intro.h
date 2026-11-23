@@ -37,7 +37,8 @@ struct FeatureIntro
     int revision = 1;
     FeatureIntroShape shape = FeatureIntroShape::OptIn;
     /// First release that contains the feature, as a `VERSION_STRING` prefix
-    /// (`3.2.0`). Installs older than this are invited; the rest are baselined.
+    /// (`3.2.0`). An entry is announced once to an install that has never seen it
+    /// and whose build contains the feature; a clean install is baselined.
     QString introducedIn;
 
     /// Stable key of the surface whose arrival may announce this feature, e.g.
