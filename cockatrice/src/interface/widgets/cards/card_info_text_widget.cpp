@@ -28,7 +28,10 @@ CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent)
     propsLabel = new QLabel;
     propsLabel->setOpenExternalLinks(false);
     propsLabel->setWordWrap(true);
-    connect(propsLabel, SIGNAL(linkActivated(const QString &)), this, SIGNAL(linkActivated(const QString &)));
+    // Forward link clicks via a queued connection: listeners react by calling setCard() -> setTexts(),
+    // which replaces propsLabel's text. Doing that synchronously destroys QLabel's internal text control
+    // while it is still processing the mouse event that emitted linkActivated, causing a crash.
+    connect(propsLabel, &QLabel::linkActivated, this, &CardInfoTextWidget::linkActivated, Qt::QueuedConnection);
 
     textLabel = new QTextEdit();
     textLabel->setReadOnly(true);
