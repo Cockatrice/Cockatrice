@@ -329,6 +329,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_editor/visual_deck_editor_sample_hand_widget.cpp
     src/interface/widgets/visual_deck_editor/visual_deck_editor_widget.cpp
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_color_identity_filter_widget.cpp
+    src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_deck_box_widget.cpp
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.cpp
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_tag_addition_widget.cpp
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp
