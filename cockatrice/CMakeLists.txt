@@ -236,8 +236,6 @@ set(cockatrice_SOURCES
     src/interface/widgets/deck_editor/printing_disabled_info_widget.cpp
     src/interface/widgets/feature_intro/feature_intro_badge.cpp
     src/interface/widgets/feature_intro/feature_intro_badge.h
-    src/interface/widgets/feature_intro/feature_intro_banner.cpp
-    src/interface/widgets/feature_intro/feature_intro_banner.h
     src/interface/widgets/game_hosting/create_game_form_widget.cpp
     src/interface/widgets/game_hosting/game_creation_options.cpp
     src/interface/widgets/general/background_sources.cpp

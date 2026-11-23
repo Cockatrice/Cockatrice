@@ -69,16 +69,6 @@ void FeatureIntroSettings::setGlobalEnabled(bool enabled)
     emit globalEnabledChanged(enabled);
 }
 
-qint64 FeatureIntroSettings::getLastPromptEpoch() const
-{
-    return getValue(QStringLiteral("lastPromptEpoch"), kRootGroup, QString(), qint64(0)).toLongLong();
-}
-
-void FeatureIntroSettings::setLastPromptEpoch(qint64 epoch)
-{
-    setValue(epoch, QStringLiteral("lastPromptEpoch"), kRootGroup);
-}
-
 std::optional<FeatureIntroState> FeatureIntroSettings::getState(const QString &id) const
 {
     const QString group = entryGroup(id);
@@ -90,6 +80,7 @@ std::optional<FeatureIntroState> FeatureIntroSettings::getState(const QString &i
     state.decision = decisionFromString(getValue(QStringLiteral("decision"), group).toString());
     state.revision = getValue(QStringLiteral("revision"), group, QString(), 0).toInt();
     state.decidedAt = getValue(QStringLiteral("decidedAt"), group, QString(), qint64(0)).toLongLong();
+    state.shownRevision = getValue(QStringLiteral("shownRevision"), group, QString(), 0).toInt();
     return state;
 }
 
@@ -99,6 +90,7 @@ void FeatureIntroSettings::setState(const QString &id, const FeatureIntroState &
     setValue(decisionToString(state.decision), QStringLiteral("decision"), group);
     setValue(state.revision, QStringLiteral("revision"), group);
     setValue(state.decidedAt, QStringLiteral("decidedAt"), group);
+    setValue(state.shownRevision, QStringLiteral("shownRevision"), group);
     emit stateChanged(id);
 }
 
@@ -110,6 +102,7 @@ void FeatureIntroSettings::setStates(const QList<QPair<QString, FeatureIntroStat
             settings.setValue(QStringLiteral("decision"), decisionToString(entry.second.decision));
             settings.setValue(QStringLiteral("revision"), entry.second.revision);
             settings.setValue(QStringLiteral("decidedAt"), entry.second.decidedAt);
+            settings.setValue(QStringLiteral("shownRevision"), entry.second.shownRevision);
             settings.endGroup();
         }
     });
@@ -125,6 +118,17 @@ void FeatureIntroSettings::clearState(const QString &id)
     deleteValue(QStringLiteral("decision"), group);
     deleteValue(QStringLiteral("revision"), group);
     deleteValue(QStringLiteral("decidedAt"), group);
+    deleteValue(QStringLiteral("shownRevision"), group);
+    emit stateChanged(id);
+}
+
+void FeatureIntroSettings::setShownRevision(const QString &id, int revision)
+{
+    const QString group = entryGroup(id);
+    if (getValue(QStringLiteral("shownRevision"), group, QString(), 0).toInt() == revision) {
+        return;
+    }
+    setValue(revision, QStringLiteral("shownRevision"), group);
     emit stateChanged(id);
 }
 

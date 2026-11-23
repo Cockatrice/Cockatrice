@@ -142,8 +142,6 @@ private:
     void createPlayerListDock(bool bReplay = false);
     void createMessageDock(bool bReplay = false);
     void createPlayAreaWidget(bool bReplay = false);
-    /// Shows the pending feature introduction above the board, once per launch.
-    void maybeShowFeatureIntro(QVBoxLayout *layout);
     void createDeckViewContainerWidget(bool bReplay = false);
     void createReplayDock(GameReplay *replay);
     void updateInviteButtonState();
@@ -213,6 +211,9 @@ public:
     bool closeRequest() override;
 
     [[nodiscard]] QString getTabText() const override;
+    /// Hover zoom and the card panel live on the board, so their introduction is
+    /// offered here and nowhere else.
+    [[nodiscard]] QString introSurface() const override;
 
     [[nodiscard]] AbstractGame *getGame() const
     {

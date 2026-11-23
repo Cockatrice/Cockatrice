@@ -38,9 +38,11 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QProcess>
+#include <QSet>
 #include <QString>
 #include <QStringList>
 #include <QUrl>
+#include <QVector>
 #include <QtGlobal>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <qtmetamacros.h>
@@ -103,6 +105,12 @@ private slots:
     void actAbout();
     void actTips();
     void actWhatsNew();
+    /// Opens the index, narrowed to @a surface when one is named.
+    void openWhatsNew(const QString &surface);
+    void showFeatureIntrosForCurrentSurface();
+    void updateFeatureIntroButton();
+    /// Fades the glyph in and shows its one tooltip the first time this session.
+    void revealFeatureIntroButton(const QString &id, const QString &description);
     void actUpdate();
     void actOpenPendingClientUpdate();
     void actViewLog();
@@ -199,6 +207,11 @@ private:
     QAction *aAbout, *aSettings, *aShow, *aExit;
     QToolButton *settingsButton = nullptr;
     QToolButton *clientUpdateButton = nullptr;
+    /// Appears only while the surface in front has an unanswered feature
+    /// introduction; left of the update glyph so #7928's placement stays intact.
+    QToolButton *featureIntroButton = nullptr;
+    /// Entries whose reveal (fade and one tooltip) already happened in this session.
+    QSet<QString> revealedFeatureIntros;
     Release *pendingClientUpdate = nullptr;
     bool pendingClientUpdateCompatible = false;
     QAction *aConnect, *aDisconnect, *aRegister, *aForgotPassword, *aSinglePlayer, *aWatchReplay, *aFullScreen;

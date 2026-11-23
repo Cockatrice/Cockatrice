@@ -33,9 +33,27 @@ FeatureIntroHandlers hoverCardPanelHandlers()
     FeatureIntroHandlers handlers;
     handlers.isConfigured = cardsConfigured;
     handlers.isAlternativeActive = classicHoverActive;
-    // The rework is already the shipped default, so keeping it needs no write and
-    // therefore has nothing to undo.
-    handlers.applyAccept = [] { return FeatureIntroAction(); };
+    // The rework is already the shipped default, so keeping it normally needs no
+    // write. After a decline it does: the triggers are Off, and the index's undo is
+    // exactly this call, so it has to put both back. A no-op write would record
+    // "you are using it" over settings that say otherwise.
+    handlers.applyAccept = []() -> FeatureIntroAction {
+        auto &cards = SettingsCache::instance().cardsDisplay();
+        const int zoom = cards.getHoverZoomTrigger();
+        const int panel = cards.getHoverPanelTrigger();
+        if (zoom == CardsDisplaySettings::HoverPanelTriggerHover &&
+            panel == CardsDisplaySettings::HoverPanelTriggerHover) {
+            return FeatureIntroAction();
+        }
+
+        cards.setHoverZoomTrigger(CardsDisplaySettings::HoverPanelTriggerHover);
+        cards.setHoverPanelTrigger(CardsDisplaySettings::HoverPanelTriggerHover);
+        return [zoom, panel] {
+            auto &restored = SettingsCache::instance().cardsDisplay();
+            restored.setHoverZoomTrigger(zoom);
+            restored.setHoverPanelTrigger(panel);
+        };
+    };
     handlers.applyDecline = [] {
         auto &cards = SettingsCache::instance().cardsDisplay();
         const int zoom = cards.getHoverZoomTrigger();

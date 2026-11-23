@@ -21,6 +21,9 @@ FeatureIntro hoverCardPanelIntro()
     intro.revision = 1;
     intro.shape = FeatureIntroShape::Rework;
     intro.introducedIn = QStringLiteral("3.2.0");
+    // Hover zoom and the card panel are a game-surface change: the glyph appears on
+    // a game tab, never on the deck editor or the server tabs.
+    intro.surface = QStringLiteral("game");
 
     intro.title = QCoreApplication::translate("FeatureIntro", "Hover zoom and a tabbed card panel");
     intro.body = QCoreApplication::translate(

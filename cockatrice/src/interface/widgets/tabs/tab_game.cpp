@@ -1,11 +1,9 @@
 #include "tab_game.h"
 
-#include "../../../client/features/feature_intro_service.h"
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../../../database/interface/settings_card_preference_provider.h"
 #include "../../../game_graphics/board/abstract_card_item.h"
-#include "../feature_intro/feature_intro_banner.h"
 #include "../game_graphics/board/arrow_item.h"
 #include "../game_graphics/board/card_item.h"
 #include "../game_graphics/deckview/deck_view_container.h"
@@ -1163,6 +1161,11 @@ QString TabGame::getTabText() const
     return tabText;
 }
 
+QString TabGame::introSurface() const
+{
+    return QStringLiteral("game");
+}
+
 /**
  * @param menu The menu to set. Pass in nullptr to set the menu to empty.
  *
@@ -1441,56 +1444,9 @@ void TabGame::createPlayAreaWidget(bool bReplay)
     auto gamePlayAreaVBox = QtUtils::makeLayout<QVBoxLayout>();
     gamePlayAreaVBox->addWidget(gameView);
 
-    if (!bReplay) {
-        maybeShowFeatureIntro(gamePlayAreaVBox);
-    }
-
     gamePlayAreaWidget = new QWidget;
     gamePlayAreaWidget->setObjectName("gamePlayAreaWidget");
     gamePlayAreaWidget->setLayout(gamePlayAreaVBox);
-}
-
-void TabGame::maybeShowFeatureIntro(QVBoxLayout *layout)
-{
-    FeatureIntroService *service = tabSupervisor->getFeatureIntroService();
-    const FeatureIntro *intro = service->nextDueIntro();
-    if (intro == nullptr) {
-        return;
-    }
-
-    const QString id = intro->id;
-    auto *banner = new FeatureIntroBanner(*intro, this);
-    layout->insertWidget(0, banner);
-
-    const auto removeBanner = [layout, banner] {
-        layout->removeWidget(banner);
-        banner->deleteLater();
-    };
-
-    connect(banner, &FeatureIntroBanner::accepted, this, [service, id, removeBanner] {
-        service->decide(id, FeatureIntroDecision::Accepted);
-        removeBanner();
-    });
-    connect(banner, &FeatureIntroBanner::declined, this,
-            [banner, service, id] { banner->showOutcome(service->decide(id, FeatureIntroDecision::Declined)); });
-    connect(banner, &FeatureIntroBanner::dismissed, this, [service, id, removeBanner] {
-        service->decide(id, FeatureIntroDecision::Dismissed);
-        removeBanner();
-    });
-    // Later only skips this session: the entry stays Pending and the service's
-    // cooldown decides when it may be offered again.
-    connect(banner, &FeatureIntroBanner::laterRequested, this, removeBanner);
-    // Undo puts the user back on the new behavior, so record that as the answer.
-    connect(banner, &FeatureIntroBanner::undone, this, [service, id, removeBanner] {
-        service->decide(id, FeatureIntroDecision::Accepted);
-        removeBanner();
-    });
-    connect(banner, &FeatureIntroBanner::settingsRequested, this, [this, intro] {
-        DlgSettings dlg(tabSupervisor);
-        dlg.setFeatureIntroService(tabSupervisor->getFeatureIntroService());
-        dlg.openSetting(intro->settingsPage, intro->settingsQuery);
-        dlg.exec();
-    });
 }
 
 void TabGame::createReplayDock(GameReplay *replay)

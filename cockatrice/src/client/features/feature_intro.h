@@ -40,6 +40,14 @@ struct FeatureIntro
     /// (`3.2.0`). Installs older than this are invited; the rest are baselined.
     QString introducedIn;
 
+    /// Stable key of the surface whose arrival may announce this feature, e.g.
+    /// `game` (see `Tab::introSurface()`). The corner glyph only appears while the
+    /// surface in front matches, so an introduction is never offered where its
+    /// change cannot be seen. Empty means anywhere: the glyph may appear on every
+    /// surface until the entry is acknowledged, which is reserved for a change with
+    /// no screen of its own.
+    QString surface;
+
     /// One line naming the feature.
     QString title;
     /// What the feature does, in the user's terms; plain text, no HTML.

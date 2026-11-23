@@ -22,10 +22,9 @@ DlgWhatsNew::DlgWhatsNew(FeatureIntroService *service, QWidget *parent) : QDialo
 
     auto *outer = QtUtils::makeLayout<QVBoxLayout>(this, 12, 16);
 
-    auto *lead =
-        new QLabel(tr("Recent additions to Cockatrice, and the settings that control them. Every feature can be "
-                      "tried or turned off here, without leaving the dialog."),
-                   this);
+    lead = new QLabel(tr("Recent additions to Cockatrice, and the settings that control them. Every feature can be "
+                         "tried or turned off here, without leaving the dialog."),
+                      this);
     lead->setObjectName(QStringLiteral("whatsNewLead"));
     lead->setWordWrap(true);
     outer->addWidget(lead);
@@ -40,9 +39,57 @@ DlgWhatsNew::DlgWhatsNew(FeatureIntroService *service, QWidget *parent) : QDialo
     auto *buttons = new QDialogButtonBox(QDialogButtonBox::Close, this);
     buttons->setObjectName(QStringLiteral("whatsNewButtons"));
     connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
-    outer->addWidget(buttons);
+
+    // The glyph leads here filtered to the screen the user is on; this keeps the
+    // rest of the catalog one click away instead of a second dialog.
+    seeAll = new QPushButton(tr("See all changes"), this);
+    seeAll->setObjectName(QStringLiteral("whatsNewSeeAll"));
+    seeAll->setAutoDefault(false);
+    seeAll->setFlat(true);
+    seeAll->setVisible(false);
+    connect(seeAll, &QPushButton::clicked, this, [this] { setSurfaceFilter(QString()); });
+
+    auto *footer = QtUtils::makeLayout<QHBoxLayout>(nullptr, 8, 0);
+    footer->addWidget(seeAll);
+    footer->addStretch(1);
+    footer->addWidget(buttons);
+    outer->addLayout(footer);
 
     rebuild();
+}
+
+void DlgWhatsNew::setSurfaceFilter(const QString &surface)
+{
+    if (surfaceFilter == surface) {
+        return;
+    }
+    surfaceFilter = surface;
+    rebuild();
+}
+
+void DlgWhatsNew::showEvent(QShowEvent *event)
+{
+    QDialog::showEvent(event);
+    if (markedShown) {
+        return;
+    }
+    markedShown = true;
+    // The revision has been on screen: from here the glyph stays neutral until the
+    // next revision, even if the user leaves the question unanswered.
+    for (const FeatureIntro *intro : visibleEntries()) {
+        service->markShown(intro->id);
+    }
+}
+
+QVector<const FeatureIntro *> DlgWhatsNew::visibleEntries() const
+{
+    QVector<const FeatureIntro *> entries;
+    for (const FeatureIntro &intro : featureIntroCatalog()) {
+        if (surfaceFilter.isEmpty() || intro.surface.isEmpty() || intro.surface == surfaceFilter) {
+            entries.append(&intro);
+        }
+    }
+    return entries;
 }
 
 QString DlgWhatsNew::stateText(const FeatureIntro &intro) const
@@ -68,17 +115,25 @@ void DlgWhatsNew::rebuild()
 {
     QtUtils::clearLayoutRec(entriesLayout, QtUtils::DeletePolicy::Immediate);
 
-    const QVector<FeatureIntro> &catalog = featureIntroCatalog();
-    if (catalog.isEmpty()) {
+    seeAll->setVisible(!surfaceFilter.isEmpty());
+    lead->setText(surfaceFilter.isEmpty()
+                      ? tr("Recent additions to Cockatrice, and the settings that control them. Every feature can be "
+                           "tried or turned off here, without leaving the dialog.")
+                      : tr("Recent additions that apply here, and the settings that control them. Every feature can "
+                           "be tried or turned off here, without leaving the dialog."));
+
+    const QVector<const FeatureIntro *> entries = visibleEntries();
+    if (entries.isEmpty()) {
         auto *empty = new QLabel(tr("No new features to show."), entriesLayout->parentWidget());
+        empty->setObjectName(QStringLiteral("whatsNewEmpty"));
         empty->setWordWrap(true);
         entriesLayout->addWidget(empty);
         entriesLayout->addStretch(1);
         return;
     }
 
-    for (const FeatureIntro &intro : catalog) {
-        addEntry(entriesLayout, intro);
+    for (const FeatureIntro *intro : entries) {
+        addEntry(entriesLayout, *intro);
     }
     entriesLayout->addStretch(1);
 }
@@ -134,7 +189,10 @@ void DlgWhatsNew::addEntry(QVBoxLayout *layout, const FeatureIntro &intro)
 
     if (decision == FeatureIntroDecision::Pending || decision == FeatureIntroDecision::Declined ||
         decision == FeatureIntroDecision::Dismissed) {
-        auto *accept = new QPushButton(intro.acceptLabel, card);
+        // After a decline this button is the way back: same decision, and the undo
+        // kept by the service restores the exact values the decline replaced.
+        auto *accept =
+            new QPushButton(decision == FeatureIntroDecision::Declined ? tr("Undo") : intro.acceptLabel, card);
         accept->setObjectName(QStringLiteral("whatsNewEntryAccept"));
         accept->setAutoDefault(false);
         connect(accept, &QPushButton::clicked, this, [this, id] {

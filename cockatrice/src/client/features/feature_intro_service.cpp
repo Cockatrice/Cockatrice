@@ -3,15 +3,10 @@
 #include "../settings/cache_settings.h"
 #include "feature_intro_planner.h"
 
-#include <QApplication>
 #include <QDateTime>
-#include <QHash>
 
 namespace
 {
-/// One prompt per week keeps "later" from turning into a nag.
-constexpr qint64 kCooldownSeconds = 7 * 24 * 60 * 60;
-
 FeatureIntroSettings &introSettings()
 {
     return SettingsCache::instance().featureIntros();
@@ -58,15 +53,23 @@ void FeatureIntroService::seed(const QString &previousVersion, const QString &cu
     }
 }
 
-const FeatureIntro *FeatureIntroService::nextDueIntro()
+QVector<const FeatureIntro *> FeatureIntroService::pendingFor(const QString &surface)
 {
-    if (!promptAllowed()) {
-        return nullptr;
+    QVector<const FeatureIntro *> due;
+
+    if (!introSettings().getGlobalEnabled()) {
+        return due;
     }
 
     for (const FeatureIntro &intro : featureIntroCatalog()) {
         const auto state = introSettings().getState(intro.id);
         if (!state || state->decision != FeatureIntroDecision::Pending) {
+            continue;
+        }
+
+        // Only where the change is visible. An entry with no surface applies
+        // anywhere, which is reserved for a change with no screen of its own.
+        if (!intro.surface.isEmpty() && intro.surface != surface) {
             continue;
         }
 
@@ -79,11 +82,27 @@ const FeatureIntro *FeatureIntroService::nextDueIntro()
             continue;
         }
 
-        notePromptShown();
-        return &intro;
+        due.append(&intro);
     }
 
-    return nullptr;
+    return due;
+}
+
+bool FeatureIntroService::isUnseen(const QString &id) const
+{
+    const FeatureIntro *intro = findFeatureIntro(id);
+    const auto state = introSettings().getState(id);
+    return intro != nullptr && state && state->decision == FeatureIntroDecision::Pending &&
+           state->shownRevision < intro->revision;
+}
+
+void FeatureIntroService::markShown(const QString &id)
+{
+    const FeatureIntro *intro = findFeatureIntro(id);
+    if (intro == nullptr) {
+        return;
+    }
+    introSettings().setShownRevision(id, intro->revision);
 }
 
 std::optional<FeatureIntroState> FeatureIntroService::stateFor(const QString &id) const
@@ -125,12 +144,28 @@ FeatureIntroAction FeatureIntroService::decide(const QString &id, FeatureIntroDe
     FeatureIntroAction undo;
 
     if (decision == FeatureIntroDecision::Accepted) {
-        if (handlers.applyAccept) {
+        // Undoing a decline restores the values the decline replaced, exactly, as
+        // long as the process that made it is still running. A restart leaves only
+        // the shipped default, which is what applyAccept writes.
+        auto kept = declinedUndo.find(id);
+        if (kept != declinedUndo.end()) {
+            const FeatureIntroAction restore = kept.value();
+            declinedUndo.erase(kept);
+            if (restore) {
+                restore();
+                if (handlers.applyDecline) {
+                    undo = handlers.applyDecline();
+                }
+            }
+        } else if (handlers.applyAccept) {
             undo = handlers.applyAccept();
         }
     } else if (decision == FeatureIntroDecision::Declined) {
         if (handlers.applyDecline) {
             undo = handlers.applyDecline();
+            if (undo) {
+                declinedUndo.insert(id, undo);
+            }
         }
     }
 
@@ -152,29 +187,4 @@ void FeatureIntroService::setGlobalEnabled(bool enabled)
     }
     introSettings().setGlobalEnabled(enabled);
     emit globalEnabledChanged(enabled);
-}
-
-bool FeatureIntroService::promptAllowed() const
-{
-    if (promptedThisSession) {
-        return false;
-    }
-
-    if (!introSettings().getGlobalEnabled()) {
-        return false;
-    }
-
-    if (QApplication::activeModalWidget() != nullptr) {
-        // A prompt behind a dialog is a prompt nobody reads.
-        return false;
-    }
-
-    const qint64 lastPrompt = introSettings().getLastPromptEpoch();
-    return lastPrompt <= 0 || nowEpoch() - lastPrompt >= kCooldownSeconds;
-}
-
-void FeatureIntroService::notePromptShown()
-{
-    promptedThisSession = true;
-    introSettings().setLastPromptEpoch(nowEpoch());
 }

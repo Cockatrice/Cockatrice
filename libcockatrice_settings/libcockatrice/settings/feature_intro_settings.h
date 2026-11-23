@@ -36,6 +36,10 @@ struct FeatureIntroState
     int revision = 0;
     /// Unix epoch seconds of the decision, or 0 when it has not been made yet.
     qint64 decidedAt = 0;
+    /// Catalog revision already displayed to the user, or 0 when never shown. This
+    /// is the unread marker: an entry that has been on screen keeps a neutral glyph
+    /// even while it still awaits an answer.
+    int shownRevision = 0;
 };
 
 class FeatureIntroSettings : public SettingsManager
@@ -47,15 +51,16 @@ public:
     [[nodiscard]] bool getGlobalEnabled() const;
     void setGlobalEnabled(bool enabled);
 
-    [[nodiscard]] qint64 getLastPromptEpoch() const;
-    void setLastPromptEpoch(qint64 epoch);
-
     [[nodiscard]] std::optional<FeatureIntroState> getState(const QString &id) const;
     void setState(const QString &id, const FeatureIntroState &state);
     /// Writes several states in one sync, so a crash cannot leave a half-seeded catalog.
     void setStates(const QList<QPair<QString, FeatureIntroState>> &states);
     void clearState(const QString &id);
     [[nodiscard]] QStringList getKnownIds() const;
+
+    /// Records that @a revision of @a id has been on screen; writes only when it
+    /// changes, so a dialog shown again does not touch the file.
+    void setShownRevision(const QString &id, int revision);
 
 signals:
     void globalEnabledChanged(bool enabled);

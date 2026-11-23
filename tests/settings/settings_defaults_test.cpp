@@ -884,10 +884,15 @@ TEST_F(SettingsDefaultsTest, FeatureIntro_GlobalEnabled_SetAndGet)
     ASSERT_FALSE(s.getGlobalEnabled());
 }
 
-TEST_F(SettingsDefaultsTest, FeatureIntro_LastPromptEpoch_Default)
+TEST_F(SettingsDefaultsTest, FeatureIntro_ShownRevision_DefaultsToUnseen)
 {
     FeatureIntroSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getLastPromptEpoch(), 0);
+    s.setState("a", FeatureIntroState{.decision = FeatureIntroDecision::Pending, .revision = 2});
+    // Never displayed: the glyph stays in the marked tone.
+    ASSERT_EQ(s.getState("a")->shownRevision, 0);
+
+    s.setShownRevision("a", 2);
+    ASSERT_EQ(s.getState("a")->shownRevision, 2);
 }
 
 TEST_F(SettingsDefaultsTest, FeatureIntro_UnknownState_IsUnset)

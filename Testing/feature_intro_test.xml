@@ -1,7 +1,9 @@
 <events>
     <!--
-        Feature introductions: in-place banner, What's New index, settings deep
-        link, and the "New" badge on the owning settings group.
+        Feature introductions: the corner glyph, the What's New index it opens
+        (filtered to the surface in front, with "See all changes"), the decline and
+        undo path inside the entry, and the "New" badge on the owning settings
+        group.
 
         This test needs an install that predates the announced feature (an older
         clientVersion and no explicit hover trigger), which run_test.sh does not
@@ -21,28 +23,38 @@
           dump taken at this point in this order (dumpTree, then read the
           "Possible match:" hint if one of them ever misses).
 
-        Order matters: the banner and the badge both require the entry to still be
-        Pending, so the "Use classic" / "Undo" steps run after the settings visits.
-        The screenshots are the deliverable.
+        Order matters: the glyph, the entry actions and the badge all require the
+        entry to still be Pending. The glyph only exists while the game tab is in
+        front, so the steps that leave the board return to it before clicking. The
+        screenshots are the deliverable.
     -->
     <event widget="MainWindow" command="resize" arguments="1280x800" />
     <event widget="MainWindow" command="process_events" arguments="3000" />
 
-    <!-- Start a local game: the banner belongs above the board, not in a dialog -->
+    <!-- Start a local game: the glyph belongs to the game surface -->
     <event widget="MainWindow/menubar" command="activate" arguments="cockatriceMenu" />
     <event widget="MainWindow/menubar/cockatriceMenu" command="activate" arguments="Start &amp;local game..." />
     <event widget="MainWindow/localGameDialog/generalGroupBox/numberPlayersEdit" command="set_int" arguments="2" />
     <event widget="MainWindow/localGameDialog" command="key" arguments="16777220" />
     <event widget="MainWindow" command="process_events" arguments="3000" />
-    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/featureIntroBanner/featureIntroBannerTitle" command="expectProperty" arguments="text,Hover zoom and a tabbed card panel" />
-    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/featureIntroBanner" command="screenshot" arguments="$COCKATRICE_SCREENSHOT_DIR/feature-intro-banner.png" />
 
-    <!-- Help > What's New: the browsable index; opening it decides nothing -->
-    <event widget="MainWindow/menubar" command="activate" arguments="helpMenu" />
-    <event widget="MainWindow/menubar/helpMenu" command="activate" arguments="actionWhatsNew" />
+    <event widget="MainWindow/tabSupervisor/tabCornerWidget" command="dumpTree" arguments="$COCKATRICE_SCREENSHOT_DIR/corner-tree.txt" />
+    <event widget="MainWindow/tabSupervisor/tabCornerWidget/featureIntroButton" command="expectProperty" arguments="visible,true" />
+    <event widget="MainWindow/tabSupervisor/tabCornerWidget/featureIntroButton" command="expectProperty" arguments="toolTip,New feature: Hover zoom and a tabbed card panel" />
+    <event widget="MainWindow/tabSupervisor/tabCornerWidget" command="screenshot" arguments="$COCKATRICE_SCREENSHOT_DIR/feature-intro-glyph.png" />
+
+    <!-- The glyph opens the index filtered to this surface -->
+    <event widget="MainWindow/tabSupervisor/tabCornerWidget/featureIntroButton" command="activate" arguments="" />
     <event widget="MainWindow" command="pause" arguments="500" />
     <event widget="MainWindow/whatsNewDialog" command="expectProperty" arguments="visible,true" />
+    <event widget="MainWindow/whatsNewDialog/whatsNewSeeAll" command="expectProperty" arguments="visible,true" />
     <event widget="MainWindow/whatsNewDialog" command="screenshot" arguments="$COCKATRICE_SCREENSHOT_DIR/feature-intro-whats-new.png" />
+
+    <!-- See all changes: the same list, unfiltered -->
+    <event widget="MainWindow/whatsNewDialog/whatsNewSeeAll" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+    <event widget="MainWindow/whatsNewDialog/whatsNewSeeAll" command="expectProperty" arguments="visible,false" />
+    <event widget="MainWindow/whatsNewDialog" command="screenshot" arguments="$COCKATRICE_SCREENSHOT_DIR/feature-intro-whats-new-all.png" />
 
     <!-- Settings... deep-links into the hover-panel settings group -->
     <event widget="MainWindow" command="pause" arguments="200" />
@@ -75,13 +87,20 @@
     <event widget="MainWindow/settingsDialog/settingsOkButton" command="activate" arguments="" />
     <event widget="MainWindow" command="pause" arguments="300" />
 
-    <!-- Use classic: the banner becomes the undo row -->
-    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/featureIntroBanner/featureIntroBannerDecline" command="activate" arguments="" />
-    <event widget="MainWindow" command="pause" arguments="300" />
-    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/featureIntroBanner/featureIntroBannerOutcome" command="expectProperty" arguments="text,Hover zoom and the card panel are off." />
-    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/featureIntroBanner" command="screenshot" arguments="$COCKATRICE_SCREENSHOT_DIR/feature-intro-banner-undo.png" />
+    <!-- Back on the game surface: decline from the index, then undo from it -->
+    <event widget="MainWindow/tabSupervisor/tabCornerWidget/featureIntroButton" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/whatsNewDialog/whatsNewScroll/qt_scrollarea_viewport/1QWidget0/whatsNewEntry/whatsNewEntryDecline" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="400" />
+    <event widget="MainWindow/whatsNewDialog/whatsNewScroll/qt_scrollarea_viewport/1QWidget0/whatsNewEntry/whatsNewEntryState" command="expectProperty" arguments="text,Hover zoom and the card panel are off." />
+    <event widget="MainWindow/whatsNewDialog/whatsNewScroll/qt_scrollarea_viewport/1QWidget0/whatsNewEntry/whatsNewEntryAccept" command="expectProperty" arguments="text,Undo" />
+    <event widget="MainWindow/whatsNewDialog" command="screenshot" arguments="$COCKATRICE_SCREENSHOT_DIR/feature-intro-whats-new-declined.png" />
 
-    <!-- Undo restores the new behavior and closes the banner -->
-    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/featureIntroBanner/featureIntroBannerUndo" command="activate" arguments="" />
+    <!-- Undo restores the exact values the decline replaced -->
+    <event widget="MainWindow/whatsNewDialog/whatsNewScroll/qt_scrollarea_viewport/1QWidget0/whatsNewEntry/whatsNewEntryAccept" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="400" />
+    <event widget="MainWindow/whatsNewDialog/whatsNewScroll/qt_scrollarea_viewport/1QWidget0/whatsNewEntry/whatsNewEntryState" command="expectProperty" arguments="text,You are using it." />
+    <event widget="MainWindow/whatsNewDialog" command="key" arguments="16777216" />
     <event widget="MainWindow" command="pause" arguments="300" />
 </events>
+</content>
