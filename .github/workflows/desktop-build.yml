@@ -1040,6 +1040,37 @@ jobs:
                 fi
               fi
             done
+
+            # Qt's own Mach-O images (frameworks and plugins such as libqcocoa). Without
+            # them every QtCore/QtWidgets/libqcocoa frame in a macOS crash stays
+            # "Unknown function" and the stack walker has no unwind information for them,
+            # which hides which object a crash in the event loop is dispatching to.
+            # Resolved like the Windows leg: from Qt6Core_DIR in the CMake cache.
+            if [[ '${{ matrix.os }}' == 'macOS' ]]; then
+              qt_dir=
+              qt_core_dir=
+              if [[ -f build/CMakeCache.txt ]]; then
+                qt_core_dir=$(sed -n 's/^Qt6Core_DIR:PATH=//p' build/CMakeCache.txt | head -1)
+              fi
+              if [[ -n $qt_core_dir ]]; then
+                qt_dir=$(dirname "$(dirname "$(dirname "$qt_core_dir")")")
+              fi
+              if [[ -z $qt_dir || ! -d $qt_dir ]]; then
+                echo "::warning::Qt directory not resolved from build/CMakeCache.txt; Qt images get no symbols"
+              else
+                shopt -s nullglob
+                for framework in "$qt_dir"/lib/Qt*.framework; do
+                  name=$(basename "$framework" .framework)
+                  if [[ -f $framework/Versions/A/$name ]]; then
+                    paths+=("$framework/Versions/A/$name")
+                  fi
+                done
+                # Debug info, when the Qt install carries it (e.g. Qt's debug-info package).
+                paths+=("$qt_dir"/lib/Qt*.framework.dSYM)
+                paths+=("$qt_dir"/plugins/*/*.dylib "$qt_dir"/plugins/*/*.dylib.dSYM)
+                shopt -u nullglob
+              fi
+            fi
           fi
           if [[ ${#paths[@]} == 0 ]]; then
             # Fail loudly instead of skipping: this step is the only way symbols reach
