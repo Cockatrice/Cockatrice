@@ -440,7 +440,11 @@ void PlayerActions::actRequestMulliganDialog()
 
 void PlayerActions::actMulligan(int number)
 {
-    int handSize = player->getHandZone()->getCards().size();
+    auto *handZone = player->getHandZone();
+    if (!handZone) {
+        return;
+    }
+    int handSize = handZone->getCards().size();
 
     if (number < 1) {
         number = handSize + number;
@@ -452,13 +456,21 @@ void PlayerActions::actMulligan(int number)
 
 void PlayerActions::actMulliganSameSize()
 {
-    int handSize = player->getHandZone()->getCards().size();
+    auto *handZone = player->getHandZone();
+    if (!handZone) {
+        return;
+    }
+    int handSize = handZone->getCards().size();
     doMulligan(handSize);
 }
 
 void PlayerActions::actMulliganMinusOne()
 {
-    int handSize = player->getHandZone()->getCards().size();
+    auto *handZone = player->getHandZone();
+    if (!handZone) {
+        return;
+    }
+    int handSize = handZone->getCards().size();
     int targetSize = qMax(1, handSize - 1);
     doMulligan(targetSize);
 }
