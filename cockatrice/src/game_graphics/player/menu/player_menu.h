@@ -50,6 +50,7 @@ private slots:
 
 public:
     explicit PlayerMenu(PlayerGraphicsItem *player);
+    ~PlayerMenu() override;
     /** @brief Retranslate all user-visible strings. Called on language change. */
     void retranslateUi();
 
@@ -114,6 +115,11 @@ private:
     template <typename MenuT, typename... Args> MenuT *addManagedMenu(Args &&...args)
     {
         auto *menu = new MenuT(std::forward<Args>(args)...);
+        // QMenu::addMenu() does not take ownership; parent the submenu so it is destroyed with playerMenu and
+        // cannot outlive the player it references.
+        if (menu->parent() == nullptr) {
+            menu->setParent(playerMenu, menu->windowFlags());
+        }
         playerMenu->addMenu(menu);
         managedComponents.append(menu);
         return menu;
