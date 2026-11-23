@@ -154,7 +154,7 @@ void CardZoneLogic::moveAllToZone()
 
     Command_MoveCard cmd;
     cmd.set_start_zone(getName().toStdString());
-    cmd.set_target_player_id(player->getPlayerInfo()->getId());
+    cmd.set_target_player_id(player->getPlayerInfo().id);
     cmd.set_target_zone(targetZone.toStdString());
     cmd.set_x(targetX);
 
@@ -191,7 +191,7 @@ void CardZoneLogic::clearContents()
 
 QString CardZoneLogic::getTranslatedName(bool theirOwn, GrammaticalCase gc) const
 {
-    QString ownerName = player->getPlayerInfo()->getName();
+    QString ownerName = player->getPlayerInfo().getName();
     if (name == ZoneNames::HAND) {
         return (theirOwn ? tr("their hand", "nominative") : tr("%1's hand", "nominative").arg(ownerName));
     }

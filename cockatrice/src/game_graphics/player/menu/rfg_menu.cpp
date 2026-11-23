@@ -23,7 +23,7 @@ RfgMenu::RfgMenu(PlayerGraphicsItem *_player, QWidget *parent) : TearOffMenu(par
 
     addAction(aViewRfg);
 
-    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo().isLocalOrJudge()) {
         addSeparator();
         moveRfgMenu = addTearOffMenu(QString());
         moveRfgMenu->addAction(aMoveRfgToTopLibrary);
@@ -39,7 +39,7 @@ RfgMenu::RfgMenu(PlayerGraphicsItem *_player, QWidget *parent) : TearOffMenu(par
 
 void RfgMenu::createMoveActions()
 {
-    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo().isLocalOrJudge()) {
         auto rfg = player->getLogic()->getRfgZone();
 
         aMoveRfgToTopLibrary = new QAction(this);
@@ -72,7 +72,7 @@ void RfgMenu::retranslateUi()
 
     aViewRfg->setText(tr("&View exile"));
 
-    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo().isLocalOrJudge()) {
         moveRfgMenu->setTitle(tr("&Move exile to..."));
         aMoveRfgToTopLibrary->setText(tr("&Top of library"));
         aMoveRfgToBottomLibrary->setText(tr("&Bottom of library"));

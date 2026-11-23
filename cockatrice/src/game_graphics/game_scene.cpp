@@ -262,7 +262,7 @@ void GameScene::onCardRightClicked(AbstractCardItem *abstractCard, QPoint screen
     if (!card->getOwner()) {
         return;
     }
-    auto *view = playerViews.value(card->getOwner()->getPlayerInfo()->getId());
+    auto *view = playerViews.value(card->getOwner()->getPlayerInfo().id);
     if (!view) {
         return;
     }
@@ -332,11 +332,11 @@ void GameScene::hideSelected(AbstractCardItem *card)
  */
 void GameScene::addPlayer(PlayerLogic *player)
 {
-    qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::addPlayer name=" << player->getPlayerInfo()->getName();
+    qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::addPlayer name=" << player->getPlayerInfo().getName();
 
     auto *view = new PlayerGraphicsItem(player);
 
-    playerViews.insert(player->getPlayerInfo()->getId(), view);
+    playerViews.insert(player->getPlayerInfo().id, view);
     addItem(view);
     connect(view, &PlayerGraphicsItem::sizeChanged, this, &GameScene::rearrange);
 
@@ -353,7 +353,7 @@ void GameScene::addPlayer(PlayerLogic *player)
     connect(player, &PlayerLogic::arrowCreateRequested, this, &GameScene::addArrow);
     connect(player, &PlayerLogic::arrowDeleteRequested, this, &GameScene::requestArrowDeletion);
     connect(player, &PlayerLogic::arrowsClearedLocally, this,
-            [this, id = player->getPlayerInfo()->getId()]() { clearArrowsForPlayerLocally(id); });
+            [this, id = player->getPlayerInfo().id]() { clearArrowsForPlayerLocally(id); });
 
     connect(player->getPlayerEventHandler(), &PlayerEventHandler::cardZoneChanged, this, &GameScene::onCardZoneChanged);
     connect(player->getPlayerEventHandler(), &PlayerEventHandler::cardViewRefreshRequested, this,
@@ -370,9 +370,9 @@ void GameScene::addPlayer(PlayerLogic *player)
  */
 void GameScene::removePlayer(PlayerLogic *player)
 {
-    qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::removePlayer name=" << player->getPlayerInfo()->getName();
+    qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::removePlayer name=" << player->getPlayerInfo().getName();
 
-    clearArrowsForPlayer(player->getPlayerInfo()->getId());
+    clearArrowsForPlayer(player->getPlayerInfo().id);
 
     // Closing a view removes it from zoneViews synchronously, so iterate over a
     // copy: otherwise a player with several open views (e.g. library and hand)
@@ -384,7 +384,7 @@ void GameScene::removePlayer(PlayerLogic *player)
             zone->close();
         }
     }
-    auto *view = playerViews.take(player->getPlayerInfo()->getId());
+    auto *view = playerViews.take(player->getPlayerInfo().id);
     removeItem(view);
     view->deleteLater();
     rearrange();
@@ -481,7 +481,7 @@ QList<PlayerLogic *> GameScene::collectActivePlayers(int &firstPlayerIndex) cons
         PlayerLogic *p = pgItem->getLogic();
         if (p && !p->getConceded()) {
             activePlayers.append(p);
-            if (!firstPlayerFound && p->getPlayerInfo()->getLocal()) {
+            if (!firstPlayerFound && p->getPlayerInfo().local) {
                 firstPlayerIndex = activePlayers.size() - 1;
                 firstPlayerFound = true;
             }
@@ -499,20 +499,20 @@ QList<PlayerLogic *> GameScene::collectActivePlayers(int &firstPlayerIndex) cons
     }
     if (!seatOrder.isEmpty()) {
         std::sort(activePlayers.begin(), activePlayers.end(), [&](PlayerLogic *a, PlayerLogic *b) {
-            int indexA = seatOrder.indexOf(a->getPlayerInfo()->getId());
-            int indexB = seatOrder.indexOf(b->getPlayerInfo()->getId());
+            int indexA = seatOrder.indexOf(a->getPlayerInfo().id);
+            int indexB = seatOrder.indexOf(b->getPlayerInfo().id);
             if (indexA == -1) {
-                indexA = seatOrder.size() + a->getPlayerInfo()->getId();
+                indexA = seatOrder.size() + a->getPlayerInfo().id;
             }
             if (indexB == -1) {
-                indexB = seatOrder.size() + b->getPlayerInfo()->getId();
+                indexB = seatOrder.size() + b->getPlayerInfo().id;
             }
             return indexA < indexB;
         });
         // Recompute the local-player index after sorting.
         firstPlayerIndex = 0;
         for (int i = 0; i < activePlayers.size(); ++i) {
-            if (activePlayers[i]->getPlayerInfo()->getLocal()) {
+            if (activePlayers[i]->getPlayerInfo().local) {
                 firstPlayerIndex = i;
                 break;
             }
@@ -580,12 +580,12 @@ QSizeF GameScene::computeSceneSizeAndPlayerLayout(const QList<PlayerLogic *> &pl
         for (int j = 0; j < rowsInColumn; ++j) {
             PlayerLogic *player = playersIter.next();
             if (col == 0) {
-                playersByColumn[col].prepend(playerViews.value(player->getPlayerInfo()->getId()));
+                playersByColumn[col].prepend(playerViews.value(player->getPlayerInfo().id));
             } else {
-                playersByColumn[col].append(playerViews.value(player->getPlayerInfo()->getId()));
+                playersByColumn[col].append(playerViews.value(player->getPlayerInfo().id));
             }
 
-            auto *pgItem = playerViews.value(player->getPlayerInfo()->getId());
+            auto *pgItem = playerViews.value(player->getPlayerInfo().id);
             thisColumnHeight += pgItem->boundingRect().height() + playerAreaSpacing;
             columnWidth[col] = std::max(columnWidth[col], (int)pgItem->boundingRect().width());
         }
@@ -1022,7 +1022,7 @@ void GameScene::showCardHoverPopup(CardItem *card)
         return;
     }
 
-    PlayerGraphicsItem *playerView = playerViews.value(card->getOwner()->getPlayerInfo()->getId());
+    PlayerGraphicsItem *playerView = playerViews.value(card->getOwner()->getPlayerInfo().id);
     if (!playerView) {
         return;
     }

@@ -31,7 +31,7 @@ HandMenu::HandMenu(PlayerGraphicsItem *_player, QWidget *parent) : TearOffMenu(p
 {
     auto *actions = player->getLogic()->getPlayerActions();
 
-    if (player->getLogic()->getPlayerInfo()->local || player->getLogic()->getPlayerInfo()->judge) {
+    if (player->getLogic()->getPlayerInfo().local || player->getLogic()->getPlayerInfo().judge) {
         aViewHand = new QAction(this);
 
         connect(aViewHand, &QAction::triggered, actions, &PlayerActions::actViewHand);
@@ -103,7 +103,7 @@ HandMenu::HandMenu(PlayerGraphicsItem *_player, QWidget *parent) : TearOffMenu(p
 
     mMoveHandMenu = addTearOffMenu(QString());
 
-    if (player->getLogic()->getPlayerInfo()->local || player->getLogic()->getPlayerInfo()->judge) {
+    if (player->getLogic()->getPlayerInfo().local || player->getLogic()->getPlayerInfo().judge) {
         aMoveHandToTopLibrary = new QAction(this);
         aMoveHandToTopLibrary->setData(QList<QVariant>() << ZoneNames::DECK << 0);
         aMoveHandToBottomLibrary = new QAction(this);
@@ -135,7 +135,7 @@ void HandMenu::retranslateUi()
 {
     setTitle(tr("&Hand"));
 
-    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo().isLocalOrJudge()) {
         aViewHand->setText(tr("&View hand"));
 
         mSortHand->setTitle(tr("Sort hand by..."));
@@ -201,8 +201,8 @@ void HandMenu::populateRevealHandMenuWithActivePlayers()
         if (other == player->getLogic()) {
             continue;
         }
-        QAction *a = mRevealHand->addAction(other->getPlayerInfo()->getName());
-        a->setData(other->getPlayerInfo()->getId());
+        QAction *a = mRevealHand->addAction(other->getPlayerInfo().getName());
+        a->setData(other->getPlayerInfo().id);
         connect(a, &QAction::triggered, this, &HandMenu::onRevealHandTriggered);
     }
 }
@@ -220,8 +220,8 @@ void HandMenu::populateRevealRandomHandCardMenuWithActivePlayers()
         if (other == player->getLogic()) {
             continue;
         }
-        QAction *a = mRevealRandomHandCard->addAction(other->getPlayerInfo()->getName());
-        a->setData(other->getPlayerInfo()->getId());
+        QAction *a = mRevealRandomHandCard->addAction(other->getPlayerInfo().getName());
+        a->setData(other->getPlayerInfo().id);
         connect(a, &QAction::triggered, this, &HandMenu::onRevealRandomHandCardTriggered);
     }
 }
@@ -260,8 +260,8 @@ void HandMenu::populateRevealRandomHandCardsMenuWithActivePlayers()
         if (other == player->getLogic()) {
             continue;
         }
-        auto *action = mRevealRandomHandCards->addAction(other->getPlayerInfo()->getName());
-        action->setData(other->getPlayerInfo()->getId());
+        auto *action = mRevealRandomHandCards->addAction(other->getPlayerInfo().getName());
+        action->setData(other->getPlayerInfo().id);
         action->setEnabled(hasCards);
         connect(action, &QAction::triggered, this, &HandMenu::onRevealRandomHandCardsTriggered);
     }

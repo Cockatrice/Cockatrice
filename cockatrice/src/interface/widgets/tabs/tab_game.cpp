@@ -619,7 +619,7 @@ void TabGame::actInviteToGame()
     QStringList excludeUserNames;
     excludeUserNames << tabSupervisor->getUserListManager()->getOwnUsername();
     for (auto player : game->getPlayerManager()->getPlayers()) {
-        excludeUserNames << player->getPlayerInfo()->getName();
+        excludeUserNames << player->getPlayerInfo().getName();
     }
     for (auto it = game->getPlayerManager()->getSpectators().cbegin();
          it != game->getPlayerManager()->getSpectators().cend(); ++it) {
@@ -663,19 +663,19 @@ void TabGame::actTurnOrder()
     if (!seatOrder.isEmpty()) {
         for (int playerId : seatOrder) {
             if (PlayerLogic *player = players.value(playerId, nullptr)) {
-                playerNames.append(player->getPlayerInfo()->getName());
+                playerNames.append(player->getPlayerInfo().getName());
             }
         }
         // Include any players missing from the tracked order rather than dropping them.
         for (auto it = players.constBegin(); it != players.constEnd(); ++it) {
-            const QString name = it.value()->getPlayerInfo()->getName();
+            const QString name = it.value()->getPlayerInfo().getName();
             if (!playerNames.contains(name)) {
                 playerNames.append(name);
             }
         }
     } else {
         for (PlayerLogic *player : players) {
-            playerNames.append(player->getPlayerInfo()->getName());
+            playerNames.append(player->getPlayerInfo().getName());
         }
     }
 
@@ -818,7 +818,7 @@ void TabGame::actRemoveLocalArrows()
 {
     auto *local = game->getPlayerManager()->getActiveLocalPlayer(game->getGameState()->getActivePlayer());
     if (local) {
-        scene->clearArrowsForPlayer(local->getPlayerInfo()->getId());
+        scene->clearArrowsForPlayer(local->getPlayerInfo().id);
     }
 }
 
@@ -859,12 +859,12 @@ void TabGame::notifyPlayerKicked()
 
 PlayerLogic *TabGame::addPlayer(PlayerLogic *newPlayer)
 {
-    QString newPlayerName = "@" + newPlayer->getPlayerInfo()->getName();
+    QString newPlayerName = "@" + newPlayer->getPlayerInfo().getName();
     addPlayerToAutoCompleteList(newPlayerName);
 
     scene->addPlayer(newPlayer);
 
-    auto *view = scene->viewForPlayer(newPlayer->getPlayerInfo()->getId());
+    auto *view = scene->viewForPlayer(newPlayer->getPlayerInfo().id);
 
     connect(newPlayer, &PlayerLogic::newCardAdded, this, &TabGame::newCardAdded);
     connect(newPlayer, &PlayerLogic::openDeckEditor, this, &TabGame::openDeckEditor);
@@ -874,17 +874,17 @@ PlayerLogic *TabGame::addPlayer(PlayerLogic *newPlayer)
     messageLog->connectToPlayerEventHandler(newPlayer->getPlayerEventHandler());
 
     if (game->getGameState()->getIsLocalGame() ||
-        (game->getPlayerManager()->isLocalPlayer(newPlayer->getPlayerInfo()->getId()) &&
+        (game->getPlayerManager()->isLocalPlayer(newPlayer->getPlayerInfo().id) &&
          !game->getPlayerManager()->getLocalRoles().isSpectator)) {
         if (game->getGameState()->getIsLocalGame()) {
-            newPlayer->getPlayerInfo()->setLocal(true);
+            newPlayer->setLocal(true);
         }
-        addLocalPlayer(newPlayer, newPlayer->getPlayerInfo()->getId());
+        addLocalPlayer(newPlayer, newPlayer->getPlayerInfo().id);
     }
 
     gameMenu->insertMenu(playersSeparator, view->getPlayerMenu()->getPlayerMenu());
 
-    createZoneForPlayer(newPlayer, newPlayer->getPlayerInfo()->getId());
+    createZoneForPlayer(newPlayer, newPlayer->getPlayerInfo().id);
 
     return newPlayer;
 }
@@ -901,7 +901,7 @@ void TabGame::addLocalPlayer(PlayerLogic *newPlayer, int playerId)
     deckViewContainerLayout->addWidget(deckView);
 
     // auto load deck for player if that debug setting is enabled
-    QString deckPath = SettingsCache::instance().debug().getDeckPathForPlayer(newPlayer->getPlayerInfo()->getName());
+    QString deckPath = SettingsCache::instance().debug().getDeckPathForPlayer(newPlayer->getPlayerInfo().getName());
     if (!deckPath.isEmpty()) {
         QTimer::singleShot(0, this, [deckView, deckPath] {
             deckView->playerDeckView->loadDeckFromFile(deckPath);
@@ -912,11 +912,11 @@ void TabGame::addLocalPlayer(PlayerLogic *newPlayer, int playerId)
 
 void TabGame::processPlayerLeave(PlayerLogic *leavingPlayer)
 {
-    removePlayerFromAutoCompleteList("@" + leavingPlayer->getPlayerInfo()->getName());
+    removePlayerFromAutoCompleteList("@" + leavingPlayer->getPlayerInfo().getName());
 
     // When we inserted the playerMenu into the gameMenu earlier, Qt wrapped the playerMenu into a QAction*, which lives
     // independently and does not get cleaned up when the source menu gets destroyed. We have to manually clean here.
-    auto *view = scene->viewForPlayer(leavingPlayer->getPlayerInfo()->getId());
+    auto *view = scene->viewForPlayer(leavingPlayer->getPlayerInfo().id);
     if (view) {
         // Find and remove the QAction pointing to this menu
         QMenu *menu = view->getPlayerMenu()->getPlayerMenu();
@@ -931,7 +931,7 @@ void TabGame::processPlayerLeave(PlayerLogic *leavingPlayer)
 
     // A shuffled local player has their seat changed, so the deck view container
     // keyed by their previous id must be cleaned up alongside the leaving player.
-    int leavingPlayerId = leavingPlayer->getPlayerInfo()->getId();
+    int leavingPlayerId = leavingPlayer->getPlayerInfo().id;
     if (deckViewContainers.contains(leavingPlayerId)) {
         TabbedDeckViewContainer *deckView = deckViewContainers.take(leavingPlayerId);
         deckViewContainerLayout->removeWidget(deckView);
@@ -1092,12 +1092,12 @@ PlayerLogic *TabGame::setActivePlayer(int id)
         if (i.value() == player) {
             i.value()->setActive(true);
             if (game->getGameState()->getClients().size() > 1) {
-                scene->viewForPlayer(i.value()->getPlayerInfo()->getId())->getPlayerMenu()->setShortcutsActive();
+                scene->viewForPlayer(i.value()->getPlayerInfo().id)->getPlayerMenu()->setShortcutsActive();
             }
         } else {
             i.value()->setActive(false);
             if (game->getGameState()->getClients().size() > 1) {
-                scene->viewForPlayer(i.value()->getPlayerInfo()->getId())->getPlayerMenu()->setShortcutsInactive();
+                scene->viewForPlayer(i.value()->getPlayerInfo().id)->getPlayerMenu()->setShortcutsInactive();
             }
         }
     }

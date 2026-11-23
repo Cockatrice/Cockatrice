@@ -45,7 +45,7 @@ AbstractCounter::AbstractCounter(CounterState *state,
         update();
     });
 
-    if (player->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getPlayerInfo().isLocalOrJudge()) {
         menu = new TearOffMenu(TranslateCounterName::getDisplayName(state->getName()));
         aSet = new QAction(this);
         connect(aSet, &QAction::triggered, this, &AbstractCounter::setCounter);
@@ -100,7 +100,7 @@ void AbstractCounter::retranslateUi()
 
 void AbstractCounter::setShortcutsActive()
 {
-    if (!menu || !player->getPlayerInfo()->getLocal()) {
+    if (!menu || !player->getPlayerInfo().local) {
         return;
     }
     ShortcutsSettings &sc = SettingsCache::instance().shortcuts();
@@ -139,7 +139,7 @@ void AbstractCounter::refreshShortcuts()
 
 void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (!isUnderMouse() || !player->getPlayerInfo()->getLocalOrJudge()) {
+    if (!isUnderMouse() || !player->getPlayerInfo().isLocalOrJudge()) {
         event->ignore();
         return;
     }

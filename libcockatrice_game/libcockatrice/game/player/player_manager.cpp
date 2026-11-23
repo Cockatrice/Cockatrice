@@ -29,7 +29,7 @@ PlayerLogic *PlayerManager::getActiveLocalPlayer(int activePlayer) const
 {
     PlayerLogic *active = players.value(activePlayer, 0);
     if (active) {
-        if (active->getPlayerInfo()->getLocal()) {
+        if (active->getPlayerInfo().local) {
             return active;
         }
     }
@@ -37,7 +37,7 @@ PlayerLogic *PlayerManager::getActiveLocalPlayer(int activePlayer) const
     QMapIterator<int, PlayerLogic *> playerIterator(players);
     while (playerIterator.hasNext()) {
         PlayerLogic *temp = playerIterator.next().value();
-        if (temp->getPlayerInfo()->getLocal()) {
+        if (temp->getPlayerInfo().local) {
             return temp;
         }
     }

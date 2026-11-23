@@ -422,7 +422,7 @@ void PlayerGraphicsItem::updatePlaymat()
     }
 
     // "Show own playmat only" — hide playmats for remote players
-    if (visibility == PlaymatVisibilityOwnOnly && !player->getPlayerInfo()->getLocal()) {
+    if (visibility == PlaymatVisibilityOwnOnly && !player->getPlayerInfo().local) {
         clearPlaymat();
         return;
     }
@@ -434,7 +434,7 @@ void PlayerGraphicsItem::updatePlaymat()
         // Prefer the server-confirmed playmat (updated by Command_SetPlaymat).
         playmatCard = player->getRemotePlaymatCard();
         params = player->getRemotePlaymatParams();
-    } else if (player->getPlayerInfo()->getLocal()) {
+    } else if (player->getPlayerInfo().local) {
         // Local player without a server broadcast yet: apply the full
         // settings-based resolution chain (mode, fallback list, behavior).
         const auto &settings = SettingsCache::instance().userInterface();

@@ -7,52 +7,24 @@
 #ifndef COCKATRICE_PLAYER_INFO_H
 #define COCKATRICE_PLAYER_INFO_H
 
-#include <QObject>
 #include <QString>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-#include <qtmetamacros.h>
 
-class PlayerInfo : public QObject
+struct PlayerInfo
 {
-    Q_OBJECT
-public:
-    PlayerInfo(const ServerInfo_User &info, int id, bool local, bool judge);
+    ServerInfo_User userInfo; ///< Server userInfo of the player
+    int id;                   ///< In-game playerId (shared with server)
+    bool local;               ///< Whether the client is controlling this player
+    bool judge;               ///< Whether this player is a judge
 
-    ServerInfo_User *userInfo;
-    int id;
-    bool local;
-    bool judge;
-
-    int getId() const
-    {
-        return id;
-    }
-    ServerInfo_User *getUserInfo() const
-    {
-        return userInfo;
-    }
-
-    void setLocal(bool _local)
-    {
-        local = _local;
-    }
-
-    bool getLocal() const
-    {
-        return local;
-    }
-    bool getLocalOrJudge() const
+    bool isLocalOrJudge() const
     {
         return local || judge;
-    }
-    bool getJudge() const
-    {
-        return judge;
     }
 
     QString getName() const
     {
-        return QString::fromStdString(userInfo->name());
+        return QString::fromStdString(userInfo.name());
     }
 };
 

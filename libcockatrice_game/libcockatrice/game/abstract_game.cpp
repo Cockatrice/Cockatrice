@@ -29,7 +29,7 @@ AbstractClient *AbstractGame::getClientForPlayer(int playerId) const
 {
     if (gameState->getClients().size() > 1) {
         if (playerId == -1) {
-            playerId = playerManager->getActiveLocalPlayer(gameState->getActivePlayer())->getPlayerInfo()->getId();
+            playerId = playerManager->getActiveLocalPlayer(gameState->getActivePlayer())->getPlayerInfo().id;
         }
 
         return gameState->getClients().at(playerId);

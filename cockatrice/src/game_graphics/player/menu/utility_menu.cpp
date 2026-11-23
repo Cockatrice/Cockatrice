@@ -22,7 +22,7 @@ UtilityMenu::UtilityMenu(PlayerGraphicsItem *_player, QMenu *playerMenu) : QMenu
             &UtilityMenu::setAndEnableCreateAnotherTokenAction);
     connect(playerActions, &PlayerActions::requestSetLastToken, this, &UtilityMenu::setLastToken);
 
-    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo().isLocalOrJudge()) {
         aUntapAll = new QAction(this);
         connect(aUntapAll, &QAction::triggered, playerActions, &PlayerActions::actUntapAll);
 
@@ -115,7 +115,7 @@ void UtilityMenu::setLastToken(CardInfoPtr lastToken)
 
 void UtilityMenu::retranslateUi()
 {
-    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo().isLocalOrJudge()) {
         aIncrementAllCardCounters->setText(tr("Increment all card counters"));
         aUntapAll->setText(tr("&Untap all permanents"));
         aRollDie->setText(tr("R&oll die..."));
@@ -130,7 +130,7 @@ void UtilityMenu::setShortcutsActive()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
 
-    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo().isLocalOrJudge()) {
         aIncrementAllCardCounters->setShortcuts(shortcuts.getShortcut("Player/aIncrementAllCardCounters"));
         aUntapAll->setShortcuts(shortcuts.getShortcut("Player/aUntapAll"));
         aRollDie->setShortcuts(shortcuts.getShortcut("Player/aRollDie"));
@@ -142,7 +142,7 @@ void UtilityMenu::setShortcutsActive()
 
 void UtilityMenu::setShortcutsInactive()
 {
-    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo().isLocalOrJudge()) {
         aUntapAll->setShortcut(QKeySequence());
         aRollDie->setShortcut(QKeySequence());
         aFlipCoin->setShortcut(QKeySequence());
@@ -154,7 +154,7 @@ void UtilityMenu::setShortcutsInactive()
 
 void UtilityMenu::setLobbyShortcutsActive()
 {
-    if (!player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (!player->getLogic()->getPlayerInfo().isLocalOrJudge()) {
         return;
     }
 

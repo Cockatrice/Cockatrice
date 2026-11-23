@@ -24,7 +24,7 @@ void CustomZoneMenu::retranslateUi()
 {
     setTitle(tr("C&ustom Zones"));
 
-    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo().isLocalOrJudge()) {
 
         for (auto aViewZone : actions()) {
             aViewZone->setText(tr("View custom zone '%1'").arg(aViewZone->data().toString()));

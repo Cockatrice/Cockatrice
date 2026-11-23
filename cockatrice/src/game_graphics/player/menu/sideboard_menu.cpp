@@ -16,7 +16,7 @@ SideboardMenu::SideboardMenu(PlayerGraphicsItem *player, QMenu *playerMenu) : QM
     connect(aViewSideboard, &QAction::triggered, player->getLogic()->getPlayerActions(),
             &PlayerActions::actViewSideboard);
 
-    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo().isLocalOrJudge()) {
         addAction(aViewSideboard);
     }
 
