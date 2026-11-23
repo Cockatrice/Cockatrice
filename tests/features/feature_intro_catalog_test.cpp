@@ -51,6 +51,14 @@ TEST(FeatureIntroCatalog, EveryReworkExplainsItsUndo)
     }
 }
 
+TEST(FeatureIntroCatalog, HoverCardPanelEntryMatchesTheShippedRollout)
+{
+    const FeatureIntro *intro = findFeatureIntro(QStringLiteral("cards-hover-panel"));
+    ASSERT_NE(intro, nullptr);
+    ASSERT_EQ(intro->shape, FeatureIntroShape::Rework);
+    ASSERT_EQ(intro->introducedIn, QStringLiteral("3.2.0"));
+}
+
 TEST(FeatureIntroCatalog, UnknownIdIsNotFound)
 {
     ASSERT_EQ(findFeatureIntro(QStringLiteral("no-such-feature")), nullptr);

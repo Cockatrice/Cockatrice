@@ -19,6 +19,8 @@ set(cockatrice_SOURCES
     src/client/network/update/card_spoiler/spoiler_file.cpp
     src/client/crash/crash_reporter.cpp
     src/client/features/feature_intro.h
+    src/client/features/feature_intro_actions.cpp
+    src/client/features/feature_intro_actions.h
     src/client/features/feature_intro_catalog.cpp
     src/client/features/feature_intro_planner.cpp
     src/client/features/feature_intro_planner.h
