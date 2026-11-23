@@ -30,6 +30,8 @@ public:
 signals:
     /// Request to re-import the card database with the newly selected card language
     void cardDatabaseUpdateRequested();
+    /// Request to open the What's New dialog; handled by the settings dialog owner.
+    void whatsNewRequested();
 
 private slots:
     void deckPathButtonClicked();
@@ -81,6 +83,8 @@ private:
     QCheckBox cardDatabaseUpdateTrayNotificationCheckBox;
 
     QCheckBox showTipsOnStartup;
+    QCheckBox informAboutNewFeatures;
+    QPushButton *whatsNewButton;
     QLabel startupTabLabel;
     QComboBox startupTabSelector;
     QLabel startupServerLabel;

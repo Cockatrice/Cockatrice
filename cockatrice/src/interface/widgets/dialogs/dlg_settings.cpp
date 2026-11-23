@@ -8,6 +8,9 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../main.h"
 #include "../settings_page/abstract_settings_page.h"
+#include "../settings_page/general_settings_page.h"
+#include "../settings_page/user_interface_settings_page.h"
+#include "dlg_whats_new.h"
 #include "libcockatrice/card/database/card_database.h"
 #include "libcockatrice/card/database/card_database_loader.h"
 #include "libcockatrice/card/database/card_database_manager.h"
@@ -102,6 +105,50 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
 void DlgSettings::setTab(int index)
 {
     settingsView->setTab(index);
+}
+
+void DlgSettings::openSetting(const QString &pageKey, const QString &query)
+{
+    // Keys, not titles: the catalog must not depend on the active translation.
+    static const QHash<QString, SettingsPage> pageKeys = {
+        {QStringLiteral("general"), GeneralPage},
+        {QStringLiteral("appearance"), AppearancePage},
+        {QStringLiteral("user-interface"), UserInterfacePage},
+        {QStringLiteral("card-sources"), DeckEditorPage},
+        {QStringLiteral("storage"), StoragePage},
+        {QStringLiteral("chat"), MessagesPage},
+        {QStringLiteral("sound"), SoundPage},
+        {QStringLiteral("shortcuts"), ShortcutsPage},
+    };
+
+    settingsView->openSetting(pageKeys.value(pageKey, GeneralPage), query);
+}
+
+void DlgSettings::setFeatureIntroService(FeatureIntroService *service)
+{
+    featureIntros = service;
+    if (featureIntros == nullptr) {
+        return;
+    }
+
+    if (auto *general = qobject_cast<GeneralSettingsPage *>(page(GeneralPage))) {
+        connect(general, &GeneralSettingsPage::whatsNewRequested, this, &DlgSettings::openWhatsNew);
+    }
+    if (auto *interfacePage = qobject_cast<UserInterfaceSettingsPage *>(page(UserInterfacePage))) {
+        connect(interfacePage, &UserInterfaceSettingsPage::featureIntroRequested, this,
+                [this](const QString &) { openWhatsNew(); });
+    }
+}
+
+void DlgSettings::openWhatsNew()
+{
+    if (featureIntros == nullptr) {
+        return;
+    }
+
+    DlgWhatsNew dlg(featureIntros, this);
+    connect(&dlg, &DlgWhatsNew::settingsRequested, this, &DlgSettings::openSetting);
+    dlg.exec();
 }
 
 AbstractSettingsPage *DlgSettings::page(SettingsPage which) const

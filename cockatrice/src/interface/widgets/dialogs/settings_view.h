@@ -56,6 +56,13 @@ public:
 
     explicit SettingsView(QWidget *parent = nullptr);
     void setTab(int index);
+    /**
+     * @brief Shows @a page and runs @a query in the search field.
+     *
+     * Used by feature introductions so "Settings…" lands on the group that owns
+     * the feature instead of the top of the page.
+     */
+    void openSetting(SettingsPage page, const QString &query);
     AbstractSettingsPage *page(SettingsPage which) const;
 
 private slots:

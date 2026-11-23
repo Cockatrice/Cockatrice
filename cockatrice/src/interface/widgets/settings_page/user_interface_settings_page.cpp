@@ -15,6 +15,7 @@
 #include <QtGlobal>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
+#include <libcockatrice/settings/feature_intro_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
@@ -36,7 +37,7 @@ static int clampHoverTrigger(int trigger)
                   static_cast<int>(CardsDisplaySettings::HoverPanelTriggerOff));
 }
 
-UserInterfaceSettingsPage::UserInterfaceSettingsPage()
+UserInterfaceSettingsPage::UserInterfaceSettingsPage() : hoverPanelNewBadge(QStringLiteral("cards-hover-panel"))
 {
     // general settings
     doubleClickToPlayCheckBox.setChecked(SettingsCache::instance().userInterface().getDoubleClickToPlay());
@@ -202,17 +203,22 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
             &CardsDisplaySettings::setHoverPanelDelayMs);
 
     auto *hoverPanelGrid = new QGridLayout;
-    hoverPanelGrid->addWidget(&hoverZoomTriggerLabel, 0, 0);
-    hoverPanelGrid->addWidget(&hoverZoomTriggerSelector, 0, 1);
-    hoverPanelGrid->addWidget(&hoverPanelTriggerLabel, 1, 0);
-    hoverPanelGrid->addWidget(&hoverPanelTriggerSelector, 1, 1);
-    hoverPanelGrid->addWidget(&hoverPanelDoubleConfirmCheckBox, 2, 0, 1, 2);
-    hoverPanelGrid->addWidget(&hoverZoomDelayLabel, 3, 0);
-    hoverPanelGrid->addWidget(&hoverZoomDelayBox, 3, 1);
-    hoverPanelGrid->addWidget(&hoverPanelDelayLabel, 4, 0);
-    hoverPanelGrid->addWidget(&hoverPanelDelayBox, 4, 1);
+    hoverPanelGrid->addWidget(&hoverPanelNewBadge, 0, 0, 1, 2, Qt::AlignRight);
+    hoverPanelGrid->addWidget(&hoverZoomTriggerLabel, 1, 0);
+    hoverPanelGrid->addWidget(&hoverZoomTriggerSelector, 1, 1);
+    hoverPanelGrid->addWidget(&hoverPanelTriggerLabel, 2, 0);
+    hoverPanelGrid->addWidget(&hoverPanelTriggerSelector, 2, 1);
+    hoverPanelGrid->addWidget(&hoverPanelDoubleConfirmCheckBox, 3, 0, 1, 2);
+    hoverPanelGrid->addWidget(&hoverZoomDelayLabel, 4, 0);
+    hoverPanelGrid->addWidget(&hoverZoomDelayBox, 4, 1);
+    hoverPanelGrid->addWidget(&hoverPanelDelayLabel, 5, 0);
+    hoverPanelGrid->addWidget(&hoverPanelDelayBox, 5, 1);
     hoverWheelNoteLabel.setWordWrap(true);
-    hoverPanelGrid->addWidget(&hoverWheelNoteLabel, 5, 0, 1, 2);
+    hoverPanelGrid->addWidget(&hoverWheelNoteLabel, 6, 0, 1, 2);
+    connect(&hoverPanelNewBadge, &QToolButton::clicked, this,
+            [this] { emit featureIntroRequested(hoverPanelNewBadge.featureId()); });
+    connect(&SettingsCache::instance().featureIntros(), &FeatureIntroSettings::stateChanged, &hoverPanelNewBadge,
+            &FeatureIntroBadge::refresh);
     connect(&hoverZoomTriggerSelector, &QComboBox::currentIndexChanged, this,
             &UserInterfaceSettingsPage::updateHoverPanelUiState);
     connect(&hoverPanelTriggerSelector, &QComboBox::currentIndexChanged, this,
