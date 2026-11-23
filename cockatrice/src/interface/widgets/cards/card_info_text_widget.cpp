@@ -37,14 +37,17 @@ CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent)
     // Forward link clicks via a queued connection: listeners react by calling setCard() -> setTexts(),
     // which replaces propsLabel's text. Doing that synchronously destroys QLabel's internal text control
     // while it is still processing the mouse event that emitted linkActivated, causing a crash.
-    connect(propsLabel, &QLabel::linkActivated, this, [this](const QString &link) {
-        if (link == SHOW_ALL_TAGS_LINK) {
-            showAllTags = true;
-            setCard(currentCard);
-            return;
-        }
-        emit linkActivated(link);
-    }, Qt::QueuedConnection);
+    connect(
+        propsLabel, &QLabel::linkActivated, this,
+        [this](const QString &link) {
+            if (link == SHOW_ALL_TAGS_LINK) {
+                showAllTags = true;
+                setCard(currentCard);
+                return;
+            }
+            emit linkActivated(link);
+        },
+        Qt::QueuedConnection);
 
     textLabel = new QTextEdit();
     textLabel->setReadOnly(true);
