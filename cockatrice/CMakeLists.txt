@@ -18,6 +18,10 @@ set(cockatrice_SOURCES
     src/client/network/update/card_spoiler/spoiler_background_updater.cpp
     src/client/network/update/card_spoiler/spoiler_file.cpp
     src/client/crash/crash_reporter.cpp
+    src/client/features/feature_intro.h
+    src/client/features/feature_intro_catalog.cpp
+    src/client/features/feature_intro_planner.cpp
+    src/client/features/feature_intro_planner.h
     src/client/latency_graph_widget.cpp
     src/client/latency_status_widget.cpp
     src/client/lag_monitor.cpp
