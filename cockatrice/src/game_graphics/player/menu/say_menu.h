@@ -10,6 +10,7 @@
 #include "abstract_player_component.h"
 
 #include <QMenu>
+#include <QPointer>
 #include <qtmetamacros.h>
 
 class PlayerGraphicsItem;
@@ -28,7 +29,7 @@ private slots:
     void initSayMenu();
 
 private:
-    PlayerGraphicsItem *player;
+    QPointer<PlayerGraphicsItem> player;
     bool shortcutsActive = false;
 };
 

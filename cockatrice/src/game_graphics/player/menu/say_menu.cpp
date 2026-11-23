@@ -46,6 +46,12 @@ void SayMenu::initSayMenu()
 {
     clear();
 
+    if (player.isNull() || player->getLogic() == nullptr) {
+        // The owning player is gone (e.g. the game was closed); there is nothing to send messages as.
+        setEnabled(false);
+        return;
+    }
+
     int count = SettingsCache::instance().messages().getCount();
     setEnabled(count > 0);
 

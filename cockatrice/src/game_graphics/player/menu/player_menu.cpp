@@ -81,6 +81,18 @@ PlayerMenu::PlayerMenu(PlayerGraphicsItem *_player) : QObject(_player), player(_
     retranslateUi();
 }
 
+PlayerMenu::~PlayerMenu()
+{
+    // playerMenu has no QObject parent, so it (and every submenu parented to it) must be released explicitly.
+    // Otherwise the submenus outlive the player and keep reacting to global settings signals with a dangling
+    // player pointer. deleteLater() is used in case the menu is currently open in a nested event loop.
+    managedComponents.clear();
+    if (playerMenu) {
+        playerMenu->deleteLater();
+        playerMenu = nullptr;
+    }
+}
+
 void PlayerMenu::setMenusForGraphicItems()
 {
     player->getTableZoneGraphicsItem()->setMenu(playerMenu);
