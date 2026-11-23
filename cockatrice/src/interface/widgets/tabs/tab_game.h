@@ -211,6 +211,9 @@ public:
     bool closeRequest() override;
 
     [[nodiscard]] QString getTabText() const override;
+    /// Hover zoom and the card panel live on the board, so their introduction is
+    /// offered here and nowhere else.
+    [[nodiscard]] QString introSurface() const override;
 
     [[nodiscard]] AbstractGame *getGame() const
     {

@@ -1,6 +1,7 @@
 #include "tab_supervisor.h"
 
 #include "../../../client/crash/crash_reporter.h"
+#include "../../../client/features/feature_intro_service.h"
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../../intents/contexts/context_connect_to_server.h"
@@ -157,10 +158,10 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 }
 
 TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent)
-    : QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabHome(nullptr),
-      tabVisualDeckStorage(nullptr), tabServer(nullptr), tabAccount(nullptr), tabDeckStorage(nullptr),
-      tabReplays(nullptr), tabAdmin(nullptr), tabCardArtRules(nullptr), tabLog(nullptr), tabReport(nullptr),
-      tabModeration(nullptr), tabAlts(nullptr), tabDeveloper(nullptr), isLocalGame(false)
+    : QTabWidget(parent), userInfo(nullptr), client(_client), featureIntroService(new FeatureIntroService(this)),
+      tabsMenu(tabsMenu), tabHome(nullptr), tabVisualDeckStorage(nullptr), tabServer(nullptr), tabAccount(nullptr),
+      tabDeckStorage(nullptr), tabReplays(nullptr), tabAdmin(nullptr), tabCardArtRules(nullptr), tabLog(nullptr),
+      tabReport(nullptr), tabModeration(nullptr), tabAlts(nullptr), tabDeveloper(nullptr), isLocalGame(false)
 {
     setObjectName("tabSupervisor");
 

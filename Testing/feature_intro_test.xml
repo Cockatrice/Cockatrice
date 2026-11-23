@@ -1,0 +1,118 @@
+<events>
+    <!--
+        Feature introductions: the corner glyph, the What's New index it opens
+        (filtered to the surface in front, with "See all changes"), the decline and
+        undo path inside the entry, and the "New" badge on the owning settings
+        group.
+
+        This test needs an install that predates the announced feature (an older
+        clientVersion and no explicit hover trigger), which run_test.sh does not
+        set up, so it runs with a prepared HOME instead of the developer's
+        settings. See Testing/README.md, "A prepared HOME for upgrade-state
+        tests", for the four files that HOME needs and the exact command. Two
+        traps that cost a debugging session each:
+
+        - The card database's set must be enabled AND known in cardDatabase.ini.
+          Otherwise startup opens the modal "all sets enabled" welcome (or the
+          "new sets found" question) before the first event and playback never
+          starts: the run times out with no failing event, which looks like a
+          harness hang.
+        - Widget paths include Qt's unnamed-sibling indices, and the settings
+          dialog opened via the What's New deep link numbers them differently
+          from the one opened from the menu. The badge paths below come from the
+          dump taken at this point in this order (dumpTree, then read the
+          "Possible match:" hint if one of them ever misses).
+
+        Order matters: the glyph, the entry actions and the badge all require the
+        entry to still be Pending. The glyph only exists while the game tab is in
+        front, so the steps that leave the board return to it before clicking. The
+        screenshots are the deliverable.
+    -->
+    <event widget="MainWindow" command="resize" arguments="1280x800" />
+    <event widget="MainWindow" command="process_events" arguments="3000" />
+
+    <!-- Start a local game: the glyph belongs to the game surface -->
+    <event widget="MainWindow/menubar" command="activate" arguments="cockatriceMenu" />
+    <event widget="MainWindow/menubar/cockatriceMenu" command="activate" arguments="Start &amp;local game..." />
+    <event widget="MainWindow/localGameDialog/generalGroupBox/numberPlayersEdit" command="set_int" arguments="2" />
+    <event widget="MainWindow/localGameDialog" command="key" arguments="16777220" />
+    <event widget="MainWindow" command="process_events" arguments="3000" />
+
+    <event widget="MainWindow/tabSupervisor/tabCornerWidget" command="dumpTree" arguments="$COCKATRICE_SCREENSHOT_DIR/corner-tree.txt" />
+    <event widget="MainWindow/tabSupervisor/tabCornerWidget/featureIntroButton" command="expectProperty" arguments="visible,true" />
+    <event widget="MainWindow/tabSupervisor/tabCornerWidget/featureIntroButton" command="expectProperty" arguments="toolTip,New feature: Hover zoom and a tabbed card panel" />
+    <event widget="MainWindow/tabSupervisor/tabCornerWidget" command="screenshot" arguments="$COCKATRICE_SCREENSHOT_DIR/feature-intro-glyph.png" />
+
+    <!-- The glyph opens the index filtered to this surface -->
+    <event widget="MainWindow/tabSupervisor/tabCornerWidget/featureIntroButton" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/whatsNewDialog" command="expectProperty" arguments="visible,true" />
+    <event widget="MainWindow/whatsNewDialog/whatsNewSeeAll" command="expectProperty" arguments="visible,true" />
+    <event widget="MainWindow/whatsNewDialog" command="screenshot" arguments="$COCKATRICE_SCREENSHOT_DIR/feature-intro-whats-new.png" />
+
+    <!-- See all changes: the same list, unfiltered -->
+    <event widget="MainWindow/whatsNewDialog/whatsNewSeeAll" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+    <event widget="MainWindow/whatsNewDialog/whatsNewSeeAll" command="expectProperty" arguments="visible,false" />
+    <event widget="MainWindow/whatsNewDialog" command="screenshot" arguments="$COCKATRICE_SCREENSHOT_DIR/feature-intro-whats-new-all.png" />
+
+    <!-- Settings... deep-links into the hover-panel settings group -->
+    <event widget="MainWindow" command="pause" arguments="200" />
+    <event widget="MainWindow/whatsNewDialog/whatsNewScroll/qt_scrollarea_viewport/1QWidget0/whatsNewEntry/whatsNewEntrySettings" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="700" />
+    <event widget="MainWindow/settingsDialog/settingsView/settingsSearchEdit" command="expectProperty" arguments="text,Hover panel settings" />
+    <event widget="MainWindow/settingsDialog/settingsView" command="screenshot" arguments="$COCKATRICE_SCREENSHOT_DIR/feature-intro-settings-link.png" />
+    <event widget="MainWindow/settingsDialog/settingsView" command="dumpTree" arguments="$COCKATRICE_SCREENSHOT_DIR/settings-tree.txt" />
+    <event widget="MainWindow/settingsDialog/settingsOkButton" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+    <event widget="MainWindow/whatsNewDialog" command="key" arguments="16777216" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+
+    <!-- The badge on the owning settings group, still Pending -->
+    <event widget="MainWindow/menubar" command="activate" arguments="cockatriceMenu" />
+    <event widget="MainWindow/menubar/cockatriceMenu" command="activate" arguments="actionSettings" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/settingsDialog/settingsView/navTree" command="selectItem" arguments="User Interface" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/settingsDialog/settingsView/pagesContainer/pagesWidget" command="expectProperty" arguments="currentIndex,2" />
+    <event widget="MainWindow/settingsDialog/settingsView" command="screenshot" arguments="$COCKATRICE_SCREENSHOT_DIR/feature-intro-settings-page.png" />
+    <!-- The badge lives on the hover group box, below the page's first screen: grab
+         the group itself instead of a viewport that would not show it. -->
+    <event widget="MainWindow/settingsDialog/settingsView/pagesContainer/pagesWidget/1QScrollArea0/qt_scrollarea_viewport/1UserInterfaceSettingsPage0/1QGroupBox3/featureIntroBadge" command="expectProperty" arguments="visible,true" />
+    <event widget="MainWindow/settingsDialog/settingsView/pagesContainer/pagesWidget/1QScrollArea0/qt_scrollarea_viewport/1UserInterfaceSettingsPage0/1QGroupBox3/featureIntroBadge" command="expectProperty" arguments="text,New" />
+    <event widget="MainWindow/settingsDialog/settingsView/pagesContainer/pagesWidget/1QScrollArea0/qt_scrollarea_viewport/1UserInterfaceSettingsPage0/1QGroupBox3" command="screenshot" arguments="$COCKATRICE_SCREENSHOT_DIR/feature-intro-badge.png" />
+    <event widget="MainWindow/settingsDialog/settingsView/settingsSearchEdit" command="typeText" arguments="Hover panel settings" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/settingsDialog/settingsView" command="dumpTree" arguments="$COCKATRICE_SCREENSHOT_DIR/settings-search-tree.txt" />
+    <event widget="MainWindow/settingsDialog/settingsOkButton" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+
+    <!-- Back on the game surface: decline from the index, then undo from it -->
+    <event widget="MainWindow/tabSupervisor/tabCornerWidget/featureIntroButton" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/whatsNewDialog/whatsNewScroll/qt_scrollarea_viewport/1QWidget0/whatsNewEntry/whatsNewEntryDecline" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="400" />
+    <event widget="MainWindow/whatsNewDialog/whatsNewScroll/qt_scrollarea_viewport/1QWidget0/whatsNewEntry/whatsNewEntryState" command="expectProperty" arguments="text,Hover zoom and the card panel are off." />
+    <event widget="MainWindow/whatsNewDialog/whatsNewScroll/qt_scrollarea_viewport/1QWidget0/whatsNewEntry/whatsNewEntryAccept" command="expectProperty" arguments="text,Undo" />
+    <event widget="MainWindow/whatsNewDialog" command="screenshot" arguments="$COCKATRICE_SCREENSHOT_DIR/feature-intro-whats-new-declined.png" />
+
+    <!-- Undo restores the exact values the decline replaced -->
+    <event widget="MainWindow/whatsNewDialog/whatsNewScroll/qt_scrollarea_viewport/1QWidget0/whatsNewEntry/whatsNewEntryAccept" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="400" />
+    <event widget="MainWindow/whatsNewDialog/whatsNewScroll/qt_scrollarea_viewport/1QWidget0/whatsNewEntry/whatsNewEntryState" command="expectProperty" arguments="text,You are using it." />
+    <event widget="MainWindow/whatsNewDialog" command="key" arguments="16777216" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+
+    <!-- Undo restored the exact trigger values, not just the label: both selectors
+         are back at Hover (0), not left at Off (4). -->
+    <event widget="MainWindow/menubar" command="activate" arguments="cockatriceMenu" />
+    <event widget="MainWindow/menubar/cockatriceMenu" command="activate" arguments="actionSettings" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/settingsDialog/settingsView/navTree" command="selectItem" arguments="User Interface" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/settingsDialog/settingsView/pagesContainer/pagesWidget/1QScrollArea0/qt_scrollarea_viewport/1UserInterfaceSettingsPage0/1QGroupBox3/1QComboBox0" command="expectProperty" arguments="currentIndex,0" />
+    <event widget="MainWindow/settingsDialog/settingsView/pagesContainer/pagesWidget/1QScrollArea0/qt_scrollarea_viewport/1UserInterfaceSettingsPage0/1QGroupBox3/1QComboBox1" command="expectProperty" arguments="currentIndex,0" />
+    <event widget="MainWindow/settingsDialog/settingsOkButton" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+</events>
+</content>
