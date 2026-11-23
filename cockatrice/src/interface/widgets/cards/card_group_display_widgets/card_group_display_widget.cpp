@@ -225,7 +225,9 @@ void CardGroupDisplayWidget::clearAllDisplayWidgets()
     while (it != indexToWidgetMap.end()) {
         for (auto displayWidget : it.value()) {
             removeFromLayout(displayWidget);
-            delete displayWidget;
+            // Deferred so pending events/timers addressed to the widget are discarded safely.
+            displayWidget->hide();
+            displayWidget->deleteLater();
         }
         it = indexToWidgetMap.erase(it);
     }

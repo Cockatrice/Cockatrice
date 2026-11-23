@@ -205,7 +205,9 @@ void DeckCardZoneDisplayWidget::cleanupInvalidCardGroup(CardGroupDisplayWidget *
             indexToWidgetMap.remove(idx);
         }
     }
-    delete displayWidget;
+    // The widget requests its own cleanup, so it is still on the call stack here.
+    displayWidget->hide();
+    displayWidget->deleteLater();
 }
 
 // =====================================================================================================================

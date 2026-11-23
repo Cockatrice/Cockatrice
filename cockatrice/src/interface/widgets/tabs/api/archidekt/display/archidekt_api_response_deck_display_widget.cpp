@@ -187,7 +187,9 @@ void ArchidektApiResponseDeckDisplayWidget::clearAllDisplayWidgets()
         auto displayWidget = indexToWidgetMap.value(idx);
         zoneContainerLayout->removeWidget(displayWidget);
         indexToWidgetMap.remove(idx);
-        delete displayWidget;
+        // Deferred so pending events/timers addressed to the widget are discarded safely.
+        displayWidget->hide();
+        displayWidget->deleteLater();
     }
 }
 

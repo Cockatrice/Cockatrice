@@ -77,7 +77,11 @@ void FilterDisplayWidget::deleteFilter()
         QFile file(filePath);
         if (file.remove()) {
             emit filterDeleted(filterFilename); // Emit signal for deletion
-            delete this;                        // Delete this widget
+            // Deferred: this runs from a click on one of our own child buttons, so the
+            // widget is still on the call stack and Qt still has events queued for it.
+            // An immediate delete leaves Qt dispatching into freed memory.
+            hide();
+            deleteLater();
         } else {
             QMessageBox::warning(this, tr("Delete Failed"), tr("Failed to delete filter '%1'.").arg(filterFilename));
         }
