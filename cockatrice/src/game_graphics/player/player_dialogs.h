@@ -11,6 +11,7 @@
 #include <QGraphicsView>
 #include <QList>
 #include <QObject>
+#include <QPointer>
 #include <QString>
 #include <QStringList>
 #include <qtmetamacros.h>
@@ -63,7 +64,19 @@ public slots:
 
 private:
     PlayerGraphicsItem *player;
-    PlayerActions *playerActions;
+    // Tracked so a modal dialog's nested event loop can't leave us with a dangling pointer
+    // if the owning PlayerLogic (and its PlayerActions) is destroyed while the dialog is open.
+    QPointer<PlayerActions> playerActions;
+
+    /**
+     * Modal dialogs spin a nested event loop, during which game events (player leave, kick,
+     * game close) may delete this player and everything it owns. Returns true only if both
+     * this PlayerDialogs and the PlayerActions it drives are still alive afterwards.
+     */
+    static bool survivedDialog(const QPointer<PlayerDialogs> &self)
+    {
+        return !self.isNull() && !self->playerActions.isNull();
+    }
 
     QWidget *dialogParent() const
     {

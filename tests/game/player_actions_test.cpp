@@ -6,8 +6,25 @@
 #include <libcockatrice/game/zones/table_zone_logic.h>
 #include <libcockatrice/protocol/pb/command_create_token.pb.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
+#include <libcockatrice/protocol/pb/command_mulligan.pb.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <string>
+
+TEST(PlayerActionsTest, MulliganRelativeSizeUsesCurrentHandSize)
+{
+    GameHarness harness;
+    ASSERT_NE(harness.addCardToZone(ZoneNames::HAND, QStringLiteral("Cat"), 7), nullptr);
+    ASSERT_NE(harness.addCardToZone(ZoneNames::HAND, QStringLiteral("Lightning Bolt"), 8), nullptr);
+
+    // 0 and below are relative to the current hand size (here: 2 cards).
+    harness.player()->getPlayerActions()->actMulligan(0);
+
+    ASSERT_FALSE(harness.client()->sent.isEmpty());
+    const CommandContainer &container = harness.lastCommand();
+    ASSERT_EQ(container.game_command_size(), 1);
+    const Command_Mulligan command = container.game_command(0).GetExtension(Command_Mulligan::ext);
+    EXPECT_EQ(command.number(), 2);
+}
 
 TEST(PlayerActionsTest, PlayCreatureSendsMoveToTable)
 {
