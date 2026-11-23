@@ -102,5 +102,17 @@
     <event widget="MainWindow/whatsNewDialog/whatsNewScroll/qt_scrollarea_viewport/1QWidget0/whatsNewEntry/whatsNewEntryState" command="expectProperty" arguments="text,You are using it." />
     <event widget="MainWindow/whatsNewDialog" command="key" arguments="16777216" />
     <event widget="MainWindow" command="pause" arguments="300" />
+
+    <!-- Undo restored the exact trigger values, not just the label: both selectors
+         are back at Hover (0), not left at Off (4). -->
+    <event widget="MainWindow/menubar" command="activate" arguments="cockatriceMenu" />
+    <event widget="MainWindow/menubar/cockatriceMenu" command="activate" arguments="actionSettings" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/settingsDialog/settingsView/navTree" command="selectItem" arguments="User Interface" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/settingsDialog/settingsView/pagesContainer/pagesWidget/1QScrollArea0/qt_scrollarea_viewport/1UserInterfaceSettingsPage0/1QGroupBox3/1QComboBox0" command="expectProperty" arguments="currentIndex,0" />
+    <event widget="MainWindow/settingsDialog/settingsView/pagesContainer/pagesWidget/1QScrollArea0/qt_scrollarea_viewport/1UserInterfaceSettingsPage0/1QGroupBox3/1QComboBox1" command="expectProperty" arguments="currentIndex,0" />
+    <event widget="MainWindow/settingsDialog/settingsOkButton" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="300" />
 </events>
 </content>

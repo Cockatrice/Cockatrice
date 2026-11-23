@@ -583,6 +583,10 @@ void TabRoom::actOpenChatSettings()
 {
     DlgSettings settings(this);
     settings.setTab(DlgSettings::MessagesPage);
+    // MainWindow is not the only place that opens DlgSettings: without the service
+    // the General page's "What's new…" button and the User Interface "New" badge
+    // are present but inert in this dialog.
+    settings.setFeatureIntroService(tabSupervisor->getFeatureIntroService());
     settings.exec();
 }
 

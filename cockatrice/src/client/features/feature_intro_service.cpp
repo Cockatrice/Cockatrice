@@ -153,8 +153,12 @@ FeatureIntroAction FeatureIntroService::decide(const QString &id, FeatureIntroDe
             declinedUndo.erase(kept);
             if (restore) {
                 restore();
+                // The undo of accepting is declining again, but only as a value:
+                // applying it here would put both triggers back to Off while the
+                // state below records Accepted — finding 9's bug in reverse.
                 if (handlers.applyDecline) {
-                    undo = handlers.applyDecline();
+                    const FeatureIntroAction declineAgain = handlers.applyDecline;
+                    undo = [declineAgain] { declineAgain(); };
                 }
             }
         } else if (handlers.applyAccept) {
