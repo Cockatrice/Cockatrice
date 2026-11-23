@@ -211,6 +211,7 @@ void StableReleaseChannel::releaseListFinished()
     lastRelease->setName(resultMap["name"].toString());
     lastRelease->setDescriptionUrl(resultMap["html_url"].toString());
     lastRelease->setPublishDate(resultMap["published_at"].toDate());
+    lastRelease->setChangelog(resultMap["body"].toString());
 
     if (resultMap.contains("assets")) {
         auto url = findBestDownloadUrl(resultMap["assets"].toList());
@@ -321,6 +322,7 @@ void BetaReleaseChannel::releaseListFinished()
 
     lastRelease->setCommitHash(resultMap["target_commitish"].toString());
     lastRelease->setPublishDate(resultMap["published_at"].toDate());
+    lastRelease->setChangelog(resultMap["body"].toString());
 
     QString shortHash = lastRelease->getCommitHash().left(GIT_SHORT_HASH_LEN);
     lastRelease->setName(QString("%1 (%2)").arg(resultMap["tag_name"].toString()).arg(shortHash));

@@ -14,6 +14,7 @@ set(cockatrice_SOURCES
     src/client/network/parsers/deck_link_to_api_transformer.cpp
     src/client/network/update/client/client_update_checker.cpp
     src/client/network/update/client/release_channel.cpp
+    src/client/network/update/client/release_notes.cpp
     src/client/network/update/card_spoiler/spoiler_background_updater.cpp
     src/client/network/update/card_spoiler/spoiler_file.cpp
     src/client/crash/crash_reporter.cpp
