@@ -181,6 +181,19 @@ TEST_F(SettingsDefaultsTest, Updates_UpdateReleaseChannelIndex_Default)
     ASSERT_EQ(s.getUpdateReleaseChannelIndex(), 0);
 }
 
+TEST_F(SettingsDefaultsTest, Updates_LastSeenReleaseNotes_Default)
+{
+    UpdatesSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getLastSeenReleaseNotes(), QString());
+}
+
+TEST_F(SettingsDefaultsTest, Updates_LastSeenReleaseNotes_SetAndGet)
+{
+    UpdatesSettings s(settingsPath, nullptr);
+    s.setLastSeenReleaseNotes(QStringLiteral("2.10.2"));
+    ASSERT_EQ(s.getLastSeenReleaseNotes(), QStringLiteral("2.10.2"));
+}
+
 // --- SoundSettings ---
 
 TEST_F(SettingsDefaultsTest, Sound_SoundEnabled_Default)

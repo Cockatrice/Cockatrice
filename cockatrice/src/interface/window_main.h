@@ -103,6 +103,7 @@ private slots:
     void actAbout();
     void actTips();
     void actUpdate();
+    void actOpenPendingClientUpdate();
     void actViewLog();
     void actOpenSettingsFolder();
 #ifdef WITH_GUI_TEST
@@ -124,6 +125,7 @@ private slots:
     void cardDatabaseAllNewSetsEnabled();
 
     void checkClientUpdatesFinished(bool needToUpdate, bool isCompatible, Release *release);
+    void onClientUpdateNotesShown(Release *release);
     void actCheckCommanderBracketDefinitionUpdates();
 
     void actOpenCustomFolder();
@@ -180,12 +182,24 @@ private:
     /** @brief Posts a tray notification when the status bar cannot show progress. */
     void notifyCardUpdateFinishedFromTray(bool success);
 
+    /** @brief Sets the release the update glyph stands for, or clears it when @p release is null. */
+    void setPendingClientUpdate(Release *release, bool isCompatible);
+
+    /** @brief Repaints the glyph: amber while the notes are unread, neutral afterwards. */
+    void updateClientUpdateButton();
+
+    /** @brief Drops the pending release once it no longer belongs to the selected update channel. */
+    void syncPendingClientUpdateChannel();
+
     void startLocalGame(const LocalGameOptions &options);
 
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *tabsMenu, *helpMenu, *trayIconMenu;
     QAction *aAbout, *aSettings, *aShow, *aExit;
     QToolButton *settingsButton = nullptr;
+    QToolButton *clientUpdateButton = nullptr;
+    Release *pendingClientUpdate = nullptr;
+    bool pendingClientUpdateCompatible = false;
     QAction *aConnect, *aDisconnect, *aRegister, *aForgotPassword, *aSinglePlayer, *aWatchReplay, *aFullScreen;
     QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet,
         *aReloadCardDatabase;

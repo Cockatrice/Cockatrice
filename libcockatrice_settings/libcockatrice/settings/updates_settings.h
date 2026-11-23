@@ -27,6 +27,8 @@ public:
     [[nodiscard]] bool getNotifyAboutNewVersion() const override;
     [[nodiscard]] bool getCardDatabaseUpdateTrayNotification() const;
     [[nodiscard]] int getUpdateReleaseChannelIndex() const override;
+    /** @brief Release whose update notes the client has already shown, empty before the first view. */
+    [[nodiscard]] QString getLastSeenReleaseNotes() const;
 
     void setCheckUpdatesOnStartup(bool value);
     void setStartupCardUpdateCheckPromptForUpdate(bool value);
@@ -38,6 +40,7 @@ public:
     void setNotifyAboutNewVersion(bool _notifyaboutnewversion);
     void setCardDatabaseUpdateTrayNotification(bool value);
     void setUpdateReleaseChannelIndex(int value);
+    void setLastSeenReleaseNotes(const QString &value);
 
 public:
     explicit UpdatesSettings(const QString &settingPath, QObject *parent = nullptr);
