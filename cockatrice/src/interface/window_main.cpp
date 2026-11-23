@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "window_main.h"
 
+#include "../client/features/feature_intro_service.h"
 #include "../client/latency_status_widget.h"
 #include "../client/network/update/client/client_update_checker.h"
 #include "../client/settings/cache_settings.h"
@@ -31,6 +32,7 @@
 #include "../interface/widgets/dialogs/dlg_tip_of_the_day.h"
 #include "../interface/widgets/dialogs/dlg_update.h"
 #include "../interface/widgets/dialogs/dlg_view_log.h"
+#include "../interface/widgets/dialogs/dlg_whats_new.h"
 #include "../interface/widgets/onboarding/first_run_wizard.h"
 #include "../interface/widgets/settings_page/general_settings_page.h"
 #include "../interface/widgets/tabs/tab_server.h"
@@ -56,6 +58,7 @@
 #include "widgets/server/handle_public_servers.h"
 #include "widgets/settings_page/abstract_settings_page.h"
 #include "widgets/tabs/api/commander_spellbook/handle_commander_brackets.h"
+#include "widgets/tabs/tab.h"
 #ifdef WITH_GUI_TEST
 #include "../game_graphics/pq_cockatrice_event_player.h"
 #include "pqEventObserver.h"
@@ -80,6 +83,8 @@
 #include <QFileInfo>
 #include <QFlags>
 #include <QFutureWatcher>
+#include <QGraphicsOpacityEffect>
+#include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QIODevice>
 #include <QLocalSocket>
@@ -90,14 +95,17 @@
 #include <QObject>
 #include <QPixmap>
 #include <QPixmapCache>
+#include <QPropertyAnimation>
 #include <QPushButton>
 #include <QSharedPointer>
 #include <QSize>
 #include <QStatusBar>
 #include <QStringLiteral>
+#include <QStyleHints>
 #include <QSystemTrayIcon>
 #include <QTimer>
 #include <QToolButton>
+#include <QToolTip>
 #include <QWidget>
 #include <QtConcurrentRun>
 #include <QtGlobal>
@@ -306,11 +314,106 @@ void MainWindow::actFullScreen(bool checked)
 void MainWindow::actSettings()
 {
     DlgSettings dlg(this);
+    dlg.setFeatureIntroService(tabSupervisor->getFeatureIntroService());
     auto *generalPage = qobject_cast<GeneralSettingsPage *>(dlg.page(DlgSettings::GeneralPage));
     connect(generalPage, &GeneralSettingsPage::cardDatabaseUpdateRequested, this, &MainWindow::actCheckCardUpdates);
     dlg.exec();
     // The channel may have changed while the dialog was up.
     syncPendingClientUpdateChannel();
+}
+
+void MainWindow::actWhatsNew()
+{
+    openWhatsNew(QString());
+}
+
+void MainWindow::openWhatsNew(const QString &surface)
+{
+    DlgWhatsNew dlg(tabSupervisor->getFeatureIntroService(), this);
+    if (!surface.isEmpty()) {
+        dlg.setSurfaceFilter(surface);
+    }
+    connect(&dlg, &DlgWhatsNew::settingsRequested, this, [this](const QString &pageKey, const QString &query) {
+        DlgSettings settings(this);
+        settings.setFeatureIntroService(tabSupervisor->getFeatureIntroService());
+        settings.openSetting(pageKey, query);
+        settings.exec();
+    });
+    dlg.exec();
+    // The dialog marked what it displayed as shown, so the glyph drops to neutral.
+    updateFeatureIntroButton();
+}
+
+void MainWindow::showFeatureIntrosForCurrentSurface()
+{
+    const auto *tab = qobject_cast<const Tab *>(tabSupervisor->currentWidget());
+    openWhatsNew(tab == nullptr ? QString() : tab->introSurface());
+}
+
+void MainWindow::updateFeatureIntroButton()
+{
+    FeatureIntroService *intros = tabSupervisor->getFeatureIntroService();
+    const auto *tab = qobject_cast<const Tab *>(tabSupervisor->currentWidget());
+    const QVector<const FeatureIntro *> due = intros->pendingFor(tab == nullptr ? QString() : tab->introSurface());
+
+    const bool wasVisible = featureIntroButton->isVisible();
+    featureIntroButton->setVisible(!due.isEmpty());
+
+    // The glyph is pointer-only, so mirror the state onto the Help menu action, as
+    // the update glyph does with its own action.
+    aWhatsNew->setText(due.isEmpty() ? tr("What's &New") : tr("What's &New (New Feature Available!)"));
+
+    QString description = tr("Recent additions to Cockatrice");
+    if (!due.isEmpty()) {
+        description = due.size() == 1 ? tr("New feature: %1").arg(due.first()->title)
+                                      : tr("%n new features apply here", "", static_cast<int>(due.size()));
+    }
+
+    bool unseen = false;
+    for (const FeatureIntro *intro : due) {
+        if (intros->isUnseen(intro->id)) {
+            unseen = true;
+            break;
+        }
+    }
+
+    // Marked until the index has shown this revision, then neutral; the same
+    // unread model the update glyph uses.
+    featureIntroButton->setIcon(
+        loadThemedIcon(QStringLiteral("icons/info"),
+                       unseen ? IconTint(AppColor::Marked, IconEmphasis::Primary) : IconTint::primary()));
+    featureIntroButton->setToolTip(description);
+    featureIntroButton->setAccessibleName(description);
+
+    if (!due.isEmpty() && !wasVisible) {
+        revealFeatureIntroButton(due.first()->id, description);
+    }
+}
+
+void MainWindow::revealFeatureIntroButton(const QString &id, const QString &description)
+{
+    if (revealedFeatureIntros.contains(id)) {
+        return;
+    }
+    revealedFeatureIntros.insert(id);
+
+    // A quiet appearance rather than a modal: the fade and the one tooltip say
+    // "something new here" without taking focus. Platforms that ask for no hover
+    // animation get the glyph without the fade.
+    if (QGuiApplication::styleHints()->useHoverEffects()) {
+        auto *effect = new QGraphicsOpacityEffect(featureIntroButton);
+        featureIntroButton->setGraphicsEffect(effect);
+        auto *fade = new QPropertyAnimation(effect, "opacity", featureIntroButton);
+        fade->setDuration(180);
+        fade->setStartValue(0.0);
+        fade->setEndValue(1.0);
+        connect(fade, &QPropertyAnimation::finished, featureIntroButton,
+                [this] { featureIntroButton->setGraphicsEffect(nullptr); });
+        fade->start(QAbstractAnimation::DeleteWhenStopped);
+    }
+
+    QToolTip::showText(featureIntroButton->mapToGlobal(QPoint(0, featureIntroButton->height())), description,
+                       featureIntroButton);
 }
 
 void MainWindow::actExit()
@@ -451,6 +554,7 @@ void MainWindow::retranslateUi()
 
     helpMenu->setTitle(tr("&Help"));
     aAbout->setText(tr("&About Cockatrice"));
+    aWhatsNew->setText(tr("What's &New"));
     aTips->setText(tr("&Tip of the Day"));
     aCheckCardUpdates->setText(tr("Check for Card Updates..."));
     aCheckCardUpdatesBackground->setText(tr("Check for Card Updates (Automatic)"));
@@ -515,6 +619,9 @@ void MainWindow::createActions()
 
     aAbout = new QAction(this);
     connect(aAbout, &QAction::triggered, this, &MainWindow::actAbout);
+    aWhatsNew = new QAction(this);
+    aWhatsNew->setObjectName("actionWhatsNew");
+    connect(aWhatsNew, &QAction::triggered, this, &MainWindow::actWhatsNew);
     aTips = new QAction(this);
     connect(aTips, &QAction::triggered, this, &MainWindow::actTips);
     aUpdate = new QAction(this);
@@ -614,6 +721,7 @@ void MainWindow::createMenus()
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->setObjectName("helpMenu");
     helpMenu->addAction(aAbout);
+    helpMenu->addAction(aWhatsNew);
     helpMenu->addAction(aTips);
     helpMenu->addSeparator();
     helpMenu->addAction(aUpdate);
@@ -674,11 +782,30 @@ MainWindow::MainWindow(QWidget *parent)
     clientUpdateButton->setVisible(false);
     connect(clientUpdateButton, &QToolButton::clicked, this, &MainWindow::actOpenPendingClientUpdate);
 
+    // Shown only while the tab in front has an unanswered introduction, so it
+    // appears and disappears with the surface it describes. Sits left of the update
+    // glyph, which keeps #7928's "immediately left of settings" placement.
+    featureIntroButton = createCornerToolButton(tabSupervisor);
+    featureIntroButton->setObjectName("featureIntroButton");
+    featureIntroButton->setVisible(false);
+    connect(featureIntroButton, &QToolButton::clicked, this, &MainWindow::showFeatureIntrosForCurrentSurface);
+
     auto *cornerWidget = new QWidget(tabSupervisor);
+    // Named so the GUI test does not depend on the corner's unnamed-sibling index.
+    cornerWidget->setObjectName(QStringLiteral("tabCornerWidget"));
     auto *cornerLayout = QtUtils::makeLayout<QHBoxLayout>(cornerWidget, 0);
+    cornerLayout->addWidget(featureIntroButton);
     cornerLayout->addWidget(clientUpdateButton);
     cornerLayout->addWidget(settingsButton);
     tabSupervisor->setCornerWidget(cornerWidget, Qt::TopRightCorner);
+
+    FeatureIntroService *featureIntros = tabSupervisor->getFeatureIntroService();
+    connect(tabSupervisor, &QTabWidget::currentChanged, this, &MainWindow::updateFeatureIntroButton);
+    connect(featureIntros, &FeatureIntroService::decisionChanged, this, &MainWindow::updateFeatureIntroButton);
+    connect(featureIntros, &FeatureIntroService::globalEnabledChanged, this, &MainWindow::updateFeatureIntroButton);
+    // The settings page writes the switch directly, not through the service.
+    connect(&SettingsCache::instance().featureIntros(), &FeatureIntroSettings::globalEnabledChanged, this,
+            &MainWindow::updateFeatureIntroButton);
 
     retranslateUi();
 
@@ -741,6 +868,16 @@ void MainWindow::startupConfigCheck()
     AtRiskDataWarning::warnAboutDataPathsInProgramDir(this);
 
     const bool isCleanInstall = SettingsCache::instance().network().getClientVersion() == CLIENT_INFO_NOT_SET;
+
+    // Seed the feature introductions before setClientVersion() below overwrites the
+    // version this install ran before: that comparison is what decides whether a
+    // feature is genuinely new to this user. TabSupervisor owns the service, and it
+    // already exists here.
+    tabSupervisor->getFeatureIntroService()->seed(SettingsCache::instance().network().getClientVersion(),
+                                                  VERSION_STRING);
+    // Seeding is what turns a catalog entry into Pending, so the glyph can only be
+    // right after it runs.
+    updateFeatureIntroButton();
 
     // The loader never runs checkUnknownSets() itself (see main.cpp): the
     // front-loaded parse runs before MainWindow exists, so

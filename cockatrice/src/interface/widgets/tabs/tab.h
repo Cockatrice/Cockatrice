@@ -64,6 +64,16 @@ public:
     virtual void retranslateUi() = 0;
 
     /**
+     * Stable key of the surface this tab shows, matched against
+     * `FeatureIntro::surface` so a feature introduction only appears where its
+     * change is visible. Empty means the tab announces nothing of its own.
+     */
+    [[nodiscard]] virtual QString introSurface() const
+    {
+        return {};
+    }
+
+    /**
      * Nicely asks to close the tab.
      * Override this method to do checks or ask for confirmation before closing the tab.
      * If you need to force close the tab, just call close() instead.

@@ -40,6 +40,7 @@ inline Q_LOGGING_CATEGORY(TabSupervisorLog, "tab_supervisor");
 
 class UserListManager;
 class AbstractClient;
+class FeatureIntroService;
 class Tab;
 class TabServer;
 class TabRoom;
@@ -104,6 +105,7 @@ public:
 private:
     ServerInfo_User *userInfo;
     AbstractClient *client;
+    FeatureIntroService *featureIntroService;
     UserListManager *userListManager;
     QList<AbstractClient *> localClients;
     QMenu *tabsMenu;
@@ -184,6 +186,11 @@ public:
     [[nodiscard]] QList<AbstractTabDeckEditor *> getDeckEditorTabs() const
     {
         return deckEditorTabs;
+    }
+    /// Owns the per-launch state of the feature introductions (see feature_intro_service.h).
+    [[nodiscard]] FeatureIntroService *getFeatureIntroService() const
+    {
+        return featureIntroService;
     }
     [[nodiscard]] QList<GameInviteOption> getGameInviteLinksForRoom(int roomId) const;
     void sendInviteToUser(const QString &userName, const QString &inviteText);

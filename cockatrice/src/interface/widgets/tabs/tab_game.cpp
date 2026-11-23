@@ -1160,6 +1160,11 @@ QString TabGame::getTabText() const
     return tabText;
 }
 
+QString TabGame::introSurface() const
+{
+    return QStringLiteral("game");
+}
+
 /**
  * @param menu The menu to set. Pass in nullptr to set the menu to empty.
  *
