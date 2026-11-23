@@ -332,7 +332,9 @@ void VisualDeckEditorWidget::clearAllDisplayWidgets()
         auto displayWidget = indexToWidgetMap.value(idx);
         zoneContainerLayout->removeWidget(displayWidget);
         indexToWidgetMap.remove(idx);
-        delete displayWidget;
+        // Deferred so pending events/timers addressed to the widget are discarded safely.
+        displayWidget->hide();
+        displayWidget->deleteLater();
     }
     updatePlaceholderVisibility();
 }
@@ -345,7 +347,9 @@ void VisualDeckEditorWidget::cleanupInvalidZones(DeckCardZoneDisplayWidget *disp
             indexToWidgetMap.remove(idx);
         }
     }
-    delete displayWidget;
+    // The widget requests its own cleanup, so it is still on the call stack here.
+    displayWidget->hide();
+    displayWidget->deleteLater();
     updatePlaceholderVisibility();
 }
 
