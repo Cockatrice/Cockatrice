@@ -20,7 +20,7 @@ class FilterDisplayWidget : public QWidget
 
 public:
     explicit FilterDisplayWidget(QWidget *parent, const QString &filename, FilterTreeModel *_filterModel);
-    ~FilterDisplayWidget() = default;
+    ~FilterDisplayWidget() override = default;
 
     QSize sizeHint() const override;
 

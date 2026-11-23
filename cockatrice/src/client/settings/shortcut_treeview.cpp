@@ -1,5 +1,6 @@
 #include "shortcut_treeview.h"
 
+#include "../../interface/theme_manager.h"
 #include "cache_settings.h"
 #include "shortcuts_settings.h"
 
@@ -78,6 +79,18 @@ ShortcutTreeView::ShortcutTreeView(QWidget *parent) : QTreeView(parent)
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &ShortcutTreeView::refreshShortcuts);
+
+    // Group headers store their font on the item; re-apply the role family on
+    // font changes (setFont emits itemChanged, which repaints the rows).
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this] {
+        QFont groupFont = themeManager->appFont(AppFont::InterfaceDefault);
+        groupFont.setBold(true);
+        for (int row = 0; row < shortcutsModel->rowCount(); ++row) {
+            if (auto *groupItem = shortcutsModel->item(row)) {
+                groupItem->setFont(groupFont);
+            }
+        }
+    });
 }
 
 void ShortcutTreeView::populateShortcutsModel()
@@ -93,7 +106,8 @@ void ShortcutTreeView::populateShortcutsModel()
             curParent = parentItems.value(group);
         } else {
             curParent = new QStandardItem(group);
-            static QFont font = curParent->font();
+            // Family comes from the InterfaceDefault theme role; bold stays caller-side.
+            QFont font = themeManager->appFont(AppFont::InterfaceDefault);
             font.setBold(true);
             curParent->setFont(font);
             parentItems.insert(group, curParent);

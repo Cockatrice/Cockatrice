@@ -14,6 +14,7 @@
 #include "deck_list_node_tree.h"
 #include "libcockatrice/protocol/pb/move_card_to_zone.pb.h"
 #include "libcockatrice/utility/card_ref.h"
+#include "printing_ref.h"
 #include "sideboard_plan.h"
 #include "tree/inner_deck_list_node.h"
 
@@ -280,10 +281,14 @@ public:
     DecklistCardNode *addCard(const QString &cardName,
                               const QString &zoneName,
                               int position = -1,
-                              const QString &cardSetName = QString(),
-                              const QString &cardSetCollectorNumber = QString(),
-                              const QString &cardProviderId = QString(),
+                              const PrintingRef &printing = {},
                               const bool formatLegal = true);
+    DecklistCardNode *addCards(const QString &cardName,
+                               int amount,
+                               const QString &zoneName,
+                               int position = -1,
+                               const PrintingRef &printing = {},
+                               const bool formatLegal = true);
     ///@}
 
     /** @name Deck identity */

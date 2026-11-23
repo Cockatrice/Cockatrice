@@ -18,7 +18,7 @@ class QMediaPlayer;
 
 inline Q_LOGGING_CATEGORY(SoundEngineLog, "sound_engine");
 
-typedef QMap<QString, QString> QStringMap;
+using QStringMap = QMap<QString, QString>;
 
 class SoundEngine : public QObject
 {

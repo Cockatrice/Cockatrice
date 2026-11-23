@@ -1,7 +1,3 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 set(HEADERS
     libcockatrice/card/card_info.h
     libcockatrice/card/card_info_comparator.h
@@ -21,11 +17,9 @@ set(HEADERS
     libcockatrice/card/relation/card_relation.h
 )
 
-qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-
 add_library(
   libcockatrice_card STATIC
-  ${MOC_SOURCES}
+  ${HEADERS}
   libcockatrice/card/card_info.cpp
   libcockatrice/card/card_info_comparator.cpp
   libcockatrice/card/card_localization.cpp

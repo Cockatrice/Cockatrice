@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "main.h"
+
 #include "libcockatrice/rng/rng_abstract.h"
 #include "servatrice.h"
 #include "server_logger.h"
@@ -38,9 +40,11 @@
 #include <QObject>
 #include <QSharedPointer>
 #include <QString>
+#include <QStringList>
 #include <QThread>
 #include <QVariant>
 #include <QVector>
+#include <cstdlib>
 #include <google/protobuf/stubs/common.h>
 #include <iostream>
 #include <libcockatrice/rng/rng_sfmt.h>
@@ -50,12 +54,7 @@
 #include <qnamespace.h>
 #include <string>
 
-RNG_Abstract *rng;
-ServerLogger *logger;
-QThread *loggerThread;
-SettingsCache *settingsCache;
 SignalHandler *signalhandler;
-SmtpClient *smtpClient;
 
 /* Prototypes */
 
@@ -126,6 +125,37 @@ void myMessageOutput2(QtMsgType /*type*/, const QMessageLogContext &, const QStr
     std::cerr << msg.toStdString() << std::endl;
 }
 
+namespace
+{
+void printEffectiveConfig(const SettingsCache &settings)
+{
+    for (const QString &key : settings.effectiveKeys()) {
+        const QString rendered =
+            SettingsCache::isSecretKey(key) ? QStringLiteral("<redacted>") : settings.value(key).toString();
+        std::cout << key.toStdString() << '=' << rendered.toStdString() << '\n';
+    }
+}
+
+bool applyConfigOverrides(SettingsCache &settings, const QStringList &values)
+{
+    for (const QString &entry : values) {
+        QString key;
+        QVariant value;
+        if (!SettingsCache::parseOverride(entry, key, value)) {
+            qCritical() << "Invalid --set value; expected a scalar key=value:" << entry;
+            return false;
+        }
+
+        settings.setOverride(key, value);
+    }
+
+    if (!values.isEmpty()) {
+        settings.rebuildDisallowedRegExps();
+    }
+    return true;
+}
+} // namespace
+
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
@@ -149,6 +179,17 @@ int main(int argc, char *argv[])
     QCommandLineOption configPathOpt("config", "Read server configuration from <file>", "file", "");
     parser.addOption(configPathOpt);
 
+    QCommandLineOption setConfigOpt(
+        "set",
+        "Override a section-qualified scalar configuration value for this run (key=value), such as "
+        "server/port. May be repeated; bare keys and array keys such as rooms/roomlist/1/name are "
+        "rejected; never writes the config file.",
+        "key=value");
+    parser.addOption(setConfigOpt);
+
+    QCommandLineOption printConfigOpt("print-config", "Print the effective configuration and exit");
+    parser.addOption(printConfigOpt);
+
     parser.process(app);
 
     bool testRandom = parser.isSet(testRandomOpt);
@@ -162,14 +203,24 @@ int main(int argc, char *argv[])
         configPath = SettingsCache::guessConfigurationPath();
     } else if (!QFile::exists(configPath)) {
         qCritical() << "Could not find configuration file at" << configPath;
-        return 1;
+        return EXIT_FAILURE;
     }
     qWarning() << "Using configuration file: " << configPath;
     settingsCache = new SettingsCache(configPath);
 
+    if (!applyConfigOverrides(*settingsCache, parser.values(setConfigOpt))) {
+        return EXIT_FAILURE;
+    }
+
+    if (parser.isSet(printConfigOpt)) {
+        printEffectiveConfig(*settingsCache);
+        return EXIT_SUCCESS;
+    }
+
     loggerThread = new QThread;
     loggerThread->setObjectName("logger");
-    logger = new ServerLogger(logToConsole);
+    logger = new ServerLogger(logToConsole, settingsCache->value("server/writelog", 1).toBool(),
+                              settingsCache->value("server/logfilters").toString());
     logger->moveToThread(loggerThread);
 
     loggerThread->start();
@@ -214,7 +265,15 @@ int main(int argc, char *argv[])
 
         std::cerr << "Server quit." << std::endl;
         std::cerr << "-------------------------" << std::endl;
+    } else {
+        // initServer() logged the reason; a failed startup must not look like a clean exit.
+        std::cerr << "Server initialization failed, exiting." << std::endl;
+        retval = EXIT_FAILURE;
     }
+
+    // The handler reads the logger and settingsCache globals torn down below; leaving it
+    // installed lets Qt's own shutdown warnings dereference freed memory.
+    qInstallMessageHandler(nullptr);
 
     delete smtpClient;
     delete rng;

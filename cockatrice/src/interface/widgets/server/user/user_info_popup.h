@@ -1,6 +1,7 @@
 #ifndef COCKATRICE_USER_INFO_POPUP_H
 #define COCKATRICE_USER_INFO_POPUP_H
 
+#include "user_games_model.h"
 #include "user_list_painter.h"
 
 #include <QColor>
@@ -15,21 +16,20 @@
 #include <qtmetamacros.h>
 #include <utility>
 
+struct GameRoleInfo;
 class AbstractClient;
 class QLabel;
 class QPushButton;
 class TabSupervisor;
 class QListView;
 class QPoint;
-class QStandardItemModel;
-class Response;
 template <class Key, class T> class QMap;
 
 // ── Roles ─────────────────────────────────────────────────────────────────────
 
 namespace PopupRoles
 {
-constexpr int GameData = Qt::UserRole + 10;
+constexpr int GameData = UserGamesModel::GameRole;
 }
 
 // Popup theme
@@ -143,6 +143,7 @@ public:
     void
     showForUser(const QString &userName, const ServerInfo_User &userInfo, bool online, bool isBuddy, bool isIgnored);
     void fetchGames();
+    void setOnline(bool online);
 
     [[nodiscard]] QString getCurrentUser() const
     {
@@ -172,7 +173,7 @@ signals:
     void closeRequested();
 
     /** Emitted when the user requests joining or spectating a game in the list. */
-    void joinGameRequested(int gameId, int roomId, bool asSpectator);
+    void joinGameRequested(int gameId, int roomId, const GameRoleInfo &roles);
 
     // ── Action signals — connect to UserContextMenu::exec*() ──────────────────
     void chatRequested(const QString &userName);
@@ -199,7 +200,7 @@ protected:
 
 private slots:
     void refreshGames();
-    void onGamesReceived(const Response &r, const QString &forUser);
+    void updateGamesDisplay();
     void onGamesContextMenu(const QPoint &pos);
 
 private:
@@ -218,6 +219,8 @@ private:
     QString currentUser;
     ServerInfo_User currentUserInfo;
     bool currentOnline = false;
+    bool currentBuddy = false;
+    bool currentIgnored = false;
     std::function<bool(const QString &userName)> gameInviteAvailable;
 
     UserInfoHeaderWidget *header;
@@ -225,7 +228,7 @@ private:
     QLabel *gamesLabel;
     QFrame *separator;
     QListView *gamesView;
-    QStandardItemModel *gamesModel;
+    UserGamesModel *gamesModel;
     QLabel *gamesStatus;
     QPushButton *closeBtn;
     QPushButton *refreshBtn;

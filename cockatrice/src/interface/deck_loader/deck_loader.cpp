@@ -1,5 +1,6 @@
 #include "deck_loader.h"
 
+#include "../theme_manager.h"
 #include "libcockatrice/card/card_info.h"
 #include "libcockatrice/card/database/card_database_querier.h"
 #include "libcockatrice/deck_list/tree/abstract_deck_list_card_node.h"
@@ -38,6 +39,7 @@
 #include <QTextTableFormat>
 #include <QVector>
 #include <QtConcurrentRun>
+#include <algorithm>
 #include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/import/card_name_normalizer.h>
@@ -371,8 +373,12 @@ bool DeckLoader::saveToStream_Plain(QTextStream &out,
         saveToStream_DeckHeader(out, deckList);
     }
 
-    // loop zones
-    for (auto zoneNode : deckList.getZoneNodes()) {
+    // Plain deck readers expect the main deck before the sideboard. Reorder a
+    // copy so native saves and the relative order of other zones stay intact.
+    auto zones = deckList.getZoneNodes();
+    std::stable_partition(zones.begin(), zones.end(),
+                          [](const auto *zone) { return zone->getName() == DECK_ZONE_MAIN; });
+    for (auto zoneNode : zones) {
         saveToStream_DeckZone(out, zoneNode, addComments, addSetNameAndNumber);
 
         // end of zone
@@ -579,6 +585,8 @@ void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode 
     if (!cards.isEmpty()) {
         QTextBlockFormat blockFormat;
         QTextCharFormat charFormat;
+        // Family comes from the DeckList theme role; sizes/weights unchanged.
+        charFormat.setFontFamilies({themeManager->deckListFont().family()});
         charFormat.setFontPointSize(11);
         charFormat.setFontWeight(QFont::Bold);
         cursor->insertBlock(blockFormat, charFormat);
@@ -592,6 +600,7 @@ void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode 
             const AbstractDecklistCardNode *card = cards[i];
 
             QTextCharFormat cellCharFormat;
+            cellCharFormat.setFontFamilies({themeManager->deckListFont().family()});
             cellCharFormat.setFontPointSize(9);
 
             QTextTableCell cell = table->cellAt(i, 0);
@@ -613,6 +622,7 @@ void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode 
 
         QTextBlockFormat blockFormat;
         QTextCharFormat charFormat;
+        charFormat.setFontFamilies({themeManager->deckListFont().family()});
         charFormat.setFontPointSize(14);
         charFormat.setFontWeight(QFont::Bold);
 
@@ -640,14 +650,18 @@ void DeckLoader::printDeckList(QPrinter *printer, const DeckList &deckList)
 {
     QTextDocument doc;
 
-    QFont font("Serif");
-    font.setStyleHint(QFont::Serif);
+    // Family comes from the DeckList theme role; the print sizes/weights below stay unchanged.
+    // Print output is a one-shot snapshot and intentionally does not subscribe
+    // to fontsChanged (there is no live view to repaint); reprinting picks up
+    // the current role font.
+    QFont font = themeManager->deckListFont();
     doc.setDefaultFont(font);
 
     QTextCursor cursor(&doc);
 
     QTextBlockFormat headerBlockFormat;
     QTextCharFormat headerCharFormat;
+    headerCharFormat.setFontFamilies({themeManager->deckListFont().family()});
     headerCharFormat.setFontPointSize(16);
     headerCharFormat.setFontWeight(QFont::Bold);
 

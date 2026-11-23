@@ -8,8 +8,12 @@
 #include <QString>
 #include <gtest/gtest.h>
 #include <libcockatrice/network/server/remote/game/server_counter.h>
+#include <libcockatrice/rng/rng_abstract.h>
 #include <limits>
 #include <string>
+
+// Referenced by other translation units in the server_remote library.
+RNG_Abstract *rng = nullptr;
 
 TEST(ServerCounter, IncrementDoesNotOverflow)
 {

@@ -1,4 +1,4 @@
-# Configuration options: https://docs.github.com/en/github/administering-a-repository/configuration-options-for-dependency-updates
+# Configuration options: https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference
 
 version: 2
 updates:
@@ -7,35 +7,37 @@ updates:
  # https://github.com/dependabot/dependabot-core/issues/1639
  # https://github.com/dependabot/dependabot-core/issues/2192
   - package-ecosystem: "gitsubmodule"
-    # Look for `.gitmodules` in the `root` directory
-    directory: "/"
+    directory: "/"                  # Look for `.gitmodules` in the `root` directory
     ignore:
-      # Ignore updates for vcpkg (Bump to latest tag not working (no SemVer used)
-      - dependency-name: "vcpkg"
-    # Check for updates once a month
+      - dependency-name: "vcpkg"    # Ignore updates for vcpkg (Bump to latest tag not working (no SemVer used)
     schedule:
-      interval: "monthly"
-    # Limit the amout of open PR's (default = 5, disabled = 0, security updates are not impacted)
-    open-pull-requests-limit: 2
+      interval: "weekly"
+    cooldown:
+      default-days: 3                # A new version is not considered for a version update until x days after its release (default = 3)
+    open-pull-requests-limit: 3      # Limit the amout of open PR's (default = 5, disabled = 0, security updates are not impacted)
 
  # # Enable version updates for Docker
  # Not yet possible to bump from one LTS version to the next and skip others, see:
  # https://github.com/dependabot/dependabot-core/issues/2247
  # - package-ecosystem: "docker"
- #   # Look for a `Dockerfile` in the `root` directory
- #   directory: "/"
- #   # Check for updates once a week
+ #   directory: "/"                    # Look for a `Dockerfile` in the `root` directory
  #   schedule:
  #     interval: "weekly"
- #   # Limit the amout of open PR's (default = 5, disabled = 0, security updates are not impacted)
- #   open-pull-requests-limit: 1
+ #   cooldown:
+ #     default-days: 3                 # A new version is not considered for a version update until x days after its release (default = 3)
+ #   open-pull-requests-limit: 1       # Limit the amout of open PR's (default = 5, disabled = 0, security updates are not impacted)
 
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
-    # Directory must be set to "/" to check for workflow files in .github/workflows
-    directory: "/"
-    # Check for updates to GitHub Actions once a week
+    directory: "/"                   # Must be set to "/" to look for workflows in default `.github/workflows` location
     schedule:
       interval: "weekly"
-    # Limit the amout of open PR's (default = 5, disabled = 0, security updates are not impacted)
-    open-pull-requests-limit: 2
+    cooldown:
+      default-days: 3                # A new version is not considered for a version update until x days after its release (default = 3)
+    open-pull-requests-limit: 5      # Limit the amout of open PR's (default = 5, disabled = 0, security updates are not impacted)
+    groups:
+      github-actions:                # Name of group
+        applies-to: version-updates  # security-updates are not included in group and create individual PR's
+        update-types:                # Combine new minor and patch versions into one PR, major bumps create individual PR's
+          - minor
+          - patch

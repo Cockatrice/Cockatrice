@@ -14,6 +14,7 @@
 inline Q_LOGGING_CATEGORY(TappedOutInterfaceLog, "tapped_out_interface");
 
 class QByteArray;
+class QString;
 class QNetworkAccessManager;
 class QNetworkReply;
 class DeckList;
@@ -29,6 +30,8 @@ class TappedOutInterface : public QObject
     Q_OBJECT
 private:
     QNetworkAccessManager *manager;
+    bool replyHandled = false;
+    void showError(const QString &message);
 
     void copyDeckSplitMainAndSide(const DeckList &source, DeckList &mainboard, DeckList &sideboard);
 private slots:
@@ -37,6 +40,12 @@ private slots:
 
 public:
     explicit TappedOutInterface(QObject *parent = nullptr);
+    /**
+     * Posts the deck for analysis and returns immediately; there is no signal for the
+     * outcome. The result opens in the browser or an error dialog, after which the
+     * interface deletes itself, so a caller must call this once and not keep or reuse
+     * the pointer afterwards.
+     */
     void analyzeDeck(const DeckList &deck);
 };
 

@@ -2,6 +2,6 @@ build/
 .github/
 .tx/
 cockatrice/
-doc/
+docs/
 oracle/
 Dockerfile

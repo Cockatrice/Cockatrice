@@ -614,3 +614,19 @@ QString CrashReporter::redactCockatriceUrls(const QString &line)
     redacted.append(line.mid(pos));
     return redacted;
 }
+
+void CrashReporter::addBreadcrumb(const char *category, const char *message)
+{
+#if COCKATRICE_WITH_CRASH_REPORTING
+    if (category == nullptr || message == nullptr) {
+        return;
+    }
+    sentry_value_t crumb = sentry_value_new_breadcrumb("default", message);
+    sentry_value_set_by_key(crumb, "category", sentry_value_new_string(category));
+    sentry_value_set_by_key(crumb, "level", sentry_value_new_string("info"));
+    sentry_add_breadcrumb(crumb);
+#else
+    Q_UNUSED(category);
+    Q_UNUSED(message);
+#endif
+}

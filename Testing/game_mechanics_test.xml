@@ -1,0 +1,101 @@
+<events>
+    <!--
+        Tier 7: Game Mechanics
+        Tests: play cards (clickCard), flip cards (flipCard),
+               create tokens (createToken), draw arrows (drawArrow).
+        All interactions are pure UI mouse events through the QGraphicsView viewport.
+    -->
+
+    <!-- ===== Start a local 2-player game ===== -->
+    <event widget="MainWindow/menubar/cockatriceMenu" command="activate" arguments="Start &amp;local game..." />
+    <!-- Force two players so both deck views exist, independent of the user's settings -->
+    <event widget="MainWindow/localGameDialog/generalGroupBox/numberPlayersEdit" command="set_int" arguments="2" />
+    <event widget="MainWindow/localGameDialog" command="key" arguments="16777220" />
+
+    <!-- ===== Player 1: Load 3-card deck ===== -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_0/qt_tabwidget_stackedwidget/deckViewContainer/loadFromClipboardButton" command="activate" arguments="" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_0/qt_tabwidget_stackedwidget/deckViewContainer/dlgDeckTextEdit/contentsEdit" command="keyEvent" arguments="6,65,67108864,,0,1" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_0/qt_tabwidget_stackedwidget/deckViewContainer/dlgDeckTextEdit/contentsEdit" command="typeText" arguments="3 Lightning Bolt" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_0/qt_tabwidget_stackedwidget/deckViewContainer/dlgDeckTextEdit" command="keyEvent" arguments="6,16777220,67108864,,0,1" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_0/qt_tabwidget_stackedwidget/deckViewContainer/readyStartButton" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+
+    <!-- ===== Player 2: Load same deck ===== -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_1/qt_tabwidget_stackedwidget/deckViewContainer/loadFromClipboardButton" command="activate" arguments="" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_1/qt_tabwidget_stackedwidget/deckViewContainer/dlgDeckTextEdit/contentsEdit" command="keyEvent" arguments="6,65,67108864,,0,1" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_1/qt_tabwidget_stackedwidget/deckViewContainer/dlgDeckTextEdit/contentsEdit" command="typeText" arguments="3 Lightning Bolt" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_1/qt_tabwidget_stackedwidget/deckViewContainer/dlgDeckTextEdit" command="keyEvent" arguments="6,16777220,67108864,,0,1" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/deckViewContainerWidget/tabbedDeckView_1/qt_tabwidget_stackedwidget/deckViewContainer/readyStartButton" command="activate" arguments="" />
+    <event widget="MainWindow" command="pause" arguments="1000" />
+
+    <!-- ===== Player 1, Turn 1 ===== -->
+    <!-- Upkeep → Draw → Main 1 -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+
+    <!-- Create a Goblin token -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/gameView" command="createToken" arguments="Goblin,r,1/1" />
+    <event widget="MainWindow" command="pause" arguments="1000" />
+
+    <!-- Create a second token (Elf) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/gameView" command="createToken" arguments="Elf,w,1/1" />
+    <event widget="MainWindow" command="pause" arguments="1000" />
+
+    <!-- Flip the Goblin (right-click → Turn Over) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/gameView" command="flipCard" arguments="Goblin,table" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+
+    <!-- Play a Lightning Bolt from hand (double-click) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/gameView" command="clickCard" arguments="Lightning Bolt,hand" />
+    <event widget="MainWindow" command="pause" arguments="500" -->
+
+    <!-- Draw arrow from Elf to Goblin (right-drag) -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/mainWidget/gamePlayAreaWidget/gameView" command="drawArrow" arguments="Elf,table,Goblin,table" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+
+    <!-- Advance through all remaining phases to end turn -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="200" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="200" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="200" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="200" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="200" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="200" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+
+    <!-- ===== Player 2, Turn 1 ===== -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <!-- Advance through all phases to end turn -->
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="200" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="200" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="200" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="200" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="200" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="200" />
+    <event widget="MainWindow/tabSupervisor/stackedWidget/TabGame/phasesMenu" command="activate" arguments="aNextPhaseAction" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+
+</events>

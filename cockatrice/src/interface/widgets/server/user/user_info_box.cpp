@@ -1,6 +1,7 @@
 #include "user_info_box.h"
 
 #include "../../interface/pixel_map_generator.h"
+#include "../../interface/theme_manager.h"
 #include "../../interface/widgets/dialogs/dlg_edit_avatar.h"
 #include "../../interface/widgets/dialogs/dlg_edit_password.h"
 #include "../../interface/widgets/dialogs/dlg_edit_user.h"
@@ -32,7 +33,6 @@
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/utility/passwordhasher.h>
 #include <libcockatrice/utility/qt_utils.h>
 #include <string>
 #include <sys/types.h>
@@ -40,10 +40,8 @@
 UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *parent, Qt::WindowFlags flags)
     : QWidget(parent, flags), client(_client), editable(_editable)
 {
-    QFont nameFont = nameLabel.font();
-    nameFont.setBold(true);
-    nameFont.setPointSizeF(nameFont.pointSizeF() * 1.5);
-    nameLabel.setFont(nameFont);
+    applyInterfaceDefaultFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this, &UserInfoBox::applyInterfaceDefaultFont);
 
     auto *userIconAndNameLayout = new QHBoxLayout;
     userIconAndNameLayout->addWidget(&userLevelIcon, 0, Qt::AlignCenter);
@@ -90,6 +88,16 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
     setWindowTitle(tr("User Information"));
     setLayout(mainLayout);
     retranslateUi();
+}
+
+void UserInfoBox::applyInterfaceDefaultFont()
+{
+    // Family comes from the InterfaceDefault theme role; the *1.5 size
+    // multiplier and bold weight stay caller-side as before.
+    QFont nameFont = themeManager->appFont(AppFont::InterfaceDefault);
+    nameFont.setBold(true);
+    nameFont.setPointSizeF(nameFont.pointSizeF() * 1.5);
+    nameLabel.setFont(nameFont);
 }
 
 void UserInfoBox::retranslateUi()
@@ -299,17 +307,7 @@ void UserInfoBox::actPassword()
 
 void UserInfoBox::changePassword(const QString &oldPassword, const QString &newPassword)
 {
-    Command_AccountPassword cmd;
-    cmd.set_old_password(oldPassword.toStdString());
-    if (client->getServerSupportsChallengeResponse()) {
-        cmd.set_hashed_new_password(PasswordHasher::generatePasswordVerifier(newPassword).toStdString());
-    } else if (client->getServerSupportsPasswordHash()) {
-        auto passwordSalt = PasswordHasher::generateRandomSalt();
-        QString hashedPassword = PasswordHasher::computeHash(newPassword, passwordSalt);
-        cmd.set_hashed_new_password(hashedPassword.toStdString());
-    } else {
-        cmd.set_new_password(newPassword.toStdString());
-    }
+    const Command_AccountPassword cmd = client->makeAccountPasswordCommand(oldPassword, newPassword);
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &UserInfoBox::processPasswordResponse);

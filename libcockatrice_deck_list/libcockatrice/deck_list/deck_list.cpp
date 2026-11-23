@@ -340,7 +340,17 @@ bool DeckList::saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards
         }
     };
 
-    forEachCard(writeToStream);
+    // Export the main deck first without changing the saved tree's zone order.
+    forEachCard([&](const auto node, const auto card) {
+        if (node->getName() == DECK_ZONE_MAIN) {
+            writeToStream(node, card);
+        }
+    });
+    forEachCard([&](const auto node, const auto card) {
+        if (node->getName() != DECK_ZONE_MAIN) {
+            writeToStream(node, card);
+        }
+    });
     return true;
 }
 
@@ -418,13 +428,23 @@ int DeckList::getSideboardSize() const
 DecklistCardNode *DeckList::addCard(const QString &cardName,
                                     const QString &zoneName,
                                     int position,
-                                    const QString &cardSetName,
-                                    const QString &cardSetCollectorNumber,
-                                    const QString &cardProviderId,
+                                    const PrintingRef &printing,
                                     bool formatLegal)
 {
-    auto node =
-        tree.addCard(cardName, 1, zoneName, position, cardSetName, cardSetCollectorNumber, cardProviderId, formatLegal);
+    return addCards(cardName, 1, zoneName, position, printing, formatLegal);
+}
+
+DecklistCardNode *DeckList::addCards(const QString &cardName,
+                                     int amount,
+                                     const QString &zoneName,
+                                     int position,
+                                     const PrintingRef &printing,
+                                     bool formatLegal)
+{
+    if (amount <= 0) {
+        return nullptr;
+    }
+    auto node = tree.addCard(cardName, amount, zoneName, position, printing, formatLegal);
     refreshDeckHash();
     return node;
 }

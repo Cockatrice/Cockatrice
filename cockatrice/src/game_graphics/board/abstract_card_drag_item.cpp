@@ -7,6 +7,7 @@
 #include <QBrush>
 #include <QColor>
 #include <QCursor>
+#include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
@@ -51,7 +52,20 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
                 update();
             });
 
-    connect(item, &QObject::destroyed, this, &AbstractCardDragItem::deleteLater);
+    // The source card can be destroyed mid-drag (e.g. moved by a server event). deleteLater() alone is not enough:
+    // a scene repaint can run before the deferred delete and paint the dead card. Detach from the scene immediately.
+    connect(_item, &QObject::destroyed, this, [this]() {
+        hide();
+        if (QGraphicsScene *sc = scene()) {
+            sc->removeItem(this);
+        }
+        deleteLater();
+    });
+}
+
+AbstractCardItem *AbstractCardDragItem::getItem() const
+{
+    return item.data();
 }
 
 QPainterPath AbstractCardDragItem::shape() const
@@ -65,6 +79,10 @@ QPainterPath AbstractCardDragItem::shape() const
 
 void AbstractCardDragItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    if (item.isNull()) {
+        return;
+    }
+
     item->paint(painter, option, widget);
 
     // adds a mask to the card so it looks like the card hasnt been placed yet

@@ -6,22 +6,22 @@
 #include <QObject>
 #include <qtmetamacros.h>
 
-class Servatrice_DatabaseInterface;
+class Server_DatabaseInterface;
 
 class Servatrice_ConnectionPool : public QObject
 {
     Q_OBJECT
 private:
-    Servatrice_DatabaseInterface *databaseInterface;
+    Server_DatabaseInterface *databaseInterface;
     bool threaded;
     mutable QMutex clientCountMutex;
     int clientCount;
 
 public:
-    explicit Servatrice_ConnectionPool(Servatrice_DatabaseInterface *_databaseInterface);
+    explicit Servatrice_ConnectionPool(Server_DatabaseInterface *_databaseInterface);
     ~Servatrice_ConnectionPool() override;
 
-    Servatrice_DatabaseInterface *getDatabaseInterface() const
+    Server_DatabaseInterface *getDatabaseInterface() const
     {
         return databaseInterface;
     }

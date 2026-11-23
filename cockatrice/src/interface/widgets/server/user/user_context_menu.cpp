@@ -1,8 +1,5 @@
 #include "user_context_menu.h"
 
-#include "../../../../game/abstract_game.h"
-#include "../../../../game/game_event_handler.h"
-#include "../../../../game/game_meta_info.h"
 #include "../../dialogs/dlg_report_user.h"
 #include "../../interface/widgets/tabs/tab_supervisor.h"
 #include "../chat_view/chat_view.h"
@@ -37,6 +34,9 @@
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QWidget>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/game_event_handler.h>
+#include <libcockatrice/game/game_meta_info.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_kick_from_game.pb.h>
 #include <libcockatrice/protocol/pb/commands.pb.h>
@@ -83,6 +83,7 @@ UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent,
     aDemoteFromDeveloper = new QAction(QString(), this);
     aGetAdminNotes = new QAction(QString(), this);
     aInvestigateUser = new QAction(QString(), this);
+    aInvestigateAlts = new QAction(QString(), this);
 
     retranslateUi();
 }
@@ -111,6 +112,7 @@ void UserContextMenu::retranslateUi()
     aDemoteFromDeveloper->setText(tr("Demote user from de&veloper"));
     aGetAdminNotes->setText(tr("View admin notes"));
     aInvestigateUser->setText(tr("Investigate user"));
+    aInvestigateAlts->setText(tr("Investigate &alts"));
 }
 
 void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer)
@@ -119,7 +121,8 @@ void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandCon
     if (resp.response_code() == Response::RespNameNotFound) {
         QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Error"), tr("This user does not exist."));
         return;
-    } else if (resp.response_code() == Response::RespInIgnoreList) {
+    }
+    if (resp.response_code() == Response::RespInIgnoreList) {
         QMessageBox::critical(
             static_cast<QWidget *>(parent()), tr("Error"),
             tr("You are being ignored by %1 and can't see their games.").arg(QString::fromStdString(cmd.user_name())));
@@ -454,6 +457,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         menu->addSeparator();
         menu->addAction(aGetAdminNotes);
         menu->addAction(aInvestigateUser);
+        menu->addAction(aInvestigateAlts);
 
         menu->addSeparator();
         if (userLevel.testFlag(ServerInfo_User::IsModerator) &&
@@ -499,6 +503,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     aBanHistory->setEnabled(anotherUser);
     aGetAdminNotes->setEnabled(anotherUser);
     aInvestigateUser->setEnabled(anotherUser);
+    aInvestigateAlts->setEnabled(anotherUser);
     aPromoteToMod->setEnabled(anotherUser);
     aDemoteFromMod->setEnabled(anotherUser);
     aPromoteToJudge->setEnabled(anotherUser);
@@ -553,6 +558,8 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         execAdminNotes(userName);
     } else if (actionClicked == aInvestigateUser) {
         execInvestigateUser(userName);
+    } else if (actionClicked == aInvestigateAlts) {
+        execInvestigateAlts(userName);
     } else if (actionClicked == aCopyToClipBoard) {
         QClipboard *clipboard = QGuiApplication::clipboard();
         clipboard->setText(deckHash);
@@ -743,6 +750,11 @@ void UserContextMenu::execAdminNotes(const QString &userName)
 void UserContextMenu::execInvestigateUser(const QString &userName)
 {
     tabSupervisor->openTabModeration(userName);
+}
+
+void UserContextMenu::execInvestigateAlts(const QString &userName)
+{
+    tabSupervisor->openTabAlts(userName);
 }
 
 void UserContextMenu::execAdjustMod(const QString &userName, bool shouldBeMod)

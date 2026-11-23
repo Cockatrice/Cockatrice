@@ -215,6 +215,12 @@ public:
     {
         attachedCards.removeOne(card);
     }
+    /**
+     * @brief Stashes @p card inside this card, taking ownership of it: it is deleted with this
+     * card unless the caller takes it back with takeStashedCard().
+     * @note A token is never stashed — if @p card would be destroyed on zone change, its own
+     * stashed card (if any) is kept in its place and @p card is deleted during the call.
+     */
     void setStashedCard(Server_Card *card)
     {
         // setStashedCard should only be called on creation of a new card, so

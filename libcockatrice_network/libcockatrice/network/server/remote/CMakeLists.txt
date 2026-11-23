@@ -1,7 +1,3 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 set(HEADERS
     game/dump_zone_range.h
     game/server_abstract_participant.h
@@ -29,11 +25,9 @@ set(HEADERS
     serverinfo_user_container.h
 )
 
-qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-
 add_library(
   libcockatrice_network_server_remote STATIC
-  ${MOC_SOURCES}
+  ${HEADERS}
   game/dump_zone_range.cpp
   game/server_abstract_participant.cpp
   game/server_abstract_player.cpp

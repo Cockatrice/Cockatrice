@@ -58,17 +58,16 @@ void IslInterface::sharedCtor(const QSslCertificate &cert, const QSslKey &privat
     socket->setLocalCertificate(cert);
     socket->setPrivateKey(privateKey);
 
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()), Qt::QueuedConnection);
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
-            SLOT(catchSocketError(QAbstractSocket::SocketError)));
-    connect(this, SIGNAL(outputBufferChanged()), this, SLOT(flushOutputBuffer()), Qt::QueuedConnection);
+    connect(socket, &QSslSocket::readyRead, this, &IslInterface::readClient, Qt::QueuedConnection);
+    connect(socket, &QAbstractSocket::errorOccurred, this, &IslInterface::catchSocketError);
+    connect(this, &IslInterface::outputBufferChanged, this, &IslInterface::flushOutputBuffer, Qt::QueuedConnection);
 }
 
 IslInterface::IslInterface(int _socketDescriptor,
                            const QSslCertificate &cert,
                            const QSslKey &privateKey,
                            Servatrice *_server)
-    : QObject(), socketDescriptor(_socketDescriptor), server(_server), messageInProgress(false)
+    : QObject(), serverId(-1), socketDescriptor(_socketDescriptor), server(_server), messageInProgress(false)
 {
     sharedCtor(cert, privateKey);
 }

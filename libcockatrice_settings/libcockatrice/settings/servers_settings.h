@@ -9,9 +9,11 @@
 
 #include "settings_manager.h"
 
+#include <QList>
 #include <QLoggingCategory>
 #include <QString>
 #include <QStringList>
+#include <optional>
 #include <qtmetamacros.h>
 
 class QObject;
@@ -27,6 +29,22 @@ class ServersSettings : public SettingsManager
     friend class SettingsCache;
 
 public:
+    struct ServerEntry
+    {
+        QString saveName;
+        QString host;
+        QString port;
+        QString username;
+        QString password;
+        bool savePassword = false;
+        QString site;
+    };
+
+    explicit ServersSettings(const QString &settingPath, QObject *parent = nullptr);
+
+    QList<ServerEntry> getServers() const;
+    std::optional<ServerEntry> getServer(int index) const;
+
     int getPreviousHostLogin() const;
     int getPrevioushostindex(const QString &) const;
     QStringList getPreviousHostList() const;
@@ -88,8 +106,11 @@ public:
     bool getClearDebugLogStatus(bool abDefaultValue) const;
 
 private:
-    explicit ServersSettings(const QString &settingPath, QObject *parent = nullptr);
     ServersSettings(const ServersSettings & /*other*/);
+
+    QList<ServerEntry> loadServers() const;
+    void storeServers(const QList<ServerEntry> &servers);
+    void migrateLegacyServers();
 };
 
 #endif // SERVERSSETTINGS_H

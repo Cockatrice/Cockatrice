@@ -8,6 +8,7 @@
 #include "libcockatrice/protocol/pb/serverinfo_user_alt.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_user_session.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_warning.pb.h"
+#include "private_chat_paging.h"
 #include "servatrice.h"
 #include "server.h"
 #include "server_protocolhandler.h"
@@ -33,6 +34,8 @@
 #include <QStringList>
 #include <QVariant>
 #include <QVariantList>
+#include <QtGlobal>
+#include <algorithm>
 #include <google/protobuf/stubs/common.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
@@ -78,7 +81,19 @@ void Servatrice_DatabaseInterface::initDatabase(const QSqlDatabase &_sqlDatabase
     }
 }
 
-bool Servatrice_DatabaseInterface::initDatabase(const QString &type,
+Server_DatabaseInterface *Servatrice_DatabaseInterface::createWorkerInterface(int instanceId)
+{
+    auto *worker = new Servatrice_DatabaseInterface(instanceId, server);
+    worker->inheritedDatabase = sqlDatabase;
+    return worker;
+}
+
+void Servatrice_DatabaseInterface::initialiseWorkerDatabase()
+{
+    initDatabase(inheritedDatabase);
+}
+
+bool Servatrice_DatabaseInterface::openDatabase(const QString &type,
                                                 const QString &hostName,
                                                 const QString &databaseName,
                                                 const QString &userName,
@@ -356,6 +371,13 @@ bool Servatrice_DatabaseInterface::registerUser(const QString &userName,
     return true;
 }
 
+bool Servatrice_DatabaseInterface::addActivationEmail(const QString &userName)
+{
+    QSqlQuery *query = prepareQuery("insert into {prefix}_activation_emails (name) values(:name)");
+    query->bindValue(":name", userName);
+    return execSqlQuery(query);
+}
+
 bool Servatrice_DatabaseInterface::activateUser(const QString &userName, const QString &token)
 {
     if (!checkSql()) {
@@ -482,6 +504,10 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                     const QByteArray expected = PasswordHasher::computeResponse(key, nonce);
                     handler->clearAuthNonce();
                     if (PasswordHasher::constantTimeEquals(expected, response)) {
+                        if (forceChange) {
+                            qCDebug(DatabaseInterfaceLog) << "Login accepted but password change required";
+                            return PasswordChangeRequired;
+                        }
                         qCDebug(DatabaseInterfaceLog) << "Login accepted: challenge-response password right";
                         return PasswordRight;
                     }
@@ -755,6 +781,20 @@ QString Servatrice_DatabaseInterface::getUserPasswordData(const QString &user)
     return query->value(0).toString();
 }
 
+QString Servatrice_DatabaseInterface::sealLegacyBackup(const QString &storedName, const QString &credential)
+{
+    const QByteArray key = server->getLegacyBackupKey();
+    if (key.isEmpty()) {
+        return {};
+    }
+    const QByteArray aad = storedName.simplified().toUtf8();
+    const QString sealed = CryptoUtil::encryptSecret(credential.toUtf8(), key, aad);
+    if (sealed.isEmpty() || sealed.length() > MAX_LEGACY_BACKUP_LENGTH) {
+        return {};
+    }
+    return sealed;
+}
+
 bool Servatrice_DatabaseInterface::submitPasswordVerifier(const QString &user, const QString &passwordVerifier)
 {
     if (server->getAuthenticationMethod() != Servatrice::AuthenticationSql) {
@@ -779,18 +819,13 @@ bool Servatrice_DatabaseInterface::submitPasswordVerifier(const QString &user, c
 
     QString sealedBackup;
     QDateTime backupUsedAt;
-    if (PasswordHasher::isLegacyFormat(currentCredential)) {
-        const QByteArray key = server->getLegacyBackupKey();
-        if (!key.isEmpty()) {
-            const QByteArray aad = storedName.simplified().toUtf8();
-            sealedBackup = CryptoUtil::encryptSecret(currentCredential.toUtf8(), key, aad);
-            if (sealedBackup.isEmpty() || sealedBackup.length() > MAX_LEGACY_BACKUP_LENGTH) {
-                qCWarning(DatabaseInterfaceLog)
-                    << "Failed to seal legacy backup for user" << user << "- account migrates without a downgrade path";
-                sealedBackup.clear();
-            } else {
-                backupUsedAt = QDateTime::currentDateTimeUtc();
-            }
+    if (PasswordHasher::isLegacyFormat(currentCredential) && !server->getLegacyBackupKey().isEmpty()) {
+        sealedBackup = sealLegacyBackup(storedName, currentCredential);
+        if (sealedBackup.isEmpty()) {
+            qCWarning(DatabaseInterfaceLog)
+                << "Failed to seal legacy backup for user" << user << "- account migrates without a downgrade path";
+        } else {
+            backupUsedAt = QDateTime::currentDateTimeUtc();
         }
     }
 
@@ -973,6 +1008,293 @@ bool Servatrice_DatabaseInterface::isInIgnoreList(const QString &whoseList, cons
         return false;
     }
     return query->next();
+}
+
+int Servatrice_DatabaseInterface::getDeckPathIdAt(int basePathId, QStringList path, int userId)
+{
+    if (path.isEmpty()) {
+        return 0;
+    }
+    if (path[0].isEmpty()) {
+        return 0;
+    }
+
+    QSqlQuery *query = prepareQuery("select id from {prefix}_decklist_folders where id_parent = "
+                                    ":id_parent and name = :name and id_user = :id_user");
+    query->bindValue(":id_parent", basePathId);
+    query->bindValue(":name", path.takeFirst());
+    query->bindValue(":id_user", userId);
+    if (!execSqlQuery(query)) {
+        return -1;
+    }
+    if (!query->next()) {
+        return -1;
+    }
+    int id = query->value(0).toInt();
+    if (path.isEmpty()) {
+        return id;
+    }
+    return getDeckPathIdAt(id, path, userId);
+}
+
+int Servatrice_DatabaseInterface::getDeckPathId(const QString &path, int userId)
+{
+    return getDeckPathIdAt(0, path.split("/"), userId);
+}
+
+Servatrice_DatabaseInterface::DeckStorageResult
+Servatrice_DatabaseInterface::setDeckVisibility(int deckId, int userId, bool isPublic)
+{
+    QSqlQuery *query = prepareQuery("select 1 from {prefix}_decklist_files where id = :id and id_user = :id_user");
+    query->bindValue(":id", deckId);
+    query->bindValue(":id_user", userId);
+    execSqlQuery(query);
+    if (!query->next()) {
+        return DeckStorageResult::NotFound;
+    }
+
+    query = prepareQuery("update {prefix}_decklist_files set is_public = :is_public where id = :id "
+                         "and id_user = :id_user");
+    query->bindValue(":is_public", isPublic ? 1 : 0);
+    query->bindValue(":id", deckId);
+    query->bindValue(":id_user", userId);
+    if (!execSqlQuery(query)) {
+        return DeckStorageResult::Failed;
+    }
+    return DeckStorageResult::Ok;
+}
+
+Servatrice_DatabaseInterface::DeckStorageResult
+Servatrice_DatabaseInterface::setDeckFolderVisibility(int folderId, int userId, bool isPublic)
+{
+    QSqlQuery *query = prepareQuery(
+        "update {prefix}_decklist_folders set is_public = :is_public where id = :id and id_user = :id_user");
+    query->bindValue(":is_public", isPublic ? 1 : 0);
+    query->bindValue(":id", folderId);
+    query->bindValue(":id_user", userId);
+    if (!execSqlQuery(query)) {
+        return DeckStorageResult::Failed;
+    }
+    return DeckStorageResult::Ok;
+}
+
+Servatrice_DatabaseInterface::DeckStorageResult
+Servatrice_DatabaseInterface::createDeckFolder(int parentId, int userId, const QString &name)
+{
+    QSqlQuery *query = prepareQuery(
+        "insert into {prefix}_decklist_folders (id_parent, id_user, name) values(:id_parent, :id_user, :name)");
+    query->bindValue(":id_parent", parentId);
+    query->bindValue(":id_user", userId);
+    query->bindValue(":name", name);
+    if (!execSqlQuery(query)) {
+        return DeckStorageResult::Failed;
+    }
+    return DeckStorageResult::Ok;
+}
+
+void Servatrice_DatabaseInterface::deleteDeckFolderTree(int basePathId)
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("select id from {prefix}_decklist_folders where id_parent = :id_parent");
+    query->bindValue(":id_parent", basePathId);
+    execSqlQuery(query);
+    while (query->next()) {
+        deleteDeckFolderTree(query->value(0).toInt());
+    }
+
+    query = prepareQuery("delete from {prefix}_decklist_files where id_folder = :id_folder");
+    query->bindValue(":id_folder", basePathId);
+    execSqlQuery(query);
+
+    query = prepareQuery("delete from {prefix}_decklist_folders where id = :id");
+    query->bindValue(":id", basePathId);
+    execSqlQuery(query);
+}
+
+Servatrice_DatabaseInterface::DeckFileWriteResult
+Servatrice_DatabaseInterface::createDeckFile(int folderId, int userId, const DeckFileData &data)
+{
+    QSqlQuery *query = prepareQuery(
+        "insert into {prefix}_decklist_files (id_folder, id_user, name, upload_time, content, is_public, "
+        "banner_card_name, banner_card_provider, color_identity, tags) values(:id_folder, :id_user, :name, NOW(), "
+        ":content, :is_public, :banner_card_name, :banner_card_provider, :color_identity, :tags)");
+    query->bindValue(":id_folder", folderId);
+    query->bindValue(":id_user", userId);
+    query->bindValue(":name", data.name);
+    query->bindValue(":content", data.content);
+    query->bindValue(":is_public", data.isPublic ? 1 : 0);
+    query->bindValue(":banner_card_name", data.bannerCardName);
+    query->bindValue(":banner_card_provider", data.bannerCardProvider);
+    query->bindValue(":color_identity", data.colorIdentity);
+    query->bindValue(":tags", data.tagsJson);
+
+    DeckFileWriteResult result;
+    if (!execSqlQuery(query)) {
+        return result;
+    }
+    result.result = DeckStorageResult::Ok;
+    result.deckId = query->lastInsertId().toInt();
+    result.isPublic = data.isPublic;
+    return result;
+}
+
+Servatrice_DatabaseInterface::DeckFileWriteResult
+Servatrice_DatabaseInterface::updateDeckFile(int deckId, int userId, const DeckFileData &data, bool updateVisibility)
+{
+    QString updateQuery = "update {prefix}_decklist_files set name=:name, upload_time=NOW(), content=:content, "
+                          "banner_card_name=:banner_card_name, banner_card_provider=:banner_card_provider, "
+                          "color_identity=:color_identity, tags=:tags";
+    if (updateVisibility) {
+        updateQuery += ", is_public=:is_public";
+    }
+    updateQuery += " where id = :id_deck and id_user = :id_user";
+
+    QSqlQuery *query = prepareQuery(updateQuery);
+    query->bindValue(":id_deck", deckId);
+    query->bindValue(":id_user", userId);
+    query->bindValue(":name", data.name);
+    query->bindValue(":content", data.content);
+    query->bindValue(":banner_card_name", data.bannerCardName);
+    query->bindValue(":banner_card_provider", data.bannerCardProvider);
+    query->bindValue(":color_identity", data.colorIdentity);
+    query->bindValue(":tags", data.tagsJson);
+    if (updateVisibility) {
+        query->bindValue(":is_public", data.isPublic ? 1 : 0);
+    }
+
+    DeckFileWriteResult result;
+    if (!execSqlQuery(query)) {
+        return result;
+    }
+    if (query->numRowsAffected() == 0) {
+        result.result = DeckStorageResult::NotFound;
+        return result;
+    }
+
+    QSqlQuery *visibilityQuery =
+        prepareQuery("select is_public from {prefix}_decklist_files where id = :id and id_user = :id_user");
+    visibilityQuery->bindValue(":id", deckId);
+    visibilityQuery->bindValue(":id_user", userId);
+    if (!execSqlQuery(visibilityQuery)) {
+        return result;
+    }
+
+    result.result = DeckStorageResult::Ok;
+    result.deckId = deckId;
+    result.isPublic = visibilityQuery->next() && visibilityQuery->value(0).toBool();
+    return result;
+}
+
+Servatrice_DatabaseInterface::DeckStorageResult Servatrice_DatabaseInterface::deleteDeckFile(int deckId, int userId)
+{
+    QSqlQuery *query = prepareQuery("select id from {prefix}_decklist_files where id = :id and id_user = :id_user");
+    query->bindValue(":id", deckId);
+    query->bindValue(":id_user", userId);
+    execSqlQuery(query);
+    if (!query->next()) {
+        return DeckStorageResult::NotFound;
+    }
+
+    query = prepareQuery("delete from {prefix}_decklist_files where id = :id");
+    query->bindValue(":id", deckId);
+    execSqlQuery(query);
+
+    return DeckStorageResult::Ok;
+}
+
+void Servatrice_DatabaseInterface::deleteDeckFolder(int folderId)
+{
+    deleteDeckFolderTree(folderId);
+}
+
+int Servatrice_DatabaseInterface::getDeckOwnerId(int deckId)
+{
+    QSqlQuery *query = prepareQuery("select id_user from {prefix}_decklist_files where id = :id");
+    query->bindValue(":id", deckId);
+    if (!execSqlQuery(query)) {
+        return -1;
+    }
+    if (!query->next()) {
+        return -1;
+    }
+    return query->value(0).toInt();
+}
+
+bool Servatrice_DatabaseInterface::isDeckEffectivelyPublic(int deckId)
+{
+    QSqlQuery *query = prepareQuery("select is_public, id_folder from {prefix}_decklist_files where id = :id");
+    query->bindValue(":id", deckId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+    if (!query->next()) {
+        return false;
+    }
+    if (query->value(0).toBool()) {
+        return true;
+    }
+
+    int folderId = query->value(1).toInt();
+    int guard = 0;
+    while (folderId != 0 && guard < 100) {
+        QSqlQuery *folderQuery =
+            prepareQuery("select is_public, id_parent from {prefix}_decklist_folders where id = :id");
+        folderQuery->bindValue(":id", folderId);
+        if (!execSqlQuery(folderQuery)) {
+            return false;
+        }
+        if (!folderQuery->next()) {
+            return false;
+        }
+        if (folderQuery->value(0).toBool()) {
+            return true;
+        }
+        folderId = folderQuery->value(1).toInt();
+        ++guard;
+    }
+    return false;
+}
+
+int Servatrice_DatabaseInterface::getUserId(const QString &name)
+{
+    return getUserIdInDB(name);
+}
+
+bool Servatrice_DatabaseInterface::addToBuddyList(int userId, int targetId)
+{
+    return addToList("buddylist", userId, targetId);
+}
+
+bool Servatrice_DatabaseInterface::removeFromBuddyList(int userId, int targetId)
+{
+    return removeFromList("buddylist", userId, targetId);
+}
+
+bool Servatrice_DatabaseInterface::addToIgnoreList(int userId, int targetId)
+{
+    return addToList("ignorelist", userId, targetId);
+}
+
+bool Servatrice_DatabaseInterface::removeFromIgnoreList(int userId, int targetId)
+{
+    return removeFromList("ignorelist", userId, targetId);
+}
+
+bool Servatrice_DatabaseInterface::addToList(const QString &table, int userId, int targetId)
+{
+    QSqlQuery *query = prepareQuery("insert into {prefix}_" + table + " (id_user1, id_user2) values(:id1, :id2)");
+    query->bindValue(":id1", userId);
+    query->bindValue(":id2", targetId);
+    return execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::removeFromList(const QString &table, int userId, int targetId)
+{
+    QSqlQuery *query = prepareQuery("delete from {prefix}_" + table + " where id_user1 = :id1 and id_user2 = :id2");
+    query->bindValue(":id1", userId);
+    query->bindValue(":id2", targetId);
+    return execSqlQuery(query);
 }
 
 ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuery *query, bool complete, bool withId)
@@ -1522,6 +1844,288 @@ void Servatrice_DatabaseInterface::cleanupExpiredDeckShares()
     execSqlQuery(query);
 }
 
+int Servatrice_DatabaseInterface::getDeckSharesCreatedToday(int userId)
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("select count(*) from {prefix}_deck_share where created_by = :created_by and "
+                                    "created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)");
+    query->bindValue(":created_by", userId);
+    if (!execSqlQuery(query) || !query->next()) {
+        return -1;
+    }
+    return query->value(0).toInt();
+}
+
+QList<Server_DatabaseInterface::ReplayMatchRecord> Servatrice_DatabaseInterface::getReplayList(int userId)
+{
+    QList<ReplayMatchRecord> matches;
+
+    QSqlQuery *query1 = prepareQuery(
+        "select a.id_game, a.replay_name, b.room_name, b.time_started, b.time_finished, b.descr, a.do_not_hide from "
+        "{prefix}_replays_access a left join {prefix}_games b on b.id = a.id_game where a.id_player = :id_player and "
+        "(a.do_not_hide = 1 or date_add(b.time_started, interval 7 day) > now())");
+    query1->bindValue(":id_player", userId);
+    execSqlQuery(query1);
+    while (query1->next()) {
+        ReplayMatchRecord match;
+        match.gameId = query1->value(0).toInt();
+        match.replayName = query1->value(1).toString();
+        match.roomName = query1->value(2).toString();
+        match.timeStarted = query1->value(3).toDateTime().toSecsSinceEpoch();
+        match.timeFinished = query1->value(4).toDateTime().toSecsSinceEpoch();
+        match.description = query1->value(5).toString();
+        match.doNotHide = query1->value(6).toBool();
+
+        {
+            QSqlQuery *query2 = prepareQuery("select player_name from {prefix}_games_players where id_game = :id_game");
+            query2->bindValue(":id_game", match.gameId);
+            execSqlQuery(query2);
+            while (query2->next()) {
+                match.playerNames.append(query2->value(0).toString());
+            }
+        }
+        {
+            QSqlQuery *query3 = prepareQuery("select id, duration from {prefix}_replays where id_game = :id_game");
+            query3->bindValue(":id_game", match.gameId);
+            execSqlQuery(query3);
+            while (query3->next()) {
+                match.replays.append(
+                    ReplayEntry{.replayId = query3->value(0).toInt(), .duration = query3->value(1).toInt()});
+            }
+        }
+
+        matches.append(match);
+    }
+
+    return matches;
+}
+
+Server_DatabaseInterface::ReplayAccessResult
+Servatrice_DatabaseInterface::getReplayData(int replayId, int userId, QByteArray &data)
+{
+    {
+        QSqlQuery *query = prepareQuery("select 1 from {prefix}_replays_access a left join {prefix}_replays b on "
+                                        "a.id_game = b.id_game where b.id = :id_replay and a.id_player = :id_player");
+        query->bindValue(":id_replay", replayId);
+        query->bindValue(":id_player", userId);
+        if (!execSqlQuery(query)) {
+            return ReplayAccessResult::Failed;
+        }
+        if (!query->next()) {
+            return ReplayAccessResult::AccessDenied;
+        }
+    }
+
+    QSqlQuery *query = prepareQuery("select replay from {prefix}_replays where id = :id_replay");
+    query->bindValue(":id_replay", replayId);
+    if (!execSqlQuery(query)) {
+        return ReplayAccessResult::Failed;
+    }
+    if (!query->next()) {
+        return ReplayAccessResult::NotFound;
+    }
+
+    data = query->value(0).toByteArray();
+    return ReplayAccessResult::Ok;
+}
+
+Server_DatabaseInterface::ReplayWriteResult
+Servatrice_DatabaseInterface::setReplayDoNotHide(int gameId, int userId, bool doNotHide)
+{
+    QSqlQuery *query = prepareQuery("update {prefix}_replays_access set do_not_hide=:do_not_hide where "
+                                    "id_player = :id_player and id_game = :id_game");
+    query->bindValue(":id_player", userId);
+    query->bindValue(":id_game", gameId);
+    query->bindValue(":do_not_hide", doNotHide);
+
+    if (!execSqlQuery(query)) {
+        return ReplayWriteResult::Failed;
+    }
+    return query->numRowsAffected() > 0 ? ReplayWriteResult::Ok : ReplayWriteResult::NotFound;
+}
+
+Server_DatabaseInterface::ReplayWriteResult Servatrice_DatabaseInterface::deleteReplayAccess(int gameId, int userId)
+{
+    QSqlQuery *query =
+        prepareQuery("delete from {prefix}_replays_access where id_player = :id_player and id_game = :id_game");
+    query->bindValue(":id_player", userId);
+    query->bindValue(":id_game", gameId);
+
+    if (!execSqlQuery(query)) {
+        return ReplayWriteResult::Failed;
+    }
+    return query->numRowsAffected() > 0 ? ReplayWriteResult::Ok : ReplayWriteResult::NotFound;
+}
+
+Server_DatabaseInterface::ReplayAccessResult Servatrice_DatabaseInterface::checkReplayAccess(int gameId, int userId)
+{
+    QSqlQuery *query =
+        prepareQuery("select 1 from {prefix}_replays_access where id_game = :id_game and id_player = :id_player");
+    query->bindValue(":id_game", gameId);
+    query->bindValue(":id_player", userId);
+    if (!execSqlQuery(query)) {
+        return ReplayAccessResult::Failed;
+    }
+    if (!query->next()) {
+        return ReplayAccessResult::AccessDenied;
+    }
+    return ReplayAccessResult::Ok;
+}
+
+Server_DatabaseInterface::ReplayAccessResult Servatrice_DatabaseInterface::getReplayName(int gameId,
+                                                                                         QString &replayName)
+{
+    QSqlQuery *query = prepareQuery("select replay_name from {prefix}_replays_access where id_game = :id_game limit 1");
+    query->bindValue(":id_game", gameId);
+    if (!execSqlQuery(query)) {
+        return ReplayAccessResult::Failed;
+    }
+    if (!query->next()) {
+        return ReplayAccessResult::NotFound;
+    }
+    replayName = query->value(0).toString();
+    return ReplayAccessResult::Ok;
+}
+
+bool Servatrice_DatabaseInterface::getReplayHashSource(int gameId, QByteArray &source)
+{
+    QSqlQuery *query = prepareQuery("select replay from {prefix}_replays where id_game = :id_game limit 3");
+    query->bindValue(":id_game", gameId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        QByteArray replay = query->value(0).toByteArray();
+        replay.truncate(128);
+        source.append(replay);
+    }
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::addReplayAccess(int gameId, int userId, const QString &replayName)
+{
+    QSqlQuery *query =
+        prepareQuery("insert into {prefix}_replays_access (id_game, id_player, replay_name, do_not_hide) "
+                     "values(:idgame, :idplayer, :replayname, 0)");
+    query->bindValue(":idgame", gameId);
+    query->bindValue(":idplayer", userId);
+    query->bindValue(":replayname", replayName);
+
+    return execSqlQuery(query);
+}
+
+Server_DatabaseInterface::ReplayAccessResult
+Servatrice_DatabaseInterface::getLatestReplayForGame(int gameId, int &replayId, QByteArray &data)
+{
+    QSqlQuery *query = prepareQuery("SELECT r.id, r.replay FROM {prefix}_replays r "
+                                    "WHERE r.id_game = :game_id ORDER BY r.id DESC LIMIT 1");
+    query->bindValue(":game_id", gameId);
+    if (!execSqlQuery(query)) {
+        return ReplayAccessResult::Failed;
+    }
+    if (!query->next()) {
+        return ReplayAccessResult::NotFound;
+    }
+
+    replayId = query->value(0).toInt();
+    data = query->value(1).toByteArray();
+    return ReplayAccessResult::Ok;
+}
+
+Server_DatabaseInterface::ReplayWriteResult
+Servatrice_DatabaseInterface::grantReplayAccessByName(int gameId, const QString &userName)
+{
+    QSqlQuery *existsQuery = prepareQuery("select count(*) from {prefix}_replays_access where id_game = :idgame");
+    existsQuery->bindValue(":idgame", gameId);
+    if (!execSqlQuery(existsQuery) || !existsQuery->next()) {
+        return ReplayWriteResult::Failed;
+    }
+    if (existsQuery->value(0).toInt() <= 0) {
+        return ReplayWriteResult::NotFound;
+    }
+
+    QSqlQuery *idQuery = prepareQuery("select id from {prefix}_users WHERE name = :name");
+    idQuery->bindValue(":name", userName);
+    if (!execSqlQuery(idQuery) || !idQuery->next()) {
+        return ReplayWriteResult::Failed;
+    }
+
+    return addReplayAccess(gameId, idQuery->value(0).toInt(), QStringLiteral("Moderator Access Replay Grant"))
+               ? ReplayWriteResult::Ok
+               : ReplayWriteResult::Failed;
+}
+
+bool Servatrice_DatabaseInterface::getDeckFilesInFolder(int folderId, int userId, QList<DeckFileListItem> &files)
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("select id, color_identity from {prefix}_decklist_files where id_folder = "
+                                    ":id_folder and id_user = :id_user");
+    query->bindValue(":id_folder", folderId);
+    query->bindValue(":id_user", userId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+    while (query->next()) {
+        files.append(DeckFileListItem{.id = query->value(0).toInt(), .colorIdentity = query->value(1).toString()});
+    }
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::getDeckListFolders(int folderId, int userId, QList<DeckListFolderRecord> &folders)
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("select id, name, is_public from {prefix}_decklist_folders where "
+                                    "id_parent = :id_parent and id_user = :id_user");
+    query->bindValue(":id_parent", folderId);
+    query->bindValue(":id_user", userId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        DeckListFolderRecord folder;
+        folder.id = query->value(0).toInt();
+        folder.name = query->value(1).toString();
+        folder.isPublic = query->value(2).toBool();
+        folders.append(folder);
+    }
+
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::getDeckListFiles(int folderId, int userId, QList<DeckListFileRecord> &files)
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("select id, name, upload_time, is_public, banner_card_name, "
+                                    "banner_card_provider, color_identity, tags from {prefix}_decklist_files where "
+                                    "id_folder = :id_folder and id_user = :id_user");
+    query->bindValue(":id_folder", folderId);
+    query->bindValue(":id_user", userId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        DeckListFileRecord file;
+        file.id = query->value(0).toInt();
+        file.name = query->value(1).toString();
+        file.uploadTime = query->value(2).toDateTime().toSecsSinceEpoch();
+        file.isPublic = query->value(3).toBool();
+        file.bannerCardName = query->value(4).toString();
+        file.bannerCardProvider = query->value(5).toString();
+        file.colorIdentity = query->value(6).toString();
+        file.tags = deserializeDeckTags(query->value(7).toString());
+        files.append(file);
+    }
+
+    return true;
+}
+
 bool Servatrice_DatabaseInterface::getDeckSharesForUser(int userId, QList<DeckShareSummaryRecord> &shares)
 {
     checkSql();
@@ -1644,6 +2248,54 @@ bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user,
     return passwordQuery->numRowsAffected() > 0;
 }
 
+bool Servatrice_DatabaseInterface::changeUserPasswordWithLegacyBackup(const QString &user,
+                                                                      const QString &passwordVerifier,
+                                                                      const QString &legacyCredential)
+{
+    if (server->getAuthenticationMethod() != Servatrice::AuthenticationSql) {
+        return false;
+    }
+
+    if (!checkSql()) {
+        return false;
+    }
+
+    // Seal against the stored row name, not the caller-supplied one: the name column is
+    // case-insensitive, so a differently-cased name would fail the tag check on open.
+    QSqlQuery *nameQuery = prepareQuery("SELECT name FROM {prefix}_users WHERE name = :name");
+    nameQuery->bindValue(":name", user);
+    if (!execSqlQuery(nameQuery) || !nameQuery->next()) {
+        return false;
+    }
+    const QString storedName = nameQuery->value(0).toString();
+
+    const QString sealedBackup = sealLegacyBackup(storedName, legacyCredential);
+    const QDateTime backupUsedAt = sealedBackup.isEmpty() ? QDateTime() : QDateTime::currentDateTimeUtc();
+    if (sealedBackup.isEmpty()) {
+        // Without a backup a pre-challenge client has nothing to authenticate against: the
+        // row holds a verifier and the legacy hash it would send cannot match it. Say so,
+        // because the symptom - the temporary password appearing not to work - shows up on
+        // a different machine from the one that reset it.
+        qCWarning(DatabaseInterfaceLog) << "Stored a verifier without a legacy backup for user" << user
+                                        << "- pre-challenge clients cannot use this password"
+                                        << "- check security/legacy_backup_key";
+    }
+
+    QSqlQuery *query = prepareQuery("update {prefix}_users set password_sha512=:password, "
+                                    "password_legacy_backup=:backup, password_legacy_backup_used_at=:used_at, "
+                                    "passwordLastChangedDate = NOW() where name = :name");
+    query->bindValue(":password", passwordVerifier);
+    query->bindValue(":backup", sealedBackup);
+    query->bindValue(":used_at", backupUsedAt.isValid()
+                                     ? QVariant(backupUsedAt.toString(QStringLiteral("yyyy-MM-dd HH:mm:ss")))
+                                     : QVariant());
+    query->bindValue(":name", storedName);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+    return query->numRowsAffected() > 0;
+}
+
 void Servatrice_DatabaseInterface::setForcePasswordChange(const QString &user, bool force)
 {
     if (!checkSql()) {
@@ -1654,6 +2306,67 @@ void Servatrice_DatabaseInterface::setForcePasswordChange(const QString &user, b
     query->bindValue(":force", force ? 1 : 0);
     query->bindValue(":name", user);
     execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::updateUserAccount(const QString &userName, const AccountUpdateRecord &update)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QStringList queryList;
+    if (update.hasRealName) {
+        queryList << "realname=:realName";
+    }
+    if (update.hasEmail) {
+        queryList << "email=:email";
+    }
+    if (update.hasCountry) {
+        queryList << "country=:country";
+    }
+
+    const QString queryText = QString("update {prefix}_users set %1 where name=:userName").arg(queryList.join(", "));
+    QSqlQuery *query = prepareQuery(queryText);
+    if (update.hasRealName) {
+        query->bindValue(":realName", update.realName);
+    }
+    if (update.hasEmail) {
+        query->bindValue(":email", update.email);
+    }
+    if (update.hasCountry) {
+        query->bindValue(":country", update.country);
+    }
+    query->bindValue(":userName", userName);
+
+    return execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::setUserAvatar(int userId, const QByteArray &image)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("update {prefix}_users set avatar_bmp=:image where id=:id");
+    query->bindValue(":image", image);
+    query->bindValue(":id", userId);
+    return execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::getUserAdminFlags(const QString &userName, int &adminFlags)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT admin FROM {prefix}_users WHERE name = :name");
+    query->bindValue(":name", userName);
+    if (!execSqlQuery(query) || !query->next()) {
+        return false;
+    }
+
+    adminFlags = query->value(0).toInt();
+    return true;
 }
 
 bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user,
@@ -1791,7 +2504,7 @@ void Servatrice_DatabaseInterface::updateUsersLastLoginData(const QString &userN
     }
 }
 
-QList<ServerInfo_Ban> Servatrice_DatabaseInterface::getUserBanHistory(const QString userName)
+QList<ServerInfo_Ban> Servatrice_DatabaseInterface::getUserBanHistory(const QString &userName)
 {
     QList<ServerInfo_Ban> results;
     ServerInfo_Ban banDetails;
@@ -1849,7 +2562,140 @@ bool Servatrice_DatabaseInterface::addWarning(const QString userName,
     return true;
 }
 
-QList<ServerInfo_Warning> Servatrice_DatabaseInterface::getUserWarnHistory(const QString userName)
+Server_DatabaseInterface::AdminFlagUpdateResult
+Servatrice_DatabaseInterface::setAdminFlag(const QString &userName, int flag, bool add)
+{
+    AdminFlagUpdateResult result;
+    if (!checkSql()) {
+        return result;
+    }
+
+    QSqlQuery *query =
+        add ? prepareQuery("update {prefix}_users set admin = (admin | :adminlevel) where name = :username")
+            : prepareQuery("update {prefix}_users set admin = (admin & ~ :adminlevel) where name = :username");
+    query->bindValue(":adminlevel", flag);
+    query->bindValue(":username", userName);
+    if (!execSqlQuery(query)) {
+        result.errorText = query->lastError().text();
+        return result;
+    }
+
+    result.success = true;
+    return result;
+}
+
+Server_DatabaseInterface::UserFieldResult Servatrice_DatabaseInterface::getUserToken(const QString &userName,
+                                                                                     QString &token)
+{
+    if (!checkSql()) {
+        return UserFieldResult::Failed;
+    }
+
+    QSqlQuery *query = prepareQuery("select token from {prefix}_users WHERE name = :name");
+    query->bindValue(":name", userName);
+    if (!execSqlQuery(query)) {
+        return UserFieldResult::Failed;
+    }
+
+    if (!query->next()) {
+        return UserFieldResult::NotFound;
+    }
+
+    token = query->value(0).toString();
+    return UserFieldResult::Ok;
+}
+
+Server_DatabaseInterface::UserFieldResult Servatrice_DatabaseInterface::getAdminNotes(const QString &userName,
+                                                                                      QString &notes)
+{
+    if (!checkSql()) {
+        return UserFieldResult::Failed;
+    }
+
+    QSqlQuery *query = prepareQuery("select adminnotes from {prefix}_users WHERE name = :name");
+    query->bindValue(":name", userName);
+    if (!execSqlQuery(query)) {
+        return UserFieldResult::Failed;
+    }
+
+    if (!query->next()) {
+        return UserFieldResult::NotFound;
+    }
+
+    notes = query->value(0).toString();
+    return UserFieldResult::Ok;
+}
+
+Server_DatabaseInterface::UserFieldResult Servatrice_DatabaseInterface::setAdminNotes(const QString &userName,
+                                                                                      const QString &notes)
+{
+    if (!checkSql()) {
+        return UserFieldResult::Failed;
+    }
+
+    QSqlQuery *query = prepareQuery("update {prefix}_users set adminnotes = :adminnotes where name = :name");
+    query->bindValue(":adminnotes", notes);
+    query->bindValue(":name", userName);
+
+    if (!execSqlQuery(query)) {
+        return UserFieldResult::Failed;
+    }
+
+    if (query->numRowsAffected() == 0) {
+        return UserFieldResult::NotFound;
+    }
+
+    return UserFieldResult::Ok;
+}
+
+bool Servatrice_DatabaseInterface::addBan(const QString &userName,
+                                          const QString &address,
+                                          int adminId,
+                                          int minutes,
+                                          const QString &reason,
+                                          const QString &visibleReason,
+                                          const QString &clientId)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery(
+        "insert into {prefix}_bans (user_name, ip_address, id_admin, time_from, minutes, reason, visible_reason, "
+        "clientid) values(:user_name, :ip_address, :id_admin, NOW(), :minutes, :reason, :visible_reason, :client_id)");
+    query->bindValue(":user_name", userName);
+    query->bindValue(":ip_address", address);
+    query->bindValue(":id_admin", adminId);
+    query->bindValue(":minutes", minutes);
+    query->bindValue(":reason", reason);
+    query->bindValue(":visible_reason", visibleReason);
+    query->bindValue(":client_id", clientId);
+    return execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::getUserNamesByClientId(const QString &clientId, QList<QString> &userNames)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("select name from {prefix}_users where clientid = :client_id");
+    query->bindValue(":client_id", clientId);
+    // The original call executed the query twice: the first result was discarded and the
+    // second governed the loop. Both executions are kept so the failure behaviour is identical.
+    execSqlQuery(query);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        userNames.append(query->value(0).toString());
+    }
+
+    return true;
+}
+
+QList<ServerInfo_Warning> Servatrice_DatabaseInterface::getUserWarnHistory(const QString &userName)
 {
     QList<ServerInfo_Warning> results;
     ServerInfo_Warning warnDetails;
@@ -1915,7 +2761,72 @@ QList<ServerInfo_UserSession> Servatrice_DatabaseInterface::getUserSessions(cons
     return results;
 }
 
-QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QString &userName)
+namespace
+{
+constexpr int MAX_USER_ALT_DEPTH = 3;
+constexpr int MAX_USER_ALTS_PER_LEVEL = 200;
+// Bounds per-level work and the size of each dynamic IN-list.
+// Identifier-heavy frontiers, e.g. VPN users with hundreds of recent IPs, are
+// truncated: this tool is deliberately a first-pass sweep, not an audit.
+constexpr int MAX_USER_ALT_IDENTIFIERS = 200;
+constexpr int MIN_USER_ALT_MONTHS = 1;
+constexpr int MAX_USER_ALT_MONTHS = 24;
+
+QString altInClause(const QString &prefix, const QList<QString> &values)
+{
+    QStringList placeholders;
+    placeholders.reserve(values.size());
+    for (int i = 0; i < values.size(); ++i) {
+        placeholders << prefix + QString::number(i);
+    }
+    return QStringLiteral("(") + placeholders.join(QStringLiteral(",")) + QStringLiteral(")");
+}
+
+void altBindValues(QSqlQuery *query, const QString &prefix, const QList<QString> &values)
+{
+    for (int i = 0; i < values.size(); ++i) {
+        query->bindValue(prefix + QString::number(i), values.at(i));
+    }
+}
+
+struct AltCandidate
+{
+    QString name;
+    QString email;
+    QString clientId;
+    qint64 registrationTime = 0;
+    qint64 lastLogin = 0;
+    bool hasLastLogin = false;
+    int warnCount = 0;
+    int banCount = 0;
+    bool isActive = false;
+};
+
+// Keeps the first-seen order: callers add the strongest evidence first so the
+// cap below drops the least relevant identifiers rather than an arbitrary slice.
+void appendIdentifier(QList<QString> &list, QSet<QString> &seen, const QString &value)
+{
+    if (!value.isEmpty() && !seen.contains(value)) {
+        seen.insert(value);
+        list << value;
+    }
+}
+
+QList<QString> cappedIdentifiers(const QList<QString> &values)
+{
+    if (values.size() <= MAX_USER_ALT_IDENTIFIERS) {
+        return values;
+    }
+    return values.mid(0, MAX_USER_ALT_IDENTIFIERS);
+}
+} // namespace
+
+QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QString &userName,
+                                                                    int depth,
+                                                                    bool useEmail,
+                                                                    bool useClientId,
+                                                                    bool useIp,
+                                                                    int sessionMonths)
 {
     QList<ServerInfo_UserAlt> results;
 
@@ -1923,63 +2834,394 @@ QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QStrin
         return results;
     }
 
-    // Seed account identifiers used to find related accounts
-    QSqlQuery *seedQuery = prepareQuery("SELECT email, clientid FROM {prefix}_users WHERE name = :user_name");
+    if (depth < 1) {
+        depth = 1;
+    } else if (depth > MAX_USER_ALT_DEPTH) {
+        depth = MAX_USER_ALT_DEPTH;
+    }
+    if (sessionMonths < MIN_USER_ALT_MONTHS) {
+        sessionMonths = MIN_USER_ALT_MONTHS;
+    } else if (sessionMonths > MAX_USER_ALT_MONTHS) {
+        sessionMonths = MAX_USER_ALT_MONTHS;
+    }
+
+    // Interpolated, not bound: placeholders are not allowed in INTERVAL
+    // expressions, and the clamped integer cannot inject SQL.
+    const QString sessionWindow = QStringLiteral(" AND start_time >= DATE_SUB(NOW(), INTERVAL ") +
+                                  QString::number(sessionMonths) + QStringLiteral(" MONTH)");
+
+    // Seed must exist; its row anchors the result at depth 0.
+    QSqlQuery *seedQuery = prepareQuery("SELECT u.name, u.email, u.clientid, UNIX_TIMESTAMP(u.registrationDate), "
+                                        "UNIX_TIMESTAMP(a.last_login), "
+                                        "(SELECT COUNT(*) FROM {prefix}_warnings w WHERE w.user_id = u.id), "
+                                        "(SELECT COUNT(*) FROM {prefix}_bans b WHERE b.user_name = u.name), "
+                                        "u.active "
+                                        "FROM {prefix}_users u "
+                                        "LEFT JOIN {prefix}_user_analytics a ON a.id = u.id "
+                                        "WHERE u.name = :user_name");
     seedQuery->bindValue(":user_name", userName);
     if (!execSqlQuery(seedQuery) || !seedQuery->next()) {
         return results;
     }
-    const QString seedEmail = seedQuery->value(0).toString();
-    const QString seedClientId = seedQuery->value(1).toString();
 
-    QString queryString = "SELECT u.name, u.email, u.clientid, UNIX_TIMESTAMP(u.registrationDate), "
-                          "UNIX_TIMESTAMP(a.last_login), "
-                          "(SELECT COUNT(*) FROM {prefix}_warnings w WHERE w.user_id = u.id), "
-                          "(SELECT COUNT(*) FROM {prefix}_bans b WHERE b.user_name = u.name), "
-                          "u.active "
-                          "FROM {prefix}_users u "
-                          "LEFT JOIN {prefix}_user_analytics a ON a.id = u.id "
-                          "WHERE u.name = :user_name";
-    if (!seedEmail.isEmpty()) {
-        queryString.append(" OR u.email = :seed_email");
-    }
-    if (!seedClientId.isEmpty()) {
-        queryString.append(" OR u.clientid = :seed_clientid");
-    }
-    queryString.append(" OR u.name IN (SELECT DISTINCT s.user_name FROM {prefix}_sessions s "
-                       "WHERE s.ip_address IN (SELECT DISTINCT s2.ip_address FROM {prefix}_sessions s2 "
-                       "WHERE s2.user_name = :user_name"
-                       " AND s2.start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH))"
-                       " AND s.start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH)) "
-                       "ORDER BY u.name LIMIT 200");
-
-    QSqlQuery *query = prepareQuery(queryString);
-    query->bindValue(":user_name", userName);
-    if (!seedEmail.isEmpty()) {
-        query->bindValue(":seed_email", seedEmail);
-    }
-    if (!seedClientId.isEmpty()) {
-        query->bindValue(":seed_clientid", seedClientId);
-    }
-
-    if (!execSqlQuery(query)) {
-        qCWarning(DatabaseInterfaceLog) << "Failed to collect user alt information: SQL Error";
-        return results;
-    }
-
-    while (query->next()) {
+    auto appendAlt = [&results](const AltCandidate &candidate, const QString &matchReason, int matchDepth,
+                                int sharedCount) {
         ServerInfo_UserAlt altDetails;
-        altDetails.set_user_name(query->value(0).toString().toStdString());
-        altDetails.set_email(query->value(1).toString().toStdString());
-        altDetails.set_clientid(query->value(2).toString().toStdString());
-        altDetails.set_registration_time(query->value(3).toLongLong());
-        if (!query->value(4).isNull()) {
-            altDetails.set_last_login(query->value(4).toLongLong());
+        altDetails.set_user_name(candidate.name.toStdString());
+        altDetails.set_email(candidate.email.toStdString());
+        altDetails.set_clientid(candidate.clientId.toStdString());
+        altDetails.set_registration_time(candidate.registrationTime);
+        if (candidate.hasLastLogin) {
+            altDetails.set_last_login(candidate.lastLogin);
         }
-        altDetails.set_warn_count(query->value(5).toInt());
-        altDetails.set_ban_count(query->value(6).toInt());
-        altDetails.set_is_active(query->value(7).toBool());
+        altDetails.set_warn_count(candidate.warnCount);
+        altDetails.set_ban_count(candidate.banCount);
+        altDetails.set_is_active(candidate.isActive);
+        altDetails.set_match_reason(matchReason.toStdString());
+        altDetails.set_depth(static_cast<google::protobuf::uint32>(matchDepth));
+        altDetails.set_shared_count(static_cast<google::protobuf::uint32>(sharedCount));
         results << altDetails;
+    };
+
+    AltCandidate seed{.name = seedQuery->value(0).toString(),
+                      .email = seedQuery->value(1).toString(),
+                      .clientId = seedQuery->value(2).toString(),
+                      .registrationTime = seedQuery->value(3).toLongLong(),
+                      .lastLogin = seedQuery->value(4).toLongLong(),
+                      .hasLastLogin = !seedQuery->value(4).isNull(),
+                      .warnCount = seedQuery->value(5).toInt(),
+                      .banCount = seedQuery->value(6).toInt(),
+                      .isActive = seedQuery->value(7).toBool()};
+    appendAlt(seed, QStringLiteral("self"), 0, 1);
+
+    // Identifier lookups are case-insensitive in SQL, so the seed must be keyed by
+    // its stored casing: otherwise the level-1 query re-lists it as an alt.
+    QSet<QString> visited{seed.name};
+    QList<QString> frontier{seed.name};
+
+    // Dynamic IN-lists bypass prepareQuery(): it caches by query text, so every
+    // distinct list size would leave a prepared statement in the long-lived cache
+    // and can exhaust MySQL's max_prepared_stmt_count.
+    const QString dbPrefix = server->getDbPrefix();
+    auto prepareDynamicQuery = [&dbPrefix](QSqlQuery &query, const QString &queryText) {
+        QString text = queryText;
+        text.replace(QStringLiteral("{prefix}"), dbPrefix);
+        query.prepare(text);
+    };
+
+    for (int level = 1; level <= depth && !frontier.isEmpty(); ++level) {
+        const QString frontierClause = altInClause(QStringLiteral(":alt_name"), frontier);
+
+        // Current identifiers of the frontier: registration email + client id.
+        // Kept strongest-first so cappedIdentifiers() drops the least useful ones.
+        QList<QString> emails;
+        QList<QString> clientIds;
+        QList<QString> ips;
+        QSet<QString> emailKeys;
+        QSet<QString> clientIdKeys;
+        QSet<QString> ipKeys;
+
+        if (useEmail || useClientId) {
+            QSqlQuery frontierQuery(sqlDatabase);
+            prepareDynamicQuery(frontierQuery,
+                                QStringLiteral("SELECT email, clientid FROM {prefix}_users WHERE name IN ") +
+                                    frontierClause);
+            altBindValues(&frontierQuery, QStringLiteral(":alt_name"), frontier);
+            if (execSqlQuery(&frontierQuery)) {
+                while (frontierQuery.next()) {
+                    // Email comparison is case-insensitive in SQL, so normalise the
+                    // keys too or the membership tests below miss real matches.
+                    if (useEmail) {
+                        appendIdentifier(emails, emailKeys, frontierQuery.value(0).toString().toLower());
+                    }
+                    if (useClientId) {
+                        appendIdentifier(clientIds, clientIdKeys, frontierQuery.value(1).toString());
+                    }
+                }
+            }
+        }
+
+        // Recent session identifiers: IPs plus historic client ids, most recent
+        // first so a capped list keeps what the account actually used lately.
+        if (useIp || useClientId) {
+            QSqlQuery sessionQuery(sqlDatabase);
+            prepareDynamicQuery(sessionQuery,
+                                QStringLiteral("SELECT ip_address, clientid, MAX(start_time) AS last_seen "
+                                               "FROM {prefix}_sessions WHERE user_name IN ") +
+                                    frontierClause + sessionWindow +
+                                    QStringLiteral(" GROUP BY ip_address, clientid "
+                                                   "ORDER BY last_seen DESC"));
+            altBindValues(&sessionQuery, QStringLiteral(":alt_name"), frontier);
+            if (execSqlQuery(&sessionQuery)) {
+                while (sessionQuery.next()) {
+                    if (useIp) {
+                        appendIdentifier(ips, ipKeys, sessionQuery.value(0).toString());
+                    }
+                    if (useClientId) {
+                        appendIdentifier(clientIds, clientIdKeys, sessionQuery.value(1).toString());
+                    }
+                }
+            }
+        }
+
+        if (emails.isEmpty() && clientIds.isEmpty() && ips.isEmpty()) {
+            break;
+        }
+
+        // Accounts sharing any frontier identifier. Historic client ids are matched
+        // through past sessions so identifier changes do not hide older alts.
+        QString candidateString =
+            QStringLiteral("SELECT u.name, u.email, u.clientid, UNIX_TIMESTAMP(u.registrationDate), "
+                           "UNIX_TIMESTAMP(a.last_login), "
+                           "(SELECT COUNT(*) FROM {prefix}_warnings w WHERE w.user_id = u.id), "
+                           "(SELECT COUNT(*) FROM {prefix}_bans b WHERE b.user_name = u.name), "
+                           "u.active "
+                           "FROM {prefix}_users u "
+                           "LEFT JOIN {prefix}_user_analytics a ON a.id = u.id "
+                           "WHERE ");
+        QStringList conditions;
+        const QList<QString> emailList = cappedIdentifiers(emails);
+        const QList<QString> clientIdList = cappedIdentifiers(clientIds);
+        const QList<QString> ipList = cappedIdentifiers(ips);
+        if (!emailList.isEmpty()) {
+            conditions << QStringLiteral("u.email IN ") + altInClause(QStringLiteral(":alt_email"), emailList);
+        }
+        if (!clientIdList.isEmpty()) {
+            conditions << QStringLiteral("u.clientid IN ") + altInClause(QStringLiteral(":alt_cid"), clientIdList);
+        }
+        if (!ipList.isEmpty()) {
+            conditions << QStringLiteral("u.name IN (SELECT DISTINCT s.user_name FROM {prefix}_sessions s WHERE "
+                                         "s.ip_address IN ") +
+                              altInClause(QStringLiteral(":alt_ip"), ipList) + sessionWindow + QStringLiteral(")");
+        }
+        if (!clientIdList.isEmpty()) {
+            conditions << QStringLiteral("u.name IN (SELECT DISTINCT s.user_name FROM {prefix}_sessions s WHERE "
+                                         "s.clientid IN ") +
+                              altInClause(QStringLiteral(":alt_hcid"), clientIdList) + sessionWindow +
+                              QStringLiteral(")");
+        }
+        candidateString += conditions.join(QStringLiteral(" OR "));
+        // Already-visited accounts match their own identifiers at every level and
+        // are dropped below, so widen the row limit by that count: otherwise a
+        // second level can return only visited rows and no new candidates.
+        candidateString +=
+            QStringLiteral(" ORDER BY u.name LIMIT ") + QString::number(MAX_USER_ALTS_PER_LEVEL + visited.size());
+
+        QSqlQuery candidateQuery(sqlDatabase);
+        prepareDynamicQuery(candidateQuery, candidateString);
+        altBindValues(&candidateQuery, QStringLiteral(":alt_email"), emailList);
+        altBindValues(&candidateQuery, QStringLiteral(":alt_cid"), clientIdList);
+        altBindValues(&candidateQuery, QStringLiteral(":alt_ip"), ipList);
+        altBindValues(&candidateQuery, QStringLiteral(":alt_hcid"), clientIdList);
+        if (!execSqlQuery(&candidateQuery)) {
+            qCWarning(DatabaseInterfaceLog) << "Failed to collect user alt information: SQL Error";
+            return results;
+        }
+
+        QList<AltCandidate> candidates;
+        while (candidateQuery.next()) {
+            AltCandidate candidate;
+            candidate.name = candidateQuery.value(0).toString();
+            if (visited.contains(candidate.name)) {
+                continue;
+            }
+            candidate.email = candidateQuery.value(1).toString();
+            candidate.clientId = candidateQuery.value(2).toString();
+            candidate.registrationTime = candidateQuery.value(3).toLongLong();
+            candidate.hasLastLogin = !candidateQuery.value(4).isNull();
+            candidate.lastLogin = candidateQuery.value(4).toLongLong();
+            candidate.warnCount = candidateQuery.value(5).toInt();
+            candidate.banCount = candidateQuery.value(6).toInt();
+            candidate.isActive = candidateQuery.value(7).toBool();
+            candidates << candidate;
+            if (candidates.size() >= MAX_USER_ALTS_PER_LEVEL) {
+                break;
+            }
+        }
+
+        // Resolve session-level evidence (shared IP or historic client id) for
+        // candidates that do not match on current email or client id.
+        QMap<QString, QString> candidateIp;
+        QMap<QString, QString> candidateHistoricClientId;
+        QList<QString> unexplained;
+        for (const AltCandidate &candidate : candidates) {
+            const bool emailMatch = !candidate.email.isEmpty() && emailKeys.contains(candidate.email.toLower());
+            const bool clientIdMatch = !candidate.clientId.isEmpty() && clientIdKeys.contains(candidate.clientId);
+            if (!emailMatch && !clientIdMatch) {
+                unexplained << candidate.name;
+            }
+        }
+        if (!unexplained.isEmpty() && (!ipKeys.isEmpty() || !clientIdKeys.isEmpty())) {
+            QString evidenceString =
+                QStringLiteral("SELECT DISTINCT user_name, ip_address, clientid FROM {prefix}_sessions WHERE "
+                               "user_name IN ") +
+                altInClause(QStringLiteral(":alt_ev"), unexplained) + QStringLiteral(" AND (");
+            QStringList evidenceConditions;
+            if (!ipList.isEmpty()) {
+                evidenceConditions << QStringLiteral("ip_address IN ") +
+                                          altInClause(QStringLiteral(":alt_eip"), ipList);
+            }
+            if (!clientIdList.isEmpty()) {
+                evidenceConditions << QStringLiteral("clientid IN ") +
+                                          altInClause(QStringLiteral(":alt_ecid"), clientIdList);
+            }
+            evidenceString += evidenceConditions.join(QStringLiteral(" OR "));
+            evidenceString += QStringLiteral(")") + sessionWindow;
+
+            QSqlQuery evidenceQuery(sqlDatabase);
+            prepareDynamicQuery(evidenceQuery, evidenceString);
+            altBindValues(&evidenceQuery, QStringLiteral(":alt_ev"), unexplained);
+            altBindValues(&evidenceQuery, QStringLiteral(":alt_eip"), ipList);
+            altBindValues(&evidenceQuery, QStringLiteral(":alt_ecid"), clientIdList);
+            if (execSqlQuery(&evidenceQuery)) {
+                while (evidenceQuery.next()) {
+                    const QString name = evidenceQuery.value(0).toString();
+                    const QString ip = evidenceQuery.value(1).toString();
+                    const QString clientId = evidenceQuery.value(2).toString();
+                    if (!ip.isEmpty() && ipKeys.contains(ip) && !candidateIp.contains(name)) {
+                        candidateIp.insert(name, ip);
+                    }
+                    if (!clientId.isEmpty() && clientIdKeys.contains(clientId) &&
+                        !candidateHistoricClientId.contains(name)) {
+                        candidateHistoricClientId.insert(name, clientId);
+                    }
+                }
+            }
+        }
+
+        // Fan-out counts so moderators can spot VPN/shared-network false positives.
+        QMap<QString, int> emailCounts;
+        QMap<QString, int> clientIdCounts;
+        QMap<QString, int> historicClientIdCounts;
+        QMap<QString, int> ipCounts;
+        QSet<QString> neededEmails;
+        QSet<QString> neededClientIds;
+        QSet<QString> neededHistoricClientIds;
+        QSet<QString> neededIps;
+        for (const AltCandidate &candidate : candidates) {
+            if (!candidate.email.isEmpty() && emailKeys.contains(candidate.email.toLower())) {
+                neededEmails << candidate.email.toLower();
+            } else if (!candidate.clientId.isEmpty() && clientIdKeys.contains(candidate.clientId)) {
+                neededClientIds << candidate.clientId;
+            } else if (candidateHistoricClientId.contains(candidate.name)) {
+                neededHistoricClientIds << candidateHistoricClientId.value(candidate.name);
+            } else if (candidateIp.contains(candidate.name)) {
+                neededIps << candidateIp.value(candidate.name);
+            }
+        }
+        if (!neededEmails.isEmpty()) {
+            const QList<QString> neededEmailList = neededEmails.values();
+            QSqlQuery countQuery(sqlDatabase);
+            prepareDynamicQuery(countQuery, QStringLiteral("SELECT email, COUNT(*) FROM {prefix}_users WHERE "
+                                                           "email IN ") +
+                                                altInClause(QStringLiteral(":alt_ce"), neededEmailList) +
+                                                QStringLiteral(" GROUP BY email"));
+            altBindValues(&countQuery, QStringLiteral(":alt_ce"), neededEmailList);
+            if (execSqlQuery(&countQuery)) {
+                while (countQuery.next()) {
+                    emailCounts.insert(countQuery.value(0).toString().toLower(), countQuery.value(1).toInt());
+                }
+            }
+        }
+        if (!neededClientIds.isEmpty()) {
+            const QList<QString> neededClientIdList = neededClientIds.values();
+            QSqlQuery countQuery(sqlDatabase);
+            prepareDynamicQuery(countQuery, QStringLiteral("SELECT clientid, COUNT(*) FROM {prefix}_users WHERE "
+                                                           "clientid IN ") +
+                                                altInClause(QStringLiteral(":alt_cc"), neededClientIdList) +
+                                                QStringLiteral(" GROUP BY clientid"));
+            altBindValues(&countQuery, QStringLiteral(":alt_cc"), neededClientIdList);
+            if (execSqlQuery(&countQuery)) {
+                while (countQuery.next()) {
+                    clientIdCounts.insert(countQuery.value(0).toString(), countQuery.value(1).toInt());
+                }
+            }
+        }
+        // Historic client ids are matched through sessions, so their fan-out must
+        // come from _sessions too: _users only knows each account's current id.
+        if (!neededHistoricClientIds.isEmpty()) {
+            const QList<QString> neededHistoricClientIdList = neededHistoricClientIds.values();
+            QSqlQuery countQuery(sqlDatabase);
+            prepareDynamicQuery(countQuery,
+                                QStringLiteral("SELECT clientid, COUNT(DISTINCT user_name) FROM {prefix}_sessions "
+                                               "WHERE clientid IN ") +
+                                    altInClause(QStringLiteral(":alt_hcc"), neededHistoricClientIdList) +
+                                    QStringLiteral(" AND start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH) "
+                                                   "GROUP BY clientid"));
+            altBindValues(&countQuery, QStringLiteral(":alt_hcc"), neededHistoricClientIdList);
+            if (execSqlQuery(&countQuery)) {
+                while (countQuery.next()) {
+                    historicClientIdCounts.insert(countQuery.value(0).toString(), countQuery.value(1).toInt());
+                }
+            }
+        }
+        if (!neededIps.isEmpty()) {
+            const QList<QString> neededIpList = neededIps.values();
+            QSqlQuery countQuery(sqlDatabase);
+            prepareDynamicQuery(countQuery,
+                                QStringLiteral("SELECT ip_address, COUNT(DISTINCT user_name) FROM {prefix}_sessions "
+                                               "WHERE ip_address IN ") +
+                                    altInClause(QStringLiteral(":alt_ci"), neededIpList) + sessionWindow +
+                                    QStringLiteral(" GROUP BY ip_address"));
+            altBindValues(&countQuery, QStringLiteral(":alt_ci"), neededIpList);
+            if (execSqlQuery(&countQuery)) {
+                while (countQuery.next()) {
+                    ipCounts.insert(countQuery.value(0).toString(), countQuery.value(1).toInt());
+                }
+            }
+        }
+
+        QList<QString> nextFrontier;
+        for (const AltCandidate &candidate : candidates) {
+            QString matchReason;
+            int sharedCount = 1;
+            if (!candidate.email.isEmpty() && emailKeys.contains(candidate.email.toLower())) {
+                matchReason = QStringLiteral("email");
+                sharedCount = qMax(1, emailCounts.value(candidate.email.toLower(), 1));
+            } else if (!candidate.clientId.isEmpty() && clientIdKeys.contains(candidate.clientId)) {
+                matchReason = QStringLiteral("clientid:") + candidate.clientId;
+                sharedCount = qMax(1, clientIdCounts.value(candidate.clientId, 1));
+            } else if (candidateHistoricClientId.contains(candidate.name)) {
+                const QString historicId = candidateHistoricClientId.value(candidate.name);
+                matchReason = QStringLiteral("clientid:") + historicId;
+                sharedCount = qMax(1, historicClientIdCounts.value(historicId, 1));
+            } else if (candidateIp.contains(candidate.name)) {
+                const QString ip = candidateIp.value(candidate.name);
+                matchReason = QStringLiteral("ip:") + ip;
+                sharedCount = qMax(1, ipCounts.value(ip, 1));
+            } else {
+                continue;
+            }
+            appendAlt(candidate, matchReason, level, sharedCount);
+            visited.insert(candidate.name);
+            nextFrontier << candidate.name;
+        }
+        frontier = nextFrontier;
+    }
+
+    // Distinct recent IP counts per account: cheap group signal without
+    // shipping full address histories to the client.
+    if (!results.isEmpty()) {
+        QList<QString> resultNames;
+        resultNames.reserve(results.size());
+        for (const ServerInfo_UserAlt &alt : results) {
+            resultNames << QString::fromStdString(alt.user_name());
+        }
+        QSqlQuery *ipCountQuery = prepareQuery(
+            QStringLiteral("SELECT user_name, COUNT(DISTINCT ip_address) FROM {prefix}_sessions WHERE user_name IN ") +
+            altInClause(QStringLiteral(":alt_ic"), resultNames) + sessionWindow +
+            QStringLiteral(" GROUP BY user_name"));
+        altBindValues(ipCountQuery, QStringLiteral(":alt_ic"), resultNames);
+        QMap<QString, int> ipCountsByUser;
+        if (execSqlQuery(ipCountQuery)) {
+            while (ipCountQuery->next()) {
+                ipCountsByUser.insert(ipCountQuery->value(0).toString(), ipCountQuery->value(1).toInt());
+            }
+        }
+        for (ServerInfo_UserAlt &alt : results) {
+            alt.set_ip_count(static_cast<google::protobuf::uint32>(
+                ipCountsByUser.value(QString::fromStdString(alt.user_name()), 0)));
+        }
     }
 
     return results;
@@ -2031,7 +3273,7 @@ QList<ServerInfo_ModeratorLogin> Servatrice_DatabaseInterface::getModeratorLastL
     return results;
 }
 
-Servatrice_DatabaseInterface::UptimeSnapshot Servatrice_DatabaseInterface::getLatestUptimeSnapshot(int serverId)
+Server_DatabaseInterface::UptimeSnapshot Servatrice_DatabaseInterface::getLatestUptimeSnapshot(int serverId)
 {
     UptimeSnapshot snapshot;
 
@@ -2061,6 +3303,211 @@ Servatrice_DatabaseInterface::UptimeSnapshot Servatrice_DatabaseInterface::getLa
     }
 
     return snapshot;
+}
+
+bool Servatrice_DatabaseInterface::getLatestServerMessage(int serverId, QString &message)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery(
+        "select message from {prefix}_servermessages where id_server = :id_server order by timest desc limit 1");
+    query->bindValue(":id_server", serverId);
+    if (!execSqlQuery(query) || !query->next()) {
+        return false;
+    }
+
+    message = query->value(0).toString();
+    return true;
+}
+
+QList<Server_DatabaseInterface::ServerListEntryRecord> Servatrice_DatabaseInterface::getServerListEntries()
+{
+    QList<ServerListEntryRecord> entries;
+    if (!checkSql()) {
+        return entries;
+    }
+
+    QSqlQuery *query = prepareQuery(
+        "select id, ssl_cert, hostname, address, game_port, control_port from {prefix}_servers order by id asc");
+    if (!execSqlQuery(query)) {
+        return entries;
+    }
+
+    while (query->next()) {
+        ServerListEntryRecord entry;
+        entry.id = query->value(0).toInt();
+        entry.sslCert = query->value(1).toString().toUtf8();
+        entry.hostname = query->value(2).toString();
+        entry.address = query->value(3).toString();
+        entry.gamePort = query->value(4).toInt();
+        entry.controlPort = query->value(5).toInt();
+        entries.append(entry);
+    }
+
+    return entries;
+}
+
+void Servatrice_DatabaseInterface::recordUptime(const UptimeRecord &record)
+{
+    if (!checkSql()) {
+        return;
+    }
+
+    QSqlQuery *query = prepareQuery(
+        "insert into {prefix}_uptime (id_server, timest, uptime, users_count, mods_count, mods_list, games_count, "
+        "tx_bytes, rx_bytes) values(:id, NOW(), :uptime, :users_count, :mods_count, :mods_list, :games_count, :tx, "
+        ":rx)");
+    query->bindValue(":id", record.serverId);
+    query->bindValue(":uptime", record.uptimeSecs);
+    query->bindValue(":users_count", record.usersCount);
+    query->bindValue(":mods_count", record.modsCount);
+    query->bindValue(":mods_list", record.modsList);
+    query->bindValue(":games_count", record.gamesCount);
+    query->bindValue(":tx", record.txBytes);
+    query->bindValue(":rx", record.rxBytes);
+    execSqlQuery(query);
+}
+
+QList<Server_DatabaseInterface::BootstrapRoomRecord> Servatrice_DatabaseInterface::getBootstrapRooms(int serverId)
+{
+    QList<BootstrapRoomRecord> rooms;
+    if (!checkSql()) {
+        return rooms;
+    }
+
+    QSqlQuery *query = prepareQuery(
+        "select id, name, descr, permissionlevel, privlevel, auto_join, join_message, chat_history_size from "
+        "{prefix}_rooms where id_server = :id_server order by id asc");
+    query->bindValue(":id_server", serverId);
+    if (!execSqlQuery(query)) {
+        return rooms;
+    }
+
+    while (query->next()) {
+        BootstrapRoomRecord room;
+        room.id = query->value(0).toInt();
+        room.name = query->value(1).toString();
+        room.description = query->value(2).toString();
+        room.permissionLevel = query->value(3).toString();
+        room.privateLevel = query->value(4).toString();
+        room.autoJoin = query->value(5).toInt() != 0;
+        room.joinMessage = query->value(6).toString();
+        room.chatHistorySize = query->value(7).toInt();
+
+        QSqlQuery *gameTypesQuery = prepareQuery(
+            "select name from {prefix}_rooms_gametypes where id_room = :id_room AND id_server = :id_server");
+        gameTypesQuery->bindValue(":id_server", serverId);
+        gameTypesQuery->bindValue(":id_room", room.id);
+        if (execSqlQuery(gameTypesQuery)) {
+            while (gameTypesQuery->next()) {
+                room.gameTypes.append(gameTypesQuery->value(0).toString());
+            }
+        }
+
+        QSqlQuery *channelsQuery =
+            prepareQuery("select channel_id, display_name, access_level, write_access_level, banner_message from "
+                         "{prefix}_rooms_channels where id_room = :id_room "
+                         "AND id_server = :id_server order by channel_id asc");
+        channelsQuery->bindValue(":id_server", serverId);
+        channelsQuery->bindValue(":id_room", room.id);
+        if (execSqlQuery(channelsQuery)) {
+            while (channelsQuery->next()) {
+                BootstrapRoomChannelRecord channel;
+                channel.id = channelsQuery->value(0).toString();
+                channel.displayName = channelsQuery->value(1).toString();
+                channel.accessKey = channelsQuery->value(2).toString();
+                channel.hasWriteAccess = !channelsQuery->isNull(3);
+                if (channel.hasWriteAccess) {
+                    channel.writeAccessKey = channelsQuery->value(3).toString();
+                }
+                channel.bannerMessage = channelsQuery->value(4).toString();
+                room.channels.append(channel);
+            }
+        }
+
+        rooms.append(room);
+    }
+
+    return rooms;
+}
+
+bool Servatrice_DatabaseInterface::getPendingActivationMails(QList<PendingActivationMailRecord> &mails)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("select a.name, b.email, b.token from "
+                                    "{prefix}_activation_emails a left join "
+                                    "{prefix}_users b on a.name = b.name");
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        PendingActivationMailRecord mail;
+        mail.userName = query->value(0).toString();
+        mail.emailAddress = query->value(1).toString();
+        mail.token = query->value(2).toString();
+        mails.append(mail);
+    }
+
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::getPendingPasswordResets(QList<PendingPasswordResetRecord> &resets)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery(
+        "select a.id, a.name, b.email, b.token from {prefix}_forgot_password a left join {prefix}_users b on "
+        "a.name = b.name where a.emailed = 0");
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        PendingPasswordResetRecord reset;
+        reset.rowId = query->value(0).toLongLong();
+        reset.userName = query->value(1).toString();
+        reset.emailAddress = query->value(2).toString();
+        reset.token = query->value(3).toString();
+        resets.append(reset);
+    }
+
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::deleteActivationEmail(const QString &userName)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("delete from {prefix}_activation_emails where name = :name");
+    query->bindValue(":name", userName);
+    return execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::markPasswordResetEmailDelivered(const QString &userName, qint64 rowId)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    if (rowId >= 0) {
+        QSqlQuery *query = prepareQuery("update {prefix}_forgot_password set emailed = 1 where id = :id");
+        query->bindValue(":id", rowId);
+        return execSqlQuery(query);
+    }
+
+    QSqlQuery *query = prepareQuery("update {prefix}_forgot_password set emailed = 1 where name = :name");
+    query->bindValue(":name", userName);
+    return execSqlQuery(query);
 }
 
 bool Servatrice_DatabaseInterface::removeUserAvatar(const QString &userName)
@@ -2179,6 +3626,92 @@ int Servatrice_DatabaseInterface::clearBlacklistedBanners()
     return cleared;
 }
 
+bool Servatrice_DatabaseInterface::getPrivateChatHistory(int callerId,
+                                                         const QString &callerName,
+                                                         int peerId,
+                                                         const QString &peerName,
+                                                         quint64 before,
+                                                         int limit,
+                                                         QList<ServerInfo_PrivateChatMessage> &messages,
+                                                         bool &hasMore)
+{
+    messages.clear();
+    hasMore = false;
+    if (callerId < 1 || peerId < 1 || callerName.isEmpty() || peerName.isEmpty() || !checkSql()) {
+        return false;
+    }
+
+    // Match both participants by account id, and verify their names as well.
+    // Names can be reused (guests, re-registration), so ids are what separate
+    // earlier holders; names are what reject a federated user's remote id that
+    // happens to collide with a local one in the shared log table.
+    const QString conversationFilter = " FROM {prefix}_log WHERE target_type = 'chat'"
+                                       " AND ((sender_id = :caller_sender_id AND sender_name = :caller_name"
+                                       " AND target_id = :peer_target_id AND target_name = :peer_name)"
+                                       " OR (target_id = :caller_target_id AND target_name = :caller_name"
+                                       " AND sender_id = :peer_sender_id AND sender_name = :peer_name))";
+    const QString selectMessages = "SELECT UNIX_TIMESTAMP(log_time), sender_name, log_message";
+    const auto bindParticipants = [&](QSqlQuery *query) {
+        query->bindValue(":caller_sender_id", callerId);
+        query->bindValue(":caller_name", callerName);
+        query->bindValue(":peer_target_id", peerId);
+        query->bindValue(":peer_name", peerName);
+        query->bindValue(":peer_sender_id", peerId);
+        query->bindValue(":caller_target_id", callerId);
+    };
+    const auto readMessages = [&](QSqlQuery *query, QList<ServerInfo_PrivateChatMessage> &out) {
+        while (query->next()) {
+            ServerInfo_PrivateChatMessage message;
+            message.set_time(query->value(0).toULongLong());
+            message.set_sender_name(query->value(1).toString().toStdString());
+            message.set_message(query->value(2).toString().toStdString());
+            out.append(message);
+        }
+    };
+
+    QString queryString = selectMessages + conversationFilter;
+    if (before) {
+        queryString.append(" AND log_time < FROM_UNIXTIME(:before)");
+    }
+    queryString.append(" ORDER BY log_time DESC LIMIT :limit_size");
+    QSqlQuery *query = prepareQuery(queryString);
+    bindParticipants(query);
+    if (before) {
+        query->bindValue(":before", before);
+    }
+    query->bindValue(":limit_size", limit + 1);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    QList<ServerInfo_PrivateChatMessage> newestFirst;
+    readMessages(query, newestFirst);
+    PrivateChatPage page = assemblePrivateChatPage(newestFirst, limit);
+
+    if (page.needsWholeSecond) {
+        query = prepareQuery(selectMessages + conversationFilter + " AND log_time = FROM_UNIXTIME(:second)");
+        bindParticipants(query);
+        query->bindValue(":second", page.boundarySecond);
+        if (!execSqlQuery(query)) {
+            return false;
+        }
+        readMessages(query, page.messages);
+        std::reverse(page.messages.begin(), page.messages.end());
+
+        query = prepareQuery("SELECT 1" + conversationFilter + " AND log_time < FROM_UNIXTIME(:before) LIMIT 1");
+        bindParticipants(query);
+        query->bindValue(":before", page.boundarySecond);
+        if (!execSqlQuery(query)) {
+            return false;
+        }
+        page.hasMore = query->next();
+    }
+
+    messages = page.messages;
+    hasMore = page.hasMore;
+    return true;
+}
+
 QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory(const QString &user,
                                                                                  const QString &ipaddress,
                                                                                  const QString &gamename,
@@ -2188,8 +3721,14 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
                                                                                  bool &game,
                                                                                  bool &room,
                                                                                  int &range,
-                                                                                 int &maxresults)
+                                                                                 int &maxresults,
+                                                                                 int offset,
+                                                                                 const QString &beforeTime,
+                                                                                 bool *hasMore)
 {
+    if (hasMore != nullptr) {
+        *hasMore = false;
+    }
 
     QList<ServerInfo_ChatMessage> results;
     ServerInfo_ChatMessage chatMessage;
@@ -2198,8 +3737,31 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
         return results;
     }
 
-    if (user.isEmpty() && ipaddress.isEmpty() && gameid.isEmpty() && gamename.isEmpty()) {
-        // To ensure quick results and minimal lag, require an indexed field
+    // Page size guard: always bound the scan so a filter-less browse of room
+    // history cannot become a 50M-row fetch. Zero means "client did not set a
+    // size", so fall back to one smooth-scroll page.
+    const int pageSize = maxresults <= 0 ? 200 : qBound(1, maxresults, 1000);
+    maxresults = pageSize;
+    const int safeOffset = qMax(0, offset);
+
+    const bool hasIndexedFilter = !user.isEmpty() || !ipaddress.isEmpty() || !gameid.isEmpty() || !gamename.isEmpty();
+    const bool hasLocationFilter = chat || game || room;
+    if (!hasLocationFilter) {
+        // No target_type restriction would mix private chat into a room/game
+        // browse, so refuse rather than leak.
+        return results;
+    }
+    // A browse narrowed only by a message substring has no index to serve it, and `range`
+    // has no upper bound on the wire: the client offers 20 days, but a hand-built command
+    // can ask for any value and every LIKE candidate in it is a row the server examines.
+    // Clamping here keeps the guard independent of what the client happens to send.
+    constexpr int maxFilterlessRangeHours = 20 * 24;
+    if (!hasIndexedFilter && range > maxFilterlessRangeHours) {
+        range = maxFilterlessRangeHours;
+    }
+    if (!hasIndexedFilter && range <= 0) {
+        // Filter-less browse must stay time-bounded (idx_log_time) so the
+        // query stays an index range scan instead of a full table scan.
         return results;
     }
 
@@ -2254,9 +3816,22 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
         queryString.append(" AND log_time >= DATE_SUB(now(), INTERVAL :range_time HOUR)");
     }
 
-    if (maxresults) {
-        queryString.append(" LIMIT :limit_size");
+    if (!beforeTime.isEmpty()) {
+        // Pages after the first run against the snapshot fixed by the first one, so rows
+        // logged while the moderator scrolls can no longer push the OFFSET window down and
+        // repeat a row already on screen.
+        queryString.append(" AND log_time <= :before_time");
     }
+
+    // Newest-first keeps "going back from today" stable across pages and lets
+    // the client append older rows at the bottom for smooth infinite scroll.
+    queryString.append(" ORDER BY log_time DESC");
+
+    // Fetch one extra row when the caller wants a has_more cursor so a full
+    // page does not need a second empty round-trip to prove exhaustion.
+    const bool detectMore = (hasMore != nullptr);
+    const int fetchSize = detectMore ? pageSize + 1 : pageSize;
+    queryString.append(" LIMIT :limit_size OFFSET :offset_size");
 
     QSqlQuery *query = prepareQuery(queryString);
     if (!user.isEmpty()) {
@@ -2277,9 +3852,11 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
     if (range) {
         query->bindValue(":range_time", range);
     }
-    if (maxresults) {
-        query->bindValue(":limit_size", maxresults);
+    if (!beforeTime.isEmpty()) {
+        query->bindValue(":before_time", beforeTime);
     }
+    query->bindValue(":limit_size", fetchSize);
+    query->bindValue(":offset_size", safeOffset);
 
     if (!execSqlQuery(query)) {
         qCWarning(DatabaseInterfaceLog) << "Failed to collect log history information: SQL Error";
@@ -2297,6 +3874,11 @@ QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory
         chatMessage.set_target_name(QString(query->value(7).toString()).toStdString());
         chatMessage.set_channel(QString(query->value(8).toString()).toStdString());
         results << chatMessage;
+    }
+
+    if (detectMore && results.size() > pageSize) {
+        results.removeLast();
+        *hasMore = true;
     }
 
     return results;
@@ -2433,12 +4015,840 @@ bool Servatrice_DatabaseInterface::validateTableColumnStringData(const QString &
     return false;
 }
 
+bool Servatrice_DatabaseInterface::userTokenMatches(const QString &userName, const QString &token)
+{
+    return validateTableColumnStringData("{prefix}_users", "token", userName, token);
+}
+
+bool Servatrice_DatabaseInterface::userEmailMatches(const QString &userName, const QString &email)
+{
+    return validateTableColumnStringData("{prefix}_users", "email", userName, email);
+}
+
+namespace
+{
+// The user level the protocol expects for a report's reported user, resolved from the
+// joined user row: the row is absent when the reported name no longer exists.
+int reportUserLevel(bool userExists, int adminFlags)
+{
+    int userLevel = ServerInfo_User::IsUser;
+    if (userExists) {
+        userLevel |= ServerInfo_User::IsRegistered;
+        if (adminFlags & 1) {
+            userLevel |= ServerInfo_User::IsAdmin | ServerInfo_User::IsModerator;
+        } else if (adminFlags & 2) {
+            userLevel |= ServerInfo_User::IsModerator;
+        }
+        if (adminFlags & 4) {
+            userLevel |= ServerInfo_User::IsJudge;
+        }
+        if (adminFlags & 8) {
+            userLevel |= ServerInfo_User::IsDeveloper;
+        }
+    }
+    return userLevel;
+}
+} // namespace
+
+bool Servatrice_DatabaseInterface::getReportList(bool unresolvedOnly,
+                                                 int offset,
+                                                 int limit,
+                                                 int &totalCount,
+                                                 QList<ServerInfo_Report> &reports)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QString whereClause;
+    if (unresolvedOnly) {
+        whereClause = "WHERE r.status = 'open' OR r.status = 'assigned' ";
+    }
+
+    QSqlQuery *countQuery = prepareQuery("SELECT COUNT(*) FROM {prefix}_reports r " + whereClause);
+    totalCount = 0;
+    if (execSqlQuery(countQuery) && countQuery->next()) {
+        totalCount = countQuery->value(0).toInt();
+    }
+
+    QString queryStr = "SELECT r.id, r.reporter_name, r.reported_user_name, r.game_id, "
+                       "r.category, r.description, r.created_at, r.status, "
+                       "r.resolution_note, u.name AS assigned_mod_name, ru.name AS resolved_by_name, r.room_id, "
+                       "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
+                       "AS replay_id, u2.id AS reported_user_id, u2.admin AS reported_user_admin "
+                       "FROM {prefix}_reports r "
+                       "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
+                       "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id "
+                       "LEFT JOIN {prefix}_users u2 ON u2.name = r.reported_user_name ";
+
+    if (unresolvedOnly) {
+        queryStr += "WHERE r.status = 'open' OR r.status = 'assigned' ";
+    }
+
+    queryStr += "ORDER BY r.created_at DESC LIMIT :limit OFFSET :offset";
+
+    QSqlQuery *query = prepareQuery(queryStr);
+    query->bindValue(":limit", limit);
+    query->bindValue(":offset", offset);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        ServerInfo_Report info;
+
+        info.set_report_id(query->value(0).toInt());
+        info.set_reporter_name(query->value(1).toString().toStdString());
+        info.set_reported_user_name(query->value(2).toString().toStdString());
+
+        if (!query->value(3).isNull()) {
+            info.set_game_id(query->value(3).toInt());
+        }
+
+        info.set_category(query->value(4).toString().toStdString());
+        info.set_description(query->value(5).toString().toStdString());
+        info.set_report_time(query->value(6).toDateTime().toSecsSinceEpoch());
+        info.set_status(query->value(7).toString().toStdString());
+
+        if (!query->value(8).isNull()) {
+            info.set_resolution_note(query->value(8).toString().toStdString());
+        }
+
+        if (!query->value(9).isNull()) {
+            info.set_assigned_mod_name(query->value(9).toString().toStdString());
+        }
+        if (!query->value(10).isNull()) {
+            info.set_resolved_by_name(query->value(10).toString().toStdString());
+        }
+
+        if (!query->value(11).isNull()) {
+            info.set_room_id(query->value(11).toInt());
+        }
+
+        if (!query->value(12).isNull()) {
+            info.set_replay_id(query->value(12).toInt());
+        }
+
+        info.set_reported_user_level(reportUserLevel(!query->value(13).isNull(), query->value(14).toInt()));
+
+        reports.append(info);
+    }
+
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::getReportsSubmittedBy(int reporterId, QList<ServerInfo_Report> &reports)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QString queryStr = "SELECT r.id, r.reporter_name, r.reported_user_name, r.game_id, "
+                       "r.category, r.description, r.created_at, r.status, "
+                       "r.resolution_note, u.name AS assigned_mod_name, ru.name AS resolved_by_name, r.room_id, "
+                       "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
+                       "AS replay_id, u2.id AS reported_user_id, u2.admin AS reported_user_admin "
+                       "FROM {prefix}_reports r "
+                       "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
+                       "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id "
+                       "LEFT JOIN {prefix}_users u2 ON u2.name = r.reported_user_name "
+                       "WHERE r.reporter_id = :reporter_id "
+                       "ORDER BY r.created_at DESC LIMIT 200";
+
+    QSqlQuery *query = prepareQuery(queryStr);
+    query->bindValue(":reporter_id", reporterId);
+
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        ServerInfo_Report info;
+
+        info.set_report_id(query->value(0).toInt());
+        info.set_reporter_name(query->value(1).toString().toStdString());
+        info.set_reported_user_name(query->value(2).toString().toStdString());
+
+        if (!query->value(3).isNull()) {
+            info.set_game_id(query->value(3).toInt());
+        }
+
+        info.set_category(query->value(4).toString().toStdString());
+        info.set_description(query->value(5).toString().toStdString());
+        info.set_report_time(query->value(6).toDateTime().toSecsSinceEpoch());
+        info.set_status(query->value(7).toString().toStdString());
+
+        if (!query->value(8).isNull()) {
+            info.set_resolution_note(query->value(8).toString().toStdString());
+        }
+
+        if (!query->value(9).isNull()) {
+            info.set_assigned_mod_name(query->value(9).toString().toStdString());
+        }
+        if (!query->value(10).isNull()) {
+            info.set_resolved_by_name(query->value(10).toString().toStdString());
+        }
+
+        if (!query->value(11).isNull()) {
+            info.set_room_id(query->value(11).toInt());
+        }
+
+        if (!query->value(12).isNull()) {
+            info.set_replay_id(query->value(12).toInt());
+        }
+
+        info.set_reported_user_level(reportUserLevel(!query->value(13).isNull(), query->value(14).toInt()));
+
+        reports.append(info);
+    }
+
+    return true;
+}
+
+Server_DatabaseInterface::ReportLookupResult
+Servatrice_DatabaseInterface::getReportForDetails(int reportId, int &reporterId, ServerInfo_Report &report)
+{
+    if (!checkSql()) {
+        return ReportLookupResult::Failed;
+    }
+
+    QString queryStr =
+        "SELECT r.id, r.reporter_id, r.reporter_name, r.reported_user_name, r.game_id, "
+        "r.category, r.description, r.created_at, r.status, "
+        "r.resolution_note, u.name AS assigned_mod_name, ru.name AS resolved_by_name, r.chat_log, r.room_id, "
+        "r.resolution_time, "
+        "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
+        "AS replay_id "
+        "FROM {prefix}_reports r "
+        "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
+        "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id "
+        "WHERE r.id = :id";
+    QSqlQuery *query = prepareQuery(queryStr);
+    query->bindValue(":id", reportId);
+
+    if (!execSqlQuery(query)) {
+        return ReportLookupResult::Failed;
+    }
+
+    if (!query->next()) {
+        return ReportLookupResult::NotFound;
+    }
+
+    reporterId = query->value(1).toInt();
+
+    report.set_report_id(query->value(0).toInt());
+    report.set_reporter_name(query->value(2).toString().toStdString());
+    report.set_reported_user_name(query->value(3).toString().toStdString());
+
+    if (!query->value(4).isNull()) {
+        report.set_game_id(query->value(4).toInt());
+    }
+
+    report.set_category(query->value(5).toString().toStdString());
+    report.set_description(query->value(6).toString().toStdString());
+    report.set_report_time(query->value(7).toDateTime().toSecsSinceEpoch());
+    report.set_status(query->value(8).toString().toStdString());
+
+    if (!query->value(9).isNull()) {
+        report.set_resolution_note(query->value(9).toString().toStdString());
+    }
+
+    if (!query->value(10).isNull()) {
+        report.set_assigned_mod_name(query->value(10).toString().toStdString());
+    }
+    if (!query->value(11).isNull()) {
+        report.set_resolved_by_name(query->value(11).toString().toStdString());
+    }
+
+    if (!query->value(12).isNull()) {
+        report.set_chat_log(query->value(12).toString().toStdString());
+    }
+
+    if (!query->value(13).isNull()) {
+        report.set_room_id(query->value(13).toInt());
+    }
+
+    if (!query->value(14).isNull()) {
+        report.set_resolution_time(query->value(14).toDateTime().toSecsSinceEpoch());
+    }
+
+    if (!query->value(15).isNull()) {
+        report.set_replay_id(query->value(15).toInt());
+    }
+
+    return ReportLookupResult::Ok;
+}
+
+bool Servatrice_DatabaseInterface::getReportComments(int reportId, QList<ServerInfo_ReportComment> &comments)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT c.author_name, c.comment_text, c.created_at, c.is_moderator "
+                                    "FROM {prefix}_report_comments c "
+                                    "WHERE c.report_id = :report_id ORDER BY c.created_at ASC");
+    query->bindValue(":report_id", reportId);
+
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        ServerInfo_ReportComment comment;
+        comment.set_author_name(query->value(0).toString().toStdString());
+        comment.set_comment_text(query->value(1).toString().toStdString());
+        comment.set_comment_time(query->value(2).toDateTime().toSecsSinceEpoch());
+        comment.set_is_moderator(query->value(3).toBool());
+        comments.append(comment);
+    }
+
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::getReportStats(ReportStatsRecord &stats)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *overviewQuery =
+        prepareQuery("SELECT COUNT(*) AS total, "
+                     "SUM(status IN ('open', 'assigned')) AS pending, "
+                     "SUM(status = 'assigned') AS assigned, "
+                     "SUM(status IN ('resolved', 'dismissed')) AS resolved, "
+                     "SUM(created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)) AS last24h, "
+                     "SUM(created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) AS last7d, "
+                     "SUM(created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) AS last30d, "
+                     "SUM(created_at >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)) AS this_week "
+                     "FROM {prefix}_reports");
+    if (!execSqlQuery(overviewQuery) || !overviewQuery->next()) {
+        return false;
+    }
+
+    stats.totalReports = overviewQuery->value(0).toInt();
+    stats.totalPending = overviewQuery->value(1).toInt();
+    stats.totalAssigned = overviewQuery->value(2).toInt();
+    stats.totalResolved = overviewQuery->value(3).toInt();
+    stats.reportsLast24h = overviewQuery->value(4).toInt();
+    stats.reportsLast7d = overviewQuery->value(5).toInt();
+    stats.reportsLast30d = overviewQuery->value(6).toInt();
+    stats.reportsThisWeek = overviewQuery->value(7).toInt();
+
+    stats.allQueriesOk = true;
+
+    QSqlQuery *lastWeekQuery =
+        prepareQuery("SELECT COUNT(*) FROM {prefix}_reports WHERE created_at >= DATE_SUB(CURDATE(), "
+                     "INTERVAL WEEKDAY(CURDATE()) + 7 DAY) "
+                     "AND created_at < DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)");
+    if (execSqlQuery(lastWeekQuery) && lastWeekQuery->next()) {
+        stats.hasReportsLastWeek = true;
+        stats.reportsLastWeek = lastWeekQuery->value(0).toInt();
+    } else {
+        stats.allQueriesOk = false;
+    }
+
+    QSqlQuery *avgResQuery =
+        prepareQuery("SELECT AVG(TIMESTAMPDIFF(HOUR, created_at, resolution_time)) "
+                     "FROM {prefix}_reports WHERE status IN ('resolved','dismissed') AND resolution_time IS NOT NULL");
+    if (execSqlQuery(avgResQuery) && avgResQuery->next()) {
+        if (!avgResQuery->value(0).isNull()) {
+            stats.hasAvgResolutionHours = true;
+            stats.avgResolutionHours = avgResQuery->value(0).toDouble();
+        }
+    } else {
+        stats.allQueriesOk = false;
+    }
+
+    QSqlQuery *catQuery =
+        prepareQuery("SELECT category, COUNT(*) AS cnt FROM {prefix}_reports GROUP BY category ORDER BY cnt DESC "
+                     "LIMIT 10");
+    if (execSqlQuery(catQuery)) {
+        while (catQuery->next()) {
+            ReportCategoryCountRecord record;
+            record.category = catQuery->value(0).toString();
+            record.count = catQuery->value(1).toInt();
+            stats.categoryCounts.append(record);
+        }
+    } else {
+        stats.allQueriesOk = false;
+    }
+
+    QSqlQuery *topReportedQuery = prepareQuery("SELECT reported_user_name, COUNT(*) AS cnt FROM {prefix}_reports "
+                                               "GROUP BY reported_user_name ORDER BY cnt DESC LIMIT 10");
+    if (execSqlQuery(topReportedQuery)) {
+        while (topReportedQuery->next()) {
+            ReportTopUserRecord record;
+            record.userName = topReportedQuery->value(0).toString();
+            record.count = topReportedQuery->value(1).toInt();
+            stats.topReportedUsers.append(record);
+        }
+    } else {
+        stats.allQueriesOk = false;
+    }
+
+    QSqlQuery *topReporterQuery = prepareQuery("SELECT reporter_name, COUNT(*) AS cnt FROM {prefix}_reports "
+                                               "GROUP BY reporter_name ORDER BY cnt DESC LIMIT 10");
+    if (execSqlQuery(topReporterQuery)) {
+        while (topReporterQuery->next()) {
+            ReportTopUserRecord record;
+            record.userName = topReporterQuery->value(0).toString();
+            record.count = topReporterQuery->value(1).toInt();
+            stats.topReporters.append(record);
+        }
+    } else {
+        stats.allQueriesOk = false;
+    }
+
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::getReportUserInfo(const QString &userName, ReportUserInfoRecord &info)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *userQuery = prepareQuery("SELECT u.admin, u.active, u.registrationDate, u.adminnotes "
+                                        "FROM {prefix}_users u "
+                                        "WHERE u.name = :name");
+    userQuery->bindValue(":name", userName);
+
+    if (!execSqlQuery(userQuery)) {
+        return false;
+    }
+
+    if (!userQuery->next()) {
+        return true;
+    }
+
+    info.found = true;
+    info.isAdmin = userQuery->value(0).toBool();
+    info.isActive = userQuery->value(1).toBool();
+    info.registrationTime = userQuery->value(2).toDateTime().toSecsSinceEpoch();
+
+    if (!userQuery->value(3).isNull()) {
+        info.hasAdminNotes = true;
+        info.adminNotes = userQuery->value(3).toString();
+    }
+
+    QSqlQuery *reportCountQuery =
+        prepareQuery("SELECT COUNT(*) FROM {prefix}_reports WHERE reported_user_name = :name");
+    reportCountQuery->bindValue(":name", userName);
+    if (execSqlQuery(reportCountQuery) && reportCountQuery->next()) {
+        info.hasTotalReports = true;
+        info.totalReports = reportCountQuery->value(0).toInt();
+    }
+
+    QSqlQuery *banCountQuery = prepareQuery("SELECT COUNT(*) FROM {prefix}_bans WHERE user_name = :name");
+    banCountQuery->bindValue(":name", userName);
+    if (execSqlQuery(banCountQuery) && banCountQuery->next()) {
+        info.hasTotalBans = true;
+        info.totalBans = banCountQuery->value(0).toInt();
+    }
+
+    QSqlQuery *warnCountQuery = prepareQuery("SELECT COUNT(*) FROM {prefix}_warnings WHERE user_name = :name");
+    warnCountQuery->bindValue(":name", userName);
+    if (execSqlQuery(warnCountQuery) && warnCountQuery->next()) {
+        info.hasTotalWarns = true;
+        info.totalWarns = warnCountQuery->value(0).toInt();
+    }
+
+    QSqlQuery *lastLoginQuery = prepareQuery("SELECT UNIX_TIMESTAMP(a.last_login) "
+                                             "FROM {prefix}_user_analytics a "
+                                             "JOIN {prefix}_users u ON u.id = a.id "
+                                             "WHERE u.name = :name");
+    lastLoginQuery->bindValue(":name", userName);
+    if (execSqlQuery(lastLoginQuery) && lastLoginQuery->next() && !lastLoginQuery->value(0).isNull()) {
+        info.hasLastLogin = true;
+        info.lastLogin = lastLoginQuery->value(0).toLongLong();
+    }
+
+    QSqlQuery *recentQuery = prepareQuery("SELECT r.id, r.reporter_name, r.reported_user_name, r.game_id, "
+                                          "r.category, r.description, r.created_at, r.status, "
+                                          "r.resolution_note, ru.name AS assigned_mod_name "
+                                          "FROM {prefix}_reports r "
+                                          "LEFT JOIN {prefix}_users ru ON r.assigned_to = ru.id "
+                                          "WHERE r.reported_user_name = :name "
+                                          "ORDER BY r.created_at DESC LIMIT 10");
+    recentQuery->bindValue(":name", userName);
+
+    if (execSqlQuery(recentQuery)) {
+        while (recentQuery->next()) {
+            ServerInfo_Report report;
+            report.set_report_id(recentQuery->value(0).toInt());
+            report.set_reporter_name(recentQuery->value(1).toString().toStdString());
+            report.set_reported_user_name(recentQuery->value(2).toString().toStdString());
+
+            if (!recentQuery->value(3).isNull()) {
+                report.set_game_id(recentQuery->value(3).toInt());
+            }
+
+            report.set_category(recentQuery->value(4).toString().toStdString());
+            report.set_description(recentQuery->value(5).toString().toStdString());
+            report.set_report_time(recentQuery->value(6).toDateTime().toSecsSinceEpoch());
+            report.set_status(recentQuery->value(7).toString().toStdString());
+
+            if (!recentQuery->value(8).isNull()) {
+                report.set_resolution_note(recentQuery->value(8).toString().toStdString());
+            }
+
+            if (!recentQuery->value(9).isNull()) {
+                report.set_assigned_mod_name(recentQuery->value(9).toString().toStdString());
+            }
+
+            info.recentReports.append(report);
+        }
+    }
+
+    return true;
+}
+
+Server_DatabaseInterface::ReportAssignResult Servatrice_DatabaseInterface::assignReport(int reportId, int moderatorId)
+{
+    if (!checkSql()) {
+        return ReportAssignResult::Failed;
+    }
+
+    QSqlQuery *lookupQuery = prepareQuery("SELECT status FROM {prefix}_reports WHERE id = :id");
+    lookupQuery->bindValue(":id", reportId);
+
+    if (!execSqlQuery(lookupQuery)) {
+        return ReportAssignResult::Failed;
+    }
+
+    if (!lookupQuery->next()) {
+        return ReportAssignResult::NotFound;
+    }
+
+    if (lookupQuery->value(0).toString() != "open") {
+        return ReportAssignResult::NotOpen;
+    }
+
+    QSqlQuery *query = prepareQuery("UPDATE {prefix}_reports "
+                                    "SET status = 'assigned', assigned_to = :mod_id "
+                                    "WHERE id = :id AND status = 'open'");
+
+    query->bindValue(":mod_id", moderatorId);
+    query->bindValue(":id", reportId);
+
+    if (!execSqlQuery(query)) {
+        return ReportAssignResult::Failed;
+    }
+
+    if (query->numRowsAffected() == 0) {
+        // The report was taken by another moderator between the lookup and this update.
+        return ReportAssignResult::NotOpen;
+    }
+
+    return ReportAssignResult::Ok;
+}
+
+Server_DatabaseInterface::ReportUpdateResult
+Servatrice_DatabaseInterface::resolveReport(int reportId, const QString &status, const QString &note, int moderatorId)
+{
+    if (!checkSql()) {
+        return ReportUpdateResult::Failed;
+    }
+
+    QSqlQuery *query = prepareQuery("UPDATE {prefix}_reports "
+                                    "SET status = :status, resolution_note = :note, "
+                                    "resolution_time = NOW(), resolved_by = :mod_id "
+                                    "WHERE id = :id AND status IN ('open', 'assigned')");
+
+    query->bindValue(":status", status);
+    query->bindValue(":note", note);
+    query->bindValue(":mod_id", moderatorId);
+    query->bindValue(":id", reportId);
+
+    if (!execSqlQuery(query)) {
+        return ReportUpdateResult::Failed;
+    }
+
+    if (query->numRowsAffected() == 0) {
+        return ReportUpdateResult::InvalidState;
+    }
+
+    return ReportUpdateResult::Ok;
+}
+
+Server_DatabaseInterface::ReportUpdateResult Servatrice_DatabaseInterface::reopenReport(int reportId)
+{
+    if (!checkSql()) {
+        return ReportUpdateResult::Failed;
+    }
+
+    QSqlQuery *query = prepareQuery("UPDATE {prefix}_reports "
+                                    "SET status = 'open', resolution_note = NULL, "
+                                    "resolution_time = NULL, resolved_by = NULL, assigned_to = NULL, "
+                                    "notified = 0 "
+                                    "WHERE id = :id AND status IN ('resolved', 'dismissed')");
+
+    query->bindValue(":id", reportId);
+
+    if (!execSqlQuery(query)) {
+        return ReportUpdateResult::Failed;
+    }
+
+    if (query->numRowsAffected() == 0) {
+        return ReportUpdateResult::InvalidState;
+    }
+
+    return ReportUpdateResult::Ok;
+}
+
+bool Servatrice_DatabaseInterface::getUserNameById(int userId, QString &userName)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT name FROM {prefix}_users WHERE id = :id");
+    query->bindValue(":id", userId);
+    if (!execSqlQuery(query) || !query->next()) {
+        return false;
+    }
+
+    userName = query->value(0).toString();
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::getReportNotificationTarget(int reportId, int &reporterId, QString &reportedUserName)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT reporter_id, reported_user_name FROM {prefix}_reports WHERE id = :id");
+    query->bindValue(":id", reportId);
+    if (!execSqlQuery(query) || !query->next()) {
+        return false;
+    }
+
+    reporterId = query->value(0).toInt();
+    reportedUserName = query->value(1).toString();
+    return true;
+}
+
+int Servatrice_DatabaseInterface::countReportCommentsInLastHour(int authorId)
+{
+    if (!checkSql()) {
+        return 0;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT COUNT(*) FROM {prefix}_report_comments WHERE author_id = :id "
+                                    "AND created_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR)");
+    query->bindValue(":id", authorId);
+    if (!execSqlQuery(query) || !query->next()) {
+        return 0;
+    }
+
+    return query->value(0).toInt();
+}
+
+bool Servatrice_DatabaseInterface::getReportCommentTarget(int reportId, ReportCommentTargetRecord &target)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query =
+        prepareQuery("SELECT reporter_id, reporter_name, assigned_to, status FROM {prefix}_reports WHERE id = :id");
+    query->bindValue(":id", reportId);
+
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    if (!query->next()) {
+        return true;
+    }
+
+    target.found = true;
+    target.reporterId = query->value(0).toInt();
+    target.reporterName = query->value(1).toString();
+    target.assignedToId = query->value(2).toInt();
+    target.status = query->value(3).toString();
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::addReportComment(int reportId,
+                                                    const QString &authorName,
+                                                    int authorId,
+                                                    const QString &commentText,
+                                                    bool isModerator,
+                                                    qlonglong &commentId)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query =
+        prepareQuery("INSERT INTO {prefix}_report_comments (report_id, author_name, author_id, "
+                     "comment_text, created_at, is_moderator) "
+                     "VALUES (:report_id, :author_name, :author_id, :comment_text, NOW(), :is_moderator)");
+    query->bindValue(":report_id", reportId);
+    query->bindValue(":author_name", authorName);
+    query->bindValue(":author_id", authorId);
+    query->bindValue(":comment_text", commentText);
+    query->bindValue(":is_moderator", isModerator);
+
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    commentId = query->lastInsertId().toLongLong();
+    return true;
+}
+
+int Servatrice_DatabaseInterface::countReportsSubmittedInLastDay(int reporterId)
+{
+    if (!checkSql()) {
+        return 0;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT COUNT(*) FROM {prefix}_reports WHERE reporter_id = :id "
+                                    "AND created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)");
+    query->bindValue(":id", reporterId);
+    if (!execSqlQuery(query) || !query->next()) {
+        return 0;
+    }
+
+    return query->value(0).toInt();
+}
+
+int Servatrice_DatabaseInterface::getReportedUserId(const QString &userName)
+{
+    if (!checkSql()) {
+        return -1;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT id FROM {prefix}_users WHERE name = :name");
+    query->bindValue(":name", userName);
+    if (!execSqlQuery(query) || !query->next()) {
+        return -1;
+    }
+
+    return query->value(0).toInt();
+}
+
+bool Servatrice_DatabaseInterface::addReport(int reporterId,
+                                             const QString &reporterName,
+                                             int reportedUserId,
+                                             const QString &reportedUserName,
+                                             int gameId,
+                                             int roomId,
+                                             const QString &category,
+                                             const QString &description,
+                                             const QString &chatLog)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("insert into {prefix}_reports "
+                                    "(reporter_id, reporter_name, reported_user_id, reported_user_name, "
+                                    "game_id, room_id, category, description, chat_log, created_at, status) "
+                                    "values "
+                                    "(:reporter_id, :reporter_name, :reported_user_id, :reported_user_name, "
+                                    ":game_id, :room_id, :category, :description, :chat_log, NOW(), 'open')");
+
+    query->bindValue(":reporter_id", reporterId);
+    query->bindValue(":reporter_name", reporterName);
+    query->bindValue(":reported_user_id", reportedUserId);
+    query->bindValue(":reported_user_name", reportedUserName);
+    query->bindValue(":game_id", gameId > 0 ? gameId : QVariant());
+    query->bindValue(":room_id", roomId > 0 ? roomId : QVariant());
+    query->bindValue(":category", category);
+    query->bindValue(":description", description);
+    query->bindValue(":chat_log", chatLog.isEmpty() ? QVariant() : chatLog);
+
+    return execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::getPendingReportNotifications(
+    int reporterId,
+    QList<Server_DatabaseInterface::PendingReportNotification> &notifications)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT id, reported_user_name, status, resolution_note "
+                                    "FROM {prefix}_reports "
+                                    "WHERE reporter_id = :reporter_id AND notified = 0 "
+                                    "AND status IN ('resolved', 'dismissed')");
+    query->bindValue(":reporter_id", reporterId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        PendingReportNotification notification;
+        notification.reportId = query->value(0).toInt();
+        notification.reportedUserName = query->value(1).toString();
+        notification.status = query->value(2).toString();
+        notification.resolutionNote = query->value(3).toString();
+        notifications.append(notification);
+    }
+
+    return true;
+}
+
+void Servatrice_DatabaseInterface::markReportNotified(int reportId)
+{
+    QSqlQuery *query = prepareQuery("UPDATE {prefix}_reports SET notified = 1 WHERE id = :id");
+    query->bindValue(":id", reportId);
+    execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::getPendingReportCommentNotifications(
+    int userId,
+    QList<Server_DatabaseInterface::PendingReportCommentNotification> &notifications)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT c.id, c.report_id, c.author_name, c.comment_text "
+                                    "FROM {prefix}_report_comments c "
+                                    "JOIN {prefix}_reports r ON r.id = c.report_id "
+                                    "WHERE c.notified = 0 "
+                                    "AND c.author_id != :user_id "
+                                    "AND ((c.is_moderator = 1 AND r.reporter_id = :user_id) "
+                                    "OR (c.is_moderator = 0 AND r.assigned_to = :user_id) "
+                                    "OR (c.is_moderator = 1 AND r.assigned_to = :user_id)) "
+                                    "ORDER BY c.created_at ASC");
+    query->bindValue(":user_id", userId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    while (query->next()) {
+        PendingReportCommentNotification notification;
+        notification.commentId = query->value(0).toLongLong();
+        notification.reportId = query->value(1).toInt();
+        notification.authorName = query->value(2).toString();
+        notification.commentText = query->value(3).toString();
+        notifications.append(notification);
+    }
+
+    return true;
+}
+
+void Servatrice_DatabaseInterface::markReportCommentNotified(qlonglong commentId)
+{
+    QSqlQuery *query = prepareQuery("UPDATE {prefix}_report_comments SET notified = 1 WHERE id = :id");
+    query->bindValue(":id", commentId);
+    execSqlQuery(query);
+}
+
 void Servatrice_DatabaseInterface::addAuditRecord(const QString &user,
                                                   const QString &ipaddress,
                                                   const QString &clientid,
                                                   const QString &action,
                                                   const QString &details,
-                                                  const bool &results = false)
+                                                  bool results)
 {
     if (!checkSql()) {
         return;
@@ -2486,4 +4896,90 @@ bool Servatrice_DatabaseInterface::isCardArtAllowed(const QString &cardName, con
     }
 
     return q->value(0).toString() != "DENY";
+}
+
+bool Servatrice_DatabaseInterface::upsertCardArtRule(const QString &cardName,
+                                                     const QString &cardProviderId,
+                                                     const QString &mode,
+                                                     const QString &reason,
+                                                     int createdBy)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *q = prepareQuery("INSERT INTO {prefix}_card_art_name_rules "
+                                "(card_name, card_provider_id, mode, reason, created_by) "
+                                "VALUES (:name, :provider, :mode, :reason, :uid) "
+                                "ON DUPLICATE KEY UPDATE mode=:mode2, reason=:reason2");
+
+    q->bindValue(":name", cardName);
+    q->bindValue(":provider", cardProviderId);
+    q->bindValue(":mode", mode);
+    q->bindValue(":mode2", mode);
+    q->bindValue(":reason", reason);
+    q->bindValue(":reason2", reason);
+    q->bindValue(":uid", createdBy);
+
+    return execSqlQuery(q);
+}
+
+bool Servatrice_DatabaseInterface::removeCardArtRule(const QString &cardName, const QString &cardProviderId)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *q =
+        prepareQuery("DELETE FROM {prefix}_card_art_name_rules WHERE card_name=:name AND card_provider_id=:provider");
+    q->bindValue(":name", cardName);
+    q->bindValue(":provider", cardProviderId);
+
+    return execSqlQuery(q);
+}
+
+bool Servatrice_DatabaseInterface::getCardArtRules(QList<CardArtRuleRecord> &rules)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *q = prepareQuery("SELECT card_name, card_provider_id, mode, reason FROM {prefix}_card_art_name_rules");
+    if (!execSqlQuery(q)) {
+        return false;
+    }
+
+    while (q->next()) {
+        CardArtRuleRecord rule;
+        rule.cardName = q->value(0).toString();
+        rule.cardProviderId = q->value(1).toString();
+        rule.mode = q->value(2).toString();
+        rule.reason = q->value(3).toString();
+        rules.append(rule);
+    }
+
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::setCardArtParams(int userId, const QString &paramsJson)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("update {prefix}_users set card_art_params=:params where id=:id");
+    query->bindValue(":params", paramsJson);
+    query->bindValue(":id", userId);
+    return execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::clearCardArtParams(int userId)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("UPDATE {prefix}_users SET card_art_params = NULL WHERE id = :id");
+    query->bindValue(":id", userId);
+    return execSqlQuery(query);
 }

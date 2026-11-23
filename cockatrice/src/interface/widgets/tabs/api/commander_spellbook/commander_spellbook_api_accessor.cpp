@@ -9,9 +9,10 @@
 #include <QJsonParseError>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QPointer>
 #include <QStringLiteral>
 #include <QUrl>
-#include <QVariant>
+#include <libcockatrice/network/network_manager.h>
 #include <version_string.h>
 
 class DeckList;
@@ -24,13 +25,18 @@ CommanderSpellbookApiAccessor &CommanderSpellbookApiAccessor::instance()
     return instance;
 }
 
-CommanderSpellbookApiAccessor::CommanderSpellbookApiAccessor(QObject *parent) : QObject(parent)
+CommanderSpellbookApiAccessor::CommanderSpellbookApiAccessor(QObject *parent)
+    : QObject(parent), network(NetworkManagerFactory::create(this))
 {
 }
 
 CommanderSpellbookApiAccessor::RequestId CommanderSpellbookApiAccessor::estimateBracket(const DeckList &deck,
                                                                                         QObject *requester)
 {
+    if (!requester) {
+        return 0;
+    }
+
     CommanderSpellbookDeckRequest deckRequest = CommanderSpellbookDeckRequest::fromDeckList(deck);
 
     QJsonDocument doc(deckRequest.toJson());
@@ -40,30 +46,39 @@ CommanderSpellbookApiAccessor::RequestId CommanderSpellbookApiAccessor::estimate
     req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     req.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
 
-    QNetworkReply *reply = network.post(req, body);
+    QNetworkReply *reply = network->post(req, body);
 
     const RequestId id = nextRequestId++;
 
-    reply->setProperty("requestId", QVariant::fromValue(id));
-    reply->setProperty("requester", QVariant::fromValue(requester));
-
-    connect(reply, &QNetworkReply::finished, this, [this, reply]() { onEstimateReplyFinished(reply); });
+    pendingRequests.insert(id, reply);
+    const QPointer<QObject> guardedRequester(requester);
+    connect(requester, &QObject::destroyed, reply, [this, id]() { cancelEstimate(id); });
+    connect(reply, &QNetworkReply::finished, this, [this, reply, id, guardedRequester]() {
+        if (pendingRequests.take(id) != reply) {
+            return;
+        }
+        reply->deleteLater();
+        if (guardedRequester) {
+            onEstimateReplyFinished(reply, id, guardedRequester);
+        }
+    });
 
     return id;
 }
 
-void CommanderSpellbookApiAccessor::onEstimateReplyFinished(QNetworkReply *reply)
+void CommanderSpellbookApiAccessor::cancelEstimate(RequestId id)
 {
-    reply->deleteLater();
-
-    const RequestId id = reply->property("requestId").toULongLong();
-    QObject *requester = reply->property("requester").value<QObject *>();
-
-    if (!requester) {
-        // Requester died — silently drop
+    const QPointer<QNetworkReply> reply = pendingRequests.take(id);
+    if (!reply) {
         return;
     }
+    disconnect(reply, nullptr, this, nullptr);
+    reply->abort();
+    reply->deleteLater();
+}
 
+void CommanderSpellbookApiAccessor::onEstimateReplyFinished(QNetworkReply *reply, RequestId id, QObject *requester)
+{
     if (reply->error() != QNetworkReply::NoError) {
         emit estimateBracketError(id, requester, reply->errorString());
         return;
@@ -78,6 +93,10 @@ void CommanderSpellbookApiAccessor::onEstimateReplyFinished(QNetworkReply *reply
     }
 
     EstimateBracketResult result = EstimateBracketResult::fromJson(doc.object());
+    if (result.bracketTag.trimmed().isEmpty()) {
+        emit estimateBracketError(id, requester, QStringLiteral("Missing bracket in response"));
+        return;
+    }
 
     emit estimateBracketFinished(id, requester, result);
 }

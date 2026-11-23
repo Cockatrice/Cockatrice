@@ -17,6 +17,8 @@
 #include <QPoint>
 #include <QPointF>
 #include <QtGlobal>
+#include <libcockatrice/game/zones/table_zone_logic.h>
+#include <optional>
 #include <qtmetamacros.h>
 
 class CardDragItem;
@@ -25,7 +27,7 @@ class CardZoneLogic;
 class QColor;
 class QGraphicsItem;
 class QPainter;
-class TableZoneLogic;
+class QPainterPath;
 template <typename T> class QList;
 
 /**
@@ -42,8 +44,6 @@ signals:
     void sizeChanged();
 
 private:
-    static const int TABLEROWS = 3;
-
     /*
     Margins between table edges and cards, paddings between cards
     */
@@ -181,15 +181,6 @@ public:
 
     QPointF closestGridPoint(const QPointF &point) override;
 
-    static int clampValidTableRow(const int row);
-
-    /**
-     * Converts a card's logical table row (0=creatures, 1=noncreatures, 2=lands)
-     * to the corresponding grid Y coordinate. Cards with tableRow > 2 (e.g.,
-     * instants/sorceries) default to the noncreatures row.
-     */
-    static int tableRowToGridY(int tableRow);
-
     /**
        Resizes the TableZone in case CardItems are within or
        outside of the TableZone constraints.
@@ -232,6 +223,13 @@ private:
 
     void paintZoneOutline(QPainter *painter);
     void paintLandDivider(QPainter *painter);
+    /**
+     * @brief This zone's paint area minus the hovered card's painted outline, in zone coordinates.
+     *
+     * @c std::nullopt when no card is hovered or it does not overlap this zone; an *empty* path when
+     * the hovered card covers this zone entirely, in which case nothing of the zone is visible.
+     */
+    [[nodiscard]] std::optional<QPainterPath> hoveredCardHole() const;
 
     /*
     Calculates card stack widths so mapping functions work properly

@@ -24,6 +24,9 @@ public:
 public slots:
     void paintEvent(QPaintEvent *event) override;
 
+private slots:
+    void applyInterfaceDefaultFont();
+
 private:
     QPair<QColor, QColor> gradientColors;
 };

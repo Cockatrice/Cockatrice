@@ -1,16 +1,14 @@
 #include "tab_supervisor.h"
 
+#include "../../../client/crash/crash_reporter.h"
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../../../game/abstract_game.h"
-#include "../../../game/game_event_handler.h"
-#include "../../../game/game_meta_info.h"
-#include "../../deck_loader/loaded_deck.h"
 #include "../../intents/contexts/context_connect_to_server.h"
 #include "../../intents/contexts/context_join_game.h"
 #include "../../intents/contexts/context_join_room.h"
 #include "../../intents/intent.h"
 #include "../../intents/intent_join_server_game.h"
+#include "../../theme_icon.h"
 #include "../interface/pixel_map_generator.h"
 #include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
@@ -25,6 +23,7 @@
 #include "tab.h"
 #include "tab_account.h"
 #include "tab_admin.h"
+#include "tab_alts.h"
 #include "tab_card_art_rules.h"
 #include "tab_deck_editor.h"
 #include "tab_deck_storage.h"
@@ -58,11 +57,16 @@
 #include <QPainter>
 #include <QRect>
 #include <QSharedPointer>
+#include <QStackedWidget>
 #include <QStringLiteral>
 #include <QStyle>
 #include <QStyleOption>
 #include <QSystemTrayIcon>
 #include <QTabBar>
+#include <libcockatrice/deck_list/loaded_deck.h>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/game_event_handler.h>
+#include <libcockatrice/game/game_meta_info.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
@@ -77,6 +81,7 @@
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
+#include <libcockatrice/utility/game_role_info.h>
 #include <libcockatrice/utility/qt_utils.h>
 #include <memory>
 #include <qnamespace.h>
@@ -155,13 +160,22 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     : QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabHome(nullptr),
       tabVisualDeckStorage(nullptr), tabServer(nullptr), tabAccount(nullptr), tabDeckStorage(nullptr),
       tabReplays(nullptr), tabAdmin(nullptr), tabCardArtRules(nullptr), tabLog(nullptr), tabReport(nullptr),
-      tabModeration(nullptr), tabDeveloper(nullptr), isLocalGame(false)
+      tabModeration(nullptr), tabAlts(nullptr), tabDeveloper(nullptr), isLocalGame(false)
 {
+    setObjectName("tabSupervisor");
+
+    // QTabWidget keeps tab pages in an internal stacked widget. Give it a stable
+    // name so the GUI tests can address the pages by a readable path
+    // (tabSupervisor/stackedWidget/<TabName>).
+    if (auto *stackedWidget = findChild<QStackedWidget *>()) {
+        stackedWidget->setObjectName("stackedWidget");
+    }
+
     setElideMode(Qt::ElideRight);
     setMovable(true);
     setIconSize(QSize(15, 15));
 
-#if defined(Q_OS_MAC)
+#if defined(Q_OS_MACOS)
     // This is necessary to fix an issue on macOS,
     // where tabs with icons and buttons get drawn incorrectly
     tabBar()->setStyle(new MacOSTabFixStyle);
@@ -462,6 +476,9 @@ void TabSupervisor::addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager
     auto closeSide = static_cast<QTabBar::ButtonPosition>(
         tabBar()->style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, nullptr, tabBar()));
     auto *closeButton = new CloseButton(tab);
+    // No object name: the tab bar index shifts when tabs move or close, so an
+    // index-derived name would go stale (or collide). Callers find the button
+    // through the tab widget instead.
     if (manager) {
         // If managed, all close requests should go through the menu action
         connect(closeButton, &CloseButton::clicked, this, [manager] { checkAndTrigger(manager, false); });
@@ -561,6 +578,7 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     tabLog = nullptr;
     tabReport = nullptr;
     tabModeration = nullptr;
+    tabAlts = nullptr;
     tabDeveloper = nullptr;
     isLocalGame = true;
     userInfo = new ServerInfo_User;
@@ -577,6 +595,7 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
  */
 void TabSupervisor::stop()
 {
+    CrashReporter::addBreadcrumb("tabs", "tab supervisor stopping");
     if ((!client) && localClients.isEmpty()) {
         return;
     }
@@ -608,6 +627,9 @@ void TabSupervisor::stop()
         }
         if (tabModeration) {
             tabModeration->close();
+        }
+        if (tabAlts) {
+            tabAlts->close();
         }
         if (tabCardArtRules) {
             tabCardArtRules->close();
@@ -917,6 +939,21 @@ void TabSupervisor::openTabModeration(const QString &userName)
     aTabModeration->setChecked(true);
 }
 
+void TabSupervisor::openTabAlts(const QString &userName)
+{
+    if (tabAlts) {
+        setCurrentWidget(tabAlts);
+        if (!userName.isEmpty()) {
+            tabAlts->investigate(userName);
+        }
+        return;
+    }
+    tabAlts = new TabAlts(this, client, userName);
+    myAddTab(tabAlts);
+    setCurrentWidget(tabAlts);
+    connect(tabAlts, &QObject::destroyed, this, [this] { tabAlts = nullptr; });
+}
+
 void TabSupervisor::actTabDeveloper(bool checked)
 {
     if (checked && !tabDeveloper) {
@@ -969,6 +1006,7 @@ void TabSupervisor::updateLatencyTooltip(const LatencyTracker::Stats &stats)
 
 void TabSupervisor::gameJoined(const Event_GameJoined &event)
 {
+    CrashReporter::addBreadcrumb("tabs", "game joined");
     QMap<int, QString> roomGameTypes;
     TabRoom *room = roomTabs.value(event.game_info().room_id());
     if (room) {
@@ -1021,6 +1059,7 @@ void TabSupervisor::gameLeft(TabGame *tab)
 
 void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
 {
+    CrashReporter::addBreadcrumb("tabs", "room tab added");
     auto *tab = new TabRoom(this, client, userInfo, info);
     connect(tab, &TabRoom::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
     connect(tab, &TabRoom::roomClosing, this, &TabSupervisor::roomLeft);
@@ -1098,12 +1137,12 @@ void TabSupervisor::replayLeft(TabGame *tab)
 
 void TabSupervisor::joinReportGame(const int gameId, const int roomId)
 {
-    joinGameByIntent(gameId, roomId, true);
+    joinGameByIntent(gameId, roomId, {.isSpectator = true});
 }
 
-void TabSupervisor::joinGameFromUserCard(const int gameId, const int roomId, const bool asSpectator)
+void TabSupervisor::joinGameFromUserCard(const int gameId, const int roomId, const GameRoleInfo &roles)
 {
-    joinGameByIntent(gameId, roomId, asSpectator);
+    joinGameByIntent(gameId, roomId, roles);
 }
 
 /**
@@ -1113,7 +1152,7 @@ void TabSupervisor::joinGameFromUserCard(const int gameId, const int roomId, con
  * room first, then retries the game, so callers do not have to care whether the
  * room happens to be on screen.
  */
-void TabSupervisor::joinGameByIntent(const int gameId, const int roomId, const bool asSpectator)
+void TabSupervisor::joinGameByIntent(const int gameId, const int roomId, const GameRoleInfo &roles)
 {
     auto *remoteClient = qobject_cast<RemoteClient *>(client);
     if (!remoteClient) {
@@ -1126,7 +1165,7 @@ void TabSupervisor::joinGameByIntent(const int gameId, const int roomId, const b
     ctx->roomContext.serverContext.port = QString::number(remoteClient->peerPort());
     ctx->roomContext.roomId = roomId;
     ctx->gameId = gameId;
-    ctx->asSpectator = asSpectator;
+    ctx->roles = roles;
 
     auto *joinGameIntent = new IntentJoinServerGame(this, remoteClient, std::move(ctx));
     joinGameIntent->setParent(this);
@@ -1347,7 +1386,7 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
     auto *tab = static_cast<Tab *>(sender());
     if (tab != currentWidget()) {
         tab->setContentsChanged(true);
-        setTabIcon(indexOf(tab), themePixmap(QStringLiteral("icons/tab_changed")));
+        setTabIcon(indexOf(tab), loadThemedIcon(QStringLiteral("icons/tab_changed")));
     }
     if (globalEvent && SettingsCache::instance().userInterface().getNotificationsEnabled()) {
         QApplication::alert(this);
@@ -1409,9 +1448,10 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
                 !userLevel.testFlag(ServerInfo_User::IsRegistered)) {
                 // Flags are additive, so reg/mod/admin are all IsRegistered
                 return;
-            } else if (SettingsCache::instance().chat().getIgnoreNonBuddyUserMessages() &&
-                       !userListManager->isUserBuddy(senderName) && !userLevel.testFlag(ServerInfo_User::IsModerator) &&
-                       !userLevel.testFlag(ServerInfo_User::IsAdmin)) {
+            }
+            if (SettingsCache::instance().chat().getIgnoreNonBuddyUserMessages() &&
+                !userListManager->isUserBuddy(senderName) && !userLevel.testFlag(ServerInfo_User::IsModerator) &&
+                !userLevel.testFlag(ServerInfo_User::IsAdmin)) {
                 // Ignore private messages from non-buddies
                 // Moderator/Admin messages are exempt to ensure warnings reach users
                 return;
@@ -1438,6 +1478,7 @@ void TabSupervisor::actShowPopup(const QString &message)
 
 void TabSupervisor::processUserLeft(const QString &userName)
 {
+    CrashReporter::addBreadcrumb("users", "user left");
     TabMessage *tab = messageTabs.value(userName);
     if (tab) {
         tab->processUserLeft();

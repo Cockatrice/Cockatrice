@@ -3,7 +3,6 @@
 #include "../../../../client/settings/cache_settings.h"
 #include "../../../../interface/widgets/dialogs/dlg_convert_deck_to_cod_format.h"
 #include "../../../deck_loader/deck_loader.h"
-#include "../../../deck_loader/loaded_deck.h"
 #include "../../cards/additional_info/color_identity_widget.h"
 #include "../../cards/deck_preview_card_picture_widget.h"
 #include "../visual_deck_storage_model.h"
@@ -45,6 +44,7 @@
 #include <compare>
 #include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
 #include <qnamespace.h>
 #include <utility>

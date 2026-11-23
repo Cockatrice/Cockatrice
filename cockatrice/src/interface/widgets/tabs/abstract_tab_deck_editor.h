@@ -90,13 +90,13 @@ public:
     virtual void createMenus() = 0;
 
     /** @brief Returns the display text for the tab. */
-    [[nodiscard]] virtual QString getTabText() const override = 0;
+    [[nodiscard]] QString getTabText() const override = 0;
 
     /** @brief Confirms whether the tab can be safely closed. */
     bool confirmClose();
 
     /** @brief Retranslates the UI text. Pure virtual. */
-    virtual void retranslateUi() override = 0;
+    void retranslateUi() override = 0;
 
     /** @brief Opens a deck in this tab.
      *  @param deck The deck to open

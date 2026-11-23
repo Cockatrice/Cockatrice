@@ -1,16 +1,17 @@
 #include "pages.h"
 
 #include "client/settings/cache_settings.h"
+#include "database_writer.h"
 #include "main.h"
 #include "oracleimporter.h"
 #include "oraclewizard.h"
 #include "pagetemplates.h"
+#include "tag_database.h"
 #include "version_string.h"
 
 #include <QBuffer>
 #include <QCheckBox>
 #include <QComboBox>
-#include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
@@ -19,7 +20,9 @@
 #include <QGridLayout>
 #include <QIODevice>
 #include <QJsonDocument>
+#include <QJsonObject>
 #include <QJsonParseError>
+#include <QJsonValue>
 #include <QLabel>
 #include <QLineEdit>
 #include <QList>
@@ -36,15 +39,16 @@
 #include <QScrollBar>
 #include <QSettings>
 #include <QSharedPointer>
+#include <QSizePolicy>
 #include <QTextEdit>
 #include <QTextStream>
 #include <QTimer>
-#include <QTranslator>
 #include <QUrl>
 #include <QVariant>
 #include <QWizard>
 #include <QtConcurrentRun>
 #include <QtGlobal>
+#include <algorithm>
 #include <cstdio>
 #include <functional>
 #include <libcockatrice/settings/personal_settings.h>
@@ -72,6 +76,7 @@ class QWidget;
 #define MTGJSON_V4_URL_COMPONENT "mtgjson.com/files/"
 #define ALLSETS_URL_FALLBACK "https://www.mtgjson.com/api/v5/AllPrintings.json"
 #define MTGJSON_VERSION_URL "https://www.mtgjson.com/api/v5/Meta.json"
+#define SCRYFALL_TAGS_URL "https://api.scryfall.com/bulk-data/oracle-tags"
 
 #ifdef HAS_LZMA
 #define ALLSETS_URL "https://www.mtgjson.com/api/v5/AllPrintings.json.xz"
@@ -171,7 +176,16 @@ LoadSetsResult loadSetsData(const QPointer<OracleImporter> &importer, QByteArray
         break;
     }
 
-    if (data.startsWith("<")) {
+    // Test the first non-space byte in place: trimmed() would duplicate the whole
+    // payload, which on the plain-XML path is the largest download we handle.
+    const auto firstNonSpace = std::find_if_not(data.cbegin(), data.cend(),
+                                                [](char c) { return c == ' ' || c == '\t' || c == '\n' || c == '\r'; });
+    const bool looksLikeXml = firstNonSpace != data.cend() && *firstNonSpace == '<';
+    if (looksLikeXml) {
+        result.errorMessage = OracleDatabase::validateXml(data);
+        if (!result.errorMessage.isEmpty()) {
+            return result;
+        }
         result.ok = true;
         result.plainXml = true;
         result.xmlData = std::move(data);
@@ -203,16 +217,23 @@ IntroPage::IntroPage(QWidget *parent) : OracleWizardPage(parent)
 
     QStringList languageCodes = findQmFiles();
     for (const QString &code : languageCodes) {
-        QString langName = languageName(code);
-        languageBox->addItem(langName, code);
+        languageBox->addItem(TranslationLoader::languageDisplayName(code), code);
     }
 
-    QString setLanguage = QCoreApplication::translate("i18n", DEFAULT_LANG_NAME);
-    int index = languageBox->findText(setLanguage, Qt::MatchExactly);
-    if (index == -1) {
-        qWarning() << "could not find language" << setLanguage;
-    } else {
+    // Select the language the wizard runs with: its own entry, the base language for a variant without a
+    // file of its own (de_CH -> de), and the default language for an unset setting, which names no file.
+    const QString configuredLanguage = SettingsCache::instance().personal().getLang();
+    int index = languageBox->findData(configuredLanguage);
+    if (index < 0) {
+        index = languageBox->findData(configuredLanguage.section('_', 0, 0));
+    }
+    if (index < 0) {
+        index = languageBox->findData(TranslationLoader::defaultLanguageCode());
+    }
+    if (index >= 0) {
         languageBox->setCurrentIndex(index);
+    } else {
+        qWarning() << "could not find language" << configuredLanguage;
     }
 
     connect(languageBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &IntroPage::languageBoxChanged);
@@ -237,18 +258,6 @@ QStringList IntroPage::findQmFiles()
 {
     return TranslationLoader::availableLanguages(translationPrefix,
                                                  TranslationLoader::applicationTranslationPaths(translationPath));
-}
-
-QString IntroPage::languageName(const QString &lang)
-{
-    QTranslator qTranslator;
-
-    // Only the language name is needed here, so the file is loaded without logging a line per
-    // language: findQmFiles() asked for languages whose files exist in the first place.
-    TranslationLoader::loadFrom(qTranslator, translationPrefix + "_" + lang,
-                                TranslationLoader::applicationTranslationPaths(translationPath));
-
-    return qTranslator.translate("i18n", DEFAULT_LANG_NAME);
 }
 
 void IntroPage::languageBoxChanged(int index)
@@ -658,6 +667,10 @@ void LoadSetsPage::importFinished()
         } else if (!result.ok && !result.plainXml) {
             qWarning() << tr("The file was retrieved successfully, but it does not contain any sets data.");
         }
+        if (!result.ok) {
+            wizard()->reject();
+            return;
+        }
         emit readyToContinue();
         return;
     }
@@ -699,6 +712,502 @@ void LoadSetsPage::importFinished()
     });
 }
 
+namespace
+{
+/**
+ * @brief True when a URL points at a tag file rather than Scryfall's bulk metadata.
+ */
+bool looksLikeTagFileUrl(const QUrl &url)
+{
+    const QString path = url.path().toLower();
+    return path.endsWith(".json") || path.endsWith(".jsonl") || path.endsWith(".gz") || path.endsWith(".xz") ||
+           path.endsWith(".zip");
+}
+
+/**
+ * @brief Extends Qt's terse network error with a JSON error body.
+ *
+ * Scryfall explains a rejected request in the response body (for example a
+ * missing Accept header); QNetworkReply::errorString() only says "status code
+ * 400". Non-JSON bodies (CDN HTML pages) are ignored so the dialog stays short.
+ */
+QString networkErrorDetail(QNetworkReply *reply)
+{
+    QString detail = reply->errorString();
+    const QString body = QString::fromUtf8(reply->readAll()).trimmed();
+    if (body.startsWith('{') && body.size() <= 300) {
+        detail += QStringLiteral(" ") + body;
+    }
+    return detail;
+}
+} // namespace
+
+TagsPage::TagsPage(QWidget *parent) : OracleWizardPage(parent)
+{
+    enableCheckBox = new QCheckBox(this);
+    enableCheckBox->setChecked(true);
+    connect(enableCheckBox, &QCheckBox::toggled, this, &TagsPage::updateSourceEnabled);
+
+    urlRadioButton = new QRadioButton(this);
+    fileRadioButton = new QRadioButton(this);
+    urlRadioButton->setChecked(true);
+    connect(urlRadioButton, &QRadioButton::toggled, this, &TagsPage::updateSourceEnabled);
+    connect(fileRadioButton, &QRadioButton::toggled, this, &TagsPage::updateSourceEnabled);
+
+    urlLineEdit = new QLineEdit(this);
+    fileLineEdit = new QLineEdit(this);
+
+    urlButton = new QPushButton(this);
+    connect(urlButton, &QPushButton::clicked, this, &TagsPage::actRestoreDefaultSource);
+
+    fileButton = new QPushButton(this);
+    connect(fileButton, &QPushButton::clicked, this, &TagsPage::actChooseFile);
+
+    parentsCheckBox = new QCheckBox(this);
+
+    parentsExplainer = new QLabel(this);
+    parentsExplainer->setWordWrap(true);
+    // Indent under the checkbox and give the wrapped text room above and below,
+    // so it reads as an explanation of the option rather than a caption glued
+    // to the controls around it.
+    parentsExplainer->setContentsMargins(24, 4, 0, 10);
+    // A word-wrapped label reports a one-line sizeHint, so a short page squeezes
+    // it and clips the text top and bottom. Pinning the vertical policy makes
+    // the wrapped height part of the page's minimum size.
+    parentsExplainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+
+    statusLabel = new QLabel(this);
+    statusLabel->setWordWrap(true);
+    statusLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    statusLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+
+    progressLabel = new QLabel(this);
+    progressBar = new QProgressBar(this);
+    progressLabel->hide();
+    progressBar->hide();
+
+    auto *layout = new QGridLayout(this);
+    layout->addWidget(enableCheckBox, 0, 0, 1, 2);
+    layout->addWidget(urlRadioButton, 1, 0);
+    layout->addWidget(urlLineEdit, 1, 1);
+    layout->addWidget(urlButton, 2, 1, Qt::AlignRight);
+    layout->addWidget(fileRadioButton, 3, 0);
+    layout->addWidget(fileLineEdit, 3, 1);
+    layout->addWidget(fileButton, 4, 1, Qt::AlignRight);
+    layout->addWidget(parentsCheckBox, 5, 0, 1, 2);
+    layout->addWidget(parentsExplainer, 6, 0, 1, 2);
+    layout->addWidget(statusLabel, 7, 0, 1, 2);
+    layout->addWidget(progressLabel, 8, 0);
+    layout->addWidget(progressBar, 8, 1);
+    layout->setRowStretch(9, 1);
+    setLayout(layout);
+
+    connect(&watcher, &QFutureWatcher<LoadResult>::finished, this, &TagsPage::actLoadFinished);
+
+    updateSourceEnabled();
+    retranslateUi();
+}
+
+void TagsPage::retranslateUi()
+{
+    setTitle(tr("Tag data"));
+    setSubTitle(tr("Card tags let you search and filter by tag. Oracle downloads Scryfall's Oracle Tags by "
+                   "default; you can also point it at your own tag database."));
+
+    enableCheckBox->setText(tr("Download card tags"));
+    enableCheckBox->setToolTip(
+        tr("Apply tag slugs to the card database so cards can be searched and filtered by tag."));
+    urlRadioButton->setText(tr("Download URL:"));
+    urlButton->setText(tr("Restore default URL"));
+    fileRadioButton->setText(tr("Local file:"));
+    fileButton->setText(tr("Choose file..."));
+    parentsCheckBox->setText(tr("Include parent tags"));
+    parentsCheckBox->setToolTip(tr("Also apply the broader tags that this tag belongs to."));
+    parentsExplainer->setText(
+        tr("Tags form a hierarchy: \"tutor-creature-giant\" belongs to \"tutor-creature\", which belongs to "
+           "\"tutor\". With this on, a card tagged with the specific tag also matches searches for its broader "
+           "parent tags. It adds many more tags to each card."));
+}
+
+bool TagsPage::isComplete() const
+{
+    return !loadActive;
+}
+
+void TagsPage::initializePage()
+{
+    enableCheckBox->setChecked(wizard()->settings->value("tagsenabled", true).toBool());
+    parentsCheckBox->setChecked(wizard()->settings->value("tagsparents", false).toBool());
+
+    const QString source = wizard()->settings->value("tagssource").toString();
+    if (source.isEmpty() || source.startsWith("http://") || source.startsWith("https://")) {
+        urlRadioButton->setChecked(true);
+        urlLineEdit->setText(source.isEmpty() ? QString(SCRYFALL_TAGS_URL) : source);
+        fileLineEdit->clear();
+    } else {
+        fileRadioButton->setChecked(true);
+        fileLineEdit->setText(source);
+        urlLineEdit->setText(SCRYFALL_TAGS_URL);
+    }
+
+    statusLabel->clear();
+    progressLabel->hide();
+    progressBar->hide();
+    updateSourceEnabled();
+
+    if (wizard()->backgroundMode && isEnabled()) {
+        // In background mode runInBackground() calls initializePage() instead of
+        // next(), so a page that has nothing to do must advance itself.
+        if (validatePage()) {
+            emit readyToContinue();
+        }
+    }
+}
+
+QString TagsPage::selectedSource() const
+{
+    return urlRadioButton->isChecked() ? urlLineEdit->text().trimmed() : fileLineEdit->text().trimmed();
+}
+
+void TagsPage::updateSourceEnabled()
+{
+    const bool enabled = enableCheckBox->isChecked();
+    const bool usingUrl = urlRadioButton->isChecked();
+    const bool usingFile = fileRadioButton->isChecked();
+
+    urlRadioButton->setEnabled(enabled);
+    fileRadioButton->setEnabled(enabled);
+    urlLineEdit->setEnabled(enabled && usingUrl);
+    urlButton->setEnabled(enabled && usingUrl);
+    fileLineEdit->setEnabled(enabled && usingFile);
+    fileButton->setEnabled(enabled && usingFile);
+    parentsCheckBox->setEnabled(enabled);
+    parentsExplainer->setEnabled(enabled);
+}
+
+void TagsPage::saveSettings()
+{
+    wizard()->settings->setValue("tagsenabled", enableCheckBox->isChecked());
+    wizard()->settings->setValue("tagsparents", parentsCheckBox->isChecked());
+
+    QString source = selectedSource();
+    if (urlRadioButton->isChecked() && source == SCRYFALL_TAGS_URL) {
+        source.clear();
+    }
+    if (source.isEmpty()) {
+        wizard()->settings->remove("tagssource");
+    } else {
+        wizard()->settings->setValue("tagssource", source);
+    }
+}
+
+bool TagsPage::validatePage()
+{
+    if (!enableCheckBox->isChecked()) {
+        wizard()->tagDatabase.reset();
+        saveSettings();
+        return true;
+    }
+
+    const auto rejectValidation = [this](const QString &message) {
+        if (wizard()->backgroundMode) {
+            qWarning() << message;
+            wizard()->tagDatabase.reset();
+            emit readyToContinue();
+        } else {
+            QMessageBox::critical(this, tr("Error"), message);
+        }
+        return false;
+    };
+
+    const QString source = selectedSource();
+    const bool includeParents = parentsCheckBox->isChecked();
+
+    // Going back and forth through the wizard must not reload an unchanged source.
+    if (wizard()->tagDatabase && source == loadedSource && includeParents == loadedParents) {
+        return true;
+    }
+
+    if (loadActive) {
+        return false;
+    }
+
+    if (urlRadioButton->isChecked()) {
+        const QUrl url = QUrl::fromUserInput(source);
+        if (!url.isValid() || url.isEmpty()) {
+            return rejectValidation(tr("The provided tag URL is not valid."));
+        }
+    } else if (source.isEmpty() || !QFile::exists(source)) {
+        return rejectValidation(tr("Please choose an existing tag database file."));
+    }
+
+    saveSettings();
+    loadedSource = source;
+    loadedParents = includeParents;
+
+    wizard()->disableButtons();
+    setEnabled(false);
+    loadActive = true;
+    emit completeChanged();
+
+    progressBar->setRange(0, 0);
+    progressBar->setValue(0);
+    progressLabel->setText(tr("Fetching tag data..."));
+    progressLabel->show();
+    progressBar->show();
+    statusLabel->clear();
+
+    if (urlRadioButton->isChecked()) {
+        const QUrl url = QUrl::fromUserInput(source);
+        if (looksLikeTagFileUrl(url)) {
+            downloadTagFile(url);
+        } else {
+            downloadMetadata(url);
+        }
+    } else {
+        loadFromFile(source);
+    }
+    return false;
+}
+
+void TagsPage::actChooseFile()
+{
+    QFileDialog dialog(this, tr("Load tag database"));
+    dialog.setFileMode(QFileDialog::ExistingFile);
+
+    QString extensions = "*.json *.jsonl";
+#ifdef HAS_ZLIB
+    extensions += " *.gz *.zip";
+#endif
+#ifdef HAS_LZMA
+    extensions += " *.xz";
+#endif
+    dialog.setNameFilter(tr("Tag database (%1)").arg(extensions));
+
+    if (!fileLineEdit->text().isEmpty() && QFile::exists(fileLineEdit->text())) {
+        dialog.selectFile(fileLineEdit->text());
+    }
+
+    if (!dialog.exec()) {
+        return;
+    }
+
+    fileLineEdit->setText(dialog.selectedFiles().at(0));
+    fileRadioButton->setChecked(true);
+    updateSourceEnabled();
+}
+
+void TagsPage::actRestoreDefaultSource()
+{
+    urlLineEdit->setText(SCRYFALL_TAGS_URL);
+    urlRadioButton->setChecked(true);
+    updateSourceEnabled();
+}
+
+void TagsPage::downloadMetadata(const QUrl &url)
+{
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
+    // api.scryfall.com rejects requests without an Accept header (HTTP 400);
+    // QNetworkAccessManager does not add one on its own.
+    request.setRawHeader("Accept", "application/json");
+    request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+
+    activeReply = wizard()->nam->get(request);
+    connect(activeReply, &QNetworkReply::finished, this, &TagsPage::actMetadataFinished);
+}
+
+void TagsPage::actMetadataFinished()
+{
+    auto *reply = qobject_cast<QNetworkReply *>(sender());
+    if (!reply) {
+        return;
+    }
+    activeReply = nullptr;
+    reply->deleteLater();
+
+    if (wizard()->wasCancelled()) {
+        return;
+    }
+    if (reply->error() != QNetworkReply::NoError) {
+        failLoad(
+            tr("Could not fetch tag metadata from %1: %2").arg(reply->url().toString(), networkErrorDetail(reply)));
+        return;
+    }
+
+    QJsonParseError parseError{};
+    const QJsonDocument document = QJsonDocument::fromJson(reply->readAll(), &parseError);
+    if (parseError.error != QJsonParseError::NoError || !document.isObject()) {
+        failLoad(tr("The tag metadata could not be read."));
+        return;
+    }
+
+    const QJsonObject metadata = document.object();
+    QString downloadUrl = metadata.value("jsonl_download_uri").toString();
+    if (downloadUrl.isEmpty()) {
+        downloadUrl = metadata.value("download_uri").toString();
+    }
+    if (downloadUrl.isEmpty()) {
+        failLoad(tr("The tag data source did not provide a download URL."));
+        return;
+    }
+
+    downloadTagFile(QUrl::fromUserInput(downloadUrl));
+}
+
+void TagsPage::downloadTagFile(const QUrl &url)
+{
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
+    request.setRawHeader("Accept", "*/*");
+    request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+
+    activeReply = wizard()->nam->get(request);
+    connect(activeReply, &QNetworkReply::finished, this, &TagsPage::actTagFileFinished);
+    connect(activeReply, &QNetworkReply::downloadProgress, this, &TagsPage::actDownloadProgress);
+}
+
+void TagsPage::actDownloadProgress(qint64 received, qint64 total)
+{
+    emitProgress("download", received, total);
+    if (total > 0) {
+        progressBar->setRange(0, static_cast<int>(total));
+        progressBar->setValue(static_cast<int>(received));
+    }
+    progressLabel->setText(tr("Downloading tag data (%1 MB)").arg(received / (1024 * 1024)));
+}
+
+void TagsPage::actTagFileFinished()
+{
+    auto *reply = qobject_cast<QNetworkReply *>(sender());
+    if (!reply) {
+        return;
+    }
+    activeReply = nullptr;
+    reply->deleteLater();
+
+    if (wizard()->wasCancelled()) {
+        return;
+    }
+    if (reply->error() != QNetworkReply::NoError) {
+        failLoad(tr("Could not download tag data from %1: %2").arg(reply->url().toString(), networkErrorDetail(reply)));
+        return;
+    }
+
+    const QByteArray data = reply->readAll();
+    if (data.isEmpty()) {
+        failLoad(tr("The tag download was empty."));
+        return;
+    }
+    beginLoad(data);
+}
+
+void TagsPage::loadFromFile(const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)) {
+        failLoad(tr("Cannot open file '%1'.").arg(path));
+        return;
+    }
+    beginLoad(file.readAll());
+}
+
+void TagsPage::beginLoad(const QByteArray &data)
+{
+    progressBar->setRange(0, 0);
+    progressLabel->setText(tr("Reading tag data..."));
+
+    const bool includeParents = parentsCheckBox->isChecked();
+    future = QtConcurrent::run([data, includeParents]() {
+        LoadResult result;
+        result.database = TagDatabase::loadFromData(data, TagDatabase::LoadOptions{.includeParentTags = includeParents},
+                                                    &result.errorMessage);
+        return result;
+    });
+    watcher.setFuture(future);
+}
+
+void TagsPage::actLoadFinished()
+{
+    if (wizard()->wasCancelled()) {
+        return;
+    }
+
+    const LoadResult result = watcher.result();
+
+    loadActive = false;
+    emit completeChanged();
+    wizard()->enableButtons();
+    setEnabled(true);
+    progressLabel->hide();
+    progressBar->hide();
+
+    if (!result.database) {
+        wizard()->tagDatabase.reset();
+        failLoad(result.errorMessage.isEmpty() ? tr("The tag data could not be read.") : result.errorMessage);
+        return;
+    }
+
+    wizard()->tagDatabase = result.database;
+    statusLabel->setText(tr("Loaded %1 tags for %2 cards.")
+                             .arg(wizard()->tagDatabase->tagCount())
+                             .arg(wizard()->tagDatabase->taggedCardCount()));
+    qInfo() << "Loaded tag database:" << wizard()->tagDatabase->tagCount() << "tags for"
+            << wizard()->tagDatabase->taggedCardCount() << "cards";
+    advance();
+}
+
+void TagsPage::failLoad(const QString &message)
+{
+    loadActive = false;
+    emit completeChanged();
+    wizard()->enableButtons();
+    setEnabled(true);
+    progressLabel->hide();
+    progressBar->hide();
+    qWarning() << message;
+
+    // The failed load leaves no usable database; never keep tags from a
+    // previous, different source.
+    wizard()->tagDatabase.reset();
+
+    if (wizard()->backgroundMode) {
+        statusLabel->setText(message);
+        emit readyToContinue();
+        return;
+    }
+
+    // Do not advance here. Advancing runs validatePage() again, which starts
+    // the same failing download and traps the user in an error loop. Staying
+    // on the page lets them fix the source, retry with Next, or opt out.
+    const QString guidance = tr("You can try again, choose another source, or untick \"Download card tags\" "
+                                "to import without tags.");
+    statusLabel->setText(message + "\n\n" + guidance);
+    QMessageBox::warning(this, tr("Tags not loaded"), message + "\n\n" + guidance);
+}
+
+void TagsPage::advance()
+{
+    if (wizard()->backgroundMode) {
+        emit readyToContinue();
+    } else {
+        wizard()->next();
+    }
+}
+
+void TagsPage::cancelWork()
+{
+    if (activeReply) {
+        activeReply->abort();
+        activeReply = nullptr;
+    }
+    if (future.isRunning()) {
+        future.cancel();
+        watcher.cancel();
+        future.waitForFinished();
+    }
+}
+
 SaveSetsPage::SaveSetsPage(QWidget *parent) : OracleWizardPage(parent)
 {
     pathLabel = new QLabel(this);
@@ -724,7 +1233,7 @@ SaveSetsPage::SaveSetsPage(QWidget *parent) : OracleWizardPage(parent)
 
 bool SaveSetsPage::isComplete() const
 {
-    return !importActive;
+    return !importActive && importReady;
 }
 
 void SaveSetsPage::cleanupPage()
@@ -737,8 +1246,11 @@ void SaveSetsPage::cleanupPage()
 
 void SaveSetsPage::initializePage()
 {
+    importReady = false;
     retranslateUi();
     if (wizard()->downloadedPlainXml) {
+        importReady = true;
+        emit completeChanged();
         messageLog->hide();
         progressBar->hide();
         if (wizard()->backgroundMode) {
@@ -759,11 +1271,18 @@ void SaveSetsPage::initializePage()
             Qt::UniqueConnection);
     connect(&importWatcher, &QFutureWatcher<int>::finished, this, &SaveSetsPage::importFinished, Qt::UniqueConnection);
 
+    // The Tags page has already loaded (or deliberately skipped) the tag data.
+    // The wizard keeps it alive past this page; the importer only borrows it.
+    wizard()->importer->setTagDatabase(wizard()->tagDatabase);
+
     wizard()->disableButtons();
     importActive = true;
     emit completeChanged();
 
     const QPointer<OracleImporter> importer = wizard()->importer;
+    if (auto *activeImporter = importer.data()) {
+        activeImporter->prepareImport();
+    }
     importFuture = QtConcurrent::run([importer] { return importer ? importer->startImport() : 0; });
     importWatcher.setFuture(importFuture);
 }
@@ -795,22 +1314,28 @@ void SaveSetsPage::importFinished()
 
     const int setsImported = importWatcher.result();
     const QPointer<OracleImporter> importer = wizard()->importer;
+    importReady = importer && importer->hasSuccessfulImport() && setsImported == totalSets;
+    const QString error = importer ? importer->getImportError() : tr("The card database importer is unavailable.");
     if (importer) {
         importer->releaseSetData();
     }
+    wizard()->button(QWizard::NextButton)->setEnabled(importReady);
+    emit completeChanged();
 
-    if (wizard()->backgroundMode) {
-        if (setsImported == 0) {
-            qWarning() << tr("No set has been imported.");
+    if (!importReady) {
+        const QString message = error.isEmpty() ? tr("No set has been imported.") : error;
+        if (wizard()->backgroundMode) {
+            qWarning() << message;
+            wizard()->reject();
+        } else {
+            QMessageBox::critical(this, tr("Error"), message);
         }
-        emit readyToContinue();
         return;
     }
 
     progressBar->setValue(progressBar->maximum());
-
-    if (setsImported == 0) {
-        QMessageBox::critical(this, tr("Error"), tr("No set has been imported."));
+    if (wizard()->backgroundMode) {
+        emit readyToContinue();
     }
 }
 
@@ -861,6 +1386,18 @@ void SaveSetsPage::updateTotalProgress(int cardsImported, int setIndex, const QS
 
 bool SaveSetsPage::validatePage()
 {
+    if (!isComplete()) {
+        return false;
+    }
+    const auto failSave = [this](const QString &message) {
+        qWarning() << message;
+        if (wizard()->backgroundMode) {
+            wizard()->reject();
+        } else {
+            QMessageBox::critical(this, tr("Error"), message);
+        }
+        return false;
+    };
     QString defaultPath = SettingsCache::instance().getCardDatabasePath();
     QString windowName = tr("Save card database");
     QString fileType = tr("XML; card database (*.xml)");
@@ -879,24 +1416,21 @@ bool SaveSetsPage::validatePage()
     QFileInfo fi(fileName);
     QDir fileDir(fi.path());
     if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
-        return false;
+        return failSave(tr("The database directory could not be created: %1").arg(fileDir.absolutePath()));
     }
 
     if (wizard()->downloadedPlainXml) {
-        QFile file(fileName);
-        if (!file.open(QIODevice::WriteOnly)) {
-            qDebug() << "File write (w) failed for" << fileName;
-            return false;
-        }
-        if (file.write(wizard()->xmlData) < 1) {
-            qDebug() << "File write (w) failed for" << fileName;
-            return false;
+        QString error;
+        if (!OracleDatabase::saveXml(fileName, wizard()->xmlData, &error)) {
+            return failSave(tr("The file could not be saved to %1: %2").arg(fileName, error));
         }
         wizard()->xmlData.clear();
     } else if (!wizard()->importer->saveToFile(fileName, wizard()->getCardSourceUrl(),
                                                wizard()->getCardSourceVersion())) {
-        QMessageBox::critical(this, tr("Error"), tr("The file could not be saved to %1").arg(fileName));
-        return false;
+        // The importer refuses to write a database whose import did not finish, and
+        // reports the reason there; do not dress an import failure up as a disk failure.
+        const QString importError = wizard()->importer->getImportError();
+        return failSave(importError.isEmpty() ? tr("The file could not be saved to %1").arg(fileName) : importError);
     }
 
     wizard()->markDatabaseSaved();

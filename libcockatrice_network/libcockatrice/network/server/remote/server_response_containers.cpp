@@ -23,7 +23,7 @@ GameEventStorageItem::~GameEventStorageItem()
     delete event;
 }
 
-GameEventStorage::GameEventStorage() : gameEventContext(0), privatePlayerId(0)
+GameEventStorage::GameEventStorage() : gameEventContext(nullptr), privatePlayerId(0)
 {
 }
 
@@ -91,7 +91,7 @@ void GameEventStorage::sendToGame(Server_Game *game)
     game->sendGameEventContainer(contOthers, GameEventStorageItem::SendToOthers, id);
 }
 
-ResponseContainer::ResponseContainer(int _cmdId) : cmdId(_cmdId), responseExtension(0)
+ResponseContainer::ResponseContainer(int _cmdId) : cmdId(_cmdId), responseExtension(nullptr)
 {
 }
 

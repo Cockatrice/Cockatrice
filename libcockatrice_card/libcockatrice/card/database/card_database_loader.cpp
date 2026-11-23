@@ -83,7 +83,7 @@ LoadStatus CardDatabaseLoader::loadCardDatabase(const QString &path, CardDatabas
     auto startTime = QTime::currentTime();
     LoadStatus tempLoadStatus = NotLoaded;
     if (!path.isEmpty()) {
-        QMutexLocker locker(loadFromFileMutex);
+        QMutexLocker locker(&loadFromFileMutex);
         tempLoadStatus = loadFromFile(path, data);
     }
 
@@ -102,7 +102,7 @@ LoadStatus CardDatabaseLoader::loadCardDatabases(bool ignoreCache)
 
 LoadStatus CardDatabaseLoader::doLoadCardDatabases(bool ignoreCache)
 {
-    QMutexLocker locker(reloadDatabaseMutex);
+    QMutexLocker locker(&reloadDatabaseMutex);
 
     if (!database) {
         qCWarning(CardDatabaseLoadingLog) << "Loader has no database pointer";

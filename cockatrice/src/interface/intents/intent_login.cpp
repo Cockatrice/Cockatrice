@@ -27,9 +27,9 @@ void IntentGetLoginCredentials::onPreconditionSatisfied()
     ServersSettings &servers = SettingsCache::instance().servers();
     const int index = servers.findServerIndex(context->hostname, context->port);
 
-    if (index >= 0) {
-        context->username = servers.getValue(QString("username%1").arg(index), "server", "server_details").toString();
-        context->password = servers.getValue(QString("password%1").arg(index), "server", "server_details").toString();
+    if (const auto server = servers.getServer(index)) {
+        context->username = server->username;
+        context->password = server->password;
         emitFinished();
     } else {
         emitFailed(tr("No saved credentials for this server"));
@@ -69,9 +69,8 @@ void IntentGetLoginCredentials::onPreconditionNotSatisfied()
         // it with the raw hostname when addNewServer updates the entry in place.
         QString saveName = context->hostname;
         const int existingIndex = servers.findServerIndex(context->hostname, context->port);
-        if (existingIndex >= 0) {
-            saveName =
-                servers.getValue(QString("saveName%1").arg(existingIndex), "server", "server_details").toString();
+        if (const auto existing = servers.getServer(existingIndex)) {
+            saveName = existing->saveName;
             if (saveName.isEmpty()) {
                 saveName = context->hostname;
             }

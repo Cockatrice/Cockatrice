@@ -11,6 +11,7 @@
 #include "libcockatrice/deck_list/tree/abstract_deck_list_node.h"
 #include "libcockatrice/deck_list/tree/deck_list_card_node.h"
 
+#include <QHash>
 #include <QModelIndexList>
 #include <QSet>
 #include <QVariant>
@@ -134,6 +135,13 @@ void DeckListModel::rebuildTree()
 
 int DeckListModel::rowCount(const QModelIndex &parent) const
 {
+    // Only column 0 carries children. Column 1 and later indexes are siblings
+    // used by views for the remaining cells of a row, and a model that hangs
+    // children off them breaks QAbstractItemModelTester and proxy models.
+    if (parent.isValid() && parent.column() != 0) {
+        return 0;
+    }
+
     // debugIndexInfo("rowCount", parent);
     auto *node = getNode<InnerDecklistNode *>(parent);
     if (node) {
@@ -282,7 +290,7 @@ QVariant DeckListModel::headerData(const int section, const Qt::Orientation orie
 QModelIndex DeckListModel::index(int row, int column, const QModelIndex &parent) const
 {
     // debugIndexInfo("index", parent);
-    if (!hasIndex(row, column, parent)) {
+    if ((parent.isValid() && parent.column() != 0) || !hasIndex(row, column, parent)) {
         return {};
     }
 
@@ -320,7 +328,7 @@ void DeckListModel::emitBackgroundUpdates(const QModelIndex &parent)
 
     QModelIndex topLeft = index(0, 0, parent);
     QModelIndex bottomRight = index(rows - 1, columnCount() - 1, parent);
-    emit dataChanged(topLeft, bottomRight, {Qt::BackgroundRole});
+    emit dataChanged(topLeft, bottomRight, {Qt::BackgroundRole, DeckRoles::IsLegalRole});
 
     for (int r = 0; r < rows; ++r) {
         QModelIndex child = index(r, 0, parent);
@@ -348,7 +356,6 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, con
     switch (index.column()) {
         case DeckListModelColumns::CARD_AMOUNT:
             node->setNumber(value.toInt());
-            refreshCardFormatLegalities();
             break;
         case DeckListModelColumns::CARD_NAME:
             node->setName(value.toString());
@@ -366,6 +373,7 @@ bool DeckListModel::setData(const QModelIndex &index, const QVariant &value, con
             return false;
     }
 
+    refreshCardFormatLegalities();
     emitRecursiveUpdates(index);
     deckList->refreshDeckHash();
     emit deckHashChanged();
@@ -408,6 +416,7 @@ bool DeckListModel::removeRows(int row, int count, const QModelIndex &parent)
         emitRecursiveUpdates(parent);
     }
 
+    refreshCardFormatLegalities();
     deckList->refreshDeckHash();
     emit deckHashChanged();
 
@@ -592,9 +601,11 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
         // Determine the correct index
         int insertRow = findSortedInsertRow(cardParent, cardInfo);
         int deckInsertRow = customZoneNeedsAppend ? -1 : insertRow;
+        PrintingRef printing{.setCode = cardSetName,
+                             .collectorNumber = printingInfo.getProperty("num"),
+                             .providerId = printingInfo.getProperty("uuid")};
 
-        auto *decklistCard = deckList->addCard(cardInfo->getName(), zoneName, deckInsertRow, cardSetName,
-                                               printingInfo.getProperty("num"), printingInfo.getProperty("uuid"));
+        auto *decklistCard = deckList->addCard(cardInfo->getName(), zoneName, deckInsertRow, printing);
 
         beginInsertRows(parentIndex, insertRow, insertRow);
         cardNode = new DecklistModelCardNode(decklistCard, cardParent, insertRow);
@@ -739,7 +750,8 @@ QModelIndex DeckListModel::nodeToIndex(AbstractDecklistNode *node) const
 void DeckListModel::sortShadowTree(InnerDecklistNode *node, Qt::SortOrder order)
 {
     // The mapping is not needed: fresh shadow nodes have no persistent indices yet.
-    (void)DeckListModelCustomZones::sortWithCustomZonesLast(root, node, order);
+    (void)DeckListModelCustomZones::sortWithCustomZonesLast(
+        root, node, order, activeGroupCriteria == DeckListModelGroupCriteria::MANA_COST && lastKnownColumn != 0);
 
     for (int i = node->size() - 1; i >= 0; --i) {
         if (auto *subNode = dynamic_cast<InnerDecklistNode *>(node->at(i))) {
@@ -752,7 +764,8 @@ void DeckListModel::sortHelper(InnerDecklistNode *node, Qt::SortOrder order)
 {
     // Sort children (custom zones always sorted after groups within a board) and
     // use the movement mapping to update the list of persistent indices.
-    const auto mapping = DeckListModelCustomZones::sortWithCustomZonesLast(root, node, order);
+    const auto mapping = DeckListModelCustomZones::sortWithCustomZonesLast(
+        root, node, order, activeGroupCriteria == DeckListModelGroupCriteria::MANA_COST && lastKnownColumn != 0);
 
     QModelIndexList from, to;
     int columns = columnCount();
@@ -809,7 +822,6 @@ void DeckListModel::setActiveFormat(const QString &_format)
 {
     deckList->setGameFormat(_format);
     refreshCardFormatLegalities();
-    emitBackgroundUpdates(QModelIndex()); // start from root
 }
 
 void DeckListModel::cleanList()
@@ -885,17 +897,17 @@ QStringList DeckListModel::getCustomZoneNames(const QString &boardZoneName) cons
     return zoneNames;
 }
 
-static int maxAllowedForLegality(const FormatRules &format, const QString &legality)
+static std::optional<int> maxAllowedForLegality(const FormatRules &format, const QString &legality)
 {
     for (const AllowedCount &c : format.allowedCounts) {
         if (c.label == legality) {
             return c.max;
         }
     }
-    return -1; // unknown legality → treat as illegal
+    return std::nullopt; // Unknown legality is distinct from an unlimited count.
 }
 
-static bool isCardQuantityLegalForFormat(const QString &format, const CardInfo &cardInfo, int quantity)
+static bool isCardQuantityLegalForFormat(const QString &format, const CardInfo &cardInfo, qint64 quantity)
 {
     if (format.isEmpty()) {
         return true;
@@ -908,9 +920,9 @@ static bool isCardQuantityLegalForFormat(const QString &format, const CardInfo &
         return cardInfo.isLegalInFormat(format);
     }
 
-    // Exceptions always win
-    if (cardHasAnyException(cardInfo, *formatRules)) {
-        return true;
+    // Explicit format exceptions retain precedence, including finite limits.
+    if (const auto limit = cardCopyLimitException(cardInfo, *formatRules)) {
+        return *limit == -1 || quantity <= *limit;
     }
 
     // check legality prop
@@ -919,42 +931,37 @@ static bool isCardQuantityLegalForFormat(const QString &format, const CardInfo &
         return false;
     }
 
-    int maxAllowed = maxAllowedForLegality(*formatRules, legality);
-
-    if (maxAllowed == -1) {
-        return false;
-    }
-
-    if (maxAllowed < 0) { // unlimited
-        return true;
-    }
-
-    return quantity <= maxAllowed;
-}
-
-static bool isCardNodeLegalForFormat(const QString &format, const InnerDecklistNode *zone, const DecklistCardNode *card)
-{
-    // Don't check legality for tokens
-    if (zone->getName() == DECK_ZONE_TOKENS) {
-        return true;
-    }
-
-    // unknown cards are not legal
-    ExactCard exactCard = CardDatabaseManager::query()->getCard(card->toCardRef());
-    if (!exactCard) {
-        return false;
-    }
-
-    // actual check
-    return isCardQuantityLegalForFormat(format, exactCard.getInfo(), card->getNumber());
+    const auto maxAllowed = maxAllowedForLegality(*formatRules, legality);
+    return maxAllowed && (*maxAllowed == -1 || (*maxAllowed >= 0 && quantity <= *maxAllowed));
 }
 
 void DeckListModel::refreshCardFormatLegalities()
 {
-    QString format = deckList->getGameFormat();
-
-    deckList->forEachCard([&format](const InnerDecklistNode *zone, DecklistCardNode *card) {
-        bool legal = isCardNodeLegalForFormat(format, zone, card);
+    const QString format = deckList->getGameFormat();
+    QHash<QString, qint64> quantities;
+    QHash<const DecklistCardNode *, CardInfoPtr> cardInfos;
+    deckList->forEachCard([&](const InnerDecklistNode *zone, DecklistCardNode *card) {
+        if (zone->getName() == DECK_ZONE_TOKENS) {
+            return;
+        }
+        const ExactCard exactCard = CardDatabaseManager::query()->getCard(card->toCardRef());
+        if (exactCard) {
+            const auto info = exactCard.getCardPtr();
+            cardInfos.insert(card, info);
+            // The maybeboard is not part of the submitted deck. Count the other
+            // non-token zones together, including printings and nested custom zones.
+            if (zone->getName() != DECK_ZONE_MAYBEBOARD) {
+                quantities[info->getName()] += std::max(0, card->getNumber());
+            }
+        }
+    });
+    deckList->forEachCard([&](const InnerDecklistNode *zone, DecklistCardNode *card) {
+        const auto info = cardInfos.value(card);
+        const qint64 quantity =
+            info && zone->getName() != DECK_ZONE_MAYBEBOARD ? quantities.value(info->getName()) : card->getNumber();
+        const bool legal =
+            zone->getName() == DECK_ZONE_TOKENS || (info && isCardQuantityLegalForFormat(format, *info, quantity));
         card->setFormatLegality(legal);
     });
+    emitBackgroundUpdates(QModelIndex());
 }

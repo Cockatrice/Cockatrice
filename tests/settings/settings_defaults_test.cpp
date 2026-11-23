@@ -181,6 +181,19 @@ TEST_F(SettingsDefaultsTest, Updates_UpdateReleaseChannelIndex_Default)
     ASSERT_EQ(s.getUpdateReleaseChannelIndex(), 0);
 }
 
+TEST_F(SettingsDefaultsTest, Updates_LastSeenReleaseNotes_Default)
+{
+    UpdatesSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getLastSeenReleaseNotes(), QString());
+}
+
+TEST_F(SettingsDefaultsTest, Updates_LastSeenReleaseNotes_SetAndGet)
+{
+    UpdatesSettings s(settingsPath, nullptr);
+    s.setLastSeenReleaseNotes(QStringLiteral("2.10.2"));
+    ASSERT_EQ(s.getLastSeenReleaseNotes(), QStringLiteral("2.10.2"));
+}
+
 // --- SoundSettings ---
 
 TEST_F(SettingsDefaultsTest, Sound_SoundEnabled_Default)
@@ -461,19 +474,6 @@ TEST_F(SettingsDefaultsTest, Appearance_StyleUserList_Default)
     ASSERT_EQ(s.getStyleUserList(), true);
 }
 
-TEST_F(SettingsDefaultsTest, Appearance_MaxFontSize_Default)
-{
-    AppearanceSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getMaxFontSize(), 12);
-}
-
-TEST_F(SettingsDefaultsTest, Appearance_MaxFontSize_SetAndGet)
-{
-    AppearanceSettings s(settingsPath, nullptr);
-    s.setMaxFontSize(14);
-    ASSERT_EQ(s.getMaxFontSize(), 14);
-}
-
 TEST_F(SettingsDefaultsTest, Appearance_HomeTabBackgroundSource_Default)
 {
     AppearanceSettings s(settingsPath, nullptr);
@@ -681,6 +681,75 @@ TEST_F(SettingsDefaultsTest, CardsDisplay_ArrowDrawAnimation_Default)
 {
     CardsDisplaySettings s(settingsPath, nullptr);
     ASSERT_EQ(s.getArrowDrawAnimation(), true);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverPanelTrigger_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHoverPanelTrigger(), CardsDisplaySettings::HoverPanelTriggerHover);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverPanelTrigger_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setHoverPanelTrigger(2);
+    ASSERT_EQ(s.getHoverPanelTrigger(), 2);
+    s.setHoverPanelTrigger(0);
+    ASSERT_EQ(s.getHoverPanelTrigger(), 0);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverZoomTrigger_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHoverZoomTrigger(), CardsDisplaySettings::HoverPanelTriggerHover);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverZoomTrigger_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setHoverZoomTrigger(1);
+    ASSERT_EQ(s.getHoverZoomTrigger(), 1);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverPanelDoubleConfirm_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHoverPanelDoubleConfirm(), false);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverPanelDoubleConfirm_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setHoverPanelDoubleConfirm(true);
+    ASSERT_EQ(s.getHoverPanelDoubleConfirm(), true);
+    s.setHoverPanelDoubleConfirm(false);
+    ASSERT_EQ(s.getHoverPanelDoubleConfirm(), false);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverZoomDelayMs_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHoverZoomDelayMs(), 400);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverZoomDelayMs_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setHoverZoomDelayMs(750);
+    ASSERT_EQ(s.getHoverZoomDelayMs(), 750);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverPanelDelayMs_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHoverPanelDelayMs(), 200);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_HoverPanelDelayMs_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setHoverPanelDelayMs(0);
+    ASSERT_EQ(s.getHoverPanelDelayMs(), 0);
 }
 
 TEST_F(SettingsDefaultsTest, CardsDisplay_CardLang_Default)

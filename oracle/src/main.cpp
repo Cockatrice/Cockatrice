@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     isSpoilersOnly = parser.isSet(spoilersOnlyOption);
     isBackgrounded = parser.isSet(backgroundOption);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     translationPath = qApp->applicationDirPath() + "/../Resources/translations";
 #elif defined(Q_OS_WIN)
     translationPath = qApp->applicationDirPath() + "/translations";

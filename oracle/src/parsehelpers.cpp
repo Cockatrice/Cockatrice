@@ -71,3 +71,52 @@ bool parseCipt(const QString &name, const QString &text)
 
     return ciptPattern.match(text).hasMatch();
 }
+
+std::optional<int> parseDeckCopyLimit(const QString &name, const QString &text)
+{
+    // Require a complete, standalone allowance. Other effects that mention a
+    // number of cards or a different card name must not change deck construction.
+    static const QRegularExpression rule(
+        R"(^A deck can have up to ([a-z]+(?:[ -][a-z]+)*|[0-9]+) cards? named ([^\r\n]+)\.\r?$)",
+        QRegularExpression::MultilineOption);
+    static const QStringList smallNumbers = {
+        "zero", "one",    "two",    "three",    "four",     "five",    "six",     "seven",     "eight",    "nine",
+        "ten",  "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"};
+    static const QStringList tens = {"twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"};
+    auto normalizedName = [](QString cardName) {
+        return cardName.replace("Æ", "AE").replace("’", "'").normalized(QString::NormalizationForm_C);
+    };
+    const QString expectedName = normalizedName(name);
+    if (expectedName.isEmpty()) {
+        return std::nullopt;
+    }
+    std::optional<int> limit;
+    auto matches = rule.globalMatch(text);
+    while (matches.hasNext()) {
+        const auto match = matches.next();
+        if (normalizedName(match.captured(2)) != expectedName) {
+            continue;
+        }
+        const QString count = match.captured(1);
+        bool numeric = false;
+        int value = count.toInt(&numeric);
+        if (!numeric) {
+            // English words through ninety-nine; larger counts remain supported
+            // as decimal numerals. Unknown wording is deliberately not guessed.
+            const QStringList words = QString(count).replace('-', ' ').split(' ');
+            value = words.size() == 1 ? smallNumbers.indexOf(words.first()) : -1;
+            const int ten = tens.indexOf(words.first());
+            if (ten >= 0 && words.size() <= 2) {
+                const int unit = words.size() == 1 ? 0 : smallNumbers.indexOf(words.last());
+                if (unit >= 0 && unit < 10 && (words.size() == 1 || unit > 0)) {
+                    value = (ten + 2) * 10 + unit;
+                }
+            }
+        }
+        if (value <= 0 || (limit && *limit != value)) {
+            return std::nullopt;
+        }
+        limit = value;
+    }
+    return limit;
+}

@@ -8,9 +8,13 @@
 #include <gtest/gtest.h>
 #include <libcockatrice/network/server/remote/game/server_card.h>
 #include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
+#include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/card_ref.h>
 #include <libcockatrice/utility/counter_limits.h>
 #include <string>
+
+// Referenced by other translation units in the server_remote library.
+RNG_Abstract *rng = nullptr;
 
 TEST(ServerCardCounter, IncrementNewCounter)
 {

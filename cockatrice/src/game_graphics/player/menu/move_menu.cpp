@@ -2,15 +2,15 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_logic.h"
 #include "../../game_scene.h"
-#include "../card_menu_action_type.h"
 #include "../player_graphics_item.h"
 
 #include <QAction>
+#include <libcockatrice/game/player/card_menu_action_type.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_logic.h>
 
-MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
+MoveMenu::MoveMenu(PlayerGraphicsItem *player, QWidget *parent) : QMenu(tr("Move to"), parent)
 {
     aMoveToTopLibrary = new QAction(this);
     aMoveToTopLibrary->setData(cmMoveToTopLibrary);
@@ -30,7 +30,7 @@ MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
 
     auto invoke = [player](CardMenuActionType type) {
         return [type, player]() {
-            player->getLogic()->getPlayerActions()->cardMenuAction(player->getGameScene()->selectedCards(), type);
+            player->getLogic()->getPlayerActions()->cardMenuAction(player->getGameScene()->selectedCardStates(), type);
         };
     };
 

@@ -13,6 +13,11 @@ class PrintingSelectorPlaceholderWidget : public QWidget
 
 public:
     explicit PrintingSelectorPlaceholderWidget(QWidget *parent = nullptr);
+    void setText(const QString &text);
+    void resetText();
+
+private slots:
+    void applyInterfaceDefaultFont();
 
 private:
     QVBoxLayout *mainLayout;

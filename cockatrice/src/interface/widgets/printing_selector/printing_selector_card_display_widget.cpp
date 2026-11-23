@@ -5,6 +5,7 @@
 #include "libcockatrice/card/set/card_set.h"
 #include "printing_selector.h"
 #include "printing_selector_card_overlay_widget.h"
+#include "printing_selector_host.h"
 #include "set_name_and_collectors_number_display_widget.h"
 
 #include <QMap>
@@ -14,8 +15,6 @@
 #include <QVBoxLayout>
 #include <qnamespace.h>
 
-class AbstractTabDeckEditor;
-class DeckStateManager;
 class QSlider;
 
 /**
@@ -28,18 +27,20 @@ class QSlider;
  * display.
  *
  * @param parent The parent widget for this display.
- * @param deckEditor The TabDeckEditor instance for deck management.
- * @param deckStateManager The DeckStateManager instance providing deck data.
+ * @param host The host supplying deck state and routing card activations.
  * @param cardSizeSlider The slider controlling the size of the displayed card.
  * @param rootCard The root card object, representing the card to be displayed.
  */
 PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *parent,
-                                                                     AbstractTabDeckEditor *deckEditor,
-                                                                     DeckStateManager *deckStateManager,
+                                                                     PrintingSelectorHost *host,
                                                                      QSlider *cardSizeSlider,
                                                                      const ExactCard &rootCard)
-    : QWidget(parent), rootCard(rootCard)
+    : QWidget(parent), rootCard(rootCard), selectionOnly(host->isSelectionOnly())
 {
+    if (selectionOnly) {
+        // A plain QWidget only paints a stylesheet border with a styled background.
+        setAttribute(Qt::WA_StyledBackground, true);
+    }
     layout = new QVBoxLayout(this);
     layout->setContentsMargins(5, 5, 5, 5);
     layout->setSpacing(3);
@@ -47,9 +48,11 @@ PrintingSelectorCardDisplayWidget::PrintingSelectorCardDisplayWidget(QWidget *pa
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     // Create the overlay widget for the card display
-    overlayWidget = new PrintingSelectorCardOverlayWidget(this, deckEditor, deckStateManager, cardSizeSlider, rootCard);
+    overlayWidget = new PrintingSelectorCardOverlayWidget(this, host, cardSizeSlider, rootCard);
     connect(overlayWidget, &PrintingSelectorCardOverlayWidget::cardPreferenceChanged, this,
             [this]() { emit cardPreferenceChanged(); });
+    connect(overlayWidget, &PrintingSelectorCardOverlayWidget::printingSelected, this,
+            [this](const ExactCard &card) { emit printingSelected(card); });
 
     CardSetPtr set = rootCard.getPrinting().getSet();
 
@@ -88,4 +91,20 @@ void PrintingSelectorCardDisplayWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
     clampSetNameToPicture();
+}
+
+void PrintingSelectorCardDisplayWidget::setSelected(bool selected)
+{
+    if (!selectionOnly) {
+        return;
+    }
+    // Keep an invisible border in both states so selection does not reflow the grid.
+    const QString border = selected ? QStringLiteral("palette(highlight)") : QStringLiteral("transparent");
+    setStyleSheet(
+        QStringLiteral("PrintingSelectorCardDisplayWidget { border: 2px solid %1; border-radius: 4px; }").arg(border));
+}
+
+QString PrintingSelectorCardDisplayWidget::getProviderId() const
+{
+    return rootCard.getPrinting().getUuid();
 }

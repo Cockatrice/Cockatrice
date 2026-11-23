@@ -38,7 +38,7 @@
 
 Server_Card::Server_Card(const CardRef &cardRef, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone)
     : zone(_zone), id(_id), coord_x(_coord_x), coord_y(_coord_y), cardRef(cardRef), tapped(false), attacking(false),
-      facedown(false), destroyOnZoneChange(false), doesntUntap(false), parentCard(0), stashedCard(nullptr)
+      facedown(false), destroyOnZoneChange(false), doesntUntap(false), parentCard(nullptr), stashedCard(nullptr)
 {
 }
 
@@ -46,7 +46,7 @@ Server_Card::~Server_Card()
 {
     // setParentCard(0) leads to the item being removed from our list, so we can't iterate properly
     while (!attachedCards.isEmpty()) {
-        attachedCards.first()->setParentCard(0);
+        attachedCards.first()->setParentCard(nullptr);
     }
 
     if (parentCard) {

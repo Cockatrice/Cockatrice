@@ -3,6 +3,7 @@
 
 #include <QNetworkReply>
 #include <QObject>
+#include <QPointer>
 #include <QVariantMap>
 #include <qtmetamacros.h>
 
@@ -14,6 +15,7 @@ class HandleCommanderBrackets : public QObject
 
 public:
     explicit HandleCommanderBrackets(QObject *parent = nullptr);
+    ~HandleCommanderBrackets() override;
 
     void downloadBracketDefinitions();
 
@@ -28,7 +30,7 @@ private:
     void updateBracketDefinitions(const QVariantMap &jsonMap);
 
     QNetworkAccessManager *nam;
-    QNetworkReply *reply;
+    QPointer<QNetworkReply> reply;
 };
 
 #endif // COCKATRICE_HANDLE_COMMANDER_BRACKETS_H

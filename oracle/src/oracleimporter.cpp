@@ -6,6 +6,7 @@
 #include "libcockatrice/card/relation/card_relation_type.h"
 #include "libcockatrice/interfaces/noop_card_set_priority_controller.h"
 #include "parsehelpers.h"
+#include "tag_database.h"
 
 #include <QChar>
 #include <QDebug>
@@ -100,6 +101,10 @@ static CardSet::Priority getSetPriority(const QString &setType, const QString &s
 
 bool OracleImporter::readSetsFromByteArray(QByteArray data)
 {
+    importSuccessful = false;
+    importError.clear();
+    allSets.clear();
+    rawSetsData.clear();
     const RawJson::ScanProgressCallback progress =
         progressReporting
             ? [this](
@@ -209,7 +214,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
                                     const QString &text,
                                     bool isToken,
                                     QHash<QString, QString> properties,
-                                    const QList<CardRelation *> &relatedCards,
+                                    const QList<CardRelation> &relatedCards,
                                     const PrintingInfo &printingInfo)
 {
     // Workaround for card name weirdness
@@ -295,6 +300,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
         qDebug() << "warning: an empty card was added to set" << printingInfo.getSet()->getShortName();
     }
     cards.insert(name, newCard);
+    magicFormatsDirty = true;
 
     return newCard;
 }
@@ -517,6 +523,31 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
             properties.insert("coloridentity", colorIdentity);
         }
 
+        // Card tags: the source's own `tags` array is used when present (MTGJson
+        // may ship one eventually), then the configured tag database is joined in
+        // while the card's identifiers are still available. Stored space-separated
+        // so `tags:` can match each slug as a discrete token; slugs never contain
+        // whitespace.
+        QStringList tags;
+        for (const QJsonValue &tag : card.value("tags").toArray()) {
+            const QString tagSlug = tag.toString().trimmed().toLower();
+            if (!tagSlug.isEmpty() && !tags.contains(tagSlug)) {
+                tags.append(tagSlug);
+            }
+        }
+        if (tagDatabase) {
+            const QString oracleId = getJsonString(identifiers, "scryfallOracleId");
+            for (const QString &tagSlug : tagDatabase->tagsForCard(oracleId, name)) {
+                if (!tags.contains(tagSlug)) {
+                    tags.append(tagSlug);
+                }
+            }
+        }
+        if (!tags.isEmpty()) {
+            tags.sort();
+            properties.insert("tags", tags.join(" "));
+        }
+
         const auto &mainCardType = getMainCardType(card.value("types").toVariant().toStringList());
         if (mainCardType.isEmpty()) {
             qDebug() << "warning: no mainCardType for card:" << name;
@@ -559,7 +590,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
             collectForeignData(normalizeCardName(name), currentSet, card, false);
         } else {
             // relations
-            QList<CardRelation *> relatedCards;
+            QList<CardRelation> relatedCards;
 
             // add other face for split cards as card relation
             if (!getJsonString(card, "side").isEmpty()) {
@@ -574,12 +605,13 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
                     static const QRegularExpression meldNameRegex{"then meld them into ([^\\.]*)"};
                     QString additionalName = meldNameRegex.match(text).captured(1);
                     if (!additionalName.isNull()) {
-                        relatedCards.append(new CardRelation(additionalName, CardRelationType::TransformInto));
+                        relatedCards.append({.name = additionalName, .attachType = CardRelationType::TransformInto});
                     }
                 } else {
                     for (const QString &additionalName : name.split(" // ")) {
                         if (additionalName != faceName) {
-                            relatedCards.append(new CardRelation(additionalName, CardRelationType::TransformInto));
+                            relatedCards.append(
+                                {.name = additionalName, .attachType = CardRelationType::TransformInto});
                         }
                     }
                 }
@@ -593,8 +625,13 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
                 QJsonArray spellbook = givenRelated.value("spellbook").toArray();
                 if (!spellbook.isEmpty()) {
                     for (const QJsonValue &spbkVal : spellbook) {
-                        relatedCards.append(new CardRelation(spbkVal.toString(), CardRelationType::DoesNotAttach, false,
-                                                             false, 1, true));
+                        CardRelation relation{.name = spbkVal.toString(),
+                                              .attachType = CardRelationType::DoesNotAttach,
+                                              .isCreateAllExclusion = false,
+                                              .isVariableCount = false,
+                                              .defaultCount = 1,
+                                              .isPersistent = true};
+                        relatedCards.append(relation);
                     }
                 }
             }
@@ -663,6 +700,14 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
                             if (newPriority >= 0 && (currentPriority < 0 || newPriority < currentPriority)) {
                                 properties.insert(prop, thisCardPropertyValue);
                             }
+                        } else if (prop == "tags") {
+                            // Tags are oracle-level: union both faces instead of
+                            // concatenating them with the split-card separator.
+                            QStringList merged =
+                                (originalPropertyValue + " " + thisCardPropertyValue).split(" ", Qt::SkipEmptyParts);
+                            merged.removeDuplicates();
+                            merged.sort();
+                            properties.insert(prop, merged.join(" "));
                         } else {
                             properties.insert(prop,
                                               originalPropertyValue + splitCardPropSeparator + thisCardPropertyValue);
@@ -756,15 +801,55 @@ static FormatRulesNameMap buildDefaultMagicFormats()
 
 const FormatRulesNameMap &OracleImporter::createDefaultMagicFormats()
 {
-    static const FormatRulesNameMap cached = buildDefaultMagicFormats();
-    return cached;
+    static const FormatRulesNameMap defaults = buildDefaultMagicFormats();
+    if (!magicFormatsDirty) {
+        return magicFormats;
+    }
+
+    // Sort by name so saved rules are independent of QHash iteration order.
+    QMap<QString, int> finiteLimits;
+    for (const auto &card : cards) {
+        if (const auto limit = parseDeckCopyLimit(card->getName(), card->getText())) {
+            finiteLimits.insert(card->getName(), *limit);
+        }
+    }
+    magicFormats = defaults;
+    if (!finiteLimits.isEmpty()) {
+        for (auto it = magicFormats.begin(); it != magicFormats.end(); ++it) {
+            // Copy the value before appending: defaults and other importer
+            // instances retain their existing shared FormatRules objects.
+            FormatRulesPtr format(new FormatRules(*it.value()));
+            for (auto limit = finiteLimits.cbegin(); limit != finiteLimits.cend(); ++limit) {
+                ExceptionRule exception;
+                exception.conditions.append({"name", "equals", limit.key()});
+                // A card's copy allowance does not make it legal in a format
+                // where it is banned, restricted or outside the card pool.
+                exception.conditions.append({"format-" + it.key(), "equals", "legal"});
+                exception.maxCopies = limit.value();
+                format->exceptions.append(exception);
+            }
+            it.value() = format;
+        }
+    }
+    magicFormatsDirty = false;
+    return magicFormats;
 }
 
 int OracleImporter::startImport()
 {
     static ICardSetPriorityController *noOpController = new NoopCardSetPriorityController();
 
-    importCancelled.storeRelease(0);
+    importSuccessful = false;
+    importError.clear();
+    sets.clear();
+    cards.clear();
+    magicFormats.clear();
+    magicFormatsDirty = true;
+    localizedEntries.clear();
+    splitLocalizedTexts.clear();
+    if (allSets.isEmpty()) {
+        return failImport(tr("No set has been selected for import."));
+    }
 
     // Pre-allocate the cards hash to avoid rehashing during import. Keys are
     // distinct card names while raw ranges only count printings (AllPrintings
@@ -786,9 +871,7 @@ int OracleImporter::startImport()
 
     for (const SetToDownload &curSetToParse : allSets) {
         if (importCancelled.loadAcquire()) {
-            // The wizard was closed mid-import: stop at the next set boundary so
-            // the caller can wait for this future without processing every set.
-            break;
+            return failImport(tr("The card database import was cancelled."));
         }
 
         CardSetPtr newSet = CardSet::newInstance(noOpController, curSetToParse.getShortName(),
@@ -798,30 +881,20 @@ int OracleImporter::startImport()
         // parse only this set's slice of the raw document so the whole JSON tree is
         // never kept in memory at once
         const RawJson::SetDataRange &rawRange = curSetToParse.getRawRange();
-        const qsizetype rangeEnd = rawRange.start + rawRange.length;
-        if (rawRange.start < 0 || rawRange.length <= 0 || rangeEnd > rawSetsData.size()) {
-            // rawSetsData is cleared by releaseSetData() while SetToDownload copies
-            // taken from getSets() keep their ranges, and nothing else enforces the
-            // pairing — so never index past the buffer on stale/mismatched ranges.
-            qWarning() << "error: out-of-bounds raw range for set" << curSetToParse.getShortName() << "skipping";
-            ++setIndex;
-            emit setIndexChanged(0, setIndex, curSetToParse.getLongName());
-            continue;
+        if (rawRange.start < 0 || rawRange.length <= 0 || rawRange.start > rawSetsData.size() ||
+            rawRange.length > rawSetsData.size() - rawRange.start) {
+            return failImport(tr("The source data for set %1 is unavailable. Load the sets file again.")
+                                  .arg(curSetToParse.getShortName()));
         }
-        // sliced() shares the buffer instead of deep-copying the slice; the largest
-        // sets in AllPrintings are tens of MB, so the copy is worth avoiding here.
         const QByteArray setBytes = rawSetsData.sliced(rawRange.start, rawRange.length);
         QJsonParseError parseError;
         const QJsonDocument setDoc = QJsonDocument::fromJson(setBytes, &parseError);
         if (parseError.error != QJsonParseError::NoError) {
-            qWarning() << "error: parsing card data for set" << curSetToParse.getShortName() << ":"
-                       << parseError.errorString();
-            ++setIndex;
-            // Keep the progress accounting honest: a set that failed to parse
-            // still advanced the index, so report it (with zero imported cards)
-            // rather than letting SaveSetsPage's bar stall per failed set.
-            emit setIndexChanged(0, setIndex, curSetToParse.getLongName());
-            continue;
+            return failImport(
+                tr("Could not import set %1: %2").arg(curSetToParse.getShortName(), parseError.errorString()));
+        }
+        if (!setDoc.isObject() || !setDoc.object().value("cards").isArray()) {
+            return failImport(tr("Set %1 does not contain a card list.").arg(curSetToParse.getShortName()));
         }
 
         // Only add the set to the database once its slice parsed cleanly;
@@ -838,7 +911,14 @@ int OracleImporter::startImport()
         emit setIndexChanged(numCardsInSet, setIndex, curSetToParse.getLongName());
     }
 
+    if (importCancelled.loadAcquire()) {
+        return failImport(tr("The card database import was cancelled."));
+    }
+    if (cards.isEmpty()) {
+        return failImport(tr("No cards were imported. The existing card database has been kept."));
+    }
     applyLocalizedData();
+    importSuccessful = true;
 
     emit setIndexChanged(0, setIndex, QString());
 
@@ -846,8 +926,25 @@ int OracleImporter::startImport()
     return setIndex;
 }
 
+int OracleImporter::failImport(const QString &message)
+{
+    importSuccessful = false;
+    importError = message;
+    sets.clear();
+    cards.clear();
+    magicFormats.clear();
+    magicFormatsDirty = true;
+    localizedEntries.clear();
+    splitLocalizedTexts.clear();
+    qWarning() << message;
+    return 0;
+}
+
 bool OracleImporter::saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion)
 {
+    if (!importSuccessful) {
+        return false;
+    }
     CockatriceXml4Parser parser(new NoopCardSetPriorityController());
 
     return parser.saveToFile(createDefaultMagicFormats(), sets, cards, fileName, sourceUrl, sourceVersion);
@@ -861,8 +958,11 @@ void OracleImporter::releaseSetData()
 
 void OracleImporter::clear()
 {
+    prepareImport();
     sets.clear();
     cards.clear();
+    magicFormats.clear();
+    magicFormatsDirty = true;
     allSets.clear();
     rawSetsData.clear();
     localizedEntries.clear();

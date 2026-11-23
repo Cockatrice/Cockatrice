@@ -28,6 +28,11 @@ class CardInfoPictureWidget : public QWidget
     Q_OBJECT
 
 public:
+    /// Width of a card picture at 100 % scale, in pixels.
+    static constexpr int BASE_WIDTH = 200;
+    /// Height / width of a card picture.
+    static constexpr qreal ASPECT_RATIO = 1.396;
+
     explicit CardInfoPictureWidget(QWidget *parent = nullptr,
                                    bool hoverToZoomEnabled = false,
                                    bool raiseOnEnter = false);
@@ -36,6 +41,20 @@ public:
         return exactCard;
     }
     [[nodiscard]] QSize sizeHint() const override;
+    /**
+     * @brief Rect of the drawn artwork inside this widget.
+     *
+     * The pixmap is scaled with KeepAspectRatio and centred, and sideways-layout cards may be
+     * rotated, so this is usually smaller than rect(). Callers that overlay the picture (rather
+     * than the widget) must anchor on this. Falls back to rect() until the first paint.
+     */
+    [[nodiscard]] QRect artRect() const;
+
+    /**
+     * @brief The size a card picture has at @p scaleFactor percent.
+     * @param scaleFactor Percentage of BASE_WIDTH, as set by the card size slider.
+     */
+    [[nodiscard]] static QSize sizeForScaleFactor(int scaleFactor);
 
 public slots:
     void setCard(const ExactCard &card);
@@ -49,6 +68,8 @@ signals:
     void cardScaleFactorChanged(int _scale);
     void cardChanged(const ExactCard &card);
     void cardClicked(QMouseEvent *event, const ExactCard &card);
+    /** @brief Emitted when the drawn artwork rect changes (size, scale factor, rotation, card). */
+    void artRectChanged();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -72,6 +93,8 @@ private:
     double scaleFactor = 100;
     QPixmap resizedPixmap;
     bool pixmapDirty;
+    /// Last drawn artwork rect, in widget coordinates; empty until the first paint.
+    QRect artRectCache;
     bool hoverToZoomEnabled;
     bool raiseOnEnter;
 

@@ -1,7 +1,9 @@
 #ifndef GAMESCENE_H
 #define GAMESCENE_H
 
-#include "../game/arrow_registry.h"
+#include "animated_item.h"
+#include "board/arrow_item.h"
+#include "board/arrow_registry.h"
 
 #include <QGraphicsScene>
 #include <QHash>
@@ -9,13 +11,17 @@
 #include <QLoggingCategory>
 #include <QMap>
 #include <QMetaObject>
+#include <QPair>
 #include <QPointF>
 #include <QPointer>
+#include <QRectF>
 #include <QSize>
 #include <QSizeF>
 #include <QString>
 #include <QTransform>
 #include <QtGlobal>
+#include <libcockatrice/game/board/arrow_data.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
 #include <qtmetamacros.h>
 
 // IWYU pragma: keep
@@ -26,6 +32,7 @@
 class CardZoneLogic;
 class IAnimatedItem;
 class QGraphicsItem;
+class QGraphicsObject;
 class QPoint;
 struct ArrowData;
 template <class T> class QSharedPointer;
@@ -39,10 +46,13 @@ class ZoneViewWidget;
 class CardZone;
 class AbstractCardItem;
 class CardItem;
+class CardState;
 class ServerInfo_Card;
 class PhasesToolbar;
 class QBasicTimer;
 class QObject;
+class QTimer;
+class CardHoverWidget;
 
 /**
  * @class GameScene
@@ -68,14 +78,38 @@ private:
     ArrowRegistry arrowRegistry;                        ///< ID registry for arrow graphics items
     QList<ZoneViewWidget *> zoneViews;                  ///< Active zone view widgets
     QSize viewSize;                                     ///< Current view size
-    QPointer<CardItem> hoveredCard;                     ///< Currently hovered card
-    QBasicTimer *animationTimer;                        ///< Timer for scene animations
-    QHash<QObject *, IAnimatedItem *> animatedItems;    ///< Items currently animating
+    QPointer<CardItem> hoveredCard;                     ///< Card the cursor is resting on
+    QPointer<CardItem> hoverZoomedCard;                 ///< Card that is currently being hover zoomed
+    QPointer<CardItem> activeCard;                      ///< Card the currently open context menu targets
+    /// Card armed for double-confirm panel summon (first trigger zooms, repeat shows).
+    QPointer<CardItem> confirmArmedCard;
+    /// Ancestor chain of the hovered card with pre-hover Z-values. Lifted while hovering
+    /// because Qt orders subtrees level by level: the card z alone cannot beat a sibling
+    /// zone, and the top ancestor alone cannot beat same-area sibling zones either — every
+    /// level from the zone up must win its own comparison. Guarded pointers: if the card
+    /// is destroyed mid-hover (or an ancestor goes away first), the guards null out and
+    /// the next restore skips them instead of touching freed memory. An orphaned lift is
+    /// invisible — areas and zones tile without overlapping and all UI layers still win —
+    /// and any outstanding lift is restored by the next hover transition.
+    QList<QPair<QPointer<QGraphicsObject>, qreal>> hoverLiftedAncestors;
+    /// Card whose ancestor chain is currently lifted (cleared together with the chain).
+    QPointer<CardItem> liftOwner;
+    QBasicTimer *animationTimer;                     ///< Timer for scene animations
+    QHash<QObject *, IAnimatedItem *> animatedItems; ///< Items currently animating
     QHash<QObject *, QMetaObject::Connection>
         animationItemConnections; ///< destroyed->removeAnimatedItem handles per animated item
     int playerRotation;           ///< Rotation offset for player layout
     bool rearranging = false;     ///< Guard against re-entrant rearrange
     bool needsReArrange = false;  ///< Pending rearrange requested during a pass
+
+    // Card hover popup
+    QPointer<CardHoverWidget> cardHoverWidget; ///< The hover popup widget
+    QTimer *hoverActivateTimer;                ///< Dwell delay before the hover zoom kicks in
+    QTimer *hoverPanelTimer;                   ///< Delay after the zoom before the tab panel shows
+    QTimer *hoverGraceTimer;                   ///< Grace period before hiding popup (200ms)
+    QPointer<CardItem> hoverPopupTarget;       ///< Card the popup is intended for
+    QPointer<CardItem> hoverPanelTarget;       ///< Card the panel timer will show
+    bool hoverGracePending = false;            ///< Grace timer armed (mouse left a card or the popup)
 
     /**
      * @brief Updates which card is currently hovered based on scene coordinates.
@@ -84,12 +118,29 @@ private:
     void updateHover(const QPointF &scenePos);
 
     /**
-     * @brief Activates hover state and escapes the card from its clip container
+     * @brief Activates hover zoom state and escapes the card from its clip container
      * so hover scaling is visible beyond zone bounds.
      */
-    void beginCardHover(CardItem *card);
-    /** @brief Deactivates hover state and restores the card to its clip container. */
-    void endCardHover(CardItem *card);
+    void beginHoverZoom(CardItem *card);
+    /** @brief Deactivates hover zoom state and restores the card to its clip container. */
+    void endHoverZoom(CardItem *card);
+    /** @brief Restores every lifted ancestor to its pre-hover Z-value and drops the chain. */
+    void restoreHoverLift();
+    /** @brief Settles a finished shrink-out: clip container and ancestor lift restore. */
+    void onHoverZoomShrinkFinished(AbstractCardItem *card);
+    /**
+     * @brief Repaints the zones that dodge the zoomed card when its footprint moves.
+     *
+     * Those zones cut the hovered card out of their paint, but they are cached: another
+     * item's geometry change does not dirty them, so without this the previous hole stays
+     * transparent in the cache and a black rectangle shows under the zoom.
+     */
+    void onHoverZoomFootprintChanged(const QRectF &oldFootprint, const QRectF &newFootprint);
+
+    // Card hover popup methods
+    void showCardHoverPopup(CardItem *card);
+    void hideCardHoverPopup();
+    void positionCardHoverPopup();
 
 public:
     /**
@@ -107,6 +158,22 @@ public:
 
     /** @brief Gets all selected CardItems. */
     QList<CardItem *> selectedCards() const;
+    QList<CardState *> selectedCardStates() const;
+
+    /** @brief Selects every card sharing the zone of @p card. */
+    void selectAllInZone(const CardItem *card);
+
+    /** @brief Selects the cards laid out in the same visual row as @p card. */
+    void selectSameRow(const CardItem *card);
+
+    /** @brief Selects the cards laid out in the same visual column as @p card. */
+    void selectSameColumn(const CardItem *card);
+
+    /** @brief Card the currently open context menu targets, or null. */
+    CardItem *getActiveCard() const;
+
+    /** @brief Sets the card the currently open context menu targets. */
+    void setActiveCard(CardItem *card);
 
     /**
      * @brief Adds a player to the scene and stores their graphics item.
@@ -205,6 +272,21 @@ public:
     /** @brief Updates hovered card highlighting. */
     void updateHoveredCard(CardItem *newCard);
 
+    /** @brief Topmost card at a scene position, without side effects. */
+    CardItem *pickCardAt(const QPointF &scenePos);
+
+    /**
+     * @brief Fires the zoom and/or panel trigger for a card (one explicit user action).
+     * When both fire on one action, double-confirm arms on first fire and shows on repeat.
+     */
+    void fireTriggers(CardItem *card, bool zoomFired, bool panelFired);
+
+    /** @brief Starts the hover zoom for a card without touching panel state. */
+    void ensureHoverZoomed(CardItem *card);
+
+    /** @brief The currently hover zoomed card, if any (used by zones to dodge it while painting). */
+    CardItem *getHoverZoomedCard() const;
+
     /**
      * @brief Registers an item for animation updates with the shared scene timer.
      *
@@ -261,11 +343,31 @@ public slots:
     /// Queues up arrow deletion but doesn't directly modify the scene
     void requestArrowDeletion(int playerId, int arrowId);
 
-    void onCardZoneChanged(CardItem *card, bool sameZone);
+    void onCardZoneChanged(CardState *card, bool sameZone);
+    /**
+     * @brief Refreshes the view of a card that the server just moved.
+     *
+     * @param card The card that moved.
+     * @param zoneChanged Whether the card crossed a zone boundary.
+     * @param newOwner The player the card now belongs to, or nullptr to leave the owner alone.
+     */
+    void onCardViewRefreshRequested(CardState *card, bool zoneChanged, PlayerLogic *newOwner);
+
+    // Card hover popup slots
+    void onHoverActivateTimeout();
+    void onHoverPanelTimeout();
+    void onHoverGraceTimeout();
+    void onHoverWidgetEntered();
+    void onHoverWidgetLeft();
+    /** @brief Summons the hover panel for the currently hovered card, if any. */
+    void summonHoverPanel();
 
 protected:
     /** @brief Handles hover updates. */
     bool event(QEvent *event) override;
+
+    /** @brief Repositions the hover popup when the viewport resizes. */
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
     /** @brief Handles animation timer updates. */
     void timerEvent(QTimerEvent *event) override;

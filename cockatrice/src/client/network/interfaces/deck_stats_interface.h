@@ -11,6 +11,7 @@
 #include <qtmetamacros.h>
 
 class QByteArray;
+class QString;
 class QNetworkAccessManager;
 class QNetworkReply;
 class DeckList;
@@ -20,6 +21,8 @@ class DeckStatsInterface : public QObject
     Q_OBJECT
 private:
     QNetworkAccessManager *manager;
+    bool replyHandled = false;
+    void showError(const QString &message);
 
     /**
      * Deckstats doesn't recognize token cards, and instead tries to find the

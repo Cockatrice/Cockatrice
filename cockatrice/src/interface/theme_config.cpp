@@ -9,7 +9,9 @@
 #include <QList>
 #include <QMetaEnum>
 #include <QPair>
+#include <QStringLiteral>
 #include <QTextStream>
+#include <algorithm>
 #include <qnamespace.h>
 #include <utility>
 
@@ -304,4 +306,274 @@ QPalette PaletteConfig::apply(QPalette base) const
     }
 
     return base;
+}
+
+bool FontConfig::hasFonts() const
+{
+    return !fonts.isEmpty() || cardTextMinSize != CARD_TEXT_MIN_SIZE || cardTextMaxSize > 0;
+}
+
+int FontConfig::resolvedCardTextMinSize() const
+{
+    const int size = cardTextMinSize > 0 ? cardTextMinSize : CARD_TEXT_MIN_SIZE;
+    return std::clamp(size, CARD_TEXT_MIN_SIZE, MAX_FONT_SIZE);
+}
+
+int FontConfig::resolvedCardTextMaxSize() const
+{
+    int size = cardTextMaxSize;
+    if (size <= 0) {
+        const auto it = fonts.constFind(AppFont::CardText);
+        size = it != fonts.constEnd() ? it.value().pointSize() : 0;
+    }
+    if (size <= 0) {
+        size = DEFAULT_CARD_TEXT_SIZE;
+    }
+    // Mirror the editor's resolution: clamp the max into its control range, then
+    // raise it to the (already clamped) min so the pair stays consistent.
+    return std::max(resolvedCardTextMinSize(), std::clamp(size, MIN_FONT_SIZE, MAX_FONT_SIZE));
+}
+
+QString FontConfig::toToml() const
+{
+    QMetaEnum roleEnum = QMetaEnum::fromType<AppFont::Role>();
+
+    QString entries;
+
+    for (auto it = fonts.cbegin(); it != fonts.cend(); ++it) {
+        const char *roleName = roleEnum.valueToKey(it.key());
+
+        if (!roleName) {
+            continue;
+        }
+
+        QString family = it.value().family().trimmed();
+        int pointSize = it.value().pointSize();
+
+        if (family.isEmpty() || pointSize <= 0) {
+            continue;
+        }
+
+        entries += QString("%1 = \"%2, %3\"\n").arg(QString(roleName), -20).arg(family).arg(pointSize);
+    }
+
+    if (cardTextMinSize != CARD_TEXT_MIN_SIZE) {
+        entries += QString("%1 = %2\n").arg(QStringLiteral("CardTextMinSize"), -20).arg(cardTextMinSize);
+    }
+
+    if (cardTextMaxSize > 0) {
+        entries += QString("%1 = %2\n").arg(QStringLiteral("CardTextMaxSize"), -20).arg(cardTextMaxSize);
+    }
+
+    if (entries.isEmpty()) {
+        return {};
+    }
+
+    return "[Fonts]\n" + entries + "\n";
+}
+
+QString FontConfig::fileName()
+{
+    return "fonts.toml";
+}
+
+FontConfig FontConfig::fromFile(const QString &filePath)
+{
+    FontConfig cfg;
+
+    QFile f(filePath);
+
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return cfg;
+    }
+
+    QMetaEnum roleEnum = QMetaEnum::fromType<AppFont::Role>();
+
+    QString currentSection;
+
+    QTextStream in(&f);
+
+    while (!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+
+        if (line.isEmpty() || line.startsWith('#') || line.startsWith(';')) {
+            continue;
+        }
+
+        if (line.startsWith('[') && line.endsWith(']')) {
+            currentSection = line.mid(1, line.length() - 2).trimmed();
+            continue;
+        }
+
+        if (currentSection.compare("Fonts", Qt::CaseInsensitive) != 0) {
+            continue;
+        }
+
+        int eq = line.indexOf('=');
+
+        if (eq < 0) {
+            continue;
+        }
+
+        QString key = line.left(eq).trimmed();
+        QString value = line.mid(eq + 1).trimmed();
+
+        // Strip inline comments if preceded by whitespace
+        for (int i = 1; i < value.size(); ++i) {
+            if ((value[i] == '#' || value[i] == ';') && value[i - 1].isSpace()) {
+                value = value.left(i).trimmed();
+                break;
+            }
+        }
+
+        // Strip surrounding quotes, if any
+        if (value.size() >= 2 &&
+            ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith('\'') && value.endsWith('\'')))) {
+            value = value.mid(1, value.size() - 2).trimmed();
+        }
+
+        // CardText size bounds: bare integers, e.g. CardTextMinSize = 2.
+        // Tolerate quoting like the family entries; skip invalid lines.
+        QString sizeKey = key;
+        if (sizeKey.startsWith("AppFont::")) {
+            sizeKey = sizeKey.mid(QStringLiteral("AppFont::").size());
+        }
+        if (sizeKey.compare("CardTextMinSize", Qt::CaseInsensitive) == 0) {
+            bool ok = false;
+            int minSize = value.trimmed().toInt(&ok);
+            if (!ok || minSize <= 0) {
+                continue;
+            }
+            cfg.cardTextMinSize = minSize;
+            continue;
+        }
+        if (sizeKey.compare("CardTextMaxSize", Qt::CaseInsensitive) == 0) {
+            bool ok = false;
+            int maxSize = value.trimmed().toInt(&ok);
+            if (!ok || maxSize <= 0) {
+                continue;
+            }
+            cfg.cardTextMaxSize = maxSize;
+            continue;
+        }
+
+        int comma = value.lastIndexOf(',');
+
+        if (comma < 0) {
+            continue;
+        }
+
+        QString family = value.left(comma).trimmed();
+
+        // Tolerate a partially-quoted family, e.g. "Inter", 10
+        if (family.size() >= 2 &&
+            ((family.startsWith('"') && family.endsWith('"')) || (family.startsWith('\'') && family.endsWith('\'')))) {
+            family = family.mid(1, family.size() - 2).trimmed();
+        }
+
+        bool ok = false;
+        int pointSize = value.mid(comma + 1).trimmed().toInt(&ok);
+
+        if (!ok || family.isEmpty() || pointSize <= 0) {
+            continue;
+        }
+
+        if (key.startsWith("AppFont::")) {
+            key = key.mid(QStringLiteral("AppFont::").size());
+        }
+
+        int roleInt = roleEnum.keyToValue(key.toUtf8().constData());
+
+        if (roleInt < 0) {
+            continue;
+        }
+
+        // Canonical family + point size only: a fresh QFont carries default
+        // (non-bold, non-italic) weight/style, so nothing caller-side leaks in.
+        // No validation against installed fonts; Qt substitution applies.
+        QFont font(family);
+        font.setPointSize(pointSize);
+        cfg.fonts[static_cast<AppFont::Role>(roleInt)] = font;
+    }
+
+    return cfg;
+}
+
+FontConfig FontConfig::fromThemeDir(const QString &themeDirPath)
+{
+    if (themeDirPath.isEmpty()) {
+        return {};
+    }
+
+    return fromFile(QDir(themeDirPath).absoluteFilePath(fileName()));
+}
+
+QColor defaultAppColor(AppColor::Role role, bool dark)
+{
+    switch (role) {
+        case AppColor::AccentStrong:
+        case AppColor::AccentSoft:
+        // The neutral icon family is palette-derived like the accent: a theme
+        // that leaves it unauthored (System, and every theme written before the
+        // roles existed) keeps the live platform palette's WindowText instead
+        // of pinning one scheme's ink.
+        case AppColor::Icon:
+        case AppColor::IconStrong:
+        case AppColor::IconSoft:
+            return {};
+        // The semantic family follows the same chroma ladder as the authored
+        // themes. A theme that authors none of it has no per-surface palette to
+        // measure against, so these are authored against the representative
+        // platform surfaces the System theme runs on.
+        case AppColor::Positive:
+            return QColor(dark ? QStringLiteral("#6dd58c") : QStringLiteral("#1a7d3a"));
+        case AppColor::PositiveStrong:
+            return QColor(dark ? QStringLiteral("#32c05c") : QStringLiteral("#007e28"));
+        case AppColor::PositiveSoft:
+            return QColor(dark ? QStringLiteral("#8ab196") : QStringLiteral("#4c7659"));
+        case AppColor::Negative:
+            return QColor(dark ? QStringLiteral("#ff8a80") : QStringLiteral("#b3261e"));
+        case AppColor::NegativeStrong:
+            return QColor(dark ? QStringLiteral("#ff8378") : QStringLiteral("#da0b00"));
+        case AppColor::NegativeSoft:
+            return QColor(dark ? QStringLiteral("#c79e9b") : QStringLiteral("#935f5c"));
+        // Informational is the third semantic family: a state that is neither a
+        // gain nor a loss (a face-down play, the exile zone). It carries the
+        // same three-level ladder so its emphasis is authored, not computed.
+        case AppColor::Informational:
+            return QColor(dark ? QStringLiteral("#7aa9f2") : QStringLiteral("#1c64c4"));
+        case AppColor::InformationalStrong:
+            return QColor(dark ? QStringLiteral("#69aeff") : QStringLiteral("#0a4fb5"));
+        case AppColor::InformationalSoft:
+            return QColor(dark ? QStringLiteral("#9db2cd") : QStringLiteral("#526a8a"));
+        // Hidden is the game's hidden-information cluster: a face-down play and
+        // peeking at a card face. Violet keeps it apart from the blue
+        // Informational family, which carries public information (reveal).
+        case AppColor::Hidden:
+            return QColor(dark ? QStringLiteral("#c6a5fa") : QStringLiteral("#6d28d9"));
+        case AppColor::HiddenStrong:
+            return QColor(dark ? QStringLiteral("#c99bff") : QStringLiteral("#4c0f9e"));
+        case AppColor::HiddenSoft:
+            return QColor(dark ? QStringLiteral("#b3a6c9") : QStringLiteral("#6a5a8c"));
+        // Marked is the marks a player leaves on a card: an annotation or a
+        // draw arrow. Amber names a persistent, removable mark rather than a
+        // gain or a loss, so annotation and arrow finally share a colour.
+        case AppColor::Marked:
+            return QColor(dark ? QStringLiteral("#e2a63a") : QStringLiteral("#9a5b05"));
+        case AppColor::MarkedStrong:
+            return QColor(dark ? QStringLiteral("#ffb020") : QStringLiteral("#8a4f02"));
+        case AppColor::MarkedSoft:
+            return QColor(dark ? QStringLiteral("#c2ab7d") : QStringLiteral("#7b6a4a"));
+        // Movement is a card changing position without a gain or a loss: the
+        // library placements (top, bottom, X from top). Teal keeps it apart
+        // from the green "into play" moves and the blue informational states.
+        case AppColor::Movement:
+            return QColor(dark ? QStringLiteral("#4cc2b5") : QStringLiteral("#0e7a72"));
+        case AppColor::MovementStrong:
+            return QColor(dark ? QStringLiteral("#2dd4bf") : QStringLiteral("#096b62"));
+        case AppColor::MovementSoft:
+            return QColor(dark ? QStringLiteral("#a3c1bc") : QStringLiteral("#4a6b67"));
+    }
+
+    return {};
 }

@@ -1,0 +1,22 @@
+#include "hand_zone_logic.h"
+
+#include "../board/card_state.h"
+#include "card_zone_algorithms.h"
+
+class PlayerLogic;
+class QObject;
+
+HandZoneLogic::HandZoneLogic(PlayerLogic *_player,
+                             const QString &_name,
+                             bool _hasCardAttr,
+                             bool _isShufflable,
+                             bool _contentsKnown,
+                             QObject *parent)
+    : CardZoneLogic(_player, _name, _hasCardAttr, _isShufflable, _contentsKnown, parent)
+{
+}
+
+void HandZoneLogic::addCardImpl(CardState *card, int x, int /*y*/)
+{
+    CardZoneAlgorithms::addCardToList(cards, card, x, false);
+}

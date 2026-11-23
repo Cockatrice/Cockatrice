@@ -1,6 +1,7 @@
 #include "oraclewizard.h"
 
 #include "client/settings/cache_settings.h"
+#include "database_writer.h"
 #include "main.h"
 #include "oracleimporter.h"
 #include "pages.h"
@@ -32,9 +33,6 @@ class QWidget;
 
 OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
 {
-    // define a dummy context that will be used where needed
-    QString dummy = QT_TRANSLATE_NOOP("i18n", "English");
-
 #ifdef Q_OS_WIN
     setWizardStyle(QWizard::ModernStyle);
 #endif
@@ -59,7 +57,8 @@ OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
     QList<OracleWizardPage *> pages;
 
     if (!isSpoilersOnly) {
-        pages << new IntroPage << new LoadSetsPage << new SaveSetsPage << new LoadTokensPage << new OutroPage;
+        pages << new IntroPage << new LoadSetsPage << new TagsPage << new SaveSetsPage << new LoadTokensPage
+              << new OutroPage;
     } else {
         pages << new LoadSpoilersPage << new OutroPage;
     }
@@ -144,6 +143,13 @@ void OracleWizard::reject()
     }
 
     QWizard::reject();
+    // A hidden wizard does not close the application's last visible window.
+    // Stop background refreshes explicitly so the hosting client receives a verdict,
+    // using the same rule as main(): a reject after the database was written is still
+    // a successful update, only a reject that wrote nothing counts as a failure.
+    if (backgroundMode) {
+        QCoreApplication::exit(hasSavedDatabase() ? 0 : 1);
+    }
 }
 
 void OracleWizard::runInBackground()
@@ -215,17 +221,10 @@ void OracleWizard::disableButtons()
 
 bool OracleWizard::saveTokensToFile(const QString &fileName)
 {
-    QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly)) {
-        qDebug() << "File open (w) failed for" << fileName;
+    QString error;
+    if (!OracleDatabase::saveXml(fileName, tokensData, &error)) {
+        qWarning() << error;
         return false;
     }
-
-    if (file.write(tokensData) == -1) {
-        qDebug() << "File write (w) failed for" << fileName;
-        return false;
-    }
-
-    file.close();
     return true;
 }

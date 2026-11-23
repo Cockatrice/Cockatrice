@@ -1,6 +1,6 @@
 #include "abstract_analytics_panel_widget.h"
 
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../general/display/banner_widget.h"
 #include "deck_list_statistics_analyzer.h"
 
@@ -28,7 +28,7 @@ AbstractAnalyticsPanelWidget::AbstractAnalyticsPanelWidget(QWidget *parent, Deck
 
     // config button
     configureButton = new QPushButton(this);
-    configureButton->setIcon(themePixmap(QStringLiteral("icons/cogwheel")));
+    configureButton->setIcon(loadThemedIcon(QStringLiteral("icons/settings")));
     configureButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(configureButton, &QPushButton::clicked, this, &AbstractAnalyticsPanelWidget::applyConfigFromDialog);
     bannerAndSettingsLayout->addWidget(configureButton, 0);

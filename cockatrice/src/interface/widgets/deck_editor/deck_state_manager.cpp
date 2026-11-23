@@ -1,7 +1,6 @@
 #include "deck_state_manager.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../deck_loader/loaded_deck.h"
 #include "deck_list_model.h"
 #include "libcockatrice/card/card_info.h"
 #include "libcockatrice/card/database/card_database_querier.h"
@@ -18,6 +17,7 @@
 #include <QVariant>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list_history_manager.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <qnamespace.h>
@@ -211,15 +211,15 @@ QModelIndex DeckStateManager::addCard(const ExactCard &card, const QString &zone
         return {};
     }
 
-    QString zone = card.getInfo().getIsToken() ? DECK_ZONE_TOKENS : zoneName;
+    QString targetZone = card.getInfo().getIsToken() ? DECK_ZONE_TOKENS : zoneName;
 
     CardSetPtr set = card.getPrinting().getSet();
     QString setName = set ? set->getCorrectedShortName() : "";
 
     QString reason =
-        tr("Added (%1): %2 (%3) %4").arg(zone, card.getName(), setName, card.getPrinting().getProperty("num"));
+        tr("Added (%1): %2 (%3) %4").arg(targetZone, card.getName(), setName, card.getPrinting().getProperty("num"));
 
-    QModelIndex idx = modifyDeck(reason, [&card, &zone](auto model) { return model->addCard(card, zone); });
+    QModelIndex idx = modifyDeck(reason, [&card, &targetZone](auto model) { return model->addCard(card, targetZone); });
 
     if (idx.isValid()) {
         emit focusIndexChanged(idx, true);
@@ -234,10 +234,22 @@ QModelIndex DeckStateManager::decrementCard(const ExactCard &card, const QString
         return {};
     }
 
+    QString targetZone = zoneName;
+
     QString providerId = card.getPrinting().getUuid();
     QString collectorNumber = card.getPrinting().getProperty("num");
 
-    QModelIndex idx = deckListModel->findCard(card.getName(), zoneName, providerId, collectorNumber);
+    QModelIndex idx = deckListModel->findCard(card.getName(), targetZone, providerId, collectorNumber);
+
+    // Tokens are usually added to the token zone, but it is possible for imported/hand-edited
+    // decks to contain them in the main or sideboards. This is why we only try to remove the
+    // token from the token zone if it does not exist in the given zone, allowing us to still
+    // remove it from there.
+    if (!idx.isValid() && card.getInfo().getIsToken() && targetZone != DECK_ZONE_TOKENS) {
+        targetZone = DECK_ZONE_TOKENS;
+        idx = deckListModel->findCard(card.getName(), targetZone, providerId, collectorNumber);
+    }
+
     if (!idx.isValid()) {
         return {};
     }
@@ -249,7 +261,7 @@ QModelIndex DeckStateManager::decrementCard(const ExactCard &card, const QString
     }
 
     // old index is no longer safe since rows could have been removed
-    QModelIndex newIdx = deckListModel->findCard(card.getName(), zoneName, providerId, collectorNumber);
+    QModelIndex newIdx = deckListModel->findCard(card.getName(), targetZone, providerId, collectorNumber);
     if (newIdx.isValid()) {
         emit focusIndexChanged(newIdx, true);
     }

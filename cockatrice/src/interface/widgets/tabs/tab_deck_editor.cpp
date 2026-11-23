@@ -131,10 +131,16 @@ void TabDeckEditor::loadLayout()
     LayoutsSettings &layouts = SettingsCache::instance().layouts();
 
     auto layoutState = layouts.getDeckEditorLayoutState();
-    if (layoutState.isNull()) {
-        restartLayout();
-    } else {
-        restoreState(layoutState);
+    // Start with every current dock placed. Saved layouts from older versions
+    // cannot describe docks introduced later; restoreState leaves those docks
+    // in their existing positions while restoring the saved docks, including
+    // their visibility and floating state.
+    restartLayout();
+    if (!layoutState.isEmpty()) {
+        if (!restoreState(layoutState)) {
+            // A corrupt or incompatible state must not leave a partial layout.
+            restartLayout();
+        }
         restoreGeometry(layouts.getDeckEditorGeometry());
     }
 }

@@ -58,13 +58,11 @@ private:
     QLineEdit *channelUnreadColor;
     QLineEdit *channelMentionColor;
     QLineEdit *customAlertString;
-    QLabel hexLabel;
-    QLabel hexHighlightLabel;
     QLabel channelUnreadColorLabel;
     QLabel channelMentionColorLabel;
-    QLabel hexChannelUnreadLabel;
-    QLabel hexChannelMentionLabel;
     QLabel customAlertStringLabel;
+    QLabel mentionColorStringLabel;
+    QLabel highlightColorStringLabel;
     QLabel explainMessagesLabel;
 
     void storeSettings();

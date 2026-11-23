@@ -7,7 +7,11 @@
 #include <climits>
 #include <gtest/gtest.h>
 #include <libcockatrice/network/server/remote/game/dump_zone_range.h>
+#include <libcockatrice/rng/rng_abstract.h>
 #include <vector>
+
+// Referenced by other translation units in the server_remote library.
+RNG_Abstract *rng = nullptr;
 
 namespace
 {

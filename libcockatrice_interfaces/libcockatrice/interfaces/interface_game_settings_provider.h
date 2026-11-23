@@ -20,6 +20,7 @@ public:
     [[nodiscard]] virtual bool getCreateGameAsSpectator() const = 0;
     [[nodiscard]] virtual int getDefaultStartingLifeTotal() const = 0;
     [[nodiscard]] virtual bool getShareDecklistsOnLoad() const = 0;
+    [[nodiscard]] virtual bool getShufflePlayers() const = 0;
     [[nodiscard]] virtual bool getRememberGameSettings() const = 0;
     [[nodiscard]] virtual bool getLocalGameRememberSettings() const = 0;
     [[nodiscard]] virtual int getLocalGameMaxPlayers() const = 0;

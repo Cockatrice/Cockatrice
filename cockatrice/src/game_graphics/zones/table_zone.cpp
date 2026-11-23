@@ -1,12 +1,6 @@
 #include "table_zone.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../game/board/card_list.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_info.h"
-#include "../../game/player/player_logic.h"
-#include "../../game/zones/card_zone_logic.h"
-#include "../../game/zones/table_zone_logic.h"
 #include "../../interface/theme_manager.h"
 #include "../board/abstract_card_item.h"
 #include "../board/card_drag_item.h"
@@ -25,6 +19,7 @@
 #include <QList>
 #include <QListIterator>
 #include <QPainter>
+#include <QPainterPath>
 #include <QRectF>
 #include <QSharedPointer>
 #include <QString>
@@ -32,10 +27,15 @@
 #include <algorithm>
 #include <iterator>
 #include <libcockatrice/card/card_info.h>
-#include <libcockatrice/protocol/pb/command_move_card.pb.h>
-#include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
+#include <libcockatrice/game/board/card_list.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
+#include <libcockatrice/game/zones/table_zone_logic.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <optional>
 #include <string>
 
 namespace google
@@ -62,7 +62,8 @@ TableZone::TableZone(TableZoneLogic *_logic, bool _mirrored, QGraphicsItem *pare
 
     updateBg();
 
-    height = MARGIN_TOP + MARGIN_BOTTOM + TABLEROWS * CardDimensions::HEIGHT + (TABLEROWS - 1) * PADDING_Y;
+    height = MARGIN_TOP + MARGIN_BOTTOM + TableZoneLogic::ROW_COUNT * CardDimensions::HEIGHT +
+             (TableZoneLogic::ROW_COUNT - 1) * PADDING_Y;
     width = MIN_WIDTH;
     currentMinimumWidth = width;
 
@@ -119,6 +120,19 @@ bool TableZone::isInverted() const
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
+    // The hovered (zoomed) card may spill over this zone: cut it out of every layer
+    // below so washes, indicators, dimming and the land divider never paint over it,
+    // whatever the stacking order is.
+    const std::optional<QPainterPath> hoverHole = hoveredCardHole();
+    const bool clipped = hoverHole.has_value();
+    if (clipped && hoverHole->isEmpty()) {
+        // The zoom covers this zone entirely: there is nothing left of it to paint.
+        return;
+    }
+    if (clipped) {
+        painter->setClipPath(*hoverHole);
+    }
+
     if (playmatActive) {
         // Subtle overlay to distinguish table zone from stack zone
         painter->fillRect(boundingRect(), QColor(0, 0, 0, 60));
@@ -143,6 +157,42 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
     }
 
     paintLandDivider(painter);
+
+    if (clipped) {
+        painter->setClipping(false);
+    }
+}
+
+/**
+ * @brief This zone's paint area minus the hovered card's painted outline, in zone coordinates.
+ *
+ * @c std::nullopt when no card is hovered or it does not overlap this zone; an *empty* path when
+ * the zoom covers this zone entirely, which means nothing of it is left to paint. Lets every
+ * paint layer dodge the zoomed card instead of painting over it.
+ */
+std::optional<QPainterPath> TableZone::hoveredCardHole() const
+{
+    auto *scene = qobject_cast<GameScene *>(this->scene());
+    if (!scene) {
+        return std::nullopt;
+    }
+    CardItem *hovered = scene->getHoverZoomedCard();
+    // The scene keeps the card it zoomed until the cursor leaves it, but the zoom can be
+    // dropped on its own (e.g. tapping cancels it). Cut no hole unless the zoom is actually
+    // up, or the zone keeps painting around a card that is back at its normal size.
+    if (!hovered || !hovered->getIsHoverZoomed()) {
+        return std::nullopt;
+    }
+    // Cut out the card's painted outline, not its bounding rectangle: the rectangle's corners
+    // are never covered by the artwork (rounded corners, antialiased edges), so they would stay
+    // black around the zoom.
+    const QPainterPath cardOutline = sceneTransform().inverted().map(hovered->sceneTransform().map(hovered->shape()));
+    if (!cardOutline.boundingRect().intersects(boundingRect())) {
+        return std::nullopt;
+    }
+    QPainterPath zoneArea;
+    zoneArea.addRect(boundingRect());
+    return zoneArea.subtracted(cardOutline);
 }
 
 void TableZone::onPlaymatChanged(bool active)
@@ -208,29 +258,20 @@ void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems,
                                       CardZoneLogic *startZone,
                                       const QPoint &gridPoint)
 {
-    Command_MoveCard cmd;
-    cmd.set_start_player_id(startZone->getPlayer()->getPlayerInfo()->getId());
-    cmd.set_start_zone(startZone->getName().toStdString());
-    cmd.set_target_player_id(getLogic()->getPlayer()->getPlayerInfo()->getId());
-    cmd.set_target_zone(getLogic()->getName().toStdString());
-    cmd.set_x(gridPoint.x());
-    cmd.set_y(gridPoint.y());
-
-    for (const auto &item : dragItems) {
-        CardToMove *ctm = cmd.mutable_cards_to_move()->add_card();
-        ctm->set_card_id(item->getId());
-        if (item->isForceFaceDown()) {
-            ctm->set_face_down(true);
-        }
+    QList<CardMoveRequest> cards;
+    cards.reserve(dragItems.size());
+    for (const CardDragItem *item : dragItems) {
+        CardMoveRequest card{item->getId(), item->isForceFaceDown()};
         if (startZone->getName() != getLogic()->getName() && !item->isForceFaceDown()) {
-            const auto &card = item->getItem()->getCard();
-            if (card) {
-                ctm->set_pt(card.getInfo().getPowTough().toStdString());
+            const auto &cardInfo = item->getItem()->getCard();
+            if (cardInfo) {
+                card.pt = cardInfo.getInfo().getPowTough();
             }
         }
+        cards.append(card);
     }
 
-    startZone->getPlayer()->getPlayerActions()->sendGameCommand(cmd);
+    startZone->getPlayer()->getPlayerActions()->moveCards(startZone, getLogic(), gridPoint.x(), gridPoint.y(), cards);
 }
 
 void TableZone::reorganizeCards()
@@ -238,8 +279,8 @@ void TableZone::reorganizeCards()
     // Calculate card stack widths so mapping functions work properly
     computeCardStackWidths();
 
-    for (int i = 0; i < getLogic()->getCards().size(); ++i) {
-        QPoint gridPoint = getLogic()->getCards()[i]->getGridPos();
+    for (int i = 0; i < cardItems().size(); ++i) {
+        QPoint gridPoint = cardItems()[i]->getGridPos();
         if (gridPoint.x() == -1) {
             continue;
         }
@@ -248,21 +289,24 @@ void TableZone::reorganizeCards()
         qreal x = mapPoint.x();
         qreal y = mapPoint.y();
 
-        int numberAttachedCards = getLogic()->getCards()[i]->getAttachedCards().size();
+        int numberAttachedCards = cardItems()[i]->getAttachedCards().size();
         qreal actualX = x + numberAttachedCards * STACKED_CARD_OFFSET_X;
         qreal actualY = y;
         if (numberAttachedCards) {
             actualY += 15;
         }
 
-        getLogic()->getCards()[i]->setPos(actualX, actualY);
-        getLogic()->getCards()[i]->setRealZValue(ZValues::tableCardZValue(actualX, actualY));
+        cardItems()[i]->setPos(actualX, actualY);
+        cardItems()[i]->setRealZValue(ZValues::tableCardZValue(actualX, actualY));
 
-        QListIterator<CardItem *> attachedCardIterator(getLogic()->getCards()[i]->getAttachedCards());
+        QListIterator<CardState *> attachedCardIterator(cardItems()[i]->getAttachedCards());
         int j = 0;
         while (attachedCardIterator.hasNext()) {
             ++j;
-            CardItem *attachedCard = attachedCardIterator.next();
+            CardItem *attachedCard = qobject_cast<CardItem *>(attachedCardIterator.next()->parent());
+            if (attachedCard == nullptr) {
+                continue;
+            }
             qreal childX = actualX - j * STACKED_CARD_OFFSET_X;
             qreal childY = y + 5;
             attachedCard->setPos(childX, childY);
@@ -276,35 +320,18 @@ void TableZone::reorganizeCards()
 
 void TableZone::toggleTapped()
 {
-    QList<QGraphicsItem *> selectedItemsRaw = scene()->selectedItems();
-    QList<QGraphicsItem *> selectedItems;
-
-    auto isCardOnTable = [](const QGraphicsItem *item) {
-        if (auto card = qgraphicsitem_cast<const CardItem *>(item)) {
-            return card->getZone()->getName() == ZoneNames::TABLE;
-        }
-        return false;
-    };
-
-    std::copy_if(selectedItemsRaw.begin(), selectedItemsRaw.end(), std::back_inserter(selectedItems), isCardOnTable);
-
-    bool tapAll = std::any_of(selectedItems.begin(), selectedItems.end(), [](const QGraphicsItem *item) {
-        return !qgraphicsitem_cast<const CardItem *>(item)->getTapped();
-    });
-    QList<const ::google::protobuf::Message *> cmdList;
-    for (const auto &selectedItem : selectedItems) {
-        CardItem *temp = qgraphicsitem_cast<CardItem *>(selectedItem);
-        if (temp->getTapped() != tapAll) {
-            Command_SetCardAttr *cmd = new Command_SetCardAttr;
-            cmd->set_zone(getLogic()->getName().toStdString());
-            cmd->set_card_id(temp->getId());
-            cmd->set_attribute(AttrTapped);
-            cmd->set_attr_value(tapAll ? "1" : "0");
-            cmdList.append(cmd);
+    QList<CardState *> selectedCards;
+    for (auto *item : scene()->selectedItems()) {
+        auto *card = qgraphicsitem_cast<CardItem *>(item);
+        if (card && card->getZone()->getName() == ZoneNames::TABLE) {
+            selectedCards.append(card->getState());
         }
     }
-    getLogic()->getPlayer()->getPlayerActions()->sendGameCommand(
-        getLogic()->getPlayer()->getPlayerActions()->prepareGameCommand(cmdList));
+
+    const bool tapAll = std::any_of(selectedCards.begin(), selectedCards.end(),
+                                    [](const CardState *card) { return !card->getTapped(); });
+
+    getLogic()->getPlayer()->getPlayerActions()->actToggleTapped(getLogic()->getName(), selectedCards, tapAll);
 }
 
 void TableZone::resizeToContents()
@@ -312,9 +339,9 @@ void TableZone::resizeToContents()
     int xMax = 0;
 
     // Find rightmost card position, which includes the left margin amount.
-    for (int i = 0; i < getLogic()->getCards().size(); ++i) {
-        if (getLogic()->getCards()[i]->pos().x() > xMax) {
-            xMax = (int)getLogic()->getCards()[i]->pos().x();
+    for (int i = 0; i < cardItems().size(); ++i) {
+        if (cardItems()[i]->pos().x() > xMax) {
+            xMax = (int)cardItems()[i]->pos().x();
         }
     }
 
@@ -335,12 +362,12 @@ void TableZone::resizeToContents()
 
 CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const
 {
-    for (int i = 0; i < getLogic()->getCards().size(); i++) {
-        if (getLogic()->getCards().at(i)->getGridPoint() == gridPoint) {
-            return getLogic()->getCards().at(i);
+    for (int i = 0; i < cardItems().size(); i++) {
+        if (cardItems().at(i)->getGridPoint() == gridPoint) {
+            return cardItems().at(i);
         }
     }
-    return 0;
+    return nullptr;
 }
 
 CardItem *TableZone::getCardFromCoords(const QPointF &point) const
@@ -354,8 +381,8 @@ void TableZone::computeCardStackWidths()
     // Each card stack is three grid points worth of card locations.
     // First pass: compute the number of cards at each card stack.
     QMap<int, int> cardStackCount;
-    for (int i = 0; i < getLogic()->getCards().size(); ++i) {
-        const QPoint &gridPoint = getLogic()->getCards()[i]->getGridPos();
+    for (int i = 0; i < cardItems().size(); ++i) {
+        const QPoint &gridPoint = cardItems()[i]->getGridPos();
         if (gridPoint.x() == -1) {
             continue;
         }
@@ -366,8 +393,8 @@ void TableZone::computeCardStackWidths()
 
     // Second pass: compute the width at each card stack.
     cardStackWidth.clear();
-    for (int i = 0; i < getLogic()->getCards().size(); ++i) {
-        const QPoint &gridPoint = getLogic()->getCards()[i]->getGridPos();
+    for (int i = 0; i < cardItems().size(); ++i) {
+        const QPoint &gridPoint = cardItems()[i]->getGridPos();
         if (gridPoint.x() == -1) {
             continue;
         }
@@ -375,8 +402,8 @@ void TableZone::computeCardStackWidths()
         const int key = getCardStackMapKey(gridPoint.x() / 3, gridPoint.y());
         const int stackCount = cardStackCount.value(key, 0);
         if (stackCount == 1) {
-            cardStackWidth.insert(key, CardDimensions::WIDTH + getLogic()->getCards()[i]->getAttachedCards().size() *
-                                                                   STACKED_CARD_OFFSET_X);
+            cardStackWidth.insert(key, CardDimensions::WIDTH +
+                                           cardItems()[i]->getAttachedCards().size() * STACKED_CARD_OFFSET_X);
         } else {
             cardStackWidth.insert(key, CardDimensions::WIDTH + (stackCount - 1) * STACKED_CARD_OFFSET_X);
         }
@@ -397,7 +424,7 @@ QPointF TableZone::mapFromGrid(QPoint gridPoint) const
     }
 
     if (isInverted()) {
-        gridPoint.setY(TABLEROWS - 1 - gridPoint.y());
+        gridPoint.setY(TableZoneLogic::ROW_COUNT - 1 - gridPoint.y());
     }
 
     // Start with margin plus stacked card offset
@@ -423,10 +450,10 @@ QPoint TableZone::mapToGrid(const QPointF &mapPoint) const
     const int gridPointHeight = CardDimensions::HEIGHT + PADDING_Y;
     int gridPointY = (y + PADDING_Y / 2) / gridPointHeight;
 
-    gridPointY = clampValidTableRow(gridPointY);
+    gridPointY = TableZoneLogic::clampValidTableRow(gridPointY);
 
     if (isInverted()) {
-        gridPointY = TABLEROWS - 1 - gridPointY;
+        gridPointY = TableZoneLogic::ROW_COUNT - 1 - gridPointY;
     }
 
     // Calculating the x-coordinate of the grid space requires adding up the
@@ -470,23 +497,4 @@ QPointF TableZone::closestGridPoint(const QPointF &point)
         gridPoint.setX(gridPoint.x() + 1);
     }
     return mapFromGrid(gridPoint);
-}
-
-int TableZone::clampValidTableRow(const int row)
-{
-    if (row < 0) {
-        return 0;
-    }
-    if (row >= TABLEROWS) {
-        return TABLEROWS - 1;
-    }
-    return row;
-}
-
-int TableZone::tableRowToGridY(int tableRow)
-{
-    if (tableRow > 2) {
-        tableRow = 1;
-    }
-    return clampValidTableRow(2 - tableRow);
 }

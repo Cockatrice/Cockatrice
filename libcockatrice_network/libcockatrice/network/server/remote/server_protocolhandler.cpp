@@ -64,8 +64,9 @@ Server_ProtocolHandler::Server_ProtocolHandler(Server *_server,
                                                Server_DatabaseInterface *_databaseInterface,
                                                QObject *parent)
     : QObject(parent), Server_AbstractUserInterface(_server), deleted(false), databaseInterface(_databaseInterface),
-      authState(NotLoggedIn), usingRealPassword(false), acceptsUserListChanges(false), acceptsRoomListChanges(false),
-      idleClientWarningSent(false), timeRunning(0), lastDataReceived(0), lastActionReceived(0)
+      authState(NotLoggedIn), usingRealPassword(false), passwordChangePending(false), acceptsUserListChanges(false),
+      acceptsRoomListChanges(false), idleClientWarningSent(false), timeRunning(0), lastDataReceived(0),
+      lastActionReceived(0)
 
 {
     connect(server, &Server::pingClockTimeout, this, &Server_ProtocolHandler::pingClockTimeout);
@@ -212,7 +213,10 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
             logDebugMessage(getSafeDebugString(sc));
         }
         const auto commandType = static_cast<SessionCommand::SessionCommandType>(num);
-        if (authState == NotLoggedIn && !isPreAuthSessionCommand(commandType)) {
+        if (passwordChangePending && commandType != SessionCommand::PING &&
+            commandType != SessionCommand::ACCOUNT_PASSWORD) {
+            resp = Response::RespFunctionNotAllowed;
+        } else if (authState == NotLoggedIn && !isPreAuthSessionCommand(commandType)) {
             resp = Response::RespLoginNeeded;
         } else {
             switch (commandType) {
@@ -489,6 +493,19 @@ void Server_ProtocolHandler::processCommandContainer(const CommandContainer &con
 
     lastDataReceived = timeRunning;
 
+    // A session that still owes a forced password change may only reach the session family,
+    // where processSessionCommandContainer narrows it further to ping and the change itself.
+    // Every other family is rejected here, including a container that also carries a session
+    // command: the dispatch below prefers game/room over session, so testing only for the
+    // absence of a session command would let such a container through.
+    if (passwordChangePending &&
+        (cont.game_command_size() || cont.room_command_size() || cont.moderator_command_size() ||
+         cont.admin_command_size() || cont.developer_command_size())) {
+        sendResponseContainer(ResponseContainer(cont.has_cmd_id() ? cont.cmd_id() : -1),
+                              Response::RespFunctionNotAllowed);
+        return;
+    }
+
     ResponseContainer responseContainer(cont.has_cmd_id() ? cont.cmd_id() : -1);
     Response::ResponseCode finalResponseCode;
 
@@ -513,34 +530,33 @@ void Server_ProtocolHandler::processCommandContainer(const CommandContainer &con
     }
 }
 
+namespace
+{
+/// Advances a rate-limit window by one keep-alive tick: add a fresh bucket at the front and
+/// drop the oldest bucket once the window holds more than `bucketCount` of them.
+void advanceCountingWindow(QList<int> &counts, int bucketCount)
+{
+    counts.prepend(0);
+    if (counts.size() > bucketCount) {
+        counts.removeLast();
+    }
+}
+} // namespace
+
 void Server_ProtocolHandler::pingClockTimeout()
 {
-
-    int cmdcountinterval = server->getCommandCountingInterval();
-    int msgcountinterval = server->getMessageCountingInterval();
-    int pingclockinterval = server->getClientKeepAlive();
-
-    int interval = server->getMessageCountingInterval();
-    if (interval > 0) {
-        if (pingclockinterval > 0) {
-            messageSizeOverTime.prepend(0);
-            if (messageSizeOverTime.size() > (msgcountinterval / pingclockinterval)) {
-                messageSizeOverTime.removeLast();
-            }
-            messageCountOverTime.prepend(0);
-            if (messageCountOverTime.size() > (msgcountinterval / pingclockinterval)) {
-                messageCountOverTime.removeLast();
-            }
+    const int keepAliveInterval = server->getClientKeepAlive();
+    if (keepAliveInterval > 0) {
+        const int messageCountingInterval = server->getMessageCountingInterval();
+        if (messageCountingInterval > 0) {
+            const int messageBucketCount = messageCountingInterval / keepAliveInterval;
+            advanceCountingWindow(messageSizeOverTime, messageBucketCount);
+            advanceCountingWindow(messageCountOverTime, messageBucketCount);
         }
-    }
 
-    interval = server->getCommandCountingInterval();
-    if (interval > 0) {
-        if (pingclockinterval > 0) {
-            commandCountOverTime.prepend(0);
-            if (commandCountOverTime.size() > (cmdcountinterval / pingclockinterval)) {
-                commandCountOverTime.removeLast();
-            }
+        const int commandCountingInterval = server->getCommandCountingInterval();
+        if (commandCountingInterval > 0) {
+            advanceCountingWindow(commandCountOverTime, commandCountingInterval / keepAliveInterval);
         }
     }
 
@@ -548,20 +564,23 @@ void Server_ProtocolHandler::pingClockTimeout()
         prepareDestroy();
     }
 
-    // PrivLevel users, Moderators, Admins, and Developers are not subject to the server idle timeout policy
+    // PrivLevel users, Moderators, Admins, and Developers are not subject to the server idle timeout policy.
     const bool hasPrivLevel = userInfo && QString::fromStdString(userInfo->privlevel()).toLower() != "none";
     const bool isStaff =
         userInfo && (userInfo->user_level() &
                      (ServerInfo_User::IsModerator | ServerInfo_User::IsAdmin | ServerInfo_User::IsDeveloper));
-    if (!hasPrivLevel && !isStaff) {
-        if ((server->getIdleClientTimeout() > 0) && (idleClientWarningSent)) {
-            if (timeRunning - lastActionReceived > server->getIdleClientTimeout()) {
-                prepareDestroy();
-            }
+    const bool isExemptFromIdleTimeout = hasPrivLevel || isStaff;
+    if (!isExemptFromIdleTimeout) {
+        const int idleTimeout = server->getIdleClientTimeout();
+        const int idleDuration = timeRunning - lastActionReceived;
+
+        if (idleTimeout > 0 && idleClientWarningSent && idleDuration > idleTimeout) {
+            prepareDestroy();
         }
 
-        if (((timeRunning - lastActionReceived) >= qCeil(server->getIdleClientTimeout() * .9)) &&
-            (!idleClientWarningSent) && (server->getIdleClientTimeout() > 0)) {
+        const bool shouldWarnBeforeIdleTimeout =
+            idleTimeout > 0 && !idleClientWarningSent && idleDuration >= qCeil(idleTimeout * .9);
+        if (shouldWarnBeforeIdleTimeout) {
             Event_NotifyUser event;
             event.set_type(Event_NotifyUser::IDLEWARNING);
             SessionEvent *se = prepareSessionEvent(event);
@@ -696,6 +715,11 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
             server->recordFailedLogin(getAddress(), userName);
             return Response::RespAccountNotActivated;
         case PasswordChangeRequired:
+            // The credentials were right, but the account must choose a new password first.
+            // Keep the session authenticated just far enough for the client to do that:
+            // processCommandContainer refuses everything except the change itself.
+            authState = PasswordRight;
+            passwordChangePending = true;
             return Response::RespPasswordChangeRequired;
         default:
             server->clearFailedLogins(getAddress(), userName);
@@ -782,10 +806,13 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
     userInterface->sendProtocolItem(*se);
     rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, se);
 
-    databaseInterface->logMessage(userInfo->id(), QString::fromStdString(userInfo->name()),
-                                  QString::fromStdString(userInfo->address()), QString::fromStdString(cmd.message()),
-                                  Server_DatabaseInterface::MessageTargetChat, userInterface->getUserInfo()->id(),
-                                  receiver);
+    databaseInterface->logMessage(
+        userInfo->id(), QString::fromStdString(userInfo->name()), QString::fromStdString(userInfo->address()),
+        QString::fromStdString(cmd.message()), Server_DatabaseInterface::MessageTargetChat,
+        // A federated user's id belongs to the remote server's
+        // database, not ours. Logging it would collide with a
+        // local id and corrupt local history lookups.
+        userInterface->getUserInfo()->server_id() == -1 ? userInterface->getUserInfo()->id() : 0, receiver);
     resetIdleTimer();
     return Response::RespOk;
 }
@@ -1094,6 +1121,7 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
     int startingLifeTotal = cmd.has_starting_life_total() ? cmd.starting_life_total() : 20;
 
     bool shareDecklistsOnLoad = cmd.has_share_decklists_on_load() ? cmd.share_decklists_on_load() : false;
+    bool shufflePlayers = cmd.has_shuffle_players() ? cmd.shuffle_players() : false;
 
     const int gameId = databaseInterface->getNextGameId();
     if (gameId == -1) {
@@ -1115,11 +1143,13 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
                       .spectatorsCanTalk = cmd.spectators_can_talk(),
                       .spectatorsSeeEverything = cmd.spectators_see_everything(),
                       .startingLifeTotal = startingLifeTotal,
-                      .shareDecklistsOnLoad = shareDecklistsOnLoad};
+                      .shareDecklistsOnLoad = shareDecklistsOnLoad,
+                      .shufflePlayers = shufflePlayers};
 
     auto *game = new Server_Game(config, room);
 
-    game->addPlayer(this, rc, asSpectator, asJudge, false);
+    GameRoleInfo roleInfo{.isJudge = asJudge, .isSpectator = asSpectator};
+    game->addPlayer(this, rc, roleInfo, false);
     room->addGame(game);
 
     return Response::RespOk;

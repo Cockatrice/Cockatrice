@@ -1,6 +1,6 @@
 #include "visual_database_display_filter_toolbar_widget.h"
 
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../deck_editor/card_database_view.h"
 #include "../quick_settings/settings_button_widget.h"
 #include "card_database_display_model.h"
@@ -10,6 +10,7 @@
 #include "visual_database_display_name_filter_widget.h"
 #include "visual_database_display_set_filter_widget.h"
 #include "visual_database_display_sub_type_filter_widget.h"
+#include "visual_database_display_tag_filter_widget.h"
 #include "visual_database_display_widget.h"
 
 #include <QAbstractItemView>
@@ -45,13 +46,15 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
     sortGroupBox = new QGroupBox(this);
     filterGroupBox = new QGroupBox(this);
 
-    auto scalePixmap = [](const QString &fileName) { return QIcon(QPixmap(fileName)).pixmap({20, 20}); };
+    auto scalePixmap = [](const QString &prefix, const IconTint &tint = {}) {
+        return loadThemedIcon(prefix, tint).pixmap({20, 20});
+    };
 
     sortByLabel = new QLabel(this);
-    sortByLabel->setPixmap(scalePixmap("theme:icons/sort_arrow_down"));
+    sortByLabel->setPixmap(scalePixmap("icons/sort_arrow_down", AppColor::Informational));
 
     filterByLabel = new QLabel(this);
-    filterByLabel->setPixmap(scalePixmap("theme:icons/filter"));
+    filterByLabel->setPixmap(scalePixmap("icons/filter", AppColor::Informational));
 
     sortColumnCombo = new QComboBox(this);
     sortColumnCombo->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
@@ -89,22 +92,26 @@ VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidg
     });
 
     quickFilterSaveLoadWidget = new SettingsButtonWidget(this);
-    quickFilterSaveLoadWidget->setButtonIcon(themePixmap(QStringLiteral("icons/floppy_disk")));
+    quickFilterSaveLoadWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/floppy_disk"), IconTint::primary()));
 
     quickFilterNameWidget = new SettingsButtonWidget(this);
-    quickFilterNameWidget->setButtonIcon(themePixmap(QStringLiteral("icons/pen_to_square")));
+    quickFilterNameWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/pen_to_square"), IconTint::primary()));
 
     quickFilterMainTypeWidget = new SettingsButtonWidget(this);
-    quickFilterMainTypeWidget->setButtonIcon(themePixmap(QStringLiteral("icons/circle_half_stroke")));
+    quickFilterMainTypeWidget->setButtonIcon(
+        loadThemedIcon(QStringLiteral("icons/circle_half_stroke"), IconTint::primary()));
 
     quickFilterSubTypeWidget = new SettingsButtonWidget(this);
-    quickFilterSubTypeWidget->setButtonIcon(themePixmap(QStringLiteral("icons/dragon")));
+    quickFilterSubTypeWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/dragon"), IconTint::primary()));
 
     quickFilterSetWidget = new SettingsButtonWidget(this);
-    quickFilterSetWidget->setButtonIcon(themePixmap(QStringLiteral("icons/scroll")));
+    quickFilterSetWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/scroll"), IconTint::primary()));
 
     quickFilterFormatLegalityWidget = new SettingsButtonWidget(this);
-    quickFilterFormatLegalityWidget->setButtonIcon(themePixmap(QStringLiteral("icons/scale_balanced")));
+    quickFilterFormatLegalityWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/scales"), IconTint::primary()));
+
+    quickFilterTagWidget = new SettingsButtonWidget(this);
+    quickFilterTagWidget->setButtonIcon(loadThemedIcon(QStringLiteral("icons/tags")));
 
     retranslateUi();
 }
@@ -126,6 +133,7 @@ void VisualDatabaseDisplayFilterToolbarWidget::initialize()
     formatLegalityWidget = new VisualDatabaseDisplayFormatLegalityFilterWidget(this, filterModel);
     subTypeFilterWidget = new VisualDatabaseDisplaySubTypeFilterWidget(this, filterModel);
     setFilterWidget = new VisualDatabaseDisplaySetFilterWidget(this, filterModel);
+    tagFilterWidget = new VisualDatabaseDisplayTagFilterWidget(this, filterModel);
 
     quickFilterSaveLoadWidget->addSettingsWidget(saveLoadWidget);
     quickFilterNameWidget->addSettingsWidget(nameFilterWidget);
@@ -133,6 +141,7 @@ void VisualDatabaseDisplayFilterToolbarWidget::initialize()
     quickFilterSubTypeWidget->addSettingsWidget(subTypeFilterWidget);
     quickFilterSetWidget->addSettingsWidget(setFilterWidget);
     quickFilterFormatLegalityWidget->addSettingsWidget(formatLegalityWidget);
+    quickFilterTagWidget->addSettingsWidget(tagFilterWidget);
 
     // fill groupbox layouts
     sortLayout->addWidget(sortByLabel);
@@ -145,6 +154,7 @@ void VisualDatabaseDisplayFilterToolbarWidget::initialize()
     filterLayout->addWidget(quickFilterSubTypeWidget);
     filterLayout->addWidget(quickFilterSetWidget);
     filterLayout->addWidget(quickFilterFormatLegalityWidget);
+    filterLayout->addWidget(quickFilterTagWidget);
 
     // put everything into main layout
     addWidget(sortGroupBox);
@@ -172,6 +182,7 @@ void VisualDatabaseDisplayFilterToolbarWidget::retranslateUi()
     quickFilterSubTypeWidget->setToolTip(tr("Filter by card sub-type"));
     quickFilterSetWidget->setToolTip(tr("Filter by set"));
     quickFilterFormatLegalityWidget->setToolTip(tr("Filter by format legality"));
+    quickFilterTagWidget->setToolTip(tr("Filter by card tag"));
 
     quickFilterSaveLoadWidget->setButtonText(tr("Save/Load"));
     quickFilterNameWidget->setButtonText(tr("Name"));
@@ -179,6 +190,7 @@ void VisualDatabaseDisplayFilterToolbarWidget::retranslateUi()
     quickFilterSubTypeWidget->setButtonText(tr("Sub Type"));
     quickFilterSetWidget->setButtonText(tr("Sets"));
     quickFilterFormatLegalityWidget->setButtonText(tr("Formats"));
+    quickFilterTagWidget->setButtonText(tr("Tags"));
 }
 
 void VisualDatabaseDisplayFilterToolbarWidget::resizeEvent(QResizeEvent *event)
@@ -192,8 +204,8 @@ void VisualDatabaseDisplayFilterToolbarWidget::updateCompactMode(int availableWi
     const bool compact = availableWidth < fullWidthHint;
 
     const QList<SettingsButtonWidget *> filterButtons = {
-        quickFilterSaveLoadWidget, quickFilterNameWidget, quickFilterMainTypeWidget,
-        quickFilterSubTypeWidget,  quickFilterSetWidget,  quickFilterFormatLegalityWidget,
+        quickFilterSaveLoadWidget, quickFilterNameWidget,           quickFilterMainTypeWidget, quickFilterSubTypeWidget,
+        quickFilterSetWidget,      quickFilterFormatLegalityWidget, quickFilterTagWidget,
     };
 
     for (auto *btn : filterButtons) {

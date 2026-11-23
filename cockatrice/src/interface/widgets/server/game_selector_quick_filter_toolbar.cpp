@@ -92,7 +92,7 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
     hideFullGamesCheckBox->setMinimumSize(20, 20);
     hideStartedGamesCheckBox->setMinimumSize(20, 20);
 
-#if defined(Q_OS_MAC)
+#if defined(Q_OS_MACOS)
     mainLayout->setSpacing(6);
 #endif
 

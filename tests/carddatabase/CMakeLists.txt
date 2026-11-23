@@ -21,10 +21,12 @@ cockatrice_add_test(
 )
 
 # ------------------------
-# Filter String Test
-# (guard must match the condition for libcockatrice_filters in the root CMakeLists.txt)
+# Guard to match condition for libcockatrice_filters in the root CMakeLists.txt
 # ------------------------
 if(WITH_ORACLE OR WITH_CLIENT)
+  # ------------------------
+  # Filter String Test
+  # ------------------------
   cockatrice_add_test(
     NAME
     filter_string_test
@@ -34,6 +36,49 @@ if(WITH_ORACLE OR WITH_CLIENT)
     mocks.cpp
     LIBS
     libcockatrice_filters
+  )
+
+  # ------------------------
+  # Filter Tree Test
+  # ------------------------
+  cockatrice_add_test(
+    NAME
+    filter_tree_test
+    SOURCES
+    ${VERSION_STRING_CPP}
+    filter_tree_test.cpp
+    mocks.cpp
+    LIBS
+    libcockatrice_filters
+  )
+
+  # ------------------------
+  # Filter Mode Test
+  # ------------------------
+  cockatrice_add_test(
+    NAME
+    filter_mode_test
+    SOURCES
+    ${VERSION_STRING_CPP}
+    filter_mode_test.cpp
+    mocks.cpp
+    LIBS
+    libcockatrice_filters
+  )
+
+  # ------------------------
+  # Visual Display Model Test
+  # ------------------------
+  cockatrice_add_test(
+    NAME
+    visual_display_model_test
+    SOURCES
+    ${VERSION_STRING_CPP}
+    visual_display_model_test.cpp
+    mocks.cpp
+    LIBS
+    libcockatrice_card
+    libcockatrice_models
   )
 endif()
 

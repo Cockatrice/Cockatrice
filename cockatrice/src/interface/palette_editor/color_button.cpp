@@ -1,5 +1,7 @@
 #include "color_button.h"
 
+#include "../theme_manager.h"
+
 #include <QBrush>
 #include <QColorDialog>
 #include <QFont>
@@ -21,6 +23,7 @@ ColorButton::ColorButton(QWidget *parent) : QToolButton(parent)
     setCursor(Qt::PointingHandCursor);
     setToolTip(tr("Click to pick a color"));
     connect(this, &QToolButton::clicked, this, &ColorButton::pickColor);
+    connect(themeManager, &ThemeManager::fontsChanged, this, &ColorButton::updateSwatch);
 }
 
 void ColorButton::setColor(const QColor &c)
@@ -73,7 +76,8 @@ void ColorButton::updateSwatch()
     // Hex label — black or white for contrast
     int luma = 0.299 * color.red() + 0.587 * color.green() + 0.114 * color.blue();
     painter.setPen((luma > 128 && color.alpha() > 80) ? QColor(0, 0, 0, 180) : QColor(255, 255, 255, 200));
-    QFont f = font();
+    // Family comes from the InterfaceDefault theme role; the 8px size stays caller-side.
+    QFont f = themeManager->appFont(AppFont::InterfaceDefault);
     f.setPixelSize(8);
     painter.setFont(f);
     painter.drawText(rect(), Qt::AlignCenter, color.name().toUpper());

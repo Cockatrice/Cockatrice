@@ -7,6 +7,8 @@
 #ifndef DECK_EDITOR_PRINTING_SELECTOR_DOCK_WIDGET_H
 #define DECK_EDITOR_PRINTING_SELECTOR_DOCK_WIDGET_H
 
+#include "deck_editor_printing_selector_host.h"
+
 #include <QDockWidget>
 #include <qtmetamacros.h>
 
@@ -27,6 +29,7 @@ public:
 
 private:
     AbstractTabDeckEditor *deckEditor;
+    DeckEditorPrintingSelectorHost printingSelectorHost;
     QWidget *printingSelectorDockContents;
     PrintingDisabledInfoWidget *printingDisabledInfoWidget;
 

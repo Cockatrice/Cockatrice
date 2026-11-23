@@ -5,6 +5,7 @@
 #include "../../settings_page/general_settings_page.h"
 #include "../first_run_wizard_page.h"
 #include "libcockatrice/settings/personal_settings.h"
+#include "libcockatrice/utility/translation_loader.h"
 
 #include <QApplication>
 #include <QChar>
@@ -30,7 +31,7 @@ WelcomePage::WelcomePage(QWidget *parent) : FirstRunWizardPage(parent)
     languageLabel = new QLabel(this);
     langCombo = new QComboBox(this);
     for (const QString &code : GeneralSettingsPage::findQmFiles()) {
-        langCombo->addItem(GeneralSettingsPage::languageName(code), code);
+        langCombo->addItem(TranslationLoader::languageDisplayName(code), code);
     }
 
     QString current = SettingsCache::instance().personal().getLang();

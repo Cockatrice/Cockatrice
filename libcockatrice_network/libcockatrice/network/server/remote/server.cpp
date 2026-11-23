@@ -98,6 +98,37 @@ Server_DatabaseInterface *Server::getDatabaseInterface() const
     return databaseInterfaces.value(QThread::currentThread());
 }
 
+namespace
+{
+/// Logs out a session that still holds this name, or warns when only the
+/// sessions table thinks it does. Either way the name cannot simply be inserted.
+void disconnectExistingSession(const QString &name,
+                               const QMap<QString, Server_ProtocolHandler *> &users,
+                               Server_DatabaseInterface *databaseInterface)
+{
+    if (!users.contains(name)) {
+        if (databaseInterface->userSessionExists(name)) {
+            qDebug() << "Active session and sessions table inconsistent, please validate session table information "
+                        "for user "
+                     << name;
+        }
+        return;
+    }
+
+    qDebug("Session already logged in, logging old session out");
+    Event_ConnectionClosed event;
+    event.set_reason(Event_ConnectionClosed::LOGGEDINELSEWERE);
+    event.set_reason_str("You have been logged out due to logging in at another location.");
+    event.set_end_time(QDateTime::currentDateTime().toSecsSinceEpoch());
+
+    SessionEvent *se = users.value(name)->prepareSessionEvent(event);
+    users.value(name)->sendProtocolItem(*se);
+    delete se;
+
+    users.value(name)->prepareDestroy();
+}
+} // namespace
+
 AuthenticationResult Server::loginUser(Server_ProtocolHandler *session,
                                        QString &name,
                                        const QString &password,
@@ -108,14 +139,10 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session,
                                        QString &clientVersion,
                                        QString & /* connectionType */)
 {
-    bool hasClientId = false;
-    if (clientid.isEmpty()) {
+    const bool hasClientId = !clientid.isEmpty();
+    if (!hasClientId && getClientIDRequiredEnabled()) {
         // client id is empty, either out dated client or client has been modified
-        if (getClientIDRequiredEnabled()) {
-            return ClientIdRequired;
-        }
-    } else {
-        hasClientId = true;
+        return ClientIdRequired;
     }
 
     if (name.size() > 35) {
@@ -131,31 +158,22 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session,
         return authState;
     }
 
+    if (authState == PasswordChangeRequired) {
+        // The credentials were right, but the account must choose a new password before it may
+        // use the server. Give the session an identity so it can complete that change, without
+        // registering a user session or announcing the user as logged in.
+        ServerInfo_User pendingData = databaseInterface->getUserData(name, true);
+        pendingData.set_address(session->getAddress().toStdString());
+        session->setUserInfo(pendingData);
+        return authState;
+    }
+
     ServerInfo_User data = databaseInterface->getUserData(name, true);
     data.set_address(session->getAddress().toStdString());
     name = QString::fromStdString(data.name()); // Compensate for case indifference
 
     if (authState == PasswordRight) {
-        if (users.contains(name) || databaseInterface->userSessionExists(name)) {
-            if (users.contains(name)) {
-                qDebug("Session already logged in, logging old session out");
-                Event_ConnectionClosed event;
-                event.set_reason(Event_ConnectionClosed::LOGGEDINELSEWERE);
-                event.set_reason_str("You have been logged out due to logging in at another location.");
-                event.set_end_time(QDateTime::currentDateTime().toSecsSinceEpoch());
-
-                SessionEvent *se = users.value(name)->prepareSessionEvent(event);
-                users.value(name)->sendProtocolItem(*se);
-                delete se;
-
-                users.value(name)->prepareDestroy();
-            } else {
-                qDebug() << "Active session and sessions table inconsistent, please validate session table information "
-                            "for user "
-                         << name;
-            }
-        }
-
+        disconnectExistingSession(name, users, databaseInterface);
     } else if (authState == UnknownUser) {
         // Change user name so that no two users have the same names,
         // don't interfere with registered user names though.
@@ -296,7 +314,9 @@ void Server::removeClient(Server_ProtocolHandler *client)
     QWriteLocker locker(&clientsLock);
     clients.removeAt(clientIndex);
     ServerInfo_User *data = client->getUserInfo();
-    if (data) {
+    // A session that never completed login (for example one that still owes a password change)
+    // has no session id: it was never announced as joined, so it must not be announced as leaving.
+    if (data && data->has_session_id()) {
         Event_UserLeft event;
         event.set_name(data->name());
         SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
@@ -311,12 +331,10 @@ void Server::removeClient(Server_ProtocolHandler *client)
         users.remove(QString::fromStdString(data->name()));
         qDebug() << "Server::removeClient: name=" << QString::fromStdString(data->name());
 
-        if (data->has_session_id()) {
-            const qint64 sessionId = data->session_id();
-            usersBySessionId.remove(sessionId);
-            emit endSession(sessionId);
-            qDebug() << "closed session id:" << sessionId;
-        }
+        const qint64 sessionId = data->session_id();
+        usersBySessionId.remove(sessionId);
+        emit endSession(sessionId);
+        qDebug() << "closed session id:" << sessionId;
     }
     qDebug() << "Server::removeClient: removed" << (void *)client << ";" << clients.size() << "clients; "
              << users.size() << "users left";
@@ -330,7 +348,9 @@ QList<QString> Server::getOnlineModeratorList() const
         ServerInfo_User *data = client->getUserInfo();
 
         //! \todo This line should be updated in the event there is any type of new user level created.
-        if (data &&
+        // A session that still owes a forced password change has user info but no session id:
+        // it never joined, so it must not be reported as an online moderator either.
+        if (data && data->has_session_id() &&
             (data->user_level() & ServerInfo_User::IsModerator || data->user_level() & ServerInfo_User::IsAdmin)) {
             results << QString::fromStdString(data->name()).simplified();
         }

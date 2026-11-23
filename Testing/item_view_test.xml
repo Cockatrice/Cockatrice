@@ -1,0 +1,34 @@
+<events>
+    <!--
+        Item-view driving through a playback.
+
+        QtTesting's own `currentChanged` command aborts on a one-element row
+        list, so rows are selected through the view's selection model or clicked
+        with real mouse events instead.
+
+        The settings navigation tree is grouped, so a page is addressed as
+        "group/page": the groups are Application, Cards &amp; Data, Chat &amp;
+        Sound and Advanced, and the page stack follows the page order
+        General(0) ... Shortcuts(7). Selecting a group header does nothing — the
+        headers are not selectable.
+
+        Double click is covered by deck_editor_double_click_test.xml, where it
+        has an effect a single click does not have.
+    -->
+    <event widget="MainWindow/menubar" command="activate" arguments="cockatriceMenu" />
+    <event widget="MainWindow/menubar/cockatriceMenu" command="activate" arguments="actionSettings" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+    <event widget="MainWindow/settingsDialog/settingsView/pagesContainer/pagesWidget" command="expectProperty" arguments="currentIndex,0" />
+
+    <!-- Chat &amp; Sound group, second page: Sound -->
+    <event widget="MainWindow/settingsDialog/settingsView/navTree" command="selectRow" arguments="2/1" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+    <event widget="MainWindow/settingsDialog/settingsView/pagesContainer/pagesWidget" command="expectProperty" arguments="currentIndex,6" />
+
+    <!-- A click goes through the view rather than the selection model: Deck Editor -->
+    <event widget="MainWindow/settingsDialog/settingsView/navTree" command="clickRow" arguments="1/0" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+    <event widget="MainWindow/settingsDialog/settingsView/pagesContainer/pagesWidget" command="expectProperty" arguments="currentIndex,3" />
+
+    <event widget="MainWindow/settingsDialog/settingsOkButton" command="activate" arguments="" />
+</events>

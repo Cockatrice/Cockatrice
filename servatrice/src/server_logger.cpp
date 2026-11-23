@@ -1,42 +1,45 @@
 #include "server_logger.h"
 
-#include "settingscache.h"
-
 #include <QDateTime>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QForeach>
 #include <QIODevice>
+#include <QMutexLocker>
 #include <QTextStream>
 #include <QThread>
-#include <QVariant>
 #include <QtGlobal>
 #include <iostream>
 #include <qnamespace.h>
 #include <qobjectdefs.h>
 #include <string>
 
-ServerLogger::ServerLogger(bool _logToConsole, QObject *parent)
+ServerLogger::ServerLogger(bool _logToConsole, bool _writeLog, const QString &_logFilters, QObject *parent)
     : QObject(parent), logToConsole(_logToConsole), flushRunning(false)
 {
+    reloadConfig(_writeLog, _logFilters);
+    connect(this, SIGNAL(sigFlushBuffer()), this, SLOT(flushBuffer()), Qt::QueuedConnection);
 }
 
 ServerLogger::~ServerLogger()
 {
     flushBuffer();
+    // logFile is a child of this object and is closed and deleted by ~QObject.
     // This does not work with the destroyed() signal as this destructor is called after the main event loop is done.
     thread()->quit();
 }
 
 void ServerLogger::startLog(const QString &logFileName)
 {
+    delete logFile;
+    logFile = nullptr;
+
     if (!logFileName.isEmpty()) {
         QFileInfo fi(logFileName);
         QDir fileDir(fi.path());
         if (!fileDir.exists() && !fileDir.mkpath(fileDir.absolutePath())) {
             std::cerr << "ERROR: logfile folder doesn't exist and i can't create it." << std::endl;
-            logFile = 0;
             return;
         }
 
@@ -44,60 +47,81 @@ void ServerLogger::startLog(const QString &logFileName)
         if (!logFile->open(QIODevice::Append)) {
             std::cerr << "ERROR: can't open() logfile." << std::endl;
             delete logFile;
-            logFile = 0;
+            logFile = nullptr;
             return;
         }
-    } else {
-        logFile = 0;
     }
+}
 
-    connect(this, SIGNAL(sigFlushBuffer()), this, SLOT(flushBuffer()), Qt::QueuedConnection);
+void ServerLogger::reloadConfig(bool _writeLog, const QString &_logFilters)
+{
+    const bool filterActive = !_logFilters.trimmed().isEmpty();
+    const QStringList filters = _logFilters.split(QStringLiteral(","), Qt::SkipEmptyParts);
+
+    configMutex.lock();
+    writeLog = _writeLog;
+    messageFilterActive = filterActive;
+    logFilters = filters;
+    configMutex.unlock();
 }
 
 bool ServerLogger::isLoggingEnabled() const
 {
-    return logFile != nullptr && settingsCache->value("server/writelog", 1).toBool();
+    // Mirror logMessage(): the console is an independent sink and the logfile needs writeLog.
+    QMutexLocker locker(&configMutex);
+    return logToConsole || (logFile != nullptr && writeLog);
 }
 
 void ServerLogger::logMessage(const QString &message, void *caller)
 {
-    if (!logFile) {
-        return;
-    }
-
     QString callerString;
     if (caller) {
-        callerString = QString::number((qulonglong)caller, 16) + " ";
+        callerString = QString::number(reinterpret_cast<qulonglong>(caller), 16) + " ";
     }
 
-    // filter out all log entries based on values in configuration file
-    bool shouldWeWriteLog = settingsCache->value("server/writelog", 1).toBool();
-    QString logFilters = settingsCache->value("server/logfilters").toString();
-    QStringList listlogFilters = logFilters.split(",", Qt::SkipEmptyParts);
-    bool shouldWeSkipLine = false;
+    const QString line = QDateTime::currentDateTime().toString() + " " + callerString + message;
+    bool queued = false;
 
-    if (!shouldWeWriteLog) {
-        return;
+    // The console is an independent sink: writelog and logfilters only describe the logfile
+    // (see servatrice.ini.example), so a disabled or unopenable logfile must not swallow
+    // startup errors such as a refused database connection. Lines are buffered for the logger
+    // thread instead of written here, so a stalled stdout reader cannot stall game threads.
+    if (logToConsole) {
+        bufferMutex.lock();
+        consoleBuffer.append(line);
+        bufferMutex.unlock();
+        queued = true;
     }
 
-    if (!logFilters.trimmed().isEmpty()) {
-        shouldWeSkipLine = true;
-        for (const QString &logFilter : listlogFilters) {
-            if (message.contains(logFilter, Qt::CaseInsensitive)) {
-                shouldWeSkipLine = false;
-                break;
+    configMutex.lock();
+    const bool shouldWriteFile = writeLog;
+    const bool filterMessages = messageFilterActive;
+    const QStringList filters = logFilters;
+    configMutex.unlock();
+
+    if (logFile && shouldWriteFile) {
+        // filter out all log entries based on values in configuration file
+        bool shouldWriteLine = !filterMessages;
+        if (filterMessages) {
+            for (const QString &logFilter : filters) {
+                if (message.contains(logFilter, Qt::CaseInsensitive)) {
+                    shouldWriteLine = true;
+                    break;
+                }
             }
+        }
+
+        if (shouldWriteLine) {
+            bufferMutex.lock();
+            buffer.append(line);
+            bufferMutex.unlock();
+            queued = true;
         }
     }
 
-    if (shouldWeSkipLine) {
-        return;
+    if (queued) {
+        emit sigFlushBuffer();
     }
-
-    bufferMutex.lock();
-    buffer.append(QDateTime::currentDateTime().toString() + " " + callerString + message);
-    bufferMutex.unlock();
-    emit sigFlushBuffer();
 }
 
 void ServerLogger::flushBuffer()
@@ -107,25 +131,42 @@ void ServerLogger::flushBuffer()
     }
 
     flushRunning = true;
-    QTextStream stream(logFile);
-    forever
-    {
-        bufferMutex.lock();
-        if (buffer.isEmpty()) {
-            bufferMutex.unlock();
-            flushRunning = false;
-            return;
-        }
-        QString message = buffer.takeFirst();
-        bufferMutex.unlock();
 
-        stream << message << "\n";
-        stream.flush();
+    bufferMutex.lock();
+    QStringList consoleLines;
+    consoleLines.swap(consoleBuffer);
+    bufferMutex.unlock();
 
-        if (logToConsole) {
-            std::cout << message.toStdString() << std::endl;
-        }
+    for (const QString &line : consoleLines) {
+        std::cout << line.toStdString() << '\n';
     }
+    if (!consoleLines.isEmpty()) {
+        std::cout.flush();
+    }
+
+    if (logFile) {
+        QTextStream stream(logFile);
+        forever
+        {
+            bufferMutex.lock();
+            if (buffer.isEmpty()) {
+                bufferMutex.unlock();
+                break;
+            }
+            QString message = buffer.takeFirst();
+            bufferMutex.unlock();
+
+            stream << message << "\n";
+            stream.flush();
+        }
+    } else {
+        // No logfile to write to; do not let the buffer grow without bound.
+        bufferMutex.lock();
+        buffer.clear();
+        bufferMutex.unlock();
+    }
+
+    flushRunning = false;
 }
 
 void ServerLogger::rotateLogs()
@@ -141,5 +182,3 @@ void ServerLogger::rotateLogs()
         std::cerr << "ERROR: Failed to open log file for writing!" << std::endl;
     }
 }
-
-QFile *ServerLogger::logFile;

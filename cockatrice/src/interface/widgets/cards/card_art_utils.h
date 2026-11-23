@@ -20,6 +20,13 @@ namespace CardArtUtils
  * @return @p art rotated 90° clockwise for sideways-layout cards, else @p art.
  */
 QPixmap rotateSidewaysLayoutArt(const QPixmap &art, const ExactCard &card);
+
+/**
+ * Return the upright artwork used by banner previews, user rows and profile
+ * popups. The crop excludes conventional name and rules boxes before callers apply
+ * their saved pan and zoom, so a taller popup cannot expose the card frame.
+ */
+QPixmap cropCardArt(const QPixmap &art, const ExactCard &card);
 } // namespace CardArtUtils
 
 #endif // CARD_ART_UTILS_H

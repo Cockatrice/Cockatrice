@@ -52,6 +52,17 @@ TEST(PasswordHashTest, DeriveKeyMatchesKnownVector)
     ASSERT_EQ(derived.toHex(), expected.toHex());
 }
 
+TEST(PasswordHashTest, DeriveKeyCoversTheWholeAcceptedRangeOfR)
+{
+    // costParamsAreSane accepts r up to 32. The memory budget handed to OpenSSL has to cover
+    // scrypt's XY array (256 * r bytes) on top of V and B, or derivation fails for r >= 17.
+    for (const int r : {17, 32}) {
+        const QByteArray derived = PasswordHasher::deriveKey("password", QByteArray("NaCl"), 1024, r, 1);
+        ASSERT_FALSE(derived.isEmpty()) << "deriveKey failed for accepted r=" << r;
+        ASSERT_EQ(derived.size(), SCRYPT_VERIFIER_LENGTH);
+    }
+}
+
 TEST(PasswordHashTest, PasswordVerifierRoundTrip)
 {
     const QString stored = PasswordHasher::generatePasswordVerifier("hunter2");

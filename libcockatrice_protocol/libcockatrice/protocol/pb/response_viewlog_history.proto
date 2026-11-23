@@ -7,4 +7,5 @@ message Response_ViewLogHistory {
         optional Response_ViewLogHistory ext = 1015;
     }
     repeated ServerInfo_ChatMessage log_message = 1;
+    optional bool has_more = 2 [default = false]; // true when more rows exist past this page
 }

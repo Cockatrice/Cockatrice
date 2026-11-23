@@ -3,6 +3,7 @@
 #include "../../client/settings/cache_settings.h"
 #include "../../interface/card_localization.h"
 #include "../../interface/card_picture_loader/card_picture_loader.h"
+#include "../../interface/theme_manager.h"
 #include "../card_dimensions.h"
 #include "../game_scene.h"
 #include "../z_values.h"
@@ -12,6 +13,7 @@
 #include "libcockatrice/card/printing/exact_card.h"
 #include "libcockatrice/utility/card_ref.h"
 
+#include <QAbstractAnimation>
 #include <QApplication>
 #include <QBrush>
 #include <QChar>
@@ -20,6 +22,7 @@
 #include <QFont>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
 #include <QHash>
 #include <QLineF>
 #include <QList>
@@ -28,27 +31,71 @@
 #include <QPen>
 #include <QPixmap>
 #include <QPointF>
+#include <QPropertyAnimation>
 #include <QRectF>
 #include <QTimer>
 #include <QTransform>
 #include <QVariant>
 #include <QtGlobal>
 #include <algorithm>
-#include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/debug_settings.h>
 #include <qnamespace.h>
 
 class QSizeF;
 
+// Width the hovered card smooth-zooms to: exactly the hover panel picture size, so
+// all four corners coincide when the panel swaps in over it.
+static constexpr qreal HOVER_ZOOM_WIDTH = 270.0;
+// The pre-panel hover enlargement, used for scaleCards
+static constexpr qreal LEGACY_HOVER_SCALE = 1.1;
+static constexpr int HOVER_ZOOM_IN_MS = 220;
+static constexpr int HOVER_ZOOM_OUT_MS = 140;
+static constexpr int FADE_DURATION_MS = 140;
+
 AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef, PlayerLogic *_owner, int _id)
-    : ArrowTarget(_owner, parent), id(_id), cardRef(cardRef), tapped(false), facedown(false), tapAngle(0),
-      bgColor(Qt::transparent), isHovered(false), realZValue(0), pendingSelectionCollapse(false)
+    : ArrowTarget(_owner, parent), state(new CardState(this, nullptr, cardRef, _id)), tapAngle(0),
+      bgColor(Qt::transparent), isHovered(false), isHoverZoomed(false), realZValue(0)
 {
     setCursor(Qt::OpenHandCursor);
     setFlag(ItemIsSelectable);
     setCacheMode(DeviceCoordinateCache);
+
+    connect(state, &CardState::cardPixmapUpdated, this, &AbstractCardItem::pixmapUpdated);
+    connect(state, &CardState::cardInfoChanged, this, &AbstractCardItem::onCardInfoChanged);
+    connect(state, &CardState::cardRefChanged, this, &AbstractCardItem::onCardRefChanged);
+    connect(state, &CardState::tappedChanged, this, &AbstractCardItem::onTappedChanged);
+    connect(state, &CardState::facedownChanged, this, [this](bool faceDown) {
+        update();
+        emit faceDownChanged(faceDown);
+    });
+    connect(state, &CardState::colorChanged, this, [this] {
+        cacheBgColor();
+        update();
+    });
+
+    hoverZoom = new QPropertyAnimation(this, "cardScale", this);
+    hoverZoom->setEasingCurve(QEasingCurve::InOutCubic);
+    // Settling the unhover waits for the shrink-out to finish: the stacking override,
+    // the clip escape and the ancestor lift all stay put while the card is still large,
+    // so siblings and the clip container cannot cut through the shrinking card.
+    connect(hoverZoom, &QPropertyAnimation::finished, this, [this] {
+        if (!isHoverZoomed) {
+            // The cursor may still rest on the card (e.g. wheel-up reverts the zoom),
+            // in which case the highlight keeps it raised.
+            setZValue(isHovered ? ZValues::HOVERED_CARD : realZValue);
+            // Final repaint at the settled footprint: with no scale delta the animation
+            // emits no per-frame updates, and zones would keep a stale clip hole behind.
+            if (scene()) {
+                scene()->update(sceneBoundingRect());
+            }
+            emit hoverShrinkFinished(this);
+        }
+    });
+
+    opacityAnim = new QPropertyAnimation(this, "cardOpacity", this);
+    opacityAnim->setDuration(FADE_DURATION_MS);
+    opacityAnim->setEasingCurve(QEasingCurve::OutCubic);
 
     connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::displayCardNamesChanged, this,
             [this] { update(); });
@@ -67,7 +114,7 @@ AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef
 
 AbstractCardItem::~AbstractCardItem()
 {
-    emit deleteCardInfoPopup(cardRef.name);
+    emit deleteCardInfoPopup(state->getCardRef().name);
 }
 
 QRectF AbstractCardItem::boundingRect() const
@@ -90,21 +137,20 @@ void AbstractCardItem::pixmapUpdated()
     emit sigPixmapUpdated();
 }
 
-void AbstractCardItem::refreshCardInfo()
+void AbstractCardItem::onCardInfoChanged()
 {
-    exactCard = CardDatabaseManager::query()->getCard(cardRef);
-
-    if (!exactCard && !cardRef.name.isEmpty()) {
-        CardInfo::UiAttributes attributes = {.tableRow = -1};
-        auto info = CardInfo::newInstance(cardRef.name, "", true, {}, {}, {}, {}, attributes);
-        exactCard = ExactCard(info);
-    }
-    if (exactCard) {
-        connect(exactCard.getCardPtr().data(), &CardInfo::pixmapUpdated, this, &AbstractCardItem::pixmapUpdated);
-    }
-
     cacheBgColor();
     update();
+}
+
+void AbstractCardItem::onCardRefChanged(const CardRef &oldCardRef, const CardRef & /*newCardRef*/)
+{
+    emit deleteCardInfoPopup(oldCardRef.name);
+}
+
+void AbstractCardItem::refreshCardInfo()
+{
+    state->refreshCardInfo();
 }
 
 /**
@@ -113,7 +159,7 @@ void AbstractCardItem::refreshCardInfo()
  */
 const CardInfo &AbstractCardItem::getCardInfo() const
 {
-    return exactCard.getInfo();
+    return state->getCardInfo();
 }
 
 void AbstractCardItem::setRealZValue(qreal _zValue)
@@ -122,7 +168,7 @@ void AbstractCardItem::setRealZValue(qreal _zValue)
     // During hover, zValue is overridden to HOVERED_CARD. Layout operations
     // like reorganizeCards() call setRealZValue() on all cards including the
     // hovered one — skip setZValue() here to avoid clobbering the override.
-    if (!isHovered) {
+    if (!isHovered && !isHoverZoomed) {
         setZValue(_zValue);
     }
 }
@@ -133,10 +179,15 @@ QSizeF AbstractCardItem::getTranslatedSize(QPainter *painter) const
                   painter->combinedTransform().map(QLineF(0, 0, 0, boundingRect().height())).length());
 }
 
+bool AbstractCardItem::shouldPaintNameOverPicture() const
+{
+    return SettingsCache::instance().cardsDisplay().getDisplayCardNames();
+}
+
 void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle)
 {
-    const int MAX_FONT_SIZE = SettingsCache::instance().appearance().getMaxFontSize();
-    const int fontSize = std::max(9, MAX_FONT_SIZE);
+    const int minSize = std::max(1, themeManager->cardTextMinSize());
+    const int fontSize = std::max(minSize, std::max(1, themeManager->cardTextMaxSize()));
 
     QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());
 
@@ -146,7 +197,7 @@ void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &transla
     painter->rotate(angle);
     painter->translate(-translatedSize.width() / 2, -translatedSize.height() / 2);
 
-    QFont f;
+    QFont f = themeManager->appFont(AppFont::CardText);
     f.setPixelSize(fontSize * scale);
 
     painter->setFont(f);
@@ -158,13 +209,13 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     QPixmap translatedPixmap;
     bool paintImage = true;
 
-    if (facedown || cardRef.name.isEmpty()) {
+    if (state->getFaceDown() || state->getCardRef().name.isEmpty()) {
         // never reveal card color, always paint the card back
         CardPictureLoader::getCardBackPixmap(translatedPixmap, translatedSize.toSize());
     } else {
         // don't even spend time trying to load the picture if our size is too small
         if (translatedSize.width() > 10) {
-            CardPictureLoader::getPixmap(translatedPixmap, exactCard, translatedSize.toSize());
+            CardPictureLoader::getPixmap(translatedPixmap, state->getCard(), translatedSize.toSize());
             if (translatedPixmap.isNull()) {
                 paintImage = false;
             }
@@ -185,19 +236,19 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
         painter->drawPath(shape());
     }
 
-    if (translatedPixmap.isNull() || SettingsCache::instance().cardsDisplay().getDisplayCardNames() || facedown) {
+    if (translatedPixmap.isNull() || state->getFaceDown() || shouldPaintNameOverPicture()) {
         painter->save();
         transformPainter(painter, translatedSize, angle);
         painter->setPen(Qt::white);
         painter->setBackground(Qt::black);
         painter->setBackgroundMode(Qt::OpaqueMode);
         QString nameStr;
-        if (facedown) {
-            nameStr = "# " + QString::number(id);
+        if (state->getFaceDown()) {
+            nameStr = "# " + QString::number(state->getId());
         } else {
             QString prefix = "";
             if (SettingsCache::instance().debug().getShowCardId()) {
-                prefix = "#" + QString::number(id) + " ";
+                prefix = "#" + QString::number(state->getId()) + " ";
             }
             nameStr = prefix + CardLocalization::displayName(getCardInfo());
         }
@@ -219,9 +270,9 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     painter->setRenderHint(QPainter::Antialiasing, false);
 
-    if (isSelected() || isHovered) {
+    if (isSelected() || isHovered || isHoverZoomed) {
         QPen pen;
-        if (isHovered) {
+        if (isHovered || isHoverZoomed) {
             pen.setColor(Qt::yellow);
         }
         if (isSelected()) {
@@ -235,19 +286,65 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->restore();
 }
 
-void AbstractCardItem::setCardRef(const CardRef &_cardRef)
+void AbstractCardItem::setHoverZoomed(bool _hoverZoomed)
 {
-    if (cardRef == _cardRef) {
+    if (isHoverZoomed == _hoverZoomed) {
         return;
     }
 
-    emit deleteCardInfoPopup(cardRef.name);
-    if (exactCard) {
-        disconnect(exactCard.getCardPtr().data(), nullptr, this, nullptr);
+    if (_hoverZoomed) {
+        processHoverEvent();
+    } else {
+        // Mark the hovered card's current scene footprint dirty so overlapped
+        // sibling zones (e.g. StackZone) repaint after the card moves away.
+        if (scene()) {
+            const QRectF footprint = sceneBoundingRect();
+            scene()->update(footprint);
+            // The hole disappears the moment the card is no longer hovered, even though the
+            // card has not changed size yet: tell the zones so they repaint it shut.
+            emit hoverFootprintChanged(footprint, footprint);
+        }
     }
-    cardRef = _cardRef;
 
-    refreshCardInfo();
+    isHoverZoomed = _hoverZoomed;
+    // The stacking override is one-directional: it applies the moment the hover starts
+    // and only drops once the shrink-out finishes (see the hoverZoom finished handler).
+    // Restoring it here would let siblings paint over the still-enlarged card.
+    if (_hoverZoomed) {
+        setZValue(ZValues::HOVERED_CARD);
+    }
+    // Scale about the center in both directions: at scale 1 the origin is moot,
+    // and keeping it centered avoids drift while shrinking back down.
+    setTransformOriginPoint(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F);
+
+    // Smooth-zoom up to the hover picture size (instead of the old 1.1 snap) so the
+    // hover panel can then swap in over the zoomed card with matching corners.
+    // The target is constant ON-SCREEN pixels: divide out the board view zoom so
+    // fullscreen (or zoomed) boards don't overshoot while the fixed-size panel matches.
+    qreal target = 1.0;
+    if (_hoverZoomed) {
+        // A tapped card is a quarter turn around: its on-screen width is its height, so the
+        // width has to come from the transformed rect. Using the untransformed width would
+        // make the zoom wider than the portrait hover picture, whose picture then leaves the
+        // zone hole the zoom cuts uncovered at the sides.
+        const QRectF rotatedFootprint = transform().mapRect(QRectF(QPointF(0, 0), boundingRect().size()));
+        const qreal w = rotatedFootprint.width();
+        qreal viewScale = 1.0;
+        if (scene() && !scene()->views().isEmpty()) {
+            if (const auto *view = scene()->views().first()) {
+                viewScale = qAbs(view->transform().m11());
+            }
+        }
+        if (w > 0.0 && viewScale > 0.0) {
+            target = qBound(1.0, HOVER_ZOOM_WIDTH / (w * viewScale), 6.0);
+        }
+    }
+    hoverZoom->stop();
+    hoverZoom->setStartValue(scale());
+    hoverZoom->setEndValue(target);
+    hoverZoom->setDuration(_hoverZoomed ? HOVER_ZOOM_IN_MS : HOVER_ZOOM_OUT_MS);
+    hoverZoom->start();
+    update();
 }
 
 void AbstractCardItem::setHovered(bool _hovered)
@@ -257,36 +354,101 @@ void AbstractCardItem::setHovered(bool _hovered)
     }
 
     if (_hovered) {
+        // The card-info widget listens for this: hovering still updates it right away.
         processHoverEvent();
-    } else {
-        // Mark the hovered card's current scene footprint dirty so overlapped
-        // sibling zones (e.g. StackZone) repaint after the card moves away.
-        if (scene()) {
-            scene()->update(sceneBoundingRect());
-        }
     }
 
     isHovered = _hovered;
-    setZValue(_hovered ? ZValues::HOVERED_CARD : realZValue);
-    setScale(_hovered && SettingsCache::instance().cardsDisplay().getScaleCards() ? 1.1 : 1);
-    setTransformOriginPoint(_hovered ? CardDimensions::WIDTH_HALF_F : 0, _hovered ? CardDimensions::HEIGHT_HALF_F : 0);
+    if (_hovered) {
+        setZValue(ZValues::HOVERED_CARD);
+    }
+
+    // contact alone must snap the card to 1.1x while scaleCards is on.
+    if (SettingsCache::instance().cardsDisplay().getScaleCards()) {
+        // Centered like the smooth zoom, so growing and shrinking never drift.
+        setTransformOriginPoint(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F);
+        setScale(_hovered ? LEGACY_HOVER_SCALE : 1.0);
+    }
+
+    if (!_hovered && !isHoverZoomed && hoverZoom->state() != QAbstractAnimation::Running) {
+        // A zoomed card keeps its raised z until the shrink-out finishes (its finished
+        // handler restores it); a highlight-only card has nothing to unwind.
+        setZValue(realZValue);
+    }
     update();
 }
 
 void AbstractCardItem::setColor(const QString &_color)
 {
-    color = _color;
-    cacheBgColor();
+    state->setColor(_color);
+}
+
+qreal AbstractCardItem::getCardScale() const
+{
+    return scale();
+}
+
+void AbstractCardItem::setCardScale(qreal _scale)
+{
+    if (qFuzzyCompare(_scale, scale())) {
+        return;
+    }
+    // The scale animates every frame: keep the scene index in step or hover
+    // picking tests a stale rect and the hover oscillates on/off by itself.
+    // Repaint the union of the old and new footprints, not just the card: zones
+    // dodge the zoomed card via a clip hole computed at paint time, and without
+    // a repaint they keep a stale hole — covering the card mid-animation and
+    // leaving a black rect behind once the hover ends.
+    const QRectF oldFootprint = sceneBoundingRect();
+    prepareGeometryChange();
+    setScale(_scale);
+    const QRectF newFootprint = sceneBoundingRect();
+    if (scene()) {
+        scene()->update(oldFootprint.united(newFootprint));
+        // Marking the scene region dirty is not enough for cached items: a zone that cuts a
+        // hover hole out of itself keeps the hole from its last repaint, which then shows as
+        // an uncovered black rectangle under the zoom.
+        emit hoverFootprintChanged(oldFootprint, newFootprint);
+    } else {
+        update();
+    }
+}
+
+qreal AbstractCardItem::getCardOpacity() const
+{
+    return opacity();
+}
+
+void AbstractCardItem::setCardOpacity(qreal _opacity)
+{
+    setOpacity(_opacity);
     update();
+}
+
+void AbstractCardItem::fadeCardOut()
+{
+    opacityAnim->stop();
+    opacityAnim->setStartValue(opacity());
+    opacityAnim->setEndValue(0.0);
+    opacityAnim->start();
+}
+
+void AbstractCardItem::fadeCardIn()
+{
+    opacityAnim->stop();
+    opacityAnim->setStartValue(opacity());
+    opacityAnim->setEndValue(1.0);
+    opacityAnim->start();
 }
 
 void AbstractCardItem::cacheBgColor()
 {
     QChar colorChar;
-    if (color.isEmpty()) {
-        colorChar = exactCard.getInfo().getColorChar();
+    const QString cardColor = state->getColor();
+    if (cardColor.isEmpty()) {
+        colorChar = state->getCardInfo().getColorChar();
     } else {
-        colorChar = color.at(0);
+        colorChar = cardColor.at(0);
     }
 
     switch (colorChar.toLower().toLatin1()) {
@@ -314,34 +476,38 @@ void AbstractCardItem::cacheBgColor()
     }
 }
 
-void AbstractCardItem::setTapped(bool _tapped, bool canAnimate)
+void AbstractCardItem::setTapAngle(int angle)
 {
-    if (tapped == _tapped) {
-        return;
+    // A tap turns the card a quarter, so the footprint moves even though the scale does not.
+    // Zones cut the hover hole from the live outline but are cached: without this they keep
+    // the hole from before the rotation, which shows as an uncovered square under the card.
+    const QRectF oldFootprint = sceneBoundingRect();
+    tapAngle = angle;
+    setTransform(QTransform()
+                     .translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F)
+                     .rotate(tapAngle)
+                     .translate(-CardDimensions::WIDTH_HALF_F, -CardDimensions::HEIGHT_HALF_F));
+    const QRectF newFootprint = sceneBoundingRect();
+    if (scene()) {
+        scene()->update(oldFootprint.united(newFootprint));
+        emit hoverFootprintChanged(oldFootprint, newFootprint);
     }
+    update();
+}
 
-    tapped = _tapped;
+void AbstractCardItem::onTappedChanged(bool newTapped, bool canAnimate)
+{
+    emit tappedChanged(newTapped);
     if (SettingsCache::instance().cardsDisplay().getTapAnimation() && canAnimate) {
         static_cast<GameScene *>(scene())->registerAnimationItem(this);
     } else {
-        tapAngle = tapped ? 90 : 0;
-        setTransform(QTransform()
-                         .translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F)
-                         .rotate(tapAngle)
-                         .translate(-CardDimensions::WIDTH_HALF_F, -CardDimensions::HEIGHT_HALF_F));
-        update();
+        setTapAngle(newTapped ? 90 : 0);
     }
 }
 
 bool AbstractCardItem::animationEvent()
 {
     return false;
-}
-
-void AbstractCardItem::setFaceDown(bool _facedown)
-{
-    facedown = _facedown;
-    update();
 }
 
 void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -357,7 +523,7 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
         }
     }
     if ((event->modifiers() & Qt::AltModifier) && event->button() == Qt::LeftButton) {
-        emit cardShiftClicked(cardRef.name);
+        emit cardShiftClicked(state->getCardRef().name);
     } else if ((event->modifiers() & Qt::ControlModifier)) {
         setSelected(!isSelected());
     } else if (!isSelected()) {
@@ -371,7 +537,7 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         setCursor(Qt::ClosedHandCursor);
     } else if (event->button() == Qt::MiddleButton) {
-        emit showCardInfoPopup(event->screenPos(), cardRef);
+        emit showCardInfoPopup(event->screenPos(), state->getCardRef());
     }
     event->accept();
 }
@@ -405,7 +571,7 @@ void AbstractCardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
 
     if (event->button() == Qt::MiddleButton) {
-        emit deleteCardInfoPopup(cardRef.name);
+        emit deleteCardInfoPopup(state->getCardRef().name);
     }
 
     // This function ensures the parent function doesn't mess around with our selection.

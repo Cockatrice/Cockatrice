@@ -1,9 +1,11 @@
 #include "game_selector.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../pixel_map_generator.h"
+#include "../../../client/settings/shortcuts_settings.h"
+#include "../../theme_icon.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
 #include "../interface/widgets/dialogs/dlg_filter_games.h"
+#include "../interface/widgets/game_hosting/game_creation_options.h"
 #include "../interface/widgets/tabs/tab_room.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
@@ -15,13 +17,18 @@
 #include "libcockatrice/protocol/pb/serverinfo_user.pb.h"
 #include "user/user_list_manager.h"
 
+#include <QAccessible>
+#include <QAccessibleEvent>
 #include <QAction>
+#include <QApplication>
 #include <QClipboard>
 #include <QDebug>
+#include <QEvent>
 #include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QItemSelectionModel>
+#include <QLabel>
 #include <QLineEdit>
 #include <QMap>
 #include <QMenu>
@@ -31,16 +38,21 @@
 #include <QSize>
 #include <QString>
 #include <QStringLiteral>
+#include <QStyle>
+#include <QToolButton>
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QVariant>
+#include <QWidget>
 #include <QtGlobal>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/game_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/utility/game_role_info.h>
 #include <libcockatrice/utility/qt_utils.h>
 #include <qlogging.h>
 #include <qnamespace.h>
@@ -50,6 +62,33 @@ class QModelIndex;
 class QPoint;
 class QWidget;
 template <typename T> class QList;
+
+namespace
+{
+
+/**
+ * @brief Returns whether the application paints with the native macOS style.
+ *
+ * QMacStyle ignores autoRaise and flat, and draws a QToolButton menu as a second square
+ * bezel, so the split host control cannot be composed there. A global style sheet wraps the
+ * real application style in a QStyleSheetStyle that takes it as a child, so that layer is
+ * unwrapped before the style is identified.
+ */
+bool usesMacStyle()
+{
+    QStyle *style = QApplication::style();
+    if (style == nullptr) {
+        return false;
+    }
+    if (style->inherits("QStyleSheetStyle")) {
+        if (QStyle *baseStyle = style->findChild<QStyle *>(QString(), Qt::FindDirectChildrenOnly)) {
+            style = baseStyle;
+        }
+    }
+    return style->inherits("QMacStyle");
+}
+
+} // namespace
 
 GameSelector::GameSelector(AbstractClient *_client,
                            TabSupervisor *_tabSupervisor,
@@ -130,20 +169,62 @@ GameSelector::GameSelector(AbstractClient *_client,
     }
 
     filterButton = new QPushButton;
-    filterButton->setIcon(themePixmap(QStringLiteral("icons/search")));
+    filterButton->setIcon(loadThemedIcon(QStringLiteral("icons/search")));
     connect(filterButton, &QPushButton::clicked, this, &GameSelector::actSetFilter);
     clearFilterButton = new QPushButton;
-    clearFilterButton->setIcon(themePixmap(QStringLiteral("icons/clearsearch")));
+    clearFilterButton->setIcon(loadThemedIcon(QStringLiteral("icons/clearsearch")));
     bool filtersSetToDefault = showFilters && gameListProxyModel->areFilterParametersSetToDefaults();
     clearFilterButton->setEnabled(!filtersSetToDefault);
     connect(clearFilterButton, &QPushButton::clicked, this, &GameSelector::actClearFilter);
     connect(gameListProxyModel, &GamesProxyModel::filtersChanged, this, &GameSelector::checkClearFilterButtonState);
 
     if (room) {
-        createButton = new QPushButton;
-        connect(createButton, &QPushButton::clicked, this, &GameSelector::actCreate);
-    } else {
-        createButton = nullptr;
+        hostGameAction = new QAction(this);
+        hostGameAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+        connect(hostGameAction, &QAction::triggered, this, &GameSelector::actQuickHost);
+
+        hostGameMenu = new QMenu(this);
+        hostGameMenu->setObjectName("hostGameMenu");
+        gameSettingsAction = hostGameMenu->addAction(QString());
+        gameSettingsAction->setObjectName("gameSettingsAction");
+        gameSettingsAction->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+        connect(gameSettingsAction, &QAction::triggered, this, &GameSelector::actCreate);
+
+        // A split QToolButton in its native style: the primary half quick-hosts, and the
+        // arrow opens the menu with the full form. This is the control on every style that
+        // can draw one; QMacStyle draws the menu half as a second square bezel instead.
+        hostGameSplitButton = new QToolButton(this);
+        hostGameSplitButton->setObjectName("hostGameSplitButton");
+        hostGameSplitButton->setDefaultAction(hostGameAction);
+        hostGameSplitButton->setPopupMode(QToolButton::MenuButtonPopup);
+        hostGameSplitButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+        hostGameSplitButton->setMenu(hostGameMenu);
+
+        // The native macOS style has no split rendering, so there the primary stays a plain
+        // QPushButton next to a plain settings button. A QPushButton does not take its text,
+        // tooltip or enabled state from an action, so those are mirrored by hand below and
+        // in updateHostControlsEnabled().
+        hostGameButton = new QPushButton(this);
+        hostGameButton->setObjectName("hostGameButton");
+        connect(hostGameButton, &QPushButton::clicked, hostGameAction, &QAction::trigger);
+
+        hostGameSettingsButton = new QPushButton(this);
+        hostGameSettingsButton->setObjectName("hostGameSettingsButton");
+        connect(hostGameSettingsButton, &QPushButton::clicked, gameSettingsAction, &QAction::trigger);
+
+        applyHostGameStyle();
+
+        // The shortcuts belong to the whole room tab, not just the game list, so they also
+        // fire while the chat or the user list has focus. A QToolButton menu is mouse-only,
+        // so the settings action needs its own shortcut for keyboard parity.
+        if (auto *roomTab = qobject_cast<TabRoom *>(parentWidget())) {
+            roomTab->addAction(hostGameAction);
+            roomTab->addAction(gameSettingsAction);
+        } else {
+            addAction(hostGameAction);
+            addAction(gameSettingsAction);
+        }
+        refreshShortcuts();
     }
     joinButton = new QPushButton;
     joinAsJudgeButton = new QPushButton;
@@ -157,7 +238,10 @@ GameSelector::GameSelector(AbstractClient *_client,
     }
     buttonLayout->addStretch();
     if (room) {
-        buttonLayout->addWidget(createButton);
+        // Only the form that matches the active style is visible; hidden widgets take no room.
+        buttonLayout->addWidget(hostGameSplitButton);
+        buttonLayout->addWidget(hostGameButton);
+        buttonLayout->addWidget(hostGameSettingsButton);
     }
     buttonLayout->addWidget(joinButton);
     if (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
@@ -173,10 +257,16 @@ GameSelector::GameSelector(AbstractClient *_client,
     }
     buttonLayout->setAlignment(Qt::AlignTop);
 
+    hostErrorLabel = new QLabel(this);
+    hostErrorLabel->setObjectName("hostGameErrorLabel");
+    hostErrorLabel->setWordWrap(true);
+    hostErrorLabel->setVisible(false);
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     if (showFilters && restoresettings) {
         mainLayout->addWidget(quickFilterToolBar);
     }
+    mainLayout->addWidget(hostErrorLabel);
     mainLayout->addWidget(gameListView);
     mainLayout->addLayout(buttonLayout);
 
@@ -266,9 +356,131 @@ void GameSelector::actCreate()
         return;
     }
 
-    DlgCreateGame dlg(room, room->getGameTypes(), this);
-    dlg.exec();
-    updateTitle();
+    clearHostError();
+
+    // Heap-allocate the dialog: if this selector (or its room tab) is destroyed while the
+    // dialog is open, e.g. on server disconnect, Qt deletes its children. A stack-allocated
+    // child would then be deleted by Qt and crash.
+    auto *dlg = new DlgCreateGame(room, room->getGameTypes(), this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    connect(dlg, &QDialog::finished, this, &GameSelector::updateTitle);
+    dlg->exec();
+}
+
+void GameSelector::actQuickHost()
+{
+    if (room == nullptr) {
+        qWarning() << "Attempted to create a game, but the room was null";
+        return;
+    }
+
+    clearHostError();
+
+    auto &gameSettings = SettingsCache::instance().game();
+    const bool registered = tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsRegistered;
+    const GameCreationOptions options =
+        gameSettings.getRememberGameSettings()
+            ? GameCreationOptions::fromSettings(gameSettings, room->getGameTypes(), registered)
+            : GameCreationOptions::defaultsFor(registered);
+
+    PendingCommand *pend = room->prepareRoomCommand(options.toCreateGameCommand());
+    connect(pend, &PendingCommand::finished, this, &GameSelector::checkQuickHostResponse);
+    room->sendRoomCommand(pend);
+
+    setHostCommandPending(true);
+}
+
+void GameSelector::checkQuickHostResponse(const Response &response)
+{
+    setHostCommandPending(false);
+
+    switch (response.response_code()) {
+        case Response::RespOk:
+            clearHostError();
+            break;
+        case Response::RespContextError:
+            showHostError(tr("You already host the maximum number of games."));
+            break;
+        case Response::RespInternalError:
+            showHostError(tr("The server could not create the game."));
+            break;
+        default:
+            showHostError(tr("Could not create the game."));
+            break;
+    }
+}
+
+void GameSelector::showHostError(const QString &message)
+{
+    hostErrorLabel->setText(message);
+    hostErrorLabel->setAccessibleName(message);
+    hostErrorLabel->setVisible(true);
+
+    // The label appears above the game list without taking focus, so announce it: a screen
+    // reader would otherwise never reach the message after the button press.
+    QAccessibleEvent alertEvent(hostErrorLabel, QAccessible::Alert);
+    QAccessible::updateAccessibility(&alertEvent);
+}
+
+void GameSelector::clearHostError()
+{
+    hostErrorLabel->clear();
+    hostErrorLabel->setAccessibleName(QString());
+    hostErrorLabel->setVisible(false);
+}
+
+void GameSelector::applyHostGameStyle()
+{
+    if (hostGameSplitButton == nullptr || hostGameButton == nullptr || hostGameSettingsButton == nullptr) {
+        return;
+    }
+
+    // Every style that can draw a split button gets one. The native macOS style cannot
+    // (QMacStyle draws the menu half as a second square bezel), so it gets the plain
+    // primary button and a sibling settings button instead.
+    const bool macStyle = usesMacStyle();
+    hostGameSplitButton->setVisible(!macStyle);
+    hostGameButton->setVisible(macStyle);
+    hostGameSettingsButton->setVisible(macStyle);
+
+    // The appearance settings can switch the style while the room is open.
+    updateHostGameToolTip();
+}
+
+void GameSelector::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::StyleChange) {
+        applyHostGameStyle();
+    }
+    QGroupBox::changeEvent(event);
+}
+
+void GameSelector::setHostCommandPending(bool pending)
+{
+    hostCommandPending = pending;
+    // A join may still be in flight: its response enables these controls again, so keep them
+    // disabled until that response arrives instead of re-enabling on the host response alone.
+    updateHostControlsEnabled();
+}
+
+void GameSelector::updateHostControlsEnabled()
+{
+    const bool hostControlsEnabled = !hostCommandPending && !joinCommandPending;
+    if (hostGameAction) {
+        hostGameAction->setEnabled(hostControlsEnabled);
+    }
+    if (hostGameButton) {
+        hostGameButton->setEnabled(hostControlsEnabled);
+    }
+    if (hostGameSplitButton) {
+        hostGameSplitButton->setEnabled(hostControlsEnabled);
+    }
+    if (hostGameSettingsButton) {
+        hostGameSettingsButton->setEnabled(hostControlsEnabled);
+    }
+    if (gameSettingsAction) {
+        gameSettingsAction->setEnabled(hostControlsEnabled);
+    }
 }
 
 void GameSelector::checkResponse(const Response &response)
@@ -285,6 +497,9 @@ void GameSelector::checkResponse(const Response &response)
     // Ideally we should have a way to figure out if the current game is the
     // same as the one we are getting a response for, but it's probably not
     // worth the trouble.
+    // The join response is the one that re-enables the buttons; clear the join flag first so
+    // the host controls become usable again unless a quick host is still in flight.
+    joinCommandPending = false;
     enableButtons();
 
     switch (response.response_code()) {
@@ -318,29 +533,29 @@ void GameSelector::checkResponse(const Response &response)
 
 void GameSelector::actJoin()
 {
-    joinGame();
+    joinGame({});
 }
 
 void GameSelector::actJoinAsJudge()
 {
     if (!(tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge)) {
-        joinGame();
+        joinGame({});
     } else {
-        joinGame(false, true);
+        joinGame({.isJudge = true, .isSpectator = false});
     }
 }
 
 void GameSelector::actJoinAsSpectator()
 {
-    joinGame(true);
+    joinGame({.isSpectator = true});
 }
 
 void GameSelector::actJoinAsJudgeSpectator()
 {
     if (!(tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge)) {
-        joinGame(true);
+        joinGame({.isSpectator = true});
     } else {
-        joinGame(true, true);
+        joinGame({.isJudge = true, .isSpectator = true});
     }
 }
 
@@ -362,8 +577,9 @@ void GameSelector::customContextMenu(const QPoint &point)
         const ServerInfo_Game &gameInfo = gameListModel->getGame(index.data(Qt::UserRole).toInt());
         const QMap<int, QString> &gameTypes = gameListModel->getGameTypes().value(gameInfo.room_id());
 
-        DlgCreateGame dlg(gameInfo, gameTypes, this);
-        dlg.exec();
+        auto *dlg = new DlgCreateGame(gameInfo, gameTypes, this);
+        dlg->setAttribute(Qt::WA_DeleteOnClose);
+        dlg->exec();
     });
 
     QAction copyLink(tr("Cop&y game link"));
@@ -399,17 +615,17 @@ void GameSelector::customContextMenu(const QPoint &point)
     menu.exec(gameListView->mapToGlobal(point));
 }
 
-void GameSelector::joinGame(const bool asSpectator, const bool asJudge)
+void GameSelector::joinGame(const GameRoleInfo &roles)
 {
     QModelIndex ind = gameListView->currentIndex();
     if (!ind.isValid()) {
         return;
     }
 
-    joinGame(gameListModel->getGame(ind.data(Qt::UserRole).toInt()), asSpectator, asJudge);
+    joinGame(gameListModel->getGame(ind.data(Qt::UserRole).toInt()), roles);
 }
 
-void GameSelector::joinGame(const ServerInfo_Game &game, const bool asSpectator, const bool asJudge)
+void GameSelector::joinGame(const ServerInfo_Game &game, const GameRoleInfo &roles)
 {
     if (tabSupervisor->switchToGameTabIfAlreadyExists(game.game_id())) {
         return;
@@ -420,14 +636,14 @@ void GameSelector::joinGame(const ServerInfo_Game &game, const bool asSpectator,
     // Joining a full game without override privileges silently becomes a
     // spectator join, so ask first instead of surprising the player.
     const bool gameFull = game.player_count() == game.max_players();
-    if (gameFull && !asSpectator && !asJudge && !overrideRestrictions) {
+    if (gameFull && !roles.isSpectator && !roles.isJudge && !overrideRestrictions) {
         if (!QtUtils::confirm(this, tr("Join game"), tr("The game is full. Join as a spectator instead?"),
                               QMessageBox::No)) {
             return;
         }
     }
 
-    bool spectator = asSpectator || gameFull;
+    bool spectator = roles.isSpectator || gameFull;
 
     QString password;
     if (game.with_password() && !(spectator && !game.spectators_need_password()) && !overrideRestrictions) {
@@ -448,7 +664,7 @@ void GameSelector::joinGame(const ServerInfo_Game &game, const bool asSpectator,
     cmd.set_password(password.toStdString());
     cmd.set_spectator(spectator);
     cmd.set_override_restrictions(overrideRestrictions);
-    cmd.set_join_as_judge(asJudge);
+    cmd.set_join_as_judge(roles.isJudge);
 
     TabRoom *r = tabSupervisor->getRoomTabs().value(game.room_id());
     if (!r) {
@@ -463,7 +679,7 @@ void GameSelector::joinGame(const ServerInfo_Game &game, const bool asSpectator,
     disableButtons();
 }
 
-bool GameSelector::joinGameById(const int gameId, const bool asSpectator)
+bool GameSelector::joinGameById(const int gameId, const GameRoleInfo &roles)
 {
     for (int row = 0; row < gameListModel->rowCount(); ++row) {
         const ServerInfo_Game &game = gameListModel->getGame(row);
@@ -471,7 +687,7 @@ bool GameSelector::joinGameById(const int gameId, const bool asSpectator)
             continue;
         }
 
-        joinGame(game, asSpectator);
+        joinGame(game, roles);
         return true;
     }
 
@@ -481,9 +697,8 @@ bool GameSelector::joinGameById(const int gameId, const bool asSpectator)
 
 void GameSelector::disableButtons()
 {
-    if (createButton) {
-        createButton->setEnabled(false);
-    }
+    joinCommandPending = true;
+    updateHostControlsEnabled();
 
     joinButton->setEnabled(false);
     spectateButton->setEnabled(false);
@@ -491,9 +706,7 @@ void GameSelector::disableButtons()
 
 void GameSelector::enableButtons()
 {
-    if (createButton) {
-        createButton->setEnabled(true);
-    }
+    updateHostControlsEnabled();
 
     // Enable buttons for the currently selected game
     enableButtonsForIndex(gameListView->currentIndex());
@@ -516,8 +729,22 @@ void GameSelector::retranslateUi()
 {
     filterButton->setText(tr("&Filter games"));
     clearFilterButton->setText(tr("C&lear filter"));
-    if (createButton) {
-        createButton->setText(tr("C&reate"));
+    if (hostGameAction) {
+        hostGameAction->setText(tr("Host game"));
+        if (hostGameButton) {
+            // A QPushButton does not draw text from an action; on macOS this button is the
+            // primary action, so it carries the same label.
+            hostGameButton->setText(tr("Host game"));
+        }
+        updateHostGameToolTip();
+    }
+    if (gameSettingsAction) {
+        gameSettingsAction->setText(tr("Game settings…"));
+        if (hostGameSettingsButton) {
+            // A QPushButton does not draw text from an action; on macOS this button is the
+            // secondary action, so it carries the same label.
+            hostGameSettingsButton->setText(tr("Game settings…"));
+        }
     }
     joinButton->setText(tr("&Join"));
     joinAsJudgeButton->setText(tr("Join as judge"));
@@ -525,6 +752,39 @@ void GameSelector::retranslateUi()
     joinAsJudgeSpectatorButton->setText(tr("Join as judge spectator"));
 
     updateTitle();
+}
+
+void GameSelector::refreshShortcuts()
+{
+    if (hostGameAction) {
+        hostGameAction->setShortcuts(SettingsCache::instance().shortcuts().getShortcut("GameSelector/aQuickHostGame"));
+        updateHostGameToolTip();
+    }
+    if (gameSettingsAction) {
+        gameSettingsAction->setShortcuts(SettingsCache::instance().shortcuts().getShortcut("GameSelector/aReviewGame"));
+    }
+}
+
+void GameSelector::updateHostGameToolTip()
+{
+    const QString shortcut = SettingsCache::instance().shortcuts().getShortcutString("GameSelector/aQuickHostGame");
+    const QString quickHostTooltip = shortcut.isEmpty()
+                                         ? tr("Host a game with your last-used settings")
+                                         : tr("Host a game with your last-used settings (%1)").arg(shortcut);
+    // The tooltip lives on the action for the shortcut and on the button for the mouse,
+    // since a QPushButton does not inherit an action's tooltip.
+    if (hostGameAction) {
+        hostGameAction->setToolTip(quickHostTooltip);
+    }
+    if (hostGameButton) {
+        hostGameButton->setToolTip(quickHostTooltip);
+    }
+    if (hostGameSplitButton) {
+        hostGameSplitButton->setToolTip(quickHostTooltip);
+    }
+    if (hostGameSettingsButton) {
+        hostGameSettingsButton->setToolTip(tr("Open the game settings before hosting"));
+    }
 }
 
 void GameSelector::processGameInfo(const ServerInfo_Game &info)

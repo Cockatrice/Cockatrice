@@ -23,6 +23,12 @@
 #include <qnamespace.h>
 #include <qobjectdefs.h>
 
+namespace
+{
+constexpr int TAGS_PREVIEW_LIMIT = 3;
+const QString SHOW_ALL_TAGS_LINK = QStringLiteral("cockatrice://show-all-tags");
+} // namespace
+
 CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent)
 {
     propsLabel = new QLabel;
@@ -31,7 +37,14 @@ CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent)
     // Forward link clicks via a queued connection: listeners react by calling setCard() -> setTexts(),
     // which replaces propsLabel's text. Doing that synchronously destroys QLabel's internal text control
     // while it is still processing the mouse event that emitted linkActivated, causing a crash.
-    connect(propsLabel, &QLabel::linkActivated, this, &CardInfoTextWidget::linkActivated, Qt::QueuedConnection);
+    connect(propsLabel, &QLabel::linkActivated, this, [this](const QString &link) {
+        if (link == SHOW_ALL_TAGS_LINK) {
+            showAllTags = true;
+            setCard(currentCard);
+            return;
+        }
+        emit linkActivated(link);
+    }, Qt::QueuedConnection);
 
     textLabel = new QTextEdit();
     textLabel->setReadOnly(true);
@@ -78,6 +91,12 @@ void CardInfoTextWidget::setCard(const ExactCard &exactCard)
         return;
     }
 
+    // Expanding the tag list re-renders the same card, so only reset the
+    // collapsed state when a genuinely different card is shown.
+    if (exactCard != currentCard) {
+        showAllTags = false;
+    }
+
     QString text = "<table width=\"100%\" border=0 cellspacing=0 cellpadding=0>";
     text += QString("<tr><td>%1</td><td width=\"5\"></td><td>%2</td></tr>")
                 .arg(tr("Name:"), CardLocalization::displayName(card).toHtmlEscaped());
@@ -97,6 +116,27 @@ void CardInfoTextWidget::setCard(const ExactCard &exactCard)
             continue;
         }
         QString keyText = Mtg::getNicePropertyName(key).toHtmlEscaped() + ":";
+
+        if (key == Mtg::Tags) {
+            const QStringList tags = card->getProperty(Mtg::Tags).split(" ", Qt::SkipEmptyParts);
+
+            QString tagsText;
+            if (!showAllTags && tags.size() > TAGS_PREVIEW_LIMIT) {
+                const QStringList preview = tags.mid(0, TAGS_PREVIEW_LIMIT);
+                const int remaining = tags.size() - preview.size();
+                // Join with non-breaking spaces so "… and N more" never wraps mid-phrase.
+                const QString moreText =
+                    tr("and %n more", nullptr, remaining).toHtmlEscaped().split(" ").join("&nbsp;");
+                tagsText = preview.join(", ").toHtmlEscaped() +
+                           QString(" <a href=\"%1\">…&nbsp;%2</a>").arg(SHOW_ALL_TAGS_LINK, moreText);
+            } else {
+                tagsText = tags.join(", ").toHtmlEscaped();
+            }
+
+            text += QString("<tr><td>%1</td><td></td><td>%2</td></tr>").arg(keyText, tagsText);
+            continue;
+        }
+
         text +=
             QString("<tr><td>%1</td><td></td><td>%2</td></tr>").arg(keyText, card->getProperty(key).toHtmlEscaped());
     }
@@ -105,8 +145,8 @@ void CardInfoTextWidget::setCard(const ExactCard &exactCard)
     if (!relatedCards.empty()) {
         text += QString("<tr><td>%1</td><td width=\"5\"></td><td>").arg(tr("Related cards:"));
 
-        for (auto *relatedCard : relatedCards) {
-            QString tmp = relatedCard->getName().toHtmlEscaped();
+        for (auto &relatedCard : relatedCards) {
+            QString tmp = relatedCard.name.toHtmlEscaped();
             text += "<a href=\"" + tmp + "\">" + tmp + "</a><br>";
         }
 

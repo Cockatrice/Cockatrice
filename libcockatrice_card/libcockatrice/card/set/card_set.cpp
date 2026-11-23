@@ -27,7 +27,6 @@ CardSetPtr CardSet::newInstance(ICardSetPriorityController *_priorityController,
                                 const Priority _priority)
 {
     CardSetPtr ptr(new CardSet(_priorityController, _shortName, _longName, _setType, _releaseDate, _priority));
-    // ptr->setSmartPointer(ptr);
     return ptr;
 }
 

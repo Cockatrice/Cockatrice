@@ -41,7 +41,7 @@ public:
     {
         return oldRow;
     }
-    [[nodiscard]] QStringList formats() const
+    [[nodiscard]] QStringList formats() const override
     {
         return QStringList() << "application/x-cockatricecardset";
     }

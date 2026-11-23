@@ -2,16 +2,10 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../../../game/abstract_game.h"
-#include "../../../game/game_event_handler.h"
-#include "../../../game/game_meta_info.h"
-#include "../../../game/game_state.h"
-#include "../../../game/player/player_info.h"
-#include "../../../game/player/player_manager.h"
+#include "../../../database/interface/settings_card_preference_provider.h"
 #include "../../../game_graphics/board/abstract_card_item.h"
-#include "../game/game.h"
-#include "../game/player/player_logic.h"
-#include "../game/replay.h"
+#include "../game_graphics/board/arrow_item.h"
+#include "../game_graphics/board/card_item.h"
 #include "../game_graphics/deckview/deck_view_container.h"
 #include "../game_graphics/deckview/tabbed_deck_view_container.h"
 #include "../game_graphics/game_scene.h"
@@ -26,12 +20,14 @@
 #include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
 #include "../interface/widgets/dialogs/dlg_invite_to_game.h"
+#include "../interface/widgets/dialogs/dlg_turn_order.h"
 #include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/utility/completer_utils.h"
 #include "../interface/widgets/utility/line_edit_completer.h"
 #include "../main.h"
 #include "../menus/tearoff_menu.h"
+#include "../replay/replay_event_sidebar.h"
 #include "../replay/replay_widget.h"
 #include "../utility/visibility_change_listener.h"
 #include "card/card_completer_proxy_model.h"
@@ -71,6 +67,15 @@
 #include <QWidget>
 #include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/game.h>
+#include <libcockatrice/game/game_event_handler.h>
+#include <libcockatrice/game/game_meta_info.h>
+#include <libcockatrice/game/game_state.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/player/player_manager.h>
+#include <libcockatrice/game/replay.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
@@ -94,10 +99,12 @@ class Message;
 } // namespace google
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
-    : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr)
+    : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr), replayDock(nullptr), historyDock(nullptr)
 {
+    setObjectName("TabGame");
     // THIS CTOR IS USED ON REPLAY
-    game = new Replay(this, _replay, tabSupervisor->getIsLocalGame());
+    game = new Replay(this, _replay, tabSupervisor->getIsLocalGame(), &SettingsCache::instance().userInterface(),
+                      new SettingsCardPreferenceProvider(this));
 
     createCardInfoDock(true);
     createPlayerListDock(true);
@@ -109,9 +116,11 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
     addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
+    addDockWidget(Qt::LeftDockWidgetArea, historyDock);
     addDockWidget(Qt::BottomDockWidgetArea, replayDock);
 
     mainWidget = new QStackedWidget(this);
+    mainWidget->setObjectName("mainWidget");
     mainWidget->addWidget(deckViewContainerWidget);
     mainWidget->addWidget(gamePlayAreaWidget);
     setCentralWidget(mainWidget);
@@ -140,8 +149,10 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
                  const QMap<int, QString> &_roomGameTypes)
     : Tab(_tabSupervisor), userListProxy(_tabSupervisor->getUserListManager())
 {
+    setObjectName("TabGame");
     // THIS CTOR IS USED ON GAMES
-    game = new Game(this, tabSupervisor->getIsLocalGame(), _clients, event, _roomGameTypes);
+    game = new Game(this, tabSupervisor->getIsLocalGame(), _clients, event, _roomGameTypes,
+                    &SettingsCache::instance().userInterface(), new SettingsCardPreferenceProvider(this));
 
     createCardInfoDock();
     createPlayerListDock();
@@ -149,12 +160,14 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     createPlayAreaWidget();
     createDeckViewContainerWidget();
     replayDock = nullptr;
+    historyDock = nullptr;
 
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
     addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
 
     mainWidget = new QStackedWidget(this);
+    mainWidget->setObjectName("mainWidget");
     mainWidget->addWidget(deckViewContainerWidget);
     mainWidget->addWidget(gamePlayAreaWidget);
     mainWidget->setContentsMargins(0, 0, 0, 0);
@@ -186,6 +199,7 @@ void TabGame::connectToGameState()
 {
     connect(game->getGameState(), &GameState::gameStarted, this, &TabGame::startGame);
     connect(game->getGameState(), &GameState::gameStopped, this, &TabGame::stopGame);
+    connect(game->getGameState(), &GameState::hostChanged, this, &TabGame::updateTurnOrderAction);
     connect(game->getGameState(), &GameState::activePhaseChanged, this, &TabGame::setActivePhase);
     connect(game->getGameState(), &GameState::activePlayerChanged, this, &TabGame::setActivePlayer);
 }
@@ -254,6 +268,8 @@ void TabGame::connectMessageLogToGameEventHandler()
 
     connect(game->getGameEventHandler(), &GameEventHandler::logTurnReversed, messageLog,
             &MessageLogWidget::logReverseTurn);
+    connect(game->getGameEventHandler(), &GameEventHandler::logTurnOrderChanged, messageLog,
+            &MessageLogWidget::logTurnOrderChanged);
 
     connect(game->getGameEventHandler(), &GameEventHandler::logConcede, messageLog, &MessageLogWidget::logConcede);
     connect(game->getGameEventHandler(), &GameEventHandler::logUnconcede, messageLog, &MessageLogWidget::logUnconcede);
@@ -306,7 +322,7 @@ void TabGame::resetForRewind()
 
 void TabGame::emitUserEvent()
 {
-    bool globalEvent = !game->getPlayerManager()->isSpectator() ||
+    bool globalEvent = !game->getPlayerManager()->getLocalRoles().isSpectator ||
                        SettingsCache::instance().userInterface().getSpectatorNotificationsEnabled();
     emit userEvent(globalEvent);
     updatePlayerListDockTitle();
@@ -314,6 +330,9 @@ void TabGame::emitUserEvent()
 
 TabGame::~TabGame()
 {
+    if (aCardMenu && aCardMenu->menu() && aCardMenu->menu() != emptyCardMenu) {
+        delete aCardMenu->menu();
+    }
     for (auto &player : game->getPlayerManager()->getPlayers()) {
         player->clear();
     }
@@ -340,6 +359,9 @@ void TabGame::retranslateUi()
     }
     cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
     messageLayoutDock->setWindowTitle(tr("Messages") + (messageLayoutDock->isWindow() ? tabText : QString()));
+    if (historyDock) {
+        historyDock->setWindowTitle(tr("Game History") + (historyDock->isWindow() ? tabText : QString()));
+    }
     if (replayDock) {
         replayDock->setWindowTitle(tr("Replay Timeline") + (replayDock->isWindow() ? tabText : QString()));
     }
@@ -363,6 +385,9 @@ void TabGame::retranslateUi()
     }
     if (aReverseTurn) {
         aReverseTurn->setText(tr("Reverse turn order"));
+    }
+    if (aTurnOrder) {
+        aTurnOrder->setText(tr("&Set turn order..."));
     }
     if (aRemoveLocalArrows) {
         aRemoveLocalArrows->setText(tr("&Remove all local arrows"));
@@ -413,6 +438,9 @@ void TabGame::retranslateUi()
     dockToActions[messageLayoutDock].menu->setTitle(tr("Messages"));
     dockToActions[playerListDock].menu->setTitle(tr("Player List"));
 
+    if (historyDock) {
+        dockToActions[historyDock].menu->setTitle(tr("Game History"));
+    }
     if (replayDock) {
         dockToActions[replayDock].menu->setTitle(tr("Replay Timeline"));
     }
@@ -538,15 +566,18 @@ void TabGame::updateTimeElapsedLabel(const QString newTime)
 
 void TabGame::adminLockChanged(bool lock)
 {
-    bool v = !(game->getPlayerManager()->isSpectator() && !game->getGameMetaInfo()->spectatorsCanChat() && lock);
+    bool v = !(game->getPlayerManager()->getLocalRoles().isSpectator && !game->getGameMetaInfo()->spectatorsCanChat() &&
+               lock);
     sayLabel->setVisible(v);
     sayEdit->setVisible(v);
 }
 
 void TabGame::actGameInfo()
 {
-    DlgCreateGame dlg(game->getGameMetaInfo()->proto(), game->getGameMetaInfo()->getRoomGameTypes(), this);
-    dlg.exec();
+    // Heap-allocated so that destroying this tab while the dialog is open cannot delete a stack object.
+    auto *dlg = new DlgCreateGame(game->getGameMetaInfo()->proto(), game->getGameMetaInfo()->getRoomGameTypes(), this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->exec();
 }
 
 void TabGame::actCopyGameLink()
@@ -620,6 +651,73 @@ void TabGame::actConcede()
     }
 }
 
+void TabGame::actTurnOrder()
+{
+    if (!canSetTurnOrder()) {
+        return;
+    }
+
+    QStringList playerNames;
+    const QList<int> seatOrder = game->getGameState()->getSeatOrder();
+    const auto &players = game->getPlayerManager()->getPlayers();
+    if (!seatOrder.isEmpty()) {
+        for (int playerId : seatOrder) {
+            if (PlayerLogic *player = players.value(playerId, nullptr)) {
+                playerNames.append(player->getPlayerInfo()->getName());
+            }
+        }
+        // Include any players missing from the tracked order rather than dropping them.
+        for (auto it = players.constBegin(); it != players.constEnd(); ++it) {
+            const QString name = it.value()->getPlayerInfo()->getName();
+            if (!playerNames.contains(name)) {
+                playerNames.append(name);
+            }
+        }
+    } else {
+        for (PlayerLogic *player : players) {
+            playerNames.append(player->getPlayerInfo()->getName());
+        }
+    }
+
+    DlgTurnOrder dlg(playerNames, this);
+    if (dlg.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    game->getGameEventHandler()->handleSetPlayerOrder(dlg.order(), dlg.isRandomizeRequested());
+}
+
+/**
+ * Whether the local user may change the seating order: only while the game has
+ * not started, and only as the host or a moderator - the server allows both
+ * (Server_AbstractParticipant::cmdSetPlayerOrder).
+ */
+bool TabGame::canSetTurnOrder() const
+{
+    if (game->getGameMetaInfo()->started()) {
+        return false;
+    }
+    if (game->isHost()) {
+        return true;
+    }
+    const ServerInfo_User *userInfo = tabSupervisor->getUserInfo();
+    return userInfo != nullptr && (userInfo->user_level() & ServerInfo_User::IsModerator);
+}
+
+/**
+ * Shows the turn order action only when it can actually change anything: the
+ * player must be allowed to set the order and the game must not have started.
+ * Called whenever either condition may have changed (game start/stop, host
+ * change).
+ */
+void TabGame::updateTurnOrderAction()
+{
+    if (aTurnOrder == nullptr) {
+        return;
+    }
+    aTurnOrder->setVisible(canSetTurnOrder());
+}
+
 /**
  * Confirms the leave game and sends the leave game command, if applicable.
  *
@@ -628,7 +726,7 @@ void TabGame::actConcede()
 bool TabGame::leaveGame()
 {
     if (!game->getGameState()->isGameClosed()) {
-        if (!game->getPlayerManager()->isSpectator()) {
+        if (!game->getPlayerManager()->getLocalRoles().isSpectator) {
             tabSupervisor->setCurrentWidget(this);
             if (!QtUtils::confirm(this, tr("Leave game"), tr("Are you sure you want to leave this game?"),
                                   QMessageBox::No)) {
@@ -777,7 +875,7 @@ PlayerLogic *TabGame::addPlayer(PlayerLogic *newPlayer)
 
     if (game->getGameState()->getIsLocalGame() ||
         (game->getPlayerManager()->isLocalPlayer(newPlayer->getPlayerInfo()->getId()) &&
-         !game->getPlayerManager()->isSpectator())) {
+         !game->getPlayerManager()->getLocalRoles().isSpectator)) {
         if (game->getGameState()->getIsLocalGame()) {
             newPlayer->getPlayerInfo()->setLocal(true);
         }
@@ -829,6 +927,15 @@ void TabGame::processPlayerLeave(PlayerLogic *leavingPlayer)
                 break;
             }
         }
+    }
+
+    // A shuffled local player has their seat changed, so the deck view container
+    // keyed by their previous id must be cleaned up alongside the leaving player.
+    int leavingPlayerId = leavingPlayer->getPlayerInfo()->getId();
+    if (deckViewContainers.contains(leavingPlayerId)) {
+        TabbedDeckViewContainer *deckView = deckViewContainers.take(leavingPlayerId);
+        deckViewContainerLayout->removeWidget(deckView);
+        deckView->deleteLater();
     }
 
     scene->removePlayer(leavingPlayer);
@@ -939,6 +1046,7 @@ void TabGame::startGame(bool _resuming)
         aConcede->setText(tr("&Concede"));
         aConcede->setEnabled(true);
     }
+    updateTurnOrderAction();
 }
 
 void TabGame::stopGame()
@@ -961,6 +1069,7 @@ void TabGame::stopGame()
         aConcede->setText(tr("&Concede"));
         aConcede->setEnabled(false);
     }
+    updateTurnOrderAction();
 }
 
 void TabGame::closeGame()
@@ -1053,10 +1162,16 @@ QString TabGame::getTabText() const
 
 /**
  * @param menu The menu to set. Pass in nullptr to set the menu to empty.
+ *
+ * The previous card menu is deleted here: QAction::setMenu() does not take ownership, so whoever installs the menu
+ * (this widget) has to dispose of the one it replaces. The empty placeholder menu is reused instead of deleted.
  */
 void TabGame::setCardMenu(CardMenu *menu)
 {
-    if (!aCardMenu) {
+    if (!aCardMenu || !emptyCardMenu) {
+        if (menu) {
+            menu->deleteLater();
+        }
         return;
     }
 
@@ -1066,10 +1181,11 @@ void TabGame::setCardMenu(CardMenu *menu)
             gameView->viewport()->update();
         }
     }
-    if (menu) {
-        aCardMenu->setMenu(menu);
-    } else {
-        aCardMenu->setMenu(new QMenu);
+
+    QMenu *previousMenu = aCardMenu->menu();
+    aCardMenu->setMenu(menu ? menu : emptyCardMenu);
+    if (previousMenu && previousMenu != emptyCardMenu && previousMenu != menu) {
+        previousMenu->deleteLater();
     }
 }
 
@@ -1085,6 +1201,9 @@ void TabGame::createMenuItems()
     connect(aNextTurn, &QAction::triggered, game->getGameEventHandler(), &GameEventHandler::handleNextTurn);
     aReverseTurn = new QAction(this);
     connect(aReverseTurn, &QAction::triggered, game->getGameEventHandler(), &GameEventHandler::handleReverseTurn);
+    aTurnOrder = new QAction(this);
+    connect(aTurnOrder, &QAction::triggered, this, &TabGame::actTurnOrder);
+    updateTurnOrderAction();
     aRemoveLocalArrows = new QAction(this);
     connect(aRemoveLocalArrows, &QAction::triggered, this, &TabGame::actRemoveLocalArrows);
     aRotateViewCW = new QAction(this);
@@ -1113,6 +1232,7 @@ void TabGame::createMenuItems()
     connect(aFocusChat, &QAction::triggered, sayEdit, qOverload<>(&LineEditCompleter::setFocus));
 
     phasesMenu = new TearOffMenu(this);
+    phasesMenu->setObjectName("phasesMenu");
 
     for (int i = 0; i < phasesToolbar->phaseCount(); ++i) {
         auto *temp = new QAction(QString(), this);
@@ -1123,13 +1243,18 @@ void TabGame::createMenuItems()
 
     phasesMenu->addSeparator();
     phasesMenu->addAction(aNextPhase);
+    aNextPhase->setObjectName("aNextPhase");
     phasesMenu->addAction(aNextPhaseAction);
+    aNextPhaseAction->setObjectName("aNextPhaseAction");
 
     gameMenu = new QMenu(this);
+    gameMenu->setObjectName("gameMenu");
     playersSeparator = gameMenu->addSeparator();
     gameMenu->addMenu(phasesMenu);
     gameMenu->addAction(aNextTurn);
+    aNextTurn->setObjectName("aNextTurn");
     gameMenu->addAction(aReverseTurn);
+    gameMenu->addAction(aTurnOrder);
     gameMenu->addSeparator();
     gameMenu->addAction(aRemoveLocalArrows);
     gameMenu->addAction(aRotateViewCW);
@@ -1144,7 +1269,8 @@ void TabGame::createMenuItems()
 
     gameMenu->addSeparator();
 
-    aCardMenu = gameMenu->addMenu(new QMenu(this));
+    emptyCardMenu = new QMenu(this);
+    aCardMenu = gameMenu->addMenu(emptyCardMenu);
 
     // Sync the new action with the same state the dock button already shows.
     updateInviteButtonState();
@@ -1158,6 +1284,7 @@ void TabGame::createReplayMenuItems()
     aNextPhaseAction = nullptr;
     aNextTurn = nullptr;
     aReverseTurn = nullptr;
+    aTurnOrder = nullptr;
     aRemoveLocalArrows = nullptr;
     aRotateViewCW = nullptr;
     aRotateViewCCW = nullptr;
@@ -1175,6 +1302,7 @@ void TabGame::createReplayMenuItems()
     gameMenu->addAction(aLeaveGame);
 
     aCardMenu = nullptr;
+    emptyCardMenu = nullptr;
 
     addTabMenu(gameMenu);
 }
@@ -1186,6 +1314,10 @@ void TabGame::createViewMenuItems()
     registerDockWidget(viewMenu, cardInfoDock, {250, 360});
     registerDockWidget(viewMenu, messageLayoutDock, {250, 200});
     registerDockWidget(viewMenu, playerListDock, {250, 50});
+
+    if (historyDock) {
+        registerDockWidget(viewMenu, historyDock, {280, 400});
+    }
 
     if (replayDock) {
         registerDockWidget(viewMenu, replayDock, {900, 100});
@@ -1256,6 +1388,12 @@ void TabGame::actResetLayout()
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
     addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
 
+    if (historyDock) {
+        historyDock->setVisible(true);
+        historyDock->setFloating(false);
+        addDockWidget(Qt::LeftDockWidgetArea, historyDock);
+    }
+
     if (replayDock) {
         replayDock->setVisible(true);
         replayDock->setFloating(false);
@@ -1264,6 +1402,9 @@ void TabGame::actResetLayout()
         cardInfoDock->resize(250, 360);
         messageLayoutDock->resize(250, 200);
         playerListDock->resize(250, 50);
+        if (historyDock) {
+            historyDock->resize(280, 400);
+        }
         replayDock->resize(900, 100);
     } else {
         cardInfoDock->resize(250, 360);
@@ -1276,12 +1417,19 @@ void TabGame::createPlayAreaWidget(bool bReplay)
 {
     phasesToolbar = new PhasesToolbar;
     if (!bReplay) {
-        connect(phasesToolbar, &PhasesToolbar::sendGameCommand, game->getGameEventHandler(),
-                qOverload<const ::google::protobuf::Message &, int>(&GameEventHandler::sendGameCommand));
+        connect(phasesToolbar, &PhasesToolbar::setActivePhaseRequested, game->getGameEventHandler(),
+                &GameEventHandler::handleActivePhaseChanged);
+        connect(phasesToolbar, &PhasesToolbar::nextTurnRequested, game->getGameEventHandler(),
+                &GameEventHandler::handleNextTurn);
+        connect(phasesToolbar, &PhasesToolbar::untapAllRequested, game->getGameEventHandler(),
+                &GameEventHandler::handleUntapAll);
+        connect(phasesToolbar, &PhasesToolbar::drawCardRequested, game->getGameEventHandler(),
+                &GameEventHandler::handleDrawCard);
     }
     scene = new GameScene(phasesToolbar, this);
     connect(game->getPlayerManager(), &PlayerManager::playerConceded, scene, &GameScene::rearrange);
     connect(game->getPlayerManager(), &PlayerManager::playerCountChanged, scene, &GameScene::rearrange);
+    connect(game->getGameState(), &GameState::seatOrderChanged, scene, &GameScene::rearrange);
     connect(scene, &GameScene::arrowDeletionRequested, game->getGameEventHandler(),
             &GameEventHandler::handleArrowDeletion);
     connect(game->getGameEventHandler(), &GameEventHandler::arrowDeleted, scene, &GameScene::deleteArrow);
@@ -1311,6 +1459,22 @@ void TabGame::createReplayDock(GameReplay *replay)
             [this](const auto &event, auto options) {
                 game->getGameEventHandler()->processGameEventContainer(event, nullptr, options);
             });
+
+    auto *historySidebar = new ReplayEventSidebar(nullptr, replay, replayWidget->getReplayTimeline());
+    historyDock = new QDockWidget(this);
+    historyDock->setObjectName("historyDock");
+    historyDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable |
+                             QDockWidget::DockWidgetMovable);
+    historyDock->setWidget(historySidebar);
+    historyDock->setFloating(false);
+
+    connect(historySidebar, &ReplayEventSidebar::eventSelected, replayWidget, &ReplayWidget::seekToEvent);
+    // The sidebar highlights events rather than times, so ask the manager which event the game state has reached.
+    connect(replayWidget, &ReplayWidget::timeChanged, historySidebar,
+            [this, historySidebar] { historySidebar->setCurrentEvent(replayWidget->getLastProcessedEventIndex()); });
+
+    // No event has been replayed yet when the sidebar is connected, so apply the initial state explicitly.
+    historySidebar->setCurrentEvent(replayWidget->getLastProcessedEventIndex());
 }
 
 void TabGame::createDeckViewContainerWidget(bool bReplay)
@@ -1358,9 +1522,11 @@ void TabGame::createPlayerListDock(bool bReplay)
         connect(playerListWidget, SIGNAL(openMessageDialog(QString, bool)), this,
                 SIGNAL(openMessageDialog(QString, bool)));
     }
+    playerListWidget->setObjectName("playerListWidget");
     playerListWidget->setFocusPolicy(Qt::NoFocus);
 
     auto *playerListBox = new QWidget(this);
+    playerListBox->setObjectName("playerListBox");
     auto *vbox = QtUtils::makeLayout<QVBoxLayout>(playerListBox, 0);
 
     vbox->addWidget(playerListWidget);
@@ -1442,13 +1608,13 @@ void TabGame::createMessageDock(bool bReplay)
 
         actCompleterChanged();
 
-        if (game->getPlayerManager()->isSpectator()) {
+        if (game->getPlayerManager()->getLocalRoles().isSpectator) {
             /* Spectators can only talk if:
              * (a) the game creator allows it
              * (b) the spectator is a moderator/administrator
              * (c) the spectator is a judge
              */
-            bool isModOrJudge = !tabSupervisor->getAdminLocked() || game->getPlayerManager()->isJudge();
+            bool isModOrJudge = !tabSupervisor->getAdminLocked() || game->getPlayerManager()->getLocalRoles().isJudge;
             if (!isModOrJudge && !game->getGameMetaInfo()->spectatorsCanChat()) {
                 sayLabel->hide();
                 sayEdit->hide();

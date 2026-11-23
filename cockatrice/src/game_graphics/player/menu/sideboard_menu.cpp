@@ -2,13 +2,13 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../../../game/player/player_info.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_logic.h"
 #include "../player_graphics_item.h"
 
 #include <QAction>
 #include <QKeySequence>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
 
 SideboardMenu::SideboardMenu(PlayerGraphicsItem *player, QMenu *playerMenu) : QMenu(playerMenu)
 {

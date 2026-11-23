@@ -26,7 +26,6 @@ public:
     void retranslateUi() override;
 
     static QStringList findQmFiles();
-    static QString languageName(const QString &lang);
 
 signals:
     /// Request to re-import the card database with the newly selected card language

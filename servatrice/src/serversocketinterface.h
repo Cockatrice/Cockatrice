@@ -37,7 +37,7 @@
 #include <server_protocolhandler.h>
 
 class Servatrice;
-class Servatrice_DatabaseInterface;
+class Server_DatabaseInterface;
 class DeckList;
 class ServerInfo_DeckStorage_Folder;
 class Command_AddToList;
@@ -81,6 +81,7 @@ class Command_ForgotPasswordReset;
 class Command_GetAdminNotes;
 class Command_GetBanHistory;
 class Command_GetModeratorLastLogins;
+class Command_GetPrivateChatHistory;
 class Command_GetServerStats;
 class Command_GetUserAlts;
 class Command_GetUserSessions;
@@ -138,24 +139,18 @@ protected:
     QMutex outputQueueMutex;
 
 private:
-    Servatrice_DatabaseInterface *sqlInterface;
-
     Response::ResponseCode cmdAddToList(const Command_AddToList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, ResponseContainer &rc);
-    int getDeckPathId(int basePathId, QStringList path);
-    int getDeckPathId(const QString &path);
+    Response::ResponseCode cmdGetPrivateChatHistory(const Command_GetPrivateChatHistory &cmd, ResponseContainer &rc);
     bool deckListHelper(int folderId,
                         ServerInfo_DeckStorage_Folder *folder,
                         int userId,
                         bool inheritedPublic,
                         bool publicOnly);
-    int getDeckOwnerId(int deckId);
-    bool isDeckEffectivelyPublic(int deckId);
     Response::ResponseCode cmdDeckList(const Command_DeckList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckListOtherUser(const Command_DeckListOtherUser &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckSetVisibility(const Command_DeckSetVisibility &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckNewDir(const Command_DeckNewDir &cmd, ResponseContainer &rc);
-    void deckDelDirHelper(int basePathId);
     void sendServerMessage(const QString userName, const QString message);
     Response::ResponseCode cmdDeckDelDir(const Command_DeckDelDir &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckDel(const Command_DeckDel &cmd, ResponseContainer &rc);
@@ -252,7 +247,7 @@ private:
 
 public:
     AbstractServerSocketInterface(Servatrice *_server,
-                                  Servatrice_DatabaseInterface *_databaseInterface,
+                                  Server_DatabaseInterface *_databaseInterface,
                                   QObject *parent = 0);
     ~AbstractServerSocketInterface()
     {
@@ -269,9 +264,7 @@ class TcpServerSocketInterface : public AbstractServerSocketInterface
 {
     Q_OBJECT
 public:
-    TcpServerSocketInterface(Servatrice *_server,
-                             Servatrice_DatabaseInterface *_databaseInterface,
-                             QObject *parent = 0);
+    TcpServerSocketInterface(Servatrice *_server, Server_DatabaseInterface *_databaseInterface, QObject *parent = 0);
     ~TcpServerSocketInterface();
 
     QHostAddress getPeerAddress() const
@@ -317,7 +310,7 @@ class WebsocketServerSocketInterface : public AbstractServerSocketInterface
     Q_OBJECT
 public:
     WebsocketServerSocketInterface(Servatrice *_server,
-                                   Servatrice_DatabaseInterface *_databaseInterface,
+                                   Server_DatabaseInterface *_databaseInterface,
                                    QObject *parent = nullptr);
     ~WebsocketServerSocketInterface();
 

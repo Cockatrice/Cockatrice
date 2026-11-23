@@ -137,22 +137,22 @@
     <message>
         <location filename="src/pages.cpp" line="379"/>
         <source>Downloading (0 MB)</source>
-        <translation type="unfinished"/>
+        <translation>Herunterladen (0 MB)</translation>
     </message>
     <message>
         <location filename="src/pages.cpp" line="460"/>
         <source>Downloading (%1 MB)</source>
-        <translation type="unfinished"/>
+        <translation>Herunterladen (%1 MB)</translation>
     </message>
     <message>
         <location filename="src/pages.cpp" line="509"/>
         <source>Parsing file (%1%)</source>
-        <translation type="unfinished"/>
+        <translation>Datei wird verarbeitet (%1%)</translation>
     </message>
     <message>
         <location filename="src/pages.cpp" line="524"/>
         <source>Extracting file...</source>
-        <translation type="unfinished"/>
+        <translation>Extrahiere Datei...</translation>
     </message>
     <message>
         <location filename="src/pages.cpp" line="604"/>
@@ -168,7 +168,7 @@
     <message>
         <location filename="src/pages.cpp" line="666"/>
         <source>Parsing file (100%)</source>
-        <translation type="unfinished"/>
+        <translation>Datei wird verarbeitet (100%)</translation>
     </message>
 </context>
 <context>
@@ -348,7 +348,7 @@
     <message>
         <location filename="src/pages.cpp" line="797"/>
         <source>A Cockatrice card database file of %1 MB has been downloaded.</source>
-        <translation type="unfinished"/>
+        <translation>Eine Cockatrice-Kartendatenbankdatei der Größe %1 MB wurde heruntergeladen.</translation>
     </message>
     <message>
         <location filename="src/pages.cpp" line="800"/>
@@ -434,7 +434,7 @@
         <location filename="src/pagetemplates.cpp" line="115"/>
         <source>Downloading (0 MB)</source>
         <oldsource>Downloading (0MB)</oldsource>
-        <translation type="unfinished"/>
+        <translation>Herunterladen (0 MB)</translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="129"/>

@@ -11,6 +11,7 @@
 
 #include <QBrush>
 #include <QColor>
+#include <QFont>
 #include <QLoggingCategory>
 #include <QMap>
 #include <QObject>
@@ -22,8 +23,8 @@
 
 inline Q_LOGGING_CATEGORY(ThemeManagerLog, "theme_manager");
 
-typedef QMap<QString, QString> QStringMap;
-typedef QMap<int, QBrush> QBrushMap;
+using QStringMap = QMap<QString, QString>;
+using QBrushMap = QMap<int, QBrush>;
 
 class ThemeManager : public QObject
 {
@@ -47,10 +48,15 @@ private:
     // palette is applied. Used as the base when a theme supplies no palette, so
     // switching away from a custom palette restores the original colours.
     QPalette defaultPalette;
+    // Pristine application font captured at startup, before any theme font is
+    // applied. Restored when a theme (or a preview) supplies no InterfaceDefault
+    // font, so switching away from a themed font cannot leave it behind.
+    QFont defaultFont;
     QString currentThemePath;
     std::array<QBrush, Role::MaxRole + 1> brushes;
     QStringMap availableThemes;
     QMap<AppColor::Role, QColor> currentAppColors;
+    FontConfig currentFonts;
     /*
       Internal cache for multiple backgrounds
     */
@@ -86,6 +92,8 @@ public:
     static bool isDirReallyWritable(const QString &dirPath);
     // Explicit color scheme of the theme: theme.cfg's ColorScheme setting
     // (Dark/Light), falling back to the OS color scheme when it is "System".
+    // A resolved directory that does not exist yet is an uncustomised stock
+    // theme, so it follows the OS rather than the shipped scheme.
     bool isDarkMode(const QString &themeDirPath) const;
     // The resolved scheme of the currently active theme.
     bool isDarkModeActive() const
@@ -101,10 +109,27 @@ public:
     // Load the global theme settings (style + color scheme preference)
     static ThemeConfig loadGlobalConfig(const QString &themeDirPath);
     static bool saveGlobalConfig(const QString &themeDirPath, const ThemeConfig &cfg);
+    // Load a theme's theme.cfg, falling back to the shipped (system) theme
+    // directory when the resolved user directory does not carry one. A user
+    // directory seeded with only fonts.toml would otherwise shadow the shipped
+    // theme and lose its style and colour scheme.
+    static ThemeConfig loadDefaultThemeConfig(const QString &themeDirPath, const QString &systemThemeDirPath);
+    // Load the theme.cfg that decides the active colour scheme. Unlike
+    // loadDefaultThemeConfig(), a resolved directory that does not exist yet is
+    // a stock theme with no user override: it returns an empty config so the
+    // caller follows the OS scheme instead of inheriting the shipped one.
+    static ThemeConfig loadColorSchemeConfig(const QString &themeDirPath, const QString &systemThemeDirPath);
+    // Resolve the theme stylesheet: the scheme-qualified style-<dark|light>.css
+    // when shipped, else style.css, preferring the resolved (user) directory
+    // over the shipped one. Empty when neither directory carries a stylesheet.
+    static QString themeStyleSheetPath(const QString &themeDirPath, const QString &systemThemeDirPath, bool dark);
 
     // Load/save per-scheme palette colors
     static PaletteConfig loadPaletteConfig(const QString &themeDirPath, const QString &colorScheme);
     static bool savePaletteConfig(const QString &themeDirPath, const QString &colorScheme, const PaletteConfig &cfg);
+    // Load/save shared per-theme fonts (fonts.toml, not split by scheme)
+    static FontConfig loadFontConfig(const QString &themeDirPath);
+    static bool saveFontConfig(const QString &themeDirPath, const FontConfig &cfg);
     // Resolve prefix to a scheme-qualified "theme:" path. Existence is probed
     // internally across the formats themes may ship (.png/.jpg/.svg), so
     // callers load the returned path directly. Prefers "<prefix>-<dark|light>"
@@ -123,6 +148,9 @@ public:
     // theme directory when it is absent from the resolved (user) directory.
     static PaletteConfig
     loadDefaultPaletteConfig(const QString &themeDirPath, const QString &themeName, const QString &colorScheme);
+    // Load the theme's shipped default fonts, falling back to the system theme
+    // directory when fonts.toml is absent from the resolved (user) directory.
+    static FontConfig loadDefaultFontConfig(const QString &themeDirPath, const QString &themeName);
     /** @brief Writes cfg to disk as the theme's palette-<scheme>.toml and updates the
      *         theme's stored colour scheme to match. Shared by PaletteEditorDialog::onSave
      *         and FirstRunWizard's theme step so the two "generate + keep" paths can't drift. */
@@ -132,10 +160,38 @@ public:
 
     void reloadCurrentTheme();
     void previewPalette(const PaletteConfig &cfg, const QString &scheme);
+    void previewFonts(const FontConfig &cfg);
 
     // Resolves an application color role: the theme's stored [AppColors] value
-    // when present, otherwise a palette-accent-derived fallback.
+    // when present, otherwise a palette-accent-derived fallback for accents and
+    // a scheme-appropriate semantic default for positive / negative.
     QColor appColor(AppColor::Role role) const;
+    /** @brief Resolves an application font role: the theme's stored [Fonts]
+     *         value when present, otherwise the application font. Roles that
+     *         had a historical hardcoded family ask for it through
+     *         cardTextFont() and deckListFont() instead. */
+    QFont appFont(AppFont::Role role) const;
+    /** @brief Whether the active theme defines this role in fonts.toml. */
+    bool hasAppFont(AppFont::Role role) const;
+    /** @brief The CardText role with its historical Serif fallback. Used by the
+     *         counter painters, which were Serif before the role existed. */
+    QFont cardTextFont() const;
+    /** @brief The DeckList role with its historical Serif fallback. Used by the
+     *         two surfaces that hardcoded Serif before the role existed (the
+     *         deck view zone headers and the printed deck list); every other
+     *         DeckList reader falls back to the application font. */
+    QFont deckListFont() const;
+    /** @brief Resolves an application font role against the startup font only,
+     *         ignoring any previewed config in currentFonts. Editors that show
+     *         "what this role resolves to" must use this, because appFont()
+     *         reflects a live preview while the editor is open. */
+    QFont defaultAppFont(AppFont::Role role) const;
+    /** @brief CardText max size resolved the way the font editor shows it:
+     *         stored CardTextMaxSize, else the CardText point size, else 12,
+     *         clamped to the editor's representable range. */
+    int cardTextMaxSize() const;
+    /** @brief CardText shrink-to-fit floor resolved the same way. */
+    int cardTextMinSize() const;
 
     QBrush &getBgBrush(Role zone);
     QBrush getExtraBgBrush(Role zone, int zoneId = 0);
@@ -144,6 +200,7 @@ protected slots:
 signals:
     void themeChanged();
     void paletteChanged();
+    void fontsChanged();
 };
 
 extern ThemeManager *themeManager;

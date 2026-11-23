@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+/**
+ * A private conversation message with its time in Unix seconds.
+ */
+message ServerInfo_PrivateChatMessage {
+    optional uint64 time = 1;
+    optional string sender_name = 2;
+    optional string message = 3;
+}

@@ -1,5 +1,6 @@
 #include "user_list_widget.h"
 
+#include "../../../../client/crash/crash_reporter.h"
 #include "../../../../client/settings/cache_settings.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/theme_manager.h"
@@ -295,7 +296,8 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
         if (lhsUserLevelFlags.testFlag(userLevelEntry) &&
             lhsUserLevelFlags.testFlag(userLevelEntry) == rhsUserLevelFlags.testFlag(userLevelEntry)) {
             return collator.compare(data(2, Qt::UserRole).toString(), other.data(2, Qt::UserRole).toString()) < 0;
-        } else if (lhsUserLevelFlags.testFlag(userLevelEntry) != rhsUserLevelFlags.testFlag(userLevelEntry)) {
+        }
+        if (lhsUserLevelFlags.testFlag(userLevelEntry) != rhsUserLevelFlags.testFlag(userLevelEntry)) {
             return lhsUserLevelFlags.testFlag(userLevelEntry) > rhsUserLevelFlags.testFlag(userLevelEntry);
         }
     }
@@ -519,6 +521,19 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
             userTree->viewport()->update();
             userTree->update();
         });
+        // Divider headers store their font on the item, so re-apply the role
+        // family here; the painter reads the role live and needs only the
+        // repaint below.
+        connect(themeManager, &ThemeManager::fontsChanged, this, [this] {
+            QFont dividerFont = themeManager->appFont(AppFont::InterfaceDefault);
+            dividerFont.setBold(true);
+            for (auto it = sectionItems.constBegin(); it != sectionItems.constEnd(); ++it) {
+                it.value()->setFont(0, dividerFont);
+                it.value()->setSizeHint(0, QSize(0, QFontMetrics(dividerFont).height() + 16));
+            }
+            userTree->viewport()->update();
+            userTree->update();
+        });
     }
 
     QVBoxLayout *vbox = new QVBoxLayout;
@@ -617,7 +632,14 @@ void UserListWidget::bind(UserListManager *mgr)
     connect(manager, &UserListManager::addedToIgnoreList, this, refreshCurrentPopup);
     connect(manager, &UserListManager::removedFromIgnoreList, this, refreshIfPopupOpen);
     connect(manager, &UserListManager::userJoinedOnline, this, refreshCurrentPopup);
-    connect(manager, &UserListManager::userLeftOnline, this, refreshIfPopupOpen);
+    connect(manager, &UserListManager::userLeftOnline, this, [this, refreshIfPopupOpen](const QString &name) {
+        // The online row may already have been removed; the pinned popup must
+        // still invalidate its games request and display the offline state.
+        if (userInfoPopup && userInfoPopup->getCurrentUser() == name) {
+            userInfoPopup->setOnline(false);
+        }
+        refreshIfPopupOpen(name);
+    });
 
     rebuild();
 }
@@ -747,9 +769,9 @@ void UserListWidget::connectPopupSignals()
     // needed. The popup closes here because that intent switches tabs, which
     // would otherwise strand it on a list that is no longer on screen.
     connect(userInfoPopup, &UserInfoPopup::joinGameRequested, this,
-            [this](const int gameId, const int roomId, const bool asSpectator) {
+            [this](const int gameId, const int roomId, const GameRoleInfo &roles) {
                 hidePopup(true);
-                tabSupervisor->joinGameFromUserCard(gameId, roomId, asSpectator);
+                tabSupervisor->joinGameFromUserCard(gameId, roomId, roles);
             });
 }
 
@@ -1201,6 +1223,7 @@ void UserListWidget::processUserInfo(Section section, const ServerInfo_User &use
 
 bool UserListWidget::deleteUser(const QString &userName)
 {
+    CrashReporter::addBreadcrumb("users", "user list row removed");
     if (sectioned) {
         // The user may own several rows (one per section). Drop them all.
         bool removed = false;
@@ -1492,7 +1515,7 @@ QTreeWidgetItem *UserListWidget::createSectionItem(Section section)
     // They act as collapsible section headers once they have focus.
     divider->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
-    QFont font = userTree->font();
+    QFont font = themeManager->appFont(AppFont::InterfaceDefault);
     font.setBold(true);
     divider->setFont(0, font);
     // A little taller than a plain text row so the header reads as a section

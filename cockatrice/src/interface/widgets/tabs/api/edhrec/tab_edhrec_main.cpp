@@ -1,7 +1,6 @@
 #include "tab_edhrec_main.h"
 
 #include "../../../../../client/settings/cache_settings.h"
-#include "../../../../deck_loader/loaded_deck.h"
 #include "../../../cards/card_size_widget.h"
 #include "../../../quick_settings/settings_button_widget.h"
 #include "../../../utility/completer_utils.h"
@@ -28,6 +27,7 @@
 #include <QRegularExpression>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/database/card_database_querier.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/models/database/card/card_completer_proxy_model.h>
 #include <libcockatrice/models/database/card/card_search_model.h>
 #include <libcockatrice/models/database/card_database_display_model.h>

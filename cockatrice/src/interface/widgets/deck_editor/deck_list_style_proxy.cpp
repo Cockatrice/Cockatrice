@@ -1,5 +1,7 @@
 #include "deck_list_style_proxy.h"
 
+#include "../../theme_manager.h"
+
 #include <QBrush>
 #include <QColor>
 #include <QFont>
@@ -7,6 +9,16 @@
 #include <QVariant>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <qnamespace.h>
+
+DeckListStyleProxy::DeckListStyleProxy(QObject *parent) : QIdentityProxyModel(parent)
+{
+    // FontRole data reads the DeckList role live; rebroadcast so attached
+    // views re-query instead of waiting for an incidental repaint.
+    connect(themeManager, &ThemeManager::fontsChanged, this, [this] {
+        emit layoutAboutToBeChanged();
+        emit layoutChanged();
+    });
+}
 
 QVariant DeckListStyleProxy::data(const QModelIndex &index, int role) const
 {
@@ -20,7 +32,8 @@ QVariant DeckListStyleProxy::data(const QModelIndex &index, int role) const
     bool isCard = src.data(DeckRoles::IsCardRole).toBool();
 
     if (role == Qt::FontRole && !isCard) {
-        QFont f;
+        // Family comes from the DeckList theme role; bold stays caller-side.
+        QFont f = themeManager->appFont(AppFont::DeckList);
         f.setBold(true);
         return f;
     }

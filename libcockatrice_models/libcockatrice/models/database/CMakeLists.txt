@@ -1,10 +1,7 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 set(HEADERS
     card_database_model.h
     card_database_display_model.h
+    card_database_visual_display_model.h
     card/card_completer_proxy_model.h
     card/card_search_model.h
     card_set/card_sets_model.h
@@ -12,13 +9,12 @@ set(HEADERS
     token/token_edit_model.h
 )
 
-qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-
 add_library(
   libcockatrice_models_database STATIC
-  ${MOC_SOURCES}
+  ${HEADERS}
   card_database_model.cpp
   card_database_display_model.cpp
+  card_database_visual_display_model.cpp
   card/card_completer_proxy_model.cpp
   card/card_search_model.cpp
   card_set/card_sets_model.cpp

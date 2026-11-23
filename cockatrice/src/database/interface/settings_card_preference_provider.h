@@ -2,13 +2,18 @@
 #define COCKATRICE_SETTINGS_CARD_PREFERENCE_PROVIDER_H
 #include "../../client/settings/cache_settings.h"
 
+#include <QObject>
 #include <libcockatrice/interfaces/interface_card_preference_provider.h>
 #include <libcockatrice/settings/card_override_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 
-class SettingsCardPreferenceProvider : public ICardPreferenceProvider
+class SettingsCardPreferenceProvider : public QObject, public ICardPreferenceProvider
 {
 public:
+    explicit SettingsCardPreferenceProvider(QObject *parent = nullptr) : QObject(parent)
+    {
+    }
+
     [[nodiscard]] QString getCardPreferenceOverride(const QString &cardName) const override
     {
         return SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardName);

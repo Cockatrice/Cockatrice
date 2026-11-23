@@ -19,6 +19,11 @@ public:
     [[nodiscard]] virtual bool getArrowDrawAnimation() const = 0;
     [[nodiscard]] virtual bool getAutoRotateSidewaysLayoutCards() const = 0;
     [[nodiscard]] virtual bool getScaleCards() const = 0;
+    [[nodiscard]] virtual int getHoverPanelTrigger() const = 0;
+    [[nodiscard]] virtual int getHoverZoomTrigger() const = 0;
+    [[nodiscard]] virtual bool getHoverPanelDoubleConfirm() const = 0;
+    [[nodiscard]] virtual int getHoverZoomDelayMs() const = 0;
+    [[nodiscard]] virtual int getHoverPanelDelayMs() const = 0;
     [[nodiscard]] virtual int getStackCardOverlapPercent() const = 0;
     [[nodiscard]] virtual int getCardInfoViewMode() const = 0;
     [[nodiscard]] virtual int getVisualDeckStorageCardSize() const = 0;

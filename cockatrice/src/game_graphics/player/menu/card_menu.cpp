@@ -3,16 +3,8 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/card_counter_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../../../game/abstract_game.h"
-#include "../../../game/player/player_info.h"
-#include "../../../game/player/player_manager.h"
-#include "../../../game/zones/card_zone_logic.h"
 #include "../../board/card_item.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_logic.h"
-#include "../../game/zones/view_zone_logic.h"
 #include "../../game_scene.h"
-#include "../card_menu_action_type.h"
 #include "../player_graphics_item.h"
 #include "libcockatrice/card/card_info.h"
 #include "libcockatrice/card/database/card_database_querier.h"
@@ -35,6 +27,14 @@
 #include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/player/card_menu_action_type.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/player/player_manager.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
+#include <libcockatrice/game/zones/view_zone_logic.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <qnamespace.h>
 #include <utility>
@@ -67,7 +67,7 @@ static QAction *makeAction(QObject *parent, Slot &&slot, bool checkable = false,
     return a;
 }
 
-CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _shortcutsActive)
+CardMenu::CardMenu(PlayerGraphicsItem *_player, CardItem *_card, bool _shortcutsActive)
     : player(_player), card(_card), shortcutsActive(_shortcutsActive)
 {
     const QList<PlayerLogic *> &players = player->getLogic()->getGame()->getPlayerManager()->getPlayers().values();
@@ -86,7 +86,7 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
     auto *gameScene = player->getGameScene();
 
     // Single selection resolver used by all lambdas — called at trigger time
-    auto sel = [gameScene]() { return gameScene->selectedCards(); };
+    auto sel = [gameScene]() { return gameScene->selectedCardStates(); };
 
     // Unified dispatcher for card menu actions
     auto invoke = [actions, sel](CardMenuActionType type) {
@@ -108,22 +108,22 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
     aHide = makeAction(this, [actions, sel]() { actions->actHide(sel()); });
     aReduceLifeByPower = makeAction(this, [actions, sel]() { actions->actReduceLifeByPower(sel()); });
 
-    // Actions that use activeCard, not selection — direct connection
+    // Actions bound to the card this menu was opened for, not to the current selection
     aAttach = new QAction(this);
     aDrawArrow = new QAction(this);
     aSelectAll = new QAction(this);
     aSelectRow = new QAction(this);
     aSelectColumn = new QAction(this);
 
-    connect(aAttach, &QAction::triggered, actions, &PlayerActions::actAttach);
-    connect(aDrawArrow, &QAction::triggered, actions, &PlayerActions::actDrawArrow);
-    connect(aSelectAll, &QAction::triggered, actions, &PlayerActions::actSelectAll);
-    connect(aSelectRow, &QAction::triggered, actions, &PlayerActions::actSelectRow);
-    connect(aSelectColumn, &QAction::triggered, actions, &PlayerActions::actSelectColumn);
+    connect(aAttach, &QAction::triggered, this, &CardMenu::attachCard);
+    connect(aDrawArrow, &QAction::triggered, this, &CardMenu::drawArrow);
+    connect(aSelectAll, &QAction::triggered, this, [this, gameScene]() { gameScene->selectAllInZone(card); });
+    connect(aSelectRow, &QAction::triggered, this, [this, gameScene]() { gameScene->selectSameRow(card); });
+    connect(aSelectColumn, &QAction::triggered, this, [this, gameScene]() { gameScene->selectSameColumn(card); });
 
     aRevealToAll = new QAction(this);
 
-    mCardCounters = new QMenu;
+    mCardCounters = new QMenu(this);
 
     // Card counters
     for (int i = 0; i < 6; ++i) {
@@ -225,7 +225,7 @@ void CardMenu::createTableMenu(bool canModifyCard)
     }
     addSeparator();
     addAction(aClone);
-    addMenu(new MoveMenu(player));
+    addMenu(new MoveMenu(player, this));
     addSeparator();
     addAction(aAttach);
     if (card->getAttachedTo()) {
@@ -233,7 +233,7 @@ void CardMenu::createTableMenu(bool canModifyCard)
     }
     addAction(aDrawArrow);
     addSeparator();
-    addMenu(new PtMenu(player));
+    addMenu(new PtMenu(player, this));
     addAction(aSetAnnotation);
     addSeparator();
     addAction(aReduceLifeByPower);
@@ -275,7 +275,7 @@ void CardMenu::createStackMenu(bool canModifyCard)
     addAction(aPlayFacedown);
     addSeparator();
     addAction(aClone);
-    addMenu(new MoveMenu(player));
+    addMenu(new MoveMenu(player, this));
     addSeparator();
     addAction(aAttach);
     addAction(aDrawArrow);
@@ -304,7 +304,7 @@ void CardMenu::createGraveyardOrExileMenu(bool canModifyCard)
     addAction(aPlayFacedown);
     addSeparator();
     addAction(aClone);
-    addMenu(new MoveMenu(player));
+    addMenu(new MoveMenu(player, this));
     addSeparator();
     addAction(aAttach);
     addAction(aDrawArrow);
@@ -337,12 +337,12 @@ void CardMenu::createHandOrCustomZoneMenu(bool canModifyCard)
     initContextualPlayersMenu(revealMenu, aRevealToAll);
 
     connect(revealMenu, &QMenu::triggered, this, [this](QAction *action) {
-        player->getLogic()->getPlayerActions()->actReveal(player->getGameScene()->selectedCards(), action);
+        player->getLogic()->getPlayerActions()->actReveal(player->getGameScene()->selectedCardStates(), action);
     });
 
     addSeparator();
     addAction(aClone);
-    addMenu(new MoveMenu(player));
+    addMenu(new MoveMenu(player, this));
 
     // actions that are really wonky when done from deck or sideboard
     if (card->getZone()->getName() == ZoneNames::HAND) {
@@ -366,7 +366,7 @@ void CardMenu::createHandOrCustomZoneMenu(bool canModifyCard)
 void CardMenu::createZonelessMenu(bool canModifyCard)
 {
     if (canModifyCard) {
-        addMenu(new MoveMenu(player));
+        addMenu(new MoveMenu(player, this));
     }
 }
 
@@ -401,9 +401,9 @@ void CardMenu::addRelatedCardView()
     }
 
     bool atLeastOneGoodRelationFound = false;
-    QList<CardRelation *> relatedCards = exactCard.getInfo().getAllRelatedCards();
-    for (const CardRelation *cardRelation : relatedCards) {
-        CardInfoPtr relatedCard = CardDatabaseManager::query()->getCardInfo(cardRelation->getName());
+    QList<CardRelation> relatedCards = exactCard.getInfo().getAllRelatedCards();
+    for (const CardRelation &cardRelation : relatedCards) {
+        CardInfoPtr relatedCard = CardDatabaseManager::query()->getCardInfo(cardRelation.name);
         if (relatedCard != nullptr) {
             atLeastOneGoodRelationFound = true;
             break;
@@ -415,10 +415,10 @@ void CardMenu::addRelatedCardView()
     }
 
     addSeparator();
-    auto viewRelatedCards = new QMenu(tr("View related cards"));
+    auto viewRelatedCards = new QMenu(tr("View related cards"), this);
     addMenu(viewRelatedCards);
-    for (const CardRelation *relatedCard : relatedCards) {
-        QString relatedCardName = relatedCard->getName();
+    for (const CardRelation &relatedCard : relatedCards) {
+        QString relatedCardName = relatedCard.name;
         CardRef cardRef = {relatedCardName, exactCard.getPrinting().getUuid()};
         QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
         Q_UNUSED(viewCard);
@@ -437,19 +437,20 @@ void CardMenu::addRelatedCardActions()
         return;
     }
 
-    QList<CardRelation *> relatedCards = exactCard.getInfo().getAllRelatedCards();
+    const QList<CardRelation> relatedCards = exactCard.getInfo().getAllRelatedCards();
     if (relatedCards.isEmpty()) {
         return;
     }
+    auto *playerActions = player->getLogic()->getPlayerActions();
 
     addSeparator();
     int index = 0;
     QAction *createRelatedCards = nullptr;
-    for (const CardRelation *cardRelation : relatedCards) {
+    for (const CardRelation &cardRelation : relatedCards) {
         ExactCard relatedCard =
-            CardDatabaseManager::query()->getCardFromSameSet(cardRelation->getName(), card->getCard().getPrinting());
+            CardDatabaseManager::query()->getCardFromSameSet(cardRelation.name, card->getCard().getPrinting());
         if (!relatedCard) {
-            relatedCard = CardDatabaseManager::query()->getCard({cardRelation->getName()});
+            relatedCard = CardDatabaseManager::query()->getCard({cardRelation.name});
         }
         if (!relatedCard) {
             continue;
@@ -462,16 +463,16 @@ void CardMenu::addRelatedCardActions()
             relatedCardName = relatedCard.getName(); // "name"
         }
 
-        QString text = tr("Token: ");
-        if (cardRelation->getDoesAttach()) {
-            text +=
-                tr(cardRelation->getDoesTransform() ? "Transform into " : "Attach to ") + "\"" + relatedCardName + "\"";
-        } else if (cardRelation->getIsVariable()) {
-            text += "X " + relatedCardName;
-        } else if (cardRelation->getDefaultCount() != 1) {
-            text += QString::number(cardRelation->getDefaultCount()) + "x " + relatedCardName;
+        QString text;
+        if (cardRelation.doesAttach()) {
+            text = cardRelation.doesTransform() ? tr("Token: Transform into \"%1\"").arg(relatedCardName)
+                                                : tr("Token: Attach to \"%1\"").arg(relatedCardName);
+        } else if (cardRelation.isVariableCount) {
+            text = tr("Token: X %1").arg(relatedCardName);
+        } else if (cardRelation.defaultCount != 1) {
+            text = tr("Token: %1x %2").arg(cardRelation.defaultCount).arg(relatedCardName);
         } else {
-            text += relatedCardName;
+            text = tr("Token: %1").arg(relatedCardName);
         }
 
         if (createRelatedCards == nullptr) {
@@ -484,9 +485,10 @@ void CardMenu::addRelatedCardActions()
         }
 
         auto *createRelated = new QAction(text, this);
-        createRelated->setData(QVariant(index++));
-        connect(createRelated, &QAction::triggered, player->getLogic()->getPlayerActions(),
-                &PlayerActions::actCreateRelatedCard);
+        const int relatedIndex = index++;
+        connect(createRelated, &QAction::triggered, this, [this, playerActions, relatedIndex] {
+            playerActions->actCreateRelatedCard(card->getState(), relatedIndex);
+        });
         addAction(createRelated);
     }
 
@@ -495,9 +497,23 @@ void CardMenu::addRelatedCardActions()
             createRelatedCards->setShortcuts(
                 SettingsCache::instance().shortcuts().getShortcut("Player/aCreateRelatedTokens"));
         }
-        connect(createRelatedCards, &QAction::triggered, player->getLogic()->getPlayerActions(),
-                &PlayerActions::actCreateAllRelatedCards);
+        connect(createRelatedCards, &QAction::triggered, this,
+                [this, playerActions] { playerActions->actCreateAllRelatedCards(card->getState()); });
         addAction(createRelatedCards);
+    }
+}
+
+void CardMenu::attachCard()
+{
+    if (card) {
+        card->drawAttachArrow();
+    }
+}
+
+void CardMenu::drawArrow()
+{
+    if (card) {
+        card->drawArrow(Qt::red);
     }
 }
 

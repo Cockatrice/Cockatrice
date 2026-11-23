@@ -6,6 +6,7 @@
 #include "relation/card_relation.h"
 #include "set/card_set.h"
 
+#include <QDebug>
 #include <QHashIterator>
 #include <QRegularExpression>
 #include <QSharedPointer>
@@ -19,6 +20,18 @@ const QHash<QString, QString> &CardInfo::getPropertiesHash() const
     return properties.getProperties();
 }
 
+void CardInfo::notifyChanged()
+{
+    const CardInfoPtr self = sharedFromThis();
+    Q_ASSERT_X(self, "CardInfo::notifyChanged", "every CardInfo is owned by a QSharedPointer");
+    if (!self) {
+        qCWarning(CardInfoLog) << "notifyChanged() on an unowned CardInfo" << name << "- observers stay stale";
+        return;
+    }
+
+    emit cardInfoChanged(self);
+}
+
 void CardInfo::setProperty(const QString &_name, const QString &_value)
 {
     bool changed = properties.insert(_name, _value);
@@ -26,15 +39,15 @@ void CardInfo::setProperty(const QString &_name, const QString &_value)
         return;
     }
 
-    emit cardInfoChanged(smartThis);
+    notifyChanged();
 }
 
 CardInfo::CardInfo(const QString &_name,
                    const QString &_text,
                    bool _isToken,
                    const QHash<QString, QString> &_properties,
-                   const QList<CardRelation *> &_relatedCards,
-                   const QList<CardRelation *> &_reverseRelatedCards,
+                   const QList<CardRelation> &_relatedCards,
+                   const QList<CardRelation> &_reverseRelatedCards,
                    SetToPrintingsMap _sets,
                    const UiAttributes _uiAttributes,
                    QMap<QString, QString> _localizedNames,
@@ -53,8 +66,8 @@ CardInfo::CardInfo(const QString &_name,
                    const QString &_text,
                    bool _isToken,
                    const QByteArray &_propertiesBlob,
-                   const QList<CardRelation *> &_relatedCards,
-                   const QList<CardRelation *> &_reverseRelatedCards,
+                   const QList<CardRelation> &_relatedCards,
+                   const QList<CardRelation> &_reverseRelatedCards,
                    SetToPrintingsMap _sets,
                    const UiAttributes _uiAttributes,
                    QString _simpleName,
@@ -88,8 +101,8 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   const QString &_text,
                                   bool _isToken,
                                   const QHash<QString, QString> &_properties,
-                                  const QList<CardRelation *> &_relatedCards,
-                                  const QList<CardRelation *> &_reverseRelatedCards,
+                                  const QList<CardRelation> &_relatedCards,
+                                  const QList<CardRelation> &_reverseRelatedCards,
                                   SetToPrintingsMap _sets,
                                   const UiAttributes _uiAttributes,
                                   QMap<QString, QString> _localizedNames,
@@ -97,7 +110,6 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
 {
     CardInfoPtr ptr(new CardInfo(_name, _text, _isToken, _properties, _relatedCards, _reverseRelatedCards, _sets,
                                  _uiAttributes, std::move(_localizedNames), std::move(_localizedTexts)));
-    ptr->setSmartPointer(ptr);
 
     for (const auto &printings : _sets) {
         for (const PrintingInfo &printing : printings) {
@@ -113,8 +125,8 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   const QString &_text,
                                   bool _isToken,
                                   QByteArray _propertiesBlob,
-                                  const QList<CardRelation *> &_relatedCards,
-                                  const QList<CardRelation *> &_reverseRelatedCards,
+                                  const QList<CardRelation> &_relatedCards,
+                                  const QList<CardRelation> &_reverseRelatedCards,
                                   SetToPrintingsMap _sets,
                                   const UiAttributes _uiAttributes,
                                   QString _simpleName,
@@ -126,7 +138,6 @@ CardInfoPtr CardInfo::newInstance(const QString &_name,
     CardInfoPtr ptr(new CardInfo(_name, _text, _isToken, std::move(_propertiesBlob), _relatedCards,
                                  _reverseRelatedCards, _sets, _uiAttributes, std::move(_simpleName),
                                  std::move(_altNames), std::move(_localizedNames), std::move(_localizedTexts)));
-    ptr->setSmartPointer(ptr);
 
     if (_appendToSets) {
         for (const auto &printings : _sets) {
@@ -169,8 +180,15 @@ bool CardInfo::isLegalInFormat(const QString &format) const
 
 void CardInfo::addToSet(const CardSetPtr &_set, const PrintingInfo &_info)
 {
-    if (!_set->contains(smartThis)) {
-        _set->append(smartThis);
+    const CardInfoPtr self = sharedFromThis();
+    Q_ASSERT_X(self, "CardInfo::addToSet", "every CardInfo is owned by a QSharedPointer");
+    if (!self) {
+        qCWarning(CardInfoLog) << "addToSet() on an unowned CardInfo" << name << "- the set will not list it";
+        return;
+    }
+
+    if (!_set->contains(self)) {
+        _set->append(self);
     }
     if (!setsToPrintings[_set->getShortName()].contains(_info)) {
         setsToPrintings[_set->getShortName()].append(_info);
@@ -188,7 +206,7 @@ void CardInfo::combineLegalities(const QHash<QString, QString> &props)
             properties.insert(it.key(), it.value());
         }
     }
-    emit cardInfoChanged(smartThis);
+    notifyChanged();
 }
 
 void CardInfo::refreshCachedSets()
@@ -264,17 +282,7 @@ QChar CardInfo::getColorChar() const
 
 void CardInfo::resetReverseRelatedCards2Me()
 {
-    for (CardRelation *cardRelation : this->getReverseRelatedCards2Me()) {
-        cardRelation->deleteLater();
-    }
-    reverseRelatedCardsToMe = QList<CardRelation *>();
-}
-
-void CardInfo::clearDirectRelations()
-{
-    relatedCards = QList<CardRelation *>();
-    reverseRelatedCards = QList<CardRelation *>();
-    reverseRelatedCardsToMe = QList<CardRelation *>();
+    reverseRelatedCardsToMe.clear();
 }
 
 // Back-compatibility methods. Remove ASAP
@@ -297,6 +305,10 @@ QString CardInfo::getColors() const
 void CardInfo::setColors(const QString &value)
 {
     setProperty(Mtg::Colors, value);
+}
+QString CardInfo::getColorIdentity() const
+{
+    return getProperty(Mtg::ColorIdentity);
 }
 QString CardInfo::getLoyalty() const
 {

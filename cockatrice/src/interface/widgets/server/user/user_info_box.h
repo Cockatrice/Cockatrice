@@ -48,6 +48,7 @@ private slots:
     void processEditResponse(const Response &r);
     void processPasswordResponse(const Response &r);
     void processAvatarResponse(const Response &r);
+    void applyInterfaceDefaultFont();
 
     void actEdit();
     void actEditInternal(const Response &r);

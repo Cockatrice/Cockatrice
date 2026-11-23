@@ -37,7 +37,6 @@
 #include "main.h"
 #include "metrics_registry.h"
 #include "servatrice.h"
-#include "servatrice_database_interface.h"
 #include "server.h"
 #include "server_database_interface.h"
 #include "server_logger.h"
@@ -68,7 +67,6 @@
 #include <QReadWriteLock>
 #include <QSharedPointer>
 #include <QSqlError>
-#include <QSqlQuery>
 #include <QString>
 #include <QStringLiteral>
 #include <QTextStream>
@@ -98,6 +96,7 @@
 #include <libcockatrice/protocol/pb/command_deck_share_list_mine.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_share_remove.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
+#include <libcockatrice/protocol/pb/command_get_private_chat_history.pb.h>
 #include <libcockatrice/protocol/pb/command_get_server_stats.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_delete_match.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_download.pb.h>
@@ -139,6 +138,7 @@
 #include <libcockatrice/protocol/pb/response_get_server_stats.pb.h>
 #include <libcockatrice/protocol/pb/response_moderator_last_logins.pb.h>
 #include <libcockatrice/protocol/pb/response_password_salt.pb.h>
+#include <libcockatrice/protocol/pb/response_private_chat_history.pb.h>
 #include <libcockatrice/protocol/pb/response_register.pb.h>
 #include <libcockatrice/protocol/pb/response_remove_user_avatar.pb.h>
 #include <libcockatrice/protocol/pb/response_remove_user_banner.pb.h>
@@ -191,15 +191,15 @@ static const int protocolVersion = 14;
 static const int MAX_TCP_MESSAGE_SIZE = 1500000;
 
 AbstractServerSocketInterface::AbstractServerSocketInterface(Servatrice *_server,
-                                                             Servatrice_DatabaseInterface *_databaseInterface,
+                                                             Server_DatabaseInterface *_databaseInterface,
                                                              QObject *parent)
-    : Server_ProtocolHandler(_server, _databaseInterface, parent), servatrice(_server),
-      sqlInterface(reinterpret_cast<Servatrice_DatabaseInterface *>(databaseInterface))
+    : Server_ProtocolHandler(_server, _databaseInterface, parent), servatrice(_server)
 {
     // Never call flushOutputQueue directly from outputQueueChanged. In case of a socket error,
     // it could lead to this object being destroyed while another function is still on the call stack. -> mutex
     // deadlocks etc.
-    connect(this, SIGNAL(outputQueueChanged()), this, SLOT(flushOutputQueue()), Qt::QueuedConnection);
+    connect(this, &AbstractServerSocketInterface::outputQueueChanged, this,
+            &AbstractServerSocketInterface::flushOutputQueue, Qt::QueuedConnection);
 }
 
 bool AbstractServerSocketInterface::initSession()
@@ -413,6 +413,8 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
             return cmdDeckShareRemove(cmd.GetExtension(Command_DeckShareRemove::ext), rc);
         case SessionCommand::DECK_SHARE_DOWNLOAD:
             return cmdDeckShareDownload(cmd.GetExtension(Command_DeckShareDownload::ext), rc);
+        case SessionCommand::GET_PRIVATE_CHAT_HISTORY:
+            return cmdGetPrivateChatHistory(cmd.GetExtension(Command_GetPrivateChatHistory::ext), rc);
         case SessionCommand::ACCOUNT_PASSWORD:
             return cmdAccountPassword(cmd.GetExtension(Command_AccountPassword::ext), rc);
         case SessionCommand::REQUEST_PASSWORD_SALT:
@@ -559,7 +561,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAddToList(const Command
     }
 
     int id1 = userInfo->id();
-    int id2 = sqlInterface->getUserIdInDB(user);
+    int id2 = databaseInterface->getUserId(user);
     if (id2 < 0) {
         return Response::RespNameNotFound;
     }
@@ -567,11 +569,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAddToList(const Command
         return Response::RespContextError;
     }
 
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("insert into {prefix}_" + list + "list (id_user1, id_user2) values(:id1, :id2)");
-    query->bindValue(":id1", id1);
-    query->bindValue(":id2", id2);
-    if (!sqlInterface->execSqlQuery(query)) {
+    const bool stored =
+        list == "buddy" ? databaseInterface->addToBuddyList(id1, id2) : databaseInterface->addToIgnoreList(id1, id2);
+    if (!stored) {
         return Response::RespInternalError;
     }
 
@@ -613,16 +613,14 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveFromList(const Co
     }
 
     int id1 = userInfo->id();
-    int id2 = sqlInterface->getUserIdInDB(user);
+    int id2 = databaseInterface->getUserId(user);
     if (id2 < 0) {
         return Response::RespNameNotFound;
     }
 
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("delete from {prefix}_" + list + "list where id_user1 = :id1 and id_user2 = :id2");
-    query->bindValue(":id1", id1);
-    query->bindValue(":id2", id2);
-    if (!sqlInterface->execSqlQuery(query)) {
+    const bool removed = list == "buddy" ? databaseInterface->removeFromBuddyList(id1, id2)
+                                         : databaseInterface->removeFromIgnoreList(id1, id2);
+    if (!removed) {
         return Response::RespInternalError;
     }
 
@@ -634,67 +632,26 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveFromList(const Co
     return Response::RespOk;
 }
 
-int AbstractServerSocketInterface::getDeckPathId(int basePathId, QStringList path)
-{
-    if (path.isEmpty()) {
-        return 0;
-    }
-    if (path[0].isEmpty()) {
-        return 0;
-    }
-
-    QSqlQuery *query = sqlInterface->prepareQuery("select id from {prefix}_decklist_folders where id_parent = "
-                                                  ":id_parent and name = :name and id_user = :id_user");
-    query->bindValue(":id_parent", basePathId);
-    query->bindValue(":name", path.takeFirst());
-    query->bindValue(":id_user", userInfo->id());
-    if (!sqlInterface->execSqlQuery(query)) {
-        return -1;
-    }
-    if (!query->next()) {
-        return -1;
-    }
-    int id = query->value(0).toInt();
-    if (path.isEmpty()) {
-        return id;
-    } else {
-        return getDeckPathId(id, path);
-    }
-}
-
-int AbstractServerSocketInterface::getDeckPathId(const QString &path)
-{
-    return getDeckPathId(0, path.split("/"));
-}
-
 bool AbstractServerSocketInterface::deckListHelper(int folderId,
                                                    ServerInfo_DeckStorage_Folder *folder,
                                                    int userId,
                                                    bool inheritedPublic,
                                                    bool publicOnly)
 {
-    QSqlQuery *query = sqlInterface->prepareQuery("select id, name, is_public from {prefix}_decklist_folders where "
-                                                  "id_parent = :id_parent and id_user = :id_user");
-    query->bindValue(":id_parent", folderId);
-    query->bindValue(":id_user", userId);
-    if (!sqlInterface->execSqlQuery(query)) {
+    QList<Server_DatabaseInterface::DeckListFolderRecord> folders;
+    if (!databaseInterface->getDeckListFolders(folderId, userId, folders)) {
         return false;
     }
 
-    QList<std::pair<int, std::pair<QString, bool>>> folderRows;
-    while (query->next()) {
-        folderRows.append({query->value(0).toInt(), {query->value(1).toString(), query->value(2).toBool()}});
-    }
-    std::sort(folderRows.begin(), folderRows.end(), [](const auto &a, const auto &b) { return a.first < b.first; });
+    std::sort(folders.begin(), folders.end(), [](const auto &a, const auto &b) { return a.id < b.id; });
 
-    for (const auto &[folderIdValue, folderInfo] : folderRows) {
-        const QString name = folderInfo.first;
-        const bool ownPublic = folderInfo.second;
+    for (const Server_DatabaseInterface::DeckListFolderRecord &folderRecord : folders) {
+        const bool ownPublic = folderRecord.isPublic;
         const bool effectivePublic = inheritedPublic || ownPublic;
 
         ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
-        newItem->set_id(folderIdValue);
-        newItem->set_name(name.toStdString());
+        newItem->set_id(folderRecord.id);
+        newItem->set_name(folderRecord.name.toStdString());
         newItem->mutable_folder()->set_is_public(ownPublic);
 
         if (!deckListHelper(newItem->id(), newItem->mutable_folder(), userId, effectivePublic, publicOnly)) {
@@ -706,32 +663,28 @@ bool AbstractServerSocketInterface::deckListHelper(int folderId,
         }
     }
 
-    query = sqlInterface->prepareQuery("select id, name, upload_time, is_public, banner_card_name, "
-                                       "banner_card_provider, color_identity, tags from {prefix}_decklist_files where "
-                                       "id_folder = :id_folder and id_user = :id_user");
-    query->bindValue(":id_folder", folderId);
-    query->bindValue(":id_user", userId);
-    if (!sqlInterface->execSqlQuery(query)) {
+    QList<Server_DatabaseInterface::DeckListFileRecord> files;
+    if (!databaseInterface->getDeckListFiles(folderId, userId, files)) {
         return false;
     }
 
-    while (query->next()) {
-        const bool ownPublic = query->value(3).toBool();
+    for (const Server_DatabaseInterface::DeckListFileRecord &file : files) {
+        const bool ownPublic = file.isPublic;
         if (publicOnly && !(inheritedPublic || ownPublic)) {
             continue;
         }
 
         ServerInfo_DeckStorage_TreeItem *newItem = folder->add_items();
-        newItem->set_id(query->value(0).toInt());
-        newItem->set_name(query->value(1).toString().toStdString());
+        newItem->set_id(file.id);
+        newItem->set_name(file.name.toStdString());
 
         ServerInfo_DeckStorage_File *newFile = newItem->mutable_file();
-        newFile->set_creation_time(query->value(2).toDateTime().toSecsSinceEpoch());
+        newFile->set_creation_time(file.uploadTime);
         newFile->set_is_public(ownPublic);
-        newFile->set_banner_card_name(query->value(4).toString().toStdString());
-        newFile->set_banner_card_provider(query->value(5).toString().toStdString());
-        newFile->set_color_identity(query->value(6).toString().toStdString());
-        for (const QString &tag : deserializeDeckTags(query->value(7).toString())) {
+        newFile->set_banner_card_name(file.bannerCardName.toStdString());
+        newFile->set_banner_card_provider(file.bannerCardProvider.toStdString());
+        newFile->set_color_identity(file.colorIdentity.toStdString());
+        for (const QString &tag : file.tags) {
             newFile->add_tags(tag.toStdString());
         }
     }
@@ -749,7 +702,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckList(const Command_
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
     Response_DeckList *re = new Response_DeckList;
     ServerInfo_DeckStorage_Folder *root = re->mutable_root();
@@ -769,10 +722,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckListOtherUser(const
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
     const QString userName = nameFromStdString(cmd.user_name());
-    const int userId = sqlInterface->getUserIdInDB(userName);
+    const int userId = databaseInterface->getUserId(userName);
     if (userId == -1) {
         return Response::RespNameNotFound;
     }
@@ -788,55 +741,6 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckListOtherUser(const
     return Response::RespOk;
 }
 
-int AbstractServerSocketInterface::getDeckOwnerId(int deckId)
-{
-    QSqlQuery *query = sqlInterface->prepareQuery("select id_user from {prefix}_decklist_files where id = :id");
-    query->bindValue(":id", deckId);
-    if (!sqlInterface->execSqlQuery(query)) {
-        return -1;
-    }
-    if (!query->next()) {
-        return -1;
-    }
-    return query->value(0).toInt();
-}
-
-bool AbstractServerSocketInterface::isDeckEffectivelyPublic(int deckId)
-{
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("select is_public, id_folder from {prefix}_decklist_files where id = :id");
-    query->bindValue(":id", deckId);
-    if (!sqlInterface->execSqlQuery(query)) {
-        return false;
-    }
-    if (!query->next()) {
-        return false;
-    }
-    if (query->value(0).toBool()) {
-        return true;
-    }
-
-    int folderId = query->value(1).toInt();
-    int guard = 0;
-    while (folderId != 0 && guard < 100) {
-        QSqlQuery *folderQuery =
-            sqlInterface->prepareQuery("select is_public, id_parent from {prefix}_decklist_folders where id = :id");
-        folderQuery->bindValue(":id", folderId);
-        if (!sqlInterface->execSqlQuery(folderQuery)) {
-            return false;
-        }
-        if (!folderQuery->next()) {
-            return false;
-        }
-        if (folderQuery->value(0).toBool()) {
-            return true;
-        }
-        folderId = folderQuery->value(1).toInt();
-        ++guard;
-    }
-    return false;
-}
-
 Response::ResponseCode AbstractServerSocketInterface::cmdDeckSetVisibility(const Command_DeckSetVisibility &cmd,
                                                                            ResponseContainer & /*rc*/)
 {
@@ -844,46 +748,30 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckSetVisibility(const
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
+    Server_DatabaseInterface::DeckStorageResult result;
     if (cmd.has_deck_id()) {
-        QSqlQuery *query =
-            sqlInterface->prepareQuery("select 1 from {prefix}_decklist_files where id = :id and id_user = :id_user");
-        query->bindValue(":id", cmd.deck_id());
-        query->bindValue(":id_user", userInfo->id());
-        sqlInterface->execSqlQuery(query);
-        if (!query->next()) {
-            return Response::RespNameNotFound;
-        }
-
-        query = sqlInterface->prepareQuery("update {prefix}_decklist_files set is_public = :is_public where id = :id "
-                                           "and id_user = :id_user");
-        query->bindValue(":is_public", cmd.is_public() ? 1 : 0);
-        query->bindValue(":id", cmd.deck_id());
-        query->bindValue(":id_user", userInfo->id());
-        if (!sqlInterface->execSqlQuery(query)) {
-            return Response::RespContextError;
-        }
+        result = databaseInterface->setDeckVisibility(cmd.deck_id(), userInfo->id(), cmd.is_public());
     } else if (cmd.has_folder_path()) {
-        const int folderId = getDeckPathId(nameFromStdString(cmd.folder_path()));
+        const int folderId = databaseInterface->getDeckPathId(nameFromStdString(cmd.folder_path()), userInfo->id());
         if (folderId == -1 || folderId == 0) {
             return Response::RespNameNotFound;
         }
-
-        QSqlQuery *query =
-            sqlInterface->prepareQuery("update {prefix}_decklist_folders set is_public = :is_public where id = :id "
-                                       "and id_user = :id_user");
-        query->bindValue(":is_public", cmd.is_public() ? 1 : 0);
-        query->bindValue(":id", folderId);
-        query->bindValue(":id_user", userInfo->id());
-        if (!sqlInterface->execSqlQuery(query)) {
-            return Response::RespContextError;
-        }
+        result = databaseInterface->setDeckFolderVisibility(folderId, userInfo->id(), cmd.is_public());
     } else {
         return Response::RespInvalidData;
     }
 
-    return Response::RespOk;
+    switch (result) {
+        case Server_DatabaseInterface::DeckStorageResult::Ok:
+            return Response::RespOk;
+        case Server_DatabaseInterface::DeckStorageResult::NotFound:
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::DeckStorageResult::Failed:
+            return Response::RespContextError;
+    }
+    return Response::RespContextError;
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdDeckDownloadPublic(const Command_DeckDownloadPublic &cmd,
@@ -893,17 +781,17 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDownloadPublic(cons
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
     const int deckId = cmd.deck_id();
-    const int ownerId = getDeckOwnerId(deckId);
-    if (ownerId == -1 || !isDeckEffectivelyPublic(deckId)) {
+    const int ownerId = databaseInterface->getDeckOwnerId(deckId);
+    if (ownerId == -1 || !databaseInterface->isDeckEffectivelyPublic(deckId)) {
         return Response::RespNameNotFound;
     }
 
     DeckList *deck;
     try {
-        deck = sqlInterface->getDeckFromDatabase(deckId, ownerId);
+        deck = databaseInterface->getDeckFromDatabase(deckId, ownerId);
     } catch (Response::ResponseCode &r) {
         return r;
     }
@@ -923,10 +811,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckNewDir(const Comman
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
     QString path = nameFromStdString(cmd.path());
-    int folderId = getDeckPathId(path);
+    int folderId = databaseInterface->getDeckPathId(path, userInfo->id());
     if (folderId == -1) {
         return Response::RespNameNotFound;
     }
@@ -936,35 +824,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckNewDir(const Comman
         return Response::RespContextError; // do not allow creation of paths that would be too long to delete
     }
 
-    QSqlQuery *query = sqlInterface->prepareQuery(
-        "insert into {prefix}_decklist_folders (id_parent, id_user, name) values(:id_parent, :id_user, :name)");
-    query->bindValue(":id_parent", folderId);
-    query->bindValue(":id_user", userInfo->id());
-    query->bindValue(":name", name);
-    if (!sqlInterface->execSqlQuery(query)) {
+    if (databaseInterface->createDeckFolder(folderId, userInfo->id(), name) !=
+        Server_DatabaseInterface::DeckStorageResult::Ok) {
         return Response::RespContextError;
     }
     return Response::RespOk;
-}
-
-void AbstractServerSocketInterface::deckDelDirHelper(int basePathId)
-{
-    sqlInterface->checkSql();
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("select id from {prefix}_decklist_folders where id_parent = :id_parent");
-    query->bindValue(":id_parent", basePathId);
-    sqlInterface->execSqlQuery(query);
-    while (query->next()) {
-        deckDelDirHelper(query->value(0).toInt());
-    }
-
-    query = sqlInterface->prepareQuery("delete from {prefix}_decklist_files where id_folder = :id_folder");
-    query->bindValue(":id_folder", basePathId);
-    sqlInterface->execSqlQuery(query);
-
-    query = sqlInterface->prepareQuery("delete from {prefix}_decklist_folders where id = :id");
-    query->bindValue(":id", basePathId);
-    sqlInterface->execSqlQuery(query);
 }
 
 void AbstractServerSocketInterface::sendServerMessage(const QString userName, const QString message)
@@ -991,13 +855,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDelDir(const Comman
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
-    int basePathId = getDeckPathId(nameFromStdString(cmd.path()));
+    int basePathId = databaseInterface->getDeckPathId(nameFromStdString(cmd.path()), userInfo->id());
     if ((basePathId == -1) || (basePathId == 0)) {
         return Response::RespNameNotFound;
     }
-    deckDelDirHelper(basePathId);
+    databaseInterface->deleteDeckFolder(basePathId);
     return Response::RespOk;
 }
 
@@ -1007,21 +871,16 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDel(const Command_D
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("select id from {prefix}_decklist_files where id = :id and id_user = :id_user");
-    query->bindValue(":id", cmd.deck_id());
-    query->bindValue(":id_user", userInfo->id());
-    sqlInterface->execSqlQuery(query);
-    if (!query->next()) {
-        return Response::RespNameNotFound;
+    databaseInterface->checkSql();
+    switch (databaseInterface->deleteDeckFile(cmd.deck_id(), userInfo->id())) {
+        case Server_DatabaseInterface::DeckStorageResult::Ok:
+            return Response::RespOk;
+        case Server_DatabaseInterface::DeckStorageResult::NotFound:
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::DeckStorageResult::Failed:
+            return Response::RespContextError;
     }
-
-    query = sqlInterface->prepareQuery("delete from {prefix}_decklist_files where id = :id");
-    query->bindValue(":id", cmd.deck_id());
-    sqlInterface->execSqlQuery(query);
-
-    return Response::RespOk;
+    return Response::RespContextError;
 }
 
 namespace
@@ -1055,7 +914,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
         return Response::RespInvalidData;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
     QString deckStr = fileFromStdString(cmd.deck_list());
     DeckList deck;
@@ -1076,86 +935,44 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
     const QString tagsJson = serializeDeckTags(deck.getTags());
     const QString colorIdentity = sanitizeColorIdentity(nameFromStdString(cmd.color_identity()));
 
+    const Server_DatabaseInterface::DeckFileData data{.name = deckName,
+                                                      .content = deckStr,
+                                                      .isPublic = cmd.has_is_public() && cmd.is_public(),
+                                                      .bannerCardName = bannerCardName,
+                                                      .bannerCardProvider = bannerCardProvider,
+                                                      .colorIdentity = colorIdentity,
+                                                      .tagsJson = tagsJson};
+
+    Server_DatabaseInterface::DeckFileWriteResult writeResult;
     if (cmd.has_path()) {
-        int folderId = getDeckPathId(nameFromStdString(cmd.path()));
+        int folderId = databaseInterface->getDeckPathId(nameFromStdString(cmd.path()), userInfo->id());
         if (folderId == -1) {
             return Response::RespNameNotFound;
         }
 
-        QSqlQuery *query =
-            sqlInterface->prepareQuery("insert into {prefix}_decklist_files (id_folder, id_user, name, upload_time, "
-                                       "content, is_public, banner_card_name, banner_card_provider, color_identity, "
-                                       "tags) values(:id_folder, :id_user, :name, NOW(), :content, :is_public, "
-                                       ":banner_card_name, :banner_card_provider, :color_identity, :tags)");
-        query->bindValue(":id_folder", folderId);
-        query->bindValue(":id_user", userInfo->id());
-        query->bindValue(":name", deckName);
-        query->bindValue(":content", deckStr);
-        query->bindValue(":is_public", cmd.has_is_public() && cmd.is_public() ? 1 : 0);
-        query->bindValue(":banner_card_name", bannerCardName);
-        query->bindValue(":banner_card_provider", bannerCardProvider);
-        query->bindValue(":color_identity", colorIdentity);
-        query->bindValue(":tags", tagsJson);
-        if (!sqlInterface->execSqlQuery(query)) {
+        writeResult = databaseInterface->createDeckFile(folderId, userInfo->id(), data);
+        if (writeResult.result != Server_DatabaseInterface::DeckStorageResult::Ok) {
             return Response::RespContextError;
         }
-
-        Response_DeckUpload *re = new Response_DeckUpload;
-        ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
-        fileInfo->set_id(query->lastInsertId().toInt());
-        fileInfo->set_name(deckName.toStdString());
-        fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toSecsSinceEpoch());
-        fileInfo->mutable_file()->set_is_public(cmd.has_is_public() && cmd.is_public());
-        rc.setResponseExtension(re);
     } else if (cmd.has_deck_id()) {
-        QString updateQuery = "update {prefix}_decklist_files set name=:name, upload_time=NOW(), content=:content, "
-                              "banner_card_name=:banner_card_name, banner_card_provider=:banner_card_provider, "
-                              "color_identity=:color_identity, tags=:tags";
-        if (cmd.has_is_public()) {
-            updateQuery += ", is_public=:is_public";
-        }
-        updateQuery += " where id = :id_deck and id_user = :id_user";
-
-        QSqlQuery *query = sqlInterface->prepareQuery(updateQuery);
-        query->bindValue(":id_deck", cmd.deck_id());
-        query->bindValue(":id_user", userInfo->id());
-        query->bindValue(":name", deckName);
-        query->bindValue(":content", deckStr);
-        query->bindValue(":banner_card_name", bannerCardName);
-        query->bindValue(":banner_card_provider", bannerCardProvider);
-        query->bindValue(":color_identity", colorIdentity);
-        query->bindValue(":tags", tagsJson);
-        if (cmd.has_is_public()) {
-            query->bindValue(":is_public", cmd.is_public() ? 1 : 0);
-        }
-        if (!sqlInterface->execSqlQuery(query)) {
-            return Response::RespContextError;
-        }
-
-        if (query->numRowsAffected() == 0) {
+        writeResult = databaseInterface->updateDeckFile(cmd.deck_id(), userInfo->id(), data, cmd.has_is_public());
+        if (writeResult.result == Server_DatabaseInterface::DeckStorageResult::NotFound) {
             return Response::RespNameNotFound;
         }
-
-        QSqlQuery *visibilityQuery =
-            sqlInterface->prepareQuery("select is_public from {prefix}_decklist_files where id = :id and "
-                                       "id_user = :id_user");
-        visibilityQuery->bindValue(":id", cmd.deck_id());
-        visibilityQuery->bindValue(":id_user", userInfo->id());
-        if (!sqlInterface->execSqlQuery(visibilityQuery)) {
+        if (writeResult.result != Server_DatabaseInterface::DeckStorageResult::Ok) {
             return Response::RespContextError;
         }
-        const bool isPublic = visibilityQuery->next() && visibilityQuery->value(0).toBool();
-
-        Response_DeckUpload *re = new Response_DeckUpload;
-        ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
-        fileInfo->set_id(cmd.deck_id());
-        fileInfo->set_name(deckName.toStdString());
-        fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toSecsSinceEpoch());
-        fileInfo->mutable_file()->set_is_public(isPublic);
-        rc.setResponseExtension(re);
     } else {
         return Response::RespInvalidData;
     }
+
+    Response_DeckUpload *re = new Response_DeckUpload;
+    ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
+    fileInfo->set_id(writeResult.deckId);
+    fileInfo->set_name(deckName.toStdString());
+    fileInfo->mutable_file()->set_creation_time(QDateTime::currentDateTime().toSecsSinceEpoch());
+    fileInfo->mutable_file()->set_is_public(writeResult.isPublic);
+    rc.setResponseExtension(re);
 
     return Response::RespOk;
 }
@@ -1169,7 +986,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDownload(const Comm
 
     DeckList *deck;
     try {
-        deck = sqlInterface->getDeckFromDatabase(cmd.deck_id(), userInfo->id());
+        deck = databaseInterface->getDeckFromDatabase(cmd.deck_id(), userInfo->id());
     } catch (Response::ResponseCode &r) {
         return r;
     }
@@ -1193,9 +1010,9 @@ QString generateShareToken()
 }
 
 /** @brief Extracts the share metadata for a deck, materializing its content. */
-DeckShareItemRecord makeShareItemFromDeck(const DeckList &deck, const QString &colorIdentity)
+Server_DatabaseInterface::DeckShareItemRecord makeShareItemFromDeck(const DeckList &deck, const QString &colorIdentity)
 {
-    DeckShareItemRecord item;
+    Server_DatabaseInterface::DeckShareItemRecord item;
     item.name = deck.getName();
     if (item.name.isEmpty()) {
         item.name = "Unnamed deck";
@@ -1216,7 +1033,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const C
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
     const int maxItems = servatrice->getDeckShareMaxDecksPerShare();
     if (maxItems > 0 && cmd.items_size() > maxItems) {
@@ -1227,19 +1044,16 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const C
     // word-of-mouth leak of public decks.
     const int maxSharesPerDay = servatrice->getDeckShareMaxSharesPerDay();
     if (maxSharesPerDay > 0) {
-        QSqlQuery *countQuery = sqlInterface->prepareQuery("select count(*) from {prefix}_deck_share where "
-                                                           "created_by = :created_by and created_at >= "
-                                                           "DATE_SUB(NOW(), INTERVAL 1 DAY)");
-        countQuery->bindValue(":created_by", userInfo->id());
-        if (!sqlInterface->execSqlQuery(countQuery) || !countQuery->next()) {
+        const int createdToday = databaseInterface->getDeckSharesCreatedToday(userInfo->id());
+        if (createdToday < 0) {
             return Response::RespContextError;
         }
-        if (countQuery->value(0).toInt() >= maxSharesPerDay) {
+        if (createdToday >= maxSharesPerDay) {
             return Response::RespTooManyRequests;
         }
     }
 
-    QList<DeckShareItemRecord> items;
+    QList<Server_DatabaseInterface::DeckShareItemRecord> items;
     if (cmd.items_size() > 0) {
         for (const DeckShareItem &shareItem : cmd.items()) {
             if (shareItem.has_deck_list()) {
@@ -1251,7 +1065,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const C
             } else if (shareItem.has_deck_id()) {
                 DeckList *deck;
                 try {
-                    deck = sqlInterface->getDeckFromDatabase(shareItem.deck_id(), userInfo->id());
+                    deck = databaseInterface->getDeckFromDatabase(shareItem.deck_id(), userInfo->id());
                 } catch (Response::ResponseCode &r) {
                     return r;
                 }
@@ -1262,33 +1076,25 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const C
             }
         }
     } else if (cmd.has_folder_path()) {
-        const int folderId = getDeckPathId(nameFromStdString(cmd.folder_path()));
+        const int folderId = databaseInterface->getDeckPathId(nameFromStdString(cmd.folder_path()), userInfo->id());
         if (folderId == -1) {
             return Response::RespNameNotFound;
         }
 
         // Drain the deck list before resolving each deck: getDeckFromDatabase
         // issues its own query on the same cached statement set.
-        QSqlQuery *query =
-            sqlInterface->prepareQuery("select id, color_identity from {prefix}_decklist_files where id_folder = "
-                                       ":id_folder and id_user = :id_user");
-        query->bindValue(":id_folder", folderId);
-        query->bindValue(":id_user", userInfo->id());
-        if (!sqlInterface->execSqlQuery(query)) {
+        QList<Server_DatabaseInterface::DeckFileListItem> deckRows;
+        if (!databaseInterface->getDeckFilesInFolder(folderId, userInfo->id(), deckRows)) {
             return Response::RespContextError;
         }
-        QList<std::pair<int, QString>> deckRows;
-        while (query->next()) {
-            deckRows.append({query->value(0).toInt(), query->value(1).toString()});
-        }
-        for (const auto &[deckId, colorIdentity] : deckRows) {
+        for (const Server_DatabaseInterface::DeckFileListItem &deckRow : deckRows) {
             DeckList *deck;
             try {
-                deck = sqlInterface->getDeckFromDatabase(deckId, userInfo->id());
+                deck = databaseInterface->getDeckFromDatabase(deckRow.id, userInfo->id());
             } catch (Response::ResponseCode &r) {
                 return r;
             }
-            items.append(makeShareItemFromDeck(*deck, colorIdentity));
+            items.append(makeShareItemFromDeck(*deck, deckRow.colorIdentity));
             delete deck;
         }
     } else {
@@ -1306,8 +1112,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const C
 
     const QString token = generateShareToken();
     qint64 expiresAt = 0;
-    if (!sqlInterface->createDeckShare(token, shareName, userInfo->id(), items, servatrice->getDeckShareExpiryDays(),
-                                       expiresAt)) {
+    if (!databaseInterface->createDeckShare(token, shareName, userInfo->id(), items,
+                                            servatrice->getDeckShareExpiryDays(), expiresAt)) {
         return Response::RespInvalidData;
     }
 
@@ -1327,15 +1133,15 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareListMine(const
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
-    QList<DeckShareSummaryRecord> shares;
-    if (!sqlInterface->getDeckSharesForUser(userInfo->id(), shares)) {
+    QList<Server_DatabaseInterface::DeckShareSummaryRecord> shares;
+    if (!databaseInterface->getDeckSharesForUser(userInfo->id(), shares)) {
         return Response::RespContextError;
     }
 
     Response_DeckShareListMine *re = new Response_DeckShareListMine;
-    for (const DeckShareSummaryRecord &share : shares) {
+    for (const Server_DatabaseInterface::DeckShareSummaryRecord &share : shares) {
         ServerInfo_DeckShareSummary *summary = re->add_shares();
         summary->set_id(share.id);
         summary->set_name(share.name.toStdString());
@@ -1359,9 +1165,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareRemove(const C
         return Response::RespInvalidData;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
-    if (!sqlInterface->deleteDeckShare(cmd.share_id(), userInfo->id())) {
+    if (!databaseInterface->deleteDeckShare(cmd.share_id(), userInfo->id())) {
         return Response::RespNameNotFound;
     }
 
@@ -1375,19 +1181,19 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareList(const Com
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
     QString name;
     qint64 expiresAt = 0;
-    QList<DeckShareItemRecord> items;
-    if (!sqlInterface->getDeckShareList(nameFromStdString(cmd.token()), name, expiresAt, items)) {
+    QList<Server_DatabaseInterface::DeckShareItemRecord> items;
+    if (!databaseInterface->getDeckShareList(nameFromStdString(cmd.token()), name, expiresAt, items)) {
         return Response::RespNameNotFound;
     }
 
     Response_DeckShareList *re = new Response_DeckShareList;
     re->set_name(name.toStdString());
     re->set_expires_at(expiresAt);
-    for (const DeckShareItemRecord &item : items) {
+    for (const Server_DatabaseInterface::DeckShareItemRecord &item : items) {
         ServerInfo_DeckShareItem *itemInfo = re->add_items();
         itemInfo->set_id(item.id);
         itemInfo->set_name(item.name.toStdString());
@@ -1410,10 +1216,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareDownload(const
         return Response::RespFunctionNotAllowed;
     }
 
-    sqlInterface->checkSql();
+    databaseInterface->checkSql();
 
     QString content;
-    if (!sqlInterface->getDeckShareItem(nameFromStdString(cmd.token()), cmd.item_id(), content)) {
+    if (!databaseInterface->getDeckShareItem(nameFromStdString(cmd.token()), cmd.item_id(), content)) {
         return Response::RespNameNotFound;
     }
 
@@ -1432,47 +1238,24 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplayList(const Comman
     }
 
     Response_ReplayList *re = new Response_ReplayList;
-
-    QSqlQuery *query1 = sqlInterface->prepareQuery(
-        "select a.id_game, a.replay_name, b.room_name, b.time_started, b.time_finished, b.descr, a.do_not_hide from "
-        "{prefix}_replays_access a left join {prefix}_games b on b.id = a.id_game where a.id_player = :id_player and "
-        "(a.do_not_hide = 1 or date_add(b.time_started, interval 7 day) > now())");
-    query1->bindValue(":id_player", userInfo->id());
-    sqlInterface->execSqlQuery(query1);
-    while (query1->next()) {
+    for (const Server_DatabaseInterface::ReplayMatchRecord &match : databaseInterface->getReplayList(userInfo->id())) {
         ServerInfo_ReplayMatch *matchInfo = re->add_match_list();
 
-        const int gameId = query1->value(0).toInt();
-        matchInfo->set_game_id(gameId);
-        matchInfo->set_room_name(query1->value(2).toString().toStdString());
-        const int timeStarted = query1->value(3).toDateTime().toSecsSinceEpoch();
-        const int timeFinished = query1->value(4).toDateTime().toSecsSinceEpoch();
-        matchInfo->set_time_started(timeStarted);
-        matchInfo->set_length(timeFinished - timeStarted);
-        matchInfo->set_game_name(query1->value(5).toString().toStdString());
-        const QString replayName = query1->value(1).toString();
-        matchInfo->set_do_not_hide(query1->value(6).toBool());
+        matchInfo->set_game_id(match.gameId);
+        matchInfo->set_room_name(match.roomName.toStdString());
+        matchInfo->set_time_started(match.timeStarted);
+        matchInfo->set_length(match.timeFinished - match.timeStarted);
+        matchInfo->set_game_name(match.description.toStdString());
+        matchInfo->set_do_not_hide(match.doNotHide);
 
-        {
-            QSqlQuery *query2 =
-                sqlInterface->prepareQuery("select player_name from {prefix}_games_players where id_game = :id_game");
-            query2->bindValue(":id_game", gameId);
-            sqlInterface->execSqlQuery(query2);
-            while (query2->next()) {
-                matchInfo->add_player_names(query2->value(0).toString().toStdString());
-            }
+        for (const QString &playerName : match.playerNames) {
+            matchInfo->add_player_names(playerName.toStdString());
         }
-        {
-            QSqlQuery *query3 =
-                sqlInterface->prepareQuery("select id, duration from {prefix}_replays where id_game = :id_game");
-            query3->bindValue(":id_game", gameId);
-            sqlInterface->execSqlQuery(query3);
-            while (query3->next()) {
-                ServerInfo_Replay *replayInfo = matchInfo->add_replay_list();
-                replayInfo->set_replay_id(query3->value(0).toInt());
-                replayInfo->set_replay_name(replayName.toStdString());
-                replayInfo->set_duration(query3->value(1).toInt());
-            }
+        for (const Server_DatabaseInterface::ReplayEntry &replay : match.replays) {
+            ServerInfo_Replay *replayInfo = matchInfo->add_replay_list();
+            replayInfo->set_replay_id(replay.replayId);
+            replayInfo->set_replay_name(match.replayName.toStdString());
+            replayInfo->set_duration(replay.duration);
         }
     }
 
@@ -1487,30 +1270,17 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplayDownload(const Co
         return Response::RespFunctionNotAllowed;
     }
 
-    {
-        QSqlQuery *query =
-            sqlInterface->prepareQuery("select 1 from {prefix}_replays_access a left join {prefix}_replays b on "
-                                       "a.id_game = b.id_game where b.id = :id_replay and a.id_player = :id_player");
-        query->bindValue(":id_replay", cmd.replay_id());
-        query->bindValue(":id_player", userInfo->id());
-        if (!sqlInterface->execSqlQuery(query)) {
-            return Response::RespInternalError;
-        }
-        if (!query->next()) {
+    QByteArray data;
+    switch (databaseInterface->getReplayData(cmd.replay_id(), userInfo->id(), data)) {
+        case Server_DatabaseInterface::ReplayAccessResult::Ok:
+            break;
+        case Server_DatabaseInterface::ReplayAccessResult::AccessDenied:
             return Response::RespAccessDenied;
-        }
+        case Server_DatabaseInterface::ReplayAccessResult::NotFound:
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::ReplayAccessResult::Failed:
+            return Response::RespInternalError;
     }
-
-    QSqlQuery *query = sqlInterface->prepareQuery("select replay from {prefix}_replays where id = :id_replay");
-    query->bindValue(":id_replay", cmd.replay_id());
-    if (!sqlInterface->execSqlQuery(query)) {
-        return Response::RespInternalError;
-    }
-    if (!query->next()) {
-        return Response::RespNameNotFound;
-    }
-
-    QByteArray data = query->value(0).toByteArray();
 
     Response_ReplayDownload *re = new Response_ReplayDownload;
     re->set_replay_data(data.data(), data.size());
@@ -1526,20 +1296,19 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplayModifyMatch(const
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
-    QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_replays_access set do_not_hide=:do_not_hide where "
-                                                  "id_player = :id_player and id_game = :id_game");
-    query->bindValue(":id_player", userInfo->id());
-    query->bindValue(":id_game", cmd.game_id());
-    query->bindValue(":do_not_hide", cmd.do_not_hide());
-
-    if (!sqlInterface->execSqlQuery(query)) {
-        return Response::RespInternalError;
+    switch (databaseInterface->setReplayDoNotHide(cmd.game_id(), userInfo->id(), cmd.do_not_hide())) {
+        case Server_DatabaseInterface::ReplayWriteResult::Ok:
+            return Response::RespOk;
+        case Server_DatabaseInterface::ReplayWriteResult::NotFound:
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::ReplayWriteResult::Failed:
+            return Response::RespInternalError;
     }
-    return query->numRowsAffected() > 0 ? Response::RespOk : Response::RespNameNotFound;
+    return Response::RespInternalError;
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdReplayDeleteMatch(const Command_ReplayDeleteMatch &cmd,
@@ -1549,19 +1318,19 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplayDeleteMatch(const
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
-    QSqlQuery *query = sqlInterface->prepareQuery(
-        "delete from {prefix}_replays_access where id_player = :id_player and id_game = :id_game");
-    query->bindValue(":id_player", userInfo->id());
-    query->bindValue(":id_game", cmd.game_id());
-
-    if (!sqlInterface->execSqlQuery(query)) {
-        return Response::RespInternalError;
+    switch (databaseInterface->deleteReplayAccess(cmd.game_id(), userInfo->id())) {
+        case Server_DatabaseInterface::ReplayWriteResult::Ok:
+            return Response::RespOk;
+        case Server_DatabaseInterface::ReplayWriteResult::NotFound:
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::ReplayWriteResult::Failed:
+            return Response::RespInternalError;
     }
-    return query->numRowsAffected() > 0 ? Response::RespOk : Response::RespNameNotFound;
+    return Response::RespInternalError;
 }
 
 /**
@@ -1576,19 +1345,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplayDeleteMatch(const
  */
 QString AbstractServerSocketInterface::createHashForReplay(int gameId)
 {
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("select replay from {prefix}_replays where id_game = :id_game limit 3");
-    query->bindValue(":id_game", gameId);
-
-    if (!sqlInterface->execSqlQuery(query)) {
-        return "";
-    }
-
     QByteArray replaysBytes;
-    while (query->next()) {
-        QByteArray replay = query->value(0).toByteArray();
-        replay.truncate(128);
-        replaysBytes.append(replay);
+    if (!databaseInterface->getReplayHashSource(gameId, replaysBytes)) {
+        return "";
     }
 
     auto hash =
@@ -1605,17 +1364,14 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplayGetCode(const Com
     }
 
     // Check that user has access to replay match
-    {
-        QSqlQuery *query = sqlInterface->prepareQuery(
-            "select 1 from {prefix}_replays_access where id_game = :id_game and id_player = :id_player");
-        query->bindValue(":id_game", cmd.game_id());
-        query->bindValue(":id_player", userInfo->id());
-        if (!sqlInterface->execSqlQuery(query)) {
-            return Response::RespInternalError;
-        }
-        if (!query->next()) {
+    switch (databaseInterface->checkReplayAccess(cmd.game_id(), userInfo->id())) {
+        case Server_DatabaseInterface::ReplayAccessResult::Ok:
+            break;
+        case Server_DatabaseInterface::ReplayAccessResult::AccessDenied:
             return Response::RespAccessDenied;
-        }
+        case Server_DatabaseInterface::ReplayAccessResult::NotFound:
+        case Server_DatabaseInterface::ReplayAccessResult::Failed:
+            return Response::RespInternalError;
     }
 
     QString hash = createHashForReplay(cmd.game_id());
@@ -1651,17 +1407,16 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const 
     QString hash = split[1];
 
     // Determine if the replay actually exists (and grab the replay name while at it)
-    auto *replayExistsQuery =
-        sqlInterface->prepareQuery("select replay_name from {prefix}_replays_access where id_game = :id_game limit 1");
-    replayExistsQuery->bindValue(":id_game", gameId);
-    if (!sqlInterface->execSqlQuery(replayExistsQuery)) {
-        return Response::RespInternalError;
+    QString replayName;
+    switch (databaseInterface->getReplayName(gameId.toInt(), replayName)) {
+        case Server_DatabaseInterface::ReplayAccessResult::Ok:
+            break;
+        case Server_DatabaseInterface::ReplayAccessResult::NotFound:
+        case Server_DatabaseInterface::ReplayAccessResult::AccessDenied:
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::ReplayAccessResult::Failed:
+            return Response::RespInternalError;
     }
-    if (!replayExistsQuery->next()) {
-        return Response::RespNameNotFound;
-    }
-
-    const auto &replayName = replayExistsQuery->value(0).toString();
 
     // Check if hash is correct
     if (hash != createHashForReplay(gameId.toInt())) {
@@ -1669,26 +1424,18 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const 
     }
 
     // Determine if user already has access to replay
-    auto *alreadyAccessQuery = sqlInterface->prepareQuery(
-        "select 1 from {prefix}_replays_access where id_game = :id_game and id_player = :id_player");
-    alreadyAccessQuery->bindValue(":id_game", gameId);
-    alreadyAccessQuery->bindValue(":id_player", userInfo->id());
-    if (!sqlInterface->execSqlQuery(alreadyAccessQuery)) {
-        return Response::RespInternalError;
-    }
-    if (alreadyAccessQuery->next()) {
-        return Response::RespOk;
+    switch (databaseInterface->checkReplayAccess(gameId.toInt(), userInfo->id())) {
+        case Server_DatabaseInterface::ReplayAccessResult::Ok:
+            return Response::RespOk;
+        case Server_DatabaseInterface::ReplayAccessResult::AccessDenied:
+            break;
+        case Server_DatabaseInterface::ReplayAccessResult::NotFound:
+        case Server_DatabaseInterface::ReplayAccessResult::Failed:
+            return Response::RespInternalError;
     }
 
     // Grant the User access to the replay
-    auto *grantReplayAccessQuery =
-        sqlInterface->prepareQuery("insert into {prefix}_replays_access (id_game, id_player, replay_name, do_not_hide) "
-                                   "values(:idgame, :idplayer, :replayname, 0)");
-    grantReplayAccessQuery->bindValue(":idgame", gameId);
-    grantReplayAccessQuery->bindValue(":idplayer", userInfo->id());
-    grantReplayAccessQuery->bindValue(":replayname", replayName);
-
-    if (!sqlInterface->execSqlQuery(grantReplayAccessQuery)) {
+    if (!databaseInterface->addReplayAccess(gameId.toInt(), userInfo->id(), replayName)) {
         return Response::RespInternalError;
     }
 
@@ -1698,6 +1445,49 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const 
     sendProtocolItem(*se);
     delete se;
 
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdGetPrivateChatHistory(const Command_GetPrivateChatHistory &cmd,
+                                                                               ResponseContainer &rc)
+{
+    if (authState != PasswordRight) {
+        return Response::RespFunctionNotAllowed;
+    }
+    if (!userInfo || !(userInfo->user_level() & ServerInfo_User::IsRegistered)) {
+        return Response::RespFunctionNotAllowed;
+    }
+    if (!settingsCache->value("logging/log_user_msg_chat", false).toBool() ||
+        !settingsCache->value("logging/allow_user_chat_history", false).toBool()) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    const QString peer = nameFromStdString(cmd.user_name());
+    if (peer.isEmpty()) {
+        return Response::RespInvalidData;
+    }
+
+    // Resolve the peer to an account id. Matching by name alone would merge the
+    // conversations of everyone who has ever used that name.
+    const int peerId = databaseInterface->getUserId(peer);
+    if (peerId < 1) {
+        return Response::RespNameNotFound;
+    }
+
+    const int limit = qBound<quint32>(1, cmd.limit(), 200);
+    QList<ServerInfo_PrivateChatMessage> messages;
+    bool hasMore = false;
+    if (!databaseInterface->getPrivateChatHistory(userInfo->id(), QString::fromStdString(userInfo->name()), peerId,
+                                                  peer, cmd.before(), limit, messages, hasMore)) {
+        return Response::RespInternalError;
+    }
+
+    Response_PrivateChatHistory *re = new Response_PrivateChatHistory;
+    for (const auto &message : messages) {
+        re->add_messages()->CopyFrom(message);
+    }
+    re->set_has_more(hasMore);
+    rc.setResponseExtension(re);
     return Response::RespOk;
 }
 
@@ -1742,12 +1532,17 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Com
 
     int dateRange = cmd.date_range();
     int maximumResults = cmd.maximum_results();
+    const int offset = cmd.has_offset() ? static_cast<int>(cmd.offset()) : 0;
+    const QString beforeTime = cmd.has_before_time() ? QString::fromStdString(cmd.before_time()) : QString();
 
     Response_ViewLogHistory *re = new Response_ViewLogHistory;
 
     if (servatrice->getEnableLogQuery()) {
-        QListIterator<ServerInfo_ChatMessage> messageIterator(sqlInterface->getMessageLogHistory(
-            userName, ipAddress, gameName, gameID, message, chatType, gameType, roomType, dateRange, maximumResults));
+        bool hasMore = false;
+        QList<ServerInfo_ChatMessage> history =
+            databaseInterface->getMessageLogHistory(userName, ipAddress, gameName, gameID, message, chatType, gameType,
+                                                    roomType, dateRange, maximumResults, offset, beforeTime, &hasMore);
+        QListIterator<ServerInfo_ChatMessage> messageIterator(history);
         while (messageIterator.hasNext()) {
             ServerInfo_ChatMessage chatMessage = messageIterator.next();
             if (!allowPrivateChat) {
@@ -1755,6 +1550,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Com
             }
             re->add_log_message()->CopyFrom(chatMessage);
         }
+        re->set_has_more(hasMore);
     } else {
         ServerInfo_ChatMessage chatMessage;
 
@@ -1808,7 +1604,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetBanHistory(const Com
     QString userName = nameFromStdString(cmd.user_name());
 
     Response_BanHistory *re = new Response_BanHistory;
-    QListIterator<ServerInfo_Ban> banIterator(sqlInterface->getUserBanHistory(userName));
+    QListIterator<ServerInfo_Ban> banIterator(databaseInterface->getUserBanHistory(userName));
     while (banIterator.hasNext()) {
         re->add_ban_list()->CopyFrom(banIterator.next());
     }
@@ -1840,7 +1636,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetWarnHistory(const Co
     QString userName = nameFromStdString(cmd.user_name());
 
     Response_WarnHistory *re = new Response_WarnHistory;
-    QListIterator<ServerInfo_Warning> warnIterator(sqlInterface->getUserWarnHistory(userName));
+    QListIterator<ServerInfo_Warning> warnIterator(databaseInterface->getUserWarnHistory(userName));
     while (warnIterator.hasNext()) {
         re->add_warn_list()->CopyFrom(warnIterator.next());
     }
@@ -1858,7 +1654,7 @@ void AbstractServerSocketInterface::removeSaidMessages(const QString &userName, 
 Response::ResponseCode AbstractServerSocketInterface::cmdWarnUser(const Command_WarnUser &cmd,
                                                                   ResponseContainer & /*rc*/)
 {
-    if (!sqlInterface->checkSql()) { // sql database is required, without database there are no moderators anyway
+    if (!databaseInterface->checkSql()) { // sql database is required, without database there are no moderators anyway
         return Response::RespInternalError;
     }
 
@@ -1871,7 +1667,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdWarnUser(const Command_
         removeSaidMessages(userName, amountRemove);
     }
 
-    if (sqlInterface->addWarning(userName, sendingModerator, warningReason, clientId)) {
+    if (databaseInterface->addWarning(userName, sendingModerator, warningReason, clientId)) {
         servatrice->clientsLock.lockForRead();
         AbstractServerSocketInterface *user =
             static_cast<AbstractServerSocketInterface *>(server->getUsers().value(userName));
@@ -1903,7 +1699,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdWarnUser(const Command_
 Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Command_BanFromServer &cmd,
                                                                        ResponseContainer & /*rc*/)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
@@ -1925,17 +1721,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
         address = "";
     }
 
-    QSqlQuery *query = sqlInterface->prepareQuery(
-        "insert into {prefix}_bans (user_name, ip_address, id_admin, time_from, minutes, reason, visible_reason, "
-        "clientid) values(:user_name, :ip_address, :id_admin, NOW(), :minutes, :reason, :visible_reason, :client_id)");
-    query->bindValue(":user_name", userName);
-    query->bindValue(":ip_address", address);
-    query->bindValue(":id_admin", userInfo->id());
-    query->bindValue(":minutes", minutes);
-    query->bindValue(":reason", textFromStdString(cmd.reason()));
-    query->bindValue(":visible_reason", visibleReason);
-    query->bindValue(":client_id", nameFromStdString(cmd.clientid()));
-    sqlInterface->execSqlQuery(query);
+    databaseInterface->addBan(userName, address, userInfo->id(), minutes, textFromStdString(cmd.reason()),
+                              visibleReason, nameFromStdString(cmd.clientid()));
 
     servatrice->clientsLock.lockForRead();
     QList<QString> moderatorList = server->getOnlineModeratorList();
@@ -1950,15 +1737,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     }
 
     if (userName.isEmpty() && address.isEmpty() && (!clientId.isEmpty())) {
-        QSqlQuery *clientIdQuery =
-            sqlInterface->prepareQuery("select name from {prefix}_users where clientid = :client_id");
-        clientIdQuery->bindValue(":client_id", nameFromStdString(cmd.clientid()));
-        sqlInterface->execSqlQuery(clientIdQuery);
-        if (!sqlInterface->execSqlQuery(clientIdQuery)) {
+        QList<QString> clientIdUserNames;
+        if (!databaseInterface->getUserNamesByClientId(nameFromStdString(cmd.clientid()), clientIdUserNames)) {
             qCWarning(AbstractServerSocketInterfaceLog) << "ClientID username ban lookup failed: SQL Error";
         } else {
-            while (clientIdQuery->next()) {
-                userName = clientIdQuery->value(0).toString();
+            for (const QString &name : clientIdUserNames) {
+                userName = name;
                 AbstractServerSocketInterface *user =
                     static_cast<AbstractServerSocketInterface *>(server->getUsers().value(userName));
                 if (user && !userList.contains(user)) {
@@ -1982,7 +1766,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
             SessionEvent *se = userList[i]->prepareSessionEvent(event);
             userList[i]->sendProtocolItem(*se);
             delete se;
-            QMetaObject::invokeMethod(userList[i], "prepareDestroy", Qt::QueuedConnection);
+            QMetaObject::invokeMethod(
+                userList[i], [user = userList[i]] { user->prepareDestroy(); }, Qt::QueuedConnection);
         }
     }
 
@@ -2008,33 +1793,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
     return Response::RespOk;
 }
 
-namespace
-{
-int reportUserLevel(bool userExists, int adminFlags)
-{
-    int userLevel = ServerInfo_User::IsUser;
-    if (userExists) {
-        userLevel |= ServerInfo_User::IsRegistered;
-        if (adminFlags & 1) {
-            userLevel |= ServerInfo_User::IsAdmin | ServerInfo_User::IsModerator;
-        } else if (adminFlags & 2) {
-            userLevel |= ServerInfo_User::IsModerator;
-        }
-        if (adminFlags & 4) {
-            userLevel |= ServerInfo_User::IsJudge;
-        }
-        if (adminFlags & 8) {
-            userLevel |= ServerInfo_User::IsDeveloper;
-        }
-    }
-    return userLevel;
-}
-} // namespace
-
 Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Command_ReportList &cmd,
                                                                     ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
@@ -2042,85 +1804,16 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Comman
     const int offset = static_cast<int>(cmd.offset());
     const int limit = qMin(static_cast<int>(cmd.limit()), 1000);
 
-    // Columns: 0=id, 1=reporter_name, 2=reported_user_name, 3=game_id,
-    //          4=category, 5=description, 6=created_at, 7=status,
-    //          8=resolution_note, 9=assigned_mod_name, 10=resolved_by_name,
-    //          11=room_id, 12=replay_id,
-    //          13=reported_user_id, 14=reported_user_admin
-    QString whereClause;
-    if (unresolvedOnly) {
-        whereClause = "WHERE r.status = 'open' OR r.status = 'assigned' ";
-    }
-
-    // Total count query
-    QSqlQuery *countQuery = sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_reports r " + whereClause);
     int totalCount = 0;
-    if (sqlInterface->execSqlQuery(countQuery) && countQuery->next()) {
-        totalCount = countQuery->value(0).toInt();
-    }
-
-    QString queryStr = "SELECT r.id, r.reporter_name, r.reported_user_name, r.game_id, "
-                       "r.category, r.description, r.created_at, r.status, "
-                       "r.resolution_note, u.name AS assigned_mod_name, ru.name AS resolved_by_name, r.room_id, "
-                       "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
-                       "AS replay_id, u2.id AS reported_user_id, u2.admin AS reported_user_admin "
-                       "FROM {prefix}_reports r "
-                       "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
-                       "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id "
-                       "LEFT JOIN {prefix}_users u2 ON u2.name = r.reported_user_name ";
-
-    if (unresolvedOnly) {
-        queryStr += "WHERE r.status = 'open' OR r.status = 'assigned' ";
-    }
-
-    queryStr += "ORDER BY r.created_at DESC LIMIT :limit OFFSET :offset";
-
-    QSqlQuery *query = sqlInterface->prepareQuery(queryStr);
-    query->bindValue(":limit", limit);
-    query->bindValue(":offset", offset);
-    if (!sqlInterface->execSqlQuery(query)) {
+    QList<ServerInfo_Report> reports;
+    if (!databaseInterface->getReportList(unresolvedOnly, offset, limit, totalCount, reports)) {
         return Response::RespInternalError;
     }
 
     Response_ReportList *re = new Response_ReportList;
     re->set_total_count(totalCount);
-
-    while (query->next()) {
-        ServerInfo_Report *info = re->add_reports();
-
-        info->set_report_id(query->value(0).toInt());
-        info->set_reporter_name(query->value(1).toString().toStdString());
-        info->set_reported_user_name(query->value(2).toString().toStdString());
-
-        if (!query->value(3).isNull()) {
-            info->set_game_id(query->value(3).toInt());
-        }
-
-        info->set_category(query->value(4).toString().toStdString());
-        info->set_description(query->value(5).toString().toStdString());
-        info->set_report_time(query->value(6).toDateTime().toSecsSinceEpoch());
-        info->set_status(query->value(7).toString().toStdString());
-
-        if (!query->value(8).isNull()) {
-            info->set_resolution_note(query->value(8).toString().toStdString());
-        }
-
-        if (!query->value(9).isNull()) {
-            info->set_assigned_mod_name(query->value(9).toString().toStdString());
-        }
-        if (!query->value(10).isNull()) {
-            info->set_resolved_by_name(query->value(10).toString().toStdString());
-        }
-
-        if (!query->value(11).isNull()) {
-            info->set_room_id(query->value(11).toInt());
-        }
-
-        if (!query->value(12).isNull()) {
-            info->set_replay_id(query->value(12).toInt());
-        }
-
-        info->set_reported_user_level(reportUserLevel(!query->value(13).isNull(), query->value(14).toInt()));
+    for (const ServerInfo_Report &report : reports) {
+        *re->add_reports() = report;
     }
 
     rc.setResponseExtension(re);
@@ -2130,42 +1823,22 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Comman
 Response::ResponseCode AbstractServerSocketInterface::cmdReportAssign(const Command_ReportAssign &cmd,
                                                                       ResponseContainer & /*rc*/)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
-    int reportId = cmd.report_id();
-    int modId = userInfo->id();
+    const int reportId = cmd.report_id();
+    const int modId = userInfo->id();
 
-    QSqlQuery *lookupQuery = sqlInterface->prepareQuery("SELECT status FROM {prefix}_reports WHERE id = :id");
-    lookupQuery->bindValue(":id", reportId);
-
-    if (!sqlInterface->execSqlQuery(lookupQuery)) {
-        return Response::RespInternalError;
-    }
-
-    if (!lookupQuery->next()) {
-        return Response::RespNameNotFound;
-    }
-
-    if (lookupQuery->value(0).toString() != "open") {
-        return Response::RespInvalidData;
-    }
-
-    QSqlQuery *query = sqlInterface->prepareQuery("UPDATE {prefix}_reports "
-                                                  "SET status = 'assigned', assigned_to = :mod_id "
-                                                  "WHERE id = :id AND status = 'open'");
-
-    query->bindValue(":mod_id", modId);
-    query->bindValue(":id", reportId);
-
-    if (!sqlInterface->execSqlQuery(query)) {
-        return Response::RespInternalError;
-    }
-
-    if (query->numRowsAffected() == 0) {
-        // The report was taken by another moderator between the lookup and this update.
-        return Response::RespInvalidData;
+    switch (databaseInterface->assignReport(reportId, modId)) {
+        case Server_DatabaseInterface::ReportAssignResult::Ok:
+            break;
+        case Server_DatabaseInterface::ReportAssignResult::NotFound:
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::ReportAssignResult::NotOpen:
+            return Response::RespInvalidData;
+        case Server_DatabaseInterface::ReportAssignResult::Failed:
+            return Response::RespInternalError;
     }
 
     return Response::RespOk;
@@ -2174,57 +1847,38 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportAssign(const Comm
 Response::ResponseCode AbstractServerSocketInterface::cmdReportResolve(const Command_ReportResolve &cmd,
                                                                        ResponseContainer & /*rc*/)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
-    int reportId = cmd.report_id();
-    QString note = textFromStdString(cmd.resolution_note());
-    bool dismissed = cmd.dismissed();
+    const int reportId = cmd.report_id();
+    const QString note = textFromStdString(cmd.resolution_note());
+    const bool dismissed = cmd.dismissed();
 
-    QString newStatus = dismissed ? "dismissed" : "resolved";
+    const QString newStatus = dismissed ? "dismissed" : "resolved";
 
-    QSqlQuery *query = sqlInterface->prepareQuery("UPDATE {prefix}_reports "
-                                                  "SET status = :status, resolution_note = :note, "
-                                                  "resolution_time = NOW(), resolved_by = :mod_id "
-                                                  "WHERE id = :id AND status IN ('open', 'assigned')");
-
-    query->bindValue(":status", newStatus);
-    query->bindValue(":note", note);
-    query->bindValue(":mod_id", userInfo->id());
-    query->bindValue(":id", reportId);
-
-    if (!sqlInterface->execSqlQuery(query)) {
-        return Response::RespInternalError;
+    switch (databaseInterface->resolveReport(reportId, newStatus, note, userInfo->id())) {
+        case Server_DatabaseInterface::ReportUpdateResult::Ok:
+            break;
+        case Server_DatabaseInterface::ReportUpdateResult::InvalidState:
+            return Response::RespInvalidData;
+        case Server_DatabaseInterface::ReportUpdateResult::Failed:
+            return Response::RespInternalError;
     }
 
-    if (query->numRowsAffected() == 0) {
-        return Response::RespInvalidData;
-    }
-
-    sqlInterface->addAuditRecord(QString::number(reportId), this->getAddress(),
-                                 QString::fromStdString(userInfo->clientid()),
-                                 dismissed ? "REPORT_DISMISSED" : "REPORT_RESOLVED",
-                                 QString("Report #%1 %2").arg(reportId).arg(newStatus), true);
+    databaseInterface->addAuditRecord(QString::number(reportId), this->getAddress(),
+                                      QString::fromStdString(userInfo->clientid()),
+                                      dismissed ? "REPORT_DISMISSED" : "REPORT_RESOLVED",
+                                      QString("Report #%1 %2").arg(reportId).arg(newStatus), true);
 
     // Notifying the reporter is best-effort: the resolve already succeeded. If any of the lookup
     // queries below fail, the report is simply left with notified = 0 and the notification is
     // delivered later via sendPendingReportNotifications.
-    QSqlQuery *lookupQuery =
-        sqlInterface->prepareQuery("SELECT reporter_id, reported_user_name FROM {prefix}_reports WHERE id = :id");
-    lookupQuery->bindValue(":id", reportId);
-
-    QString reporterName;
+    int reporterId = -1;
     QString reportedUser;
-    if (sqlInterface->execSqlQuery(lookupQuery) && lookupQuery->next()) {
-        int reporterId = lookupQuery->value(0).toInt();
-        reportedUser = lookupQuery->value(1).toString();
-
-        QSqlQuery *nameQuery = sqlInterface->prepareQuery("SELECT name FROM {prefix}_users WHERE id = :id");
-        nameQuery->bindValue(":id", reporterId);
-        if (sqlInterface->execSqlQuery(nameQuery) && nameQuery->next()) {
-            reporterName = nameQuery->value(0).toString();
-        }
+    QString reporterName;
+    if (databaseInterface->getReportNotificationTarget(reportId, reporterId, reportedUser)) {
+        databaseInterface->getUserNameById(reporterId, reporterName);
     }
 
     const QString ownName = QString::fromStdString(userInfo->name());
@@ -2232,10 +1886,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportResolve(const Com
         if (reporterName == ownName) {
             // Resolving your own report: no self-notification needed, but mark it as notified
             // so it is not delivered on the next login via sendPendingReportNotifications.
-            QSqlQuery *notifiedQuery =
-                sqlInterface->prepareQuery("UPDATE {prefix}_reports SET notified = 1 WHERE id = :id");
-            notifiedQuery->bindValue(":id", reportId);
-            sqlInterface->execSqlQuery(notifiedQuery);
+            databaseInterface->markReportNotified(reportId);
         } else {
             QReadLocker clientsLocker(&servatrice->clientsLock);
             AbstractServerSocketInterface *reporter =
@@ -2259,10 +1910,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportResolve(const Com
 
                 // Only mark the report as notified if the reporter is still connected; otherwise the
                 // notification is delivered on their next login via sendPendingReportNotifications.
-                QSqlQuery *notifiedQuery =
-                    sqlInterface->prepareQuery("UPDATE {prefix}_reports SET notified = 1 WHERE id = :id");
-                notifiedQuery->bindValue(":id", reportId);
-                sqlInterface->execSqlQuery(notifiedQuery);
+                databaseInterface->markReportNotified(reportId);
             }
         }
     }
@@ -2273,99 +1921,50 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportResolve(const Com
 Response::ResponseCode AbstractServerSocketInterface::cmdReportUserInfo(const Command_ReportUserInfo &cmd,
                                                                         ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
-    QString userName = nameFromStdString(cmd.user_name());
+    const QString userName = nameFromStdString(cmd.user_name());
 
-    QSqlQuery *userQuery = sqlInterface->prepareQuery("SELECT u.admin, u.active, u.registrationDate, u.adminnotes "
-                                                      "FROM {prefix}_users u "
-                                                      "WHERE u.name = :name");
-    userQuery->bindValue(":name", userName);
-
-    if (!sqlInterface->execSqlQuery(userQuery)) {
+    Server_DatabaseInterface::ReportUserInfoRecord userReportInfo;
+    if (!databaseInterface->getReportUserInfo(userName, userReportInfo)) {
         return Response::RespInternalError;
     }
 
-    if (!userQuery->next()) {
+    if (!userReportInfo.found) {
         return Response::RespNameNotFound;
     }
 
     Response_ReportUserInfo *re = new Response_ReportUserInfo;
     re->set_user_name(cmd.user_name());
 
-    re->set_is_admin(userQuery->value(0).toBool());
-    re->set_is_active(userQuery->value(1).toBool());
-    re->set_registration_time(userQuery->value(2).toDateTime().toSecsSinceEpoch());
+    re->set_is_admin(userReportInfo.isAdmin);
+    re->set_is_active(userReportInfo.isActive);
+    re->set_registration_time(userReportInfo.registrationTime);
 
-    if (!userQuery->value(3).isNull()) {
-        re->set_admin_notes(userQuery->value(3).toString().toStdString());
+    if (userReportInfo.hasAdminNotes) {
+        re->set_admin_notes(userReportInfo.adminNotes.toStdString());
     }
 
-    QSqlQuery *reportCountQuery =
-        sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_reports WHERE reported_user_name = :name");
-    reportCountQuery->bindValue(":name", userName);
-    if (sqlInterface->execSqlQuery(reportCountQuery) && reportCountQuery->next()) {
-        re->set_total_reports(reportCountQuery->value(0).toInt());
+    if (userReportInfo.hasTotalReports) {
+        re->set_total_reports(userReportInfo.totalReports);
     }
 
-    QSqlQuery *banCountQuery = sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_bans WHERE user_name = :name");
-    banCountQuery->bindValue(":name", userName);
-    if (sqlInterface->execSqlQuery(banCountQuery) && banCountQuery->next()) {
-        re->set_total_bans(banCountQuery->value(0).toInt());
+    if (userReportInfo.hasTotalBans) {
+        re->set_total_bans(userReportInfo.totalBans);
     }
 
-    QSqlQuery *warnCountQuery =
-        sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_warnings WHERE user_name = :name");
-    warnCountQuery->bindValue(":name", userName);
-    if (sqlInterface->execSqlQuery(warnCountQuery) && warnCountQuery->next()) {
-        re->set_total_warns(warnCountQuery->value(0).toInt());
+    if (userReportInfo.hasTotalWarns) {
+        re->set_total_warns(userReportInfo.totalWarns);
     }
 
-    QSqlQuery *lastLoginQuery = sqlInterface->prepareQuery("SELECT UNIX_TIMESTAMP(a.last_login) "
-                                                           "FROM {prefix}_user_analytics a "
-                                                           "JOIN {prefix}_users u ON u.id = a.id "
-                                                           "WHERE u.name = :name");
-    lastLoginQuery->bindValue(":name", userName);
-    if (sqlInterface->execSqlQuery(lastLoginQuery) && lastLoginQuery->next() && !lastLoginQuery->value(0).isNull()) {
-        re->set_last_login(lastLoginQuery->value(0).toLongLong());
+    if (userReportInfo.hasLastLogin) {
+        re->set_last_login(userReportInfo.lastLogin);
     }
 
-    QSqlQuery *recentQuery =
-        sqlInterface->prepareQuery("SELECT r.id, r.reporter_name, r.reported_user_name, r.game_id, "
-                                   "r.category, r.description, r.created_at, r.status, "
-                                   "r.resolution_note, ru.name AS assigned_mod_name "
-                                   "FROM {prefix}_reports r "
-                                   "LEFT JOIN {prefix}_users ru ON r.assigned_to = ru.id "
-                                   "WHERE r.reported_user_name = :name "
-                                   "ORDER BY r.created_at DESC LIMIT 10");
-    recentQuery->bindValue(":name", userName);
-
-    if (sqlInterface->execSqlQuery(recentQuery)) {
-        while (recentQuery->next()) {
-            ServerInfo_Report *info = re->add_recent_reports();
-            info->set_report_id(recentQuery->value(0).toInt());
-            info->set_reporter_name(recentQuery->value(1).toString().toStdString());
-            info->set_reported_user_name(recentQuery->value(2).toString().toStdString());
-
-            if (!recentQuery->value(3).isNull()) {
-                info->set_game_id(recentQuery->value(3).toInt());
-            }
-
-            info->set_category(recentQuery->value(4).toString().toStdString());
-            info->set_description(recentQuery->value(5).toString().toStdString());
-            info->set_report_time(recentQuery->value(6).toDateTime().toSecsSinceEpoch());
-            info->set_status(recentQuery->value(7).toString().toStdString());
-
-            if (!recentQuery->value(8).isNull()) {
-                info->set_resolution_note(recentQuery->value(8).toString().toStdString());
-            }
-
-            if (!recentQuery->value(9).isNull()) {
-                info->set_assigned_mod_name(recentQuery->value(9).toString().toStdString());
-            }
-        }
+    for (const ServerInfo_Report &report : userReportInfo.recentReports) {
+        re->add_recent_reports()->CopyFrom(report);
     }
 
     rc.setResponseExtension(re);
@@ -2375,13 +1974,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportUserInfo(const Co
 Response::ResponseCode AbstractServerSocketInterface::cmdGetServerStats(const Command_GetServerStats & /*cmd */,
                                                                         ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
     // Servatrice::statusUpdate() periodically snapshots server health into the
     // uptime table. Serve the freshest snapshot for this server.
-    const auto snapshot = sqlInterface->getLatestUptimeSnapshot(servatrice->getServerID());
+    const auto snapshot = databaseInterface->getLatestUptimeSnapshot(servatrice->getServerID());
     if (!snapshot.valid) {
         // No snapshot yet (fresh server, or statusUpdate() has not ticked).
         return Response::RespInternalError;
@@ -2448,7 +2047,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetServerStats(const Co
 Response::ResponseCode AbstractServerSocketInterface::cmdReportStats(const Command_ReportStats & /*cmd */,
                                                                      ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
@@ -2457,94 +2056,48 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportStats(const Comma
         return Response::RespOk;
     }
 
-    Response_ReportStats *re = new Response_ReportStats;
-
-    QSqlQuery *overviewQuery = sqlInterface->prepareQuery(
-        "SELECT COUNT(*) AS total, "
-        "SUM(status IN ('open', 'assigned')) AS pending, "
-        "SUM(status = 'assigned') AS assigned, "
-        "SUM(status IN ('resolved', 'dismissed')) AS resolved, "
-        "SUM(created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)) AS last24h, "
-        "SUM(created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) AS last7d, "
-        "SUM(created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) AS last30d, "
-        "SUM(created_at >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)) AS this_week "
-        "FROM {prefix}_reports");
-    if (!sqlInterface->execSqlQuery(overviewQuery) || !overviewQuery->next()) {
-        delete re;
+    Server_DatabaseInterface::ReportStatsRecord stats;
+    if (!databaseInterface->getReportStats(stats)) {
         return Response::RespInternalError;
     }
 
-    re->set_total_reports(overviewQuery->value(0).toInt());
-    re->set_total_pending(overviewQuery->value(1).toInt());
-    re->set_total_assigned(overviewQuery->value(2).toInt());
-    re->set_total_resolved(overviewQuery->value(3).toInt());
-    re->set_reports_last_24h(overviewQuery->value(4).toInt());
-    re->set_reports_last_7d(overviewQuery->value(5).toInt());
-    re->set_reports_last_30d(overviewQuery->value(6).toInt());
-    re->set_reports_this_week(overviewQuery->value(7).toInt());
+    auto *re = new Response_ReportStats;
+    re->set_total_reports(stats.totalReports);
+    re->set_total_pending(stats.totalPending);
+    re->set_total_assigned(stats.totalAssigned);
+    re->set_total_resolved(stats.totalResolved);
+    re->set_reports_last_24h(stats.reportsLast24h);
+    re->set_reports_last_7d(stats.reportsLast7d);
+    re->set_reports_last_30d(stats.reportsLast30d);
+    re->set_reports_this_week(stats.reportsThisWeek);
 
-    bool allQueriesOk = true;
-
-    QSqlQuery *lastWeekQuery =
-        sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_reports WHERE created_at >= DATE_SUB(CURDATE(), "
-                                   "INTERVAL WEEKDAY(CURDATE()) + 7 DAY) "
-                                   "AND created_at < DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)");
-    if (sqlInterface->execSqlQuery(lastWeekQuery) && lastWeekQuery->next()) {
-        re->set_reports_last_week(lastWeekQuery->value(0).toInt());
-    } else {
-        allQueriesOk = false;
+    if (stats.hasReportsLastWeek) {
+        re->set_reports_last_week(stats.reportsLastWeek);
     }
 
-    QSqlQuery *avgResQuery = sqlInterface->prepareQuery(
-        "SELECT AVG(TIMESTAMPDIFF(HOUR, created_at, resolution_time)) "
-        "FROM {prefix}_reports WHERE status IN ('resolved','dismissed') AND resolution_time IS NOT NULL");
-    if (sqlInterface->execSqlQuery(avgResQuery) && avgResQuery->next()) {
-        if (!avgResQuery->value(0).isNull()) {
-            re->set_avg_resolution_hours(avgResQuery->value(0).toDouble());
-        }
-    } else {
-        allQueriesOk = false;
+    if (stats.hasAvgResolutionHours) {
+        re->set_avg_resolution_hours(stats.avgResolutionHours);
     }
 
-    QSqlQuery *catQuery = sqlInterface->prepareQuery(
-        "SELECT category, COUNT(*) AS cnt FROM {prefix}_reports GROUP BY category ORDER BY cnt DESC LIMIT 10");
-    if (sqlInterface->execSqlQuery(catQuery)) {
-        while (catQuery->next()) {
-            ReportCategoryCount *cc = re->add_category_counts();
-            cc->set_category(catQuery->value(0).toString().toStdString());
-            cc->set_count(catQuery->value(1).toInt());
-        }
-    } else {
-        allQueriesOk = false;
+    for (const Server_DatabaseInterface::ReportCategoryCountRecord &count : stats.categoryCounts) {
+        ReportCategoryCount *cc = re->add_category_counts();
+        cc->set_category(count.category.toStdString());
+        cc->set_count(count.count);
     }
 
-    QSqlQuery *topReportedQuery =
-        sqlInterface->prepareQuery("SELECT reported_user_name, COUNT(*) AS cnt FROM {prefix}_reports "
-                                   "GROUP BY reported_user_name ORDER BY cnt DESC LIMIT 10");
-    if (sqlInterface->execSqlQuery(topReportedQuery)) {
-        while (topReportedQuery->next()) {
-            ReportTopUser *tu = re->add_top_reported_users();
-            tu->set_user_name(topReportedQuery->value(0).toString().toStdString());
-            tu->set_count(topReportedQuery->value(1).toInt());
-        }
-    } else {
-        allQueriesOk = false;
+    for (const Server_DatabaseInterface::ReportTopUserRecord &user : stats.topReportedUsers) {
+        ReportTopUser *tu = re->add_top_reported_users();
+        tu->set_user_name(user.userName.toStdString());
+        tu->set_count(user.count);
     }
 
-    QSqlQuery *topReporterQuery =
-        sqlInterface->prepareQuery("SELECT reporter_name, COUNT(*) AS cnt FROM {prefix}_reports "
-                                   "GROUP BY reporter_name ORDER BY cnt DESC LIMIT 10");
-    if (sqlInterface->execSqlQuery(topReporterQuery)) {
-        while (topReporterQuery->next()) {
-            ReportTopUser *tu = re->add_top_reporters();
-            tu->set_user_name(topReporterQuery->value(0).toString().toStdString());
-            tu->set_count(topReporterQuery->value(1).toInt());
-        }
-    } else {
-        allQueriesOk = false;
+    for (const Server_DatabaseInterface::ReportTopUserRecord &user : stats.topReporters) {
+        ReportTopUser *tu = re->add_top_reporters();
+        tu->set_user_name(user.userName.toStdString());
+        tu->set_count(user.count);
     }
 
-    if (allQueriesOk) {
+    if (stats.allQueriesOk) {
         servatrice->cacheReportStats(*re);
     }
 
@@ -2555,7 +2108,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportStats(const Comma
 Response::ResponseCode AbstractServerSocketInterface::cmdGetUserSessions(const Command_GetUserSessions &cmd,
                                                                          ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
@@ -2566,7 +2119,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetUserSessions(const C
 
     Response_UserSessions *re = new Response_UserSessions;
     const int limit = qMin(static_cast<int>(cmd.limit()), 500);
-    const QList<ServerInfo_UserSession> sessions = sqlInterface->getUserSessions(userName, limit);
+    const QList<ServerInfo_UserSession> sessions = databaseInterface->getUserSessions(userName, limit);
     for (const ServerInfo_UserSession &session : sessions) {
         re->add_sessions()->CopyFrom(session);
     }
@@ -2577,7 +2130,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetUserSessions(const C
 Response::ResponseCode AbstractServerSocketInterface::cmdGetUserAlts(const Command_GetUserAlts &cmd,
                                                                      ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
@@ -2587,7 +2140,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetUserAlts(const Comma
     }
 
     Response_UserAlts *re = new Response_UserAlts;
-    const QList<ServerInfo_UserAlt> alts = sqlInterface->getUserAlts(userName);
+    const int depth = cmd.has_depth() ? static_cast<int>(cmd.depth()) : 1;
+    const int sessionMonths = cmd.has_session_months() ? static_cast<int>(cmd.session_months()) : 6;
+    const QList<ServerInfo_UserAlt> alts = databaseInterface->getUserAlts(
+        userName, depth, cmd.include_email(), cmd.include_clientid(), cmd.include_ip(), sessionMonths);
     for (const ServerInfo_UserAlt &alt : alts) {
         re->add_alts()->CopyFrom(alt);
     }
@@ -2598,12 +2154,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetUserAlts(const Comma
 Response::ResponseCode AbstractServerSocketInterface::cmdGetModeratorLastLogins(const Command_GetModeratorLastLogins &,
                                                                                 ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
     Response_ModeratorLastLogins *re = new Response_ModeratorLastLogins;
-    const QList<ServerInfo_ModeratorLogin> logins = sqlInterface->getModeratorLastLogins();
+    const QList<ServerInfo_ModeratorLogin> logins = databaseInterface->getModeratorLastLogins();
     for (const ServerInfo_ModeratorLogin &login : logins) {
         re->add_logins()->CopyFrom(login);
     }
@@ -2614,7 +2170,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetModeratorLastLogins(
 Response::ResponseCode AbstractServerSocketInterface::cmdResetUserPassword(const Command_ResetUserPassword &cmd,
                                                                            ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
@@ -2624,12 +2180,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdResetUserPassword(const
     }
 
     // Look up the target user's privilege level to prevent escalation.
-    QSqlQuery *privQuery = sqlInterface->prepareQuery("SELECT admin FROM {prefix}_users WHERE name = :name");
-    privQuery->bindValue(":name", userName);
-    if (!sqlInterface->execSqlQuery(privQuery) || !privQuery->next()) {
+    int targetAdmin = 0;
+    if (!databaseInterface->getUserAdminFlags(userName, targetAdmin)) {
         return Response::RespNameNotFound;
     }
-    const int targetAdmin = privQuery->value(0).toInt();
     const bool targetIsAdmin = targetAdmin & 1;
     const bool targetIsMod = targetAdmin & 2;
 
@@ -2641,13 +2195,21 @@ Response::ResponseCode AbstractServerSocketInterface::cmdResetUserPassword(const
     }
 
     const QString tempPassword = PasswordHasher::generateRandomSalt();
-    if (!sqlInterface->changeUserPassword(userName, tempPassword, true)) {
+    // Store a scrypt verifier rather than a legacy salt+hash: a legacy row makes the next
+    // login look like an authentication downgrade, which modern clients refuse when they
+    // still hold a verifier for the account. Where security/legacy_backup_key is configured,
+    // keep a sealed legacy hash of the same temporary password as the downgrade backup so
+    // pre-challenge clients keep the path the reset used to provide; without the key they
+    // have none, which changeUserPasswordWithLegacyBackup warns about.
+    const QString verifier = PasswordHasher::generatePasswordVerifier(tempPassword);
+    const QString legacyCredential = PasswordHasher::computeHash(tempPassword, PasswordHasher::generateRandomSalt());
+    if (!databaseInterface->changeUserPasswordWithLegacyBackup(userName, verifier, legacyCredential)) {
         return Response::RespInternalError;
     }
-    sqlInterface->setForcePasswordChange(userName, true);
+    databaseInterface->setForcePasswordChange(userName, true);
 
-    sqlInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
-                                 "PASSWORD_RESET", "Admin password reset", true);
+    databaseInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
+                                      "PASSWORD_RESET", "Admin password reset", true);
 
     // Notify the affected user if they are currently online.
     QReadLocker clientsLocker(&servatrice->clientsLock);
@@ -2675,7 +2237,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdResetUserPassword(const
 Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserAvatar(const Command_RemoveUserAvatar &cmd,
                                                                           ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
@@ -2684,12 +2246,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserAvatar(const 
         return Response::RespContextError;
     }
 
-    if (!sqlInterface->removeUserAvatar(userName)) {
+    if (!databaseInterface->removeUserAvatar(userName)) {
         return Response::RespInternalError;
     }
 
-    sqlInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
-                                 "REMOVE_USER_AVATAR", "Moderator removed user avatar", true);
+    databaseInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
+                                      "REMOVE_USER_AVATAR", "Moderator removed user avatar", true);
 
     Response_RemoveUserAvatar *re = new Response_RemoveUserAvatar;
     re->set_user_name(userName.toStdString());
@@ -2700,7 +2262,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserAvatar(const 
 Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserBanner(const Command_RemoveUserBanner &cmd,
                                                                           ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
@@ -2710,22 +2272,22 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserBanner(const 
     }
 
     bool hadBanner = true;
-    switch (sqlInterface->removeUserBanner(userName)) {
-        case Servatrice_DatabaseInterface::RemoveUserBannerResult::Removed:
+    switch (databaseInterface->removeUserBanner(userName)) {
+        case Server_DatabaseInterface::RemoveUserBannerResult::Removed:
             break;
-        case Servatrice_DatabaseInterface::RemoveUserBannerResult::NothingToRemove:
+        case Server_DatabaseInterface::RemoveUserBannerResult::NothingToRemove:
             hadBanner = false;
             break;
-        case Servatrice_DatabaseInterface::RemoveUserBannerResult::NoSuchUser:
+        case Server_DatabaseInterface::RemoveUserBannerResult::NoSuchUser:
             return Response::RespNameNotFound;
-        case Servatrice_DatabaseInterface::RemoveUserBannerResult::DatabaseError:
+        case Server_DatabaseInterface::RemoveUserBannerResult::DatabaseError:
         default:
             return Response::RespInternalError;
     }
 
     if (hadBanner) {
-        sqlInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
-                                     "REMOVE_USER_BANNER", "Moderator removed user banner card", true);
+        databaseInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
+                                          "REMOVE_USER_BANNER", "Moderator removed user banner card", true);
     }
 
     Response_RemoveUserBanner *re = new Response_RemoveUserBanner;
@@ -2739,18 +2301,18 @@ Response::ResponseCode
 AbstractServerSocketInterface::cmdClearBlacklistedBanners(const Command_ClearBlacklistedBanners & /* cmd */,
                                                           ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
-    const int cleared = sqlInterface->clearBlacklistedBanners();
+    const int cleared = databaseInterface->clearBlacklistedBanners();
     if (cleared < 0) {
         return Response::RespInternalError;
     }
 
-    sqlInterface->addAuditRecord(QString::fromStdString(userInfo->name()), this->getAddress(),
-                                 QString::fromStdString(userInfo->clientid()), "CLEAR_BLACKLISTED_BANNERS",
-                                 QString("Moderator cleared %1 blacklisted banner(s)").arg(cleared), true);
+    databaseInterface->addAuditRecord(QString::fromStdString(userInfo->name()), this->getAddress(),
+                                      QString::fromStdString(userInfo->clientid()), "CLEAR_BLACKLISTED_BANNERS",
+                                      QString("Moderator cleared %1 blacklisted banner(s)").arg(cleared), true);
 
     Response_ClearBlacklistedBanners *re = new Response_ClearBlacklistedBanners;
     re->set_cleared_count(static_cast<unsigned int>(cleared));
@@ -2760,77 +2322,45 @@ AbstractServerSocketInterface::cmdClearBlacklistedBanners(const Command_ClearBla
 
 void AbstractServerSocketInterface::sendPendingReportNotifications(ResponseContainer &rc)
 {
-    if (!sqlInterface->checkSql()) {
+    QList<Server_DatabaseInterface::PendingReportNotification> reportNotifications;
+    if (!databaseInterface->getPendingReportNotifications(userInfo->id(), reportNotifications)) {
         return;
     }
 
-    QSqlQuery *query = sqlInterface->prepareQuery("SELECT id, reported_user_name, status, resolution_note "
-                                                  "FROM {prefix}_reports "
-                                                  "WHERE reporter_id = :reporter_id AND notified = 0 "
-                                                  "AND status IN ('resolved', 'dismissed')");
-    query->bindValue(":reporter_id", userInfo->id());
-
-    if (!sqlInterface->execSqlQuery(query)) {
-        return;
-    }
-
-    while (query->next()) {
-        const int reportId = query->value(0).toInt();
-        const QString reportedUser = query->value(1).toString();
-        const bool dismissed = query->value(2).toString() == "dismissed";
-        const QString note = query->value(3).toString();
+    for (const Server_DatabaseInterface::PendingReportNotification &notification : reportNotifications) {
+        const bool dismissed = notification.status == "dismissed";
 
         Event_NotifyUser event;
         event.set_type(Event_NotifyUser::REPORT_RESOLVED);
         event.set_custom_title(dismissed ? tr("Report Dismissed").toStdString() : tr("Report Resolved").toStdString());
 
-        QString content = dismissed ? tr("Your report about %1 has been dismissed.").arg(reportedUser)
-                                    : tr("Your report about %1 has been resolved.").arg(reportedUser);
-        if (!note.isEmpty()) {
-            content += "\n" + tr("Note: %1").arg(note);
+        QString content = dismissed ? tr("Your report about %1 has been dismissed.").arg(notification.reportedUserName)
+                                    : tr("Your report about %1 has been resolved.").arg(notification.reportedUserName);
+        if (!notification.resolutionNote.isEmpty()) {
+            content += "\n" + tr("Note: %1").arg(notification.resolutionNote);
         }
         event.set_custom_content(content.toStdString());
 
         rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event));
 
-        QSqlQuery *notifiedQuery =
-            sqlInterface->prepareQuery("UPDATE {prefix}_reports SET notified = 1 WHERE id = :id");
-        notifiedQuery->bindValue(":id", reportId);
-        sqlInterface->execSqlQuery(notifiedQuery);
+        databaseInterface->markReportNotified(notification.reportId);
     }
 
-    QSqlQuery *commentQuery = sqlInterface->prepareQuery("SELECT c.id, c.report_id, c.author_name, c.comment_text "
-                                                         "FROM {prefix}_report_comments c "
-                                                         "JOIN {prefix}_reports r ON r.id = c.report_id "
-                                                         "WHERE c.notified = 0 "
-                                                         "AND c.author_id != :user_id "
-                                                         "AND ((c.is_moderator = 1 AND r.reporter_id = :user_id) "
-                                                         "OR (c.is_moderator = 0 AND r.assigned_to = :user_id) "
-                                                         "OR (c.is_moderator = 1 AND r.assigned_to = :user_id)) "
-                                                         "ORDER BY c.created_at ASC");
-    commentQuery->bindValue(":user_id", userInfo->id());
-
-    if (!sqlInterface->execSqlQuery(commentQuery)) {
+    QList<Server_DatabaseInterface::PendingReportCommentNotification> commentNotifications;
+    if (!databaseInterface->getPendingReportCommentNotifications(userInfo->id(), commentNotifications)) {
         return;
     }
 
-    while (commentQuery->next()) {
-        const qlonglong commentId = commentQuery->value(0).toLongLong();
-        const int reportId = commentQuery->value(1).toInt();
-        const QString authorName = commentQuery->value(2).toString();
-        const QString commentText = commentQuery->value(3).toString();
-
+    for (const Server_DatabaseInterface::PendingReportCommentNotification &notification : commentNotifications) {
         Event_NotifyUser event;
         event.set_type(Event_NotifyUser::REPORT_COMMENT);
-        event.set_custom_title(tr("New Comment on Report #%1").arg(reportId).toStdString());
-        event.set_custom_content(tr("%1 commented:\n%2").arg(authorName, commentText).toStdString());
+        event.set_custom_title(tr("New Comment on Report #%1").arg(notification.reportId).toStdString());
+        event.set_custom_content(
+            tr("%1 commented:\n%2").arg(notification.authorName, notification.commentText).toStdString());
 
         rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event));
 
-        QSqlQuery *notifiedQuery =
-            sqlInterface->prepareQuery("UPDATE {prefix}_report_comments SET notified = 1 WHERE id = :id");
-        notifiedQuery->bindValue(":id", commentId);
-        sqlInterface->execSqlQuery(notifiedQuery);
+        databaseInterface->markReportCommentNotified(notification.commentId);
     }
 }
 
@@ -2846,69 +2376,20 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportMyList(const Comm
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
     sendPendingReportNotifications(rc);
 
-    QString queryStr = "SELECT r.id, r.reporter_name, r.reported_user_name, r.game_id, "
-                       "r.category, r.description, r.created_at, r.status, "
-                       "r.resolution_note, u.name AS assigned_mod_name, ru.name AS resolved_by_name, r.room_id, "
-                       "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
-                       "AS replay_id, u2.id AS reported_user_id, u2.admin AS reported_user_admin "
-                       "FROM {prefix}_reports r "
-                       "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
-                       "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id "
-                       "LEFT JOIN {prefix}_users u2 ON u2.name = r.reported_user_name "
-                       "WHERE r.reporter_id = :reporter_id "
-                       "ORDER BY r.created_at DESC LIMIT 200";
-
-    QSqlQuery *query = sqlInterface->prepareQuery(queryStr);
-    query->bindValue(":reporter_id", userInfo->id());
-
-    if (!sqlInterface->execSqlQuery(query)) {
+    QList<ServerInfo_Report> reports;
+    if (!databaseInterface->getReportsSubmittedBy(userInfo->id(), reports)) {
         return Response::RespInternalError;
     }
 
     Response_ReportMyList *re = new Response_ReportMyList;
-
-    while (query->next()) {
-        ServerInfo_Report *info = re->add_reports();
-
-        info->set_report_id(query->value(0).toInt());
-        info->set_reporter_name(query->value(1).toString().toStdString());
-        info->set_reported_user_name(query->value(2).toString().toStdString());
-
-        if (!query->value(3).isNull()) {
-            info->set_game_id(query->value(3).toInt());
-        }
-
-        info->set_category(query->value(4).toString().toStdString());
-        info->set_description(query->value(5).toString().toStdString());
-        info->set_report_time(query->value(6).toDateTime().toSecsSinceEpoch());
-        info->set_status(query->value(7).toString().toStdString());
-
-        if (!query->value(8).isNull()) {
-            info->set_resolution_note(query->value(8).toString().toStdString());
-        }
-
-        if (!query->value(9).isNull()) {
-            info->set_assigned_mod_name(query->value(9).toString().toStdString());
-        }
-        if (!query->value(10).isNull()) {
-            info->set_resolved_by_name(query->value(10).toString().toStdString());
-        }
-
-        if (!query->value(11).isNull()) {
-            info->set_room_id(query->value(11).toInt());
-        }
-
-        if (!query->value(12).isNull()) {
-            info->set_replay_id(query->value(12).toInt());
-        }
-
-        info->set_reported_user_level(reportUserLevel(!query->value(13).isNull(), query->value(14).toInt()));
+    for (const ServerInfo_Report &report : reports) {
+        *re->add_reports() = report;
     }
 
     rc.setResponseExtension(re);
@@ -2918,35 +2399,29 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportMyList(const Comm
 Response::ResponseCode AbstractServerSocketInterface::cmdReportReopen(const Command_ReportReopen &cmd,
                                                                       ResponseContainer & /*rc*/)
 {
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
-    int reportId = cmd.report_id();
-    QString note = textFromStdString(cmd.reopen_note());
+    const int reportId = cmd.report_id();
+    const QString note = textFromStdString(cmd.reopen_note());
 
-    QSqlQuery *query = sqlInterface->prepareQuery("UPDATE {prefix}_reports "
-                                                  "SET status = 'open', resolution_note = NULL, "
-                                                  "resolution_time = NULL, resolved_by = NULL, assigned_to = NULL, "
-                                                  "notified = 0 "
-                                                  "WHERE id = :id AND status IN ('resolved', 'dismissed')");
-
-    query->bindValue(":id", reportId);
-
-    if (!sqlInterface->execSqlQuery(query)) {
-        return Response::RespInternalError;
-    }
-
-    if (query->numRowsAffected() == 0) {
-        return Response::RespInvalidData;
+    switch (databaseInterface->reopenReport(reportId)) {
+        case Server_DatabaseInterface::ReportUpdateResult::Ok:
+            break;
+        case Server_DatabaseInterface::ReportUpdateResult::InvalidState:
+            return Response::RespInvalidData;
+        case Server_DatabaseInterface::ReportUpdateResult::Failed:
+            return Response::RespInternalError;
     }
 
     QString auditDetails = QString("Report #%1 reopened").arg(reportId);
     if (!note.isEmpty()) {
         auditDetails += QString(". Reason: %1").arg(note.left(200));
     }
-    sqlInterface->addAuditRecord(QString::number(reportId), this->getAddress(),
-                                 QString::fromStdString(userInfo->clientid()), "REPORT_REOPENED", auditDetails, true);
+    databaseInterface->addAuditRecord(QString::number(reportId), this->getAddress(),
+                                      QString::fromStdString(userInfo->clientid()), "REPORT_REOPENED", auditDetails,
+                                      true);
 
     return Response::RespOk;
 }
@@ -2958,103 +2433,37 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportDetails(const Com
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
     const int reportId = cmd.report_id();
 
-    // Columns: 0=id, 1=reporter_id, 2=reporter_name, 3=reported_user_name, 4=game_id,
-    //          5=category, 6=description, 7=created_at, 8=status,
-    //          9=resolution_note, 10=assigned_mod_name, 11=resolved_by_name,
-    //          12=chat_log, 13=room_id, 14=resolution_time, 15=replay_id
-    QString queryStr =
-        "SELECT r.id, r.reporter_id, r.reporter_name, r.reported_user_name, r.game_id, "
-        "r.category, r.description, r.created_at, r.status, "
-        "r.resolution_note, u.name AS assigned_mod_name, ru.name AS resolved_by_name, r.chat_log, r.room_id, "
-        "r.resolution_time, "
-        "(SELECT id FROM {prefix}_replays WHERE id_game = r.game_id ORDER BY id DESC LIMIT 1) "
-        "AS replay_id "
-        "FROM {prefix}_reports r "
-        "LEFT JOIN {prefix}_users u ON r.assigned_to = u.id "
-        "LEFT JOIN {prefix}_users ru ON r.resolved_by = ru.id "
-        "WHERE r.id = :id";
-    QSqlQuery *query = sqlInterface->prepareQuery(queryStr);
-    query->bindValue(":id", reportId);
-
-    if (!sqlInterface->execSqlQuery(query)) {
-        return Response::RespInternalError;
-    }
-
-    if (!query->next()) {
-        return Response::RespNameNotFound;
+    int reporterId = -1;
+    ServerInfo_Report info;
+    switch (databaseInterface->getReportForDetails(reportId, reporterId, info)) {
+        case Server_DatabaseInterface::ReportLookupResult::Failed:
+            return Response::RespInternalError;
+        case Server_DatabaseInterface::ReportLookupResult::NotFound:
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::ReportLookupResult::Ok:
+            break;
     }
 
     const bool isMod = userInfo->user_level() & ServerInfo_User::IsModerator;
-    const int reporterId = query->value(1).toInt();
     if (reporterId != userInfo->id() && !isMod) {
         return Response::RespAccessDenied;
     }
 
-    ServerInfo_Report *info = new ServerInfo_Report;
-    info->set_report_id(query->value(0).toInt());
-    info->set_reporter_name(query->value(2).toString().toStdString());
-    info->set_reported_user_name(query->value(3).toString().toStdString());
-
-    if (!query->value(4).isNull()) {
-        info->set_game_id(query->value(4).toInt());
-    }
-
-    info->set_category(query->value(5).toString().toStdString());
-    info->set_description(query->value(6).toString().toStdString());
-    info->set_report_time(query->value(7).toDateTime().toSecsSinceEpoch());
-    info->set_status(query->value(8).toString().toStdString());
-
-    if (!query->value(9).isNull()) {
-        info->set_resolution_note(query->value(9).toString().toStdString());
-    }
-
-    if (!query->value(10).isNull()) {
-        info->set_assigned_mod_name(query->value(10).toString().toStdString());
-    }
-    if (!query->value(11).isNull()) {
-        info->set_resolved_by_name(query->value(11).toString().toStdString());
-    }
-
-    if (!query->value(12).isNull()) {
-        info->set_chat_log(query->value(12).toString().toStdString());
-    }
-
-    if (!query->value(13).isNull()) {
-        info->set_room_id(query->value(13).toInt());
-    }
-
-    if (!query->value(14).isNull()) {
-        info->set_resolution_time(query->value(14).toDateTime().toSecsSinceEpoch());
-    }
-
-    if (!query->value(15).isNull()) {
-        info->set_replay_id(query->value(15).toInt());
-    }
-
-    QSqlQuery *commentQuery =
-        sqlInterface->prepareQuery("SELECT c.author_name, c.comment_text, c.created_at, c.is_moderator "
-                                   "FROM {prefix}_report_comments c "
-                                   "WHERE c.report_id = :report_id ORDER BY c.created_at ASC");
-    commentQuery->bindValue(":report_id", reportId);
-
-    if (sqlInterface->execSqlQuery(commentQuery)) {
-        while (commentQuery->next()) {
-            ServerInfo_ReportComment *comment = info->add_comments();
-            comment->set_author_name(commentQuery->value(0).toString().toStdString());
-            comment->set_comment_text(commentQuery->value(1).toString().toStdString());
-            comment->set_comment_time(commentQuery->value(2).toDateTime().toSecsSinceEpoch());
-            comment->set_is_moderator(commentQuery->value(3).toBool());
+    QList<ServerInfo_ReportComment> comments;
+    if (databaseInterface->getReportComments(reportId, comments)) {
+        for (const ServerInfo_ReportComment &comment : comments) {
+            *info.add_comments() = comment;
         }
     }
 
     Response_ReportDetails *re = new Response_ReportDetails;
-    re->set_allocated_report(info);
+    re->set_allocated_report(new ServerInfo_Report(info));
     rc.setResponseExtension(re);
     return Response::RespOk;
 }
@@ -3066,89 +2475,58 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportAddComment(const 
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
-    int reportId = cmd.report_id();
-    QString commentText = textFromStdString(cmd.comment()).trimmed();
+    const int reportId = cmd.report_id();
+    const QString commentText = textFromStdString(cmd.comment()).trimmed();
 
     if (commentText.isEmpty()) {
         return Response::RespInvalidData;
     }
 
     const int maxCommentsPerHour = settingsCache->value("reporting/max_comments_per_hour", 30).toInt();
-    if (maxCommentsPerHour > 0) {
-        QSqlQuery *countQuery =
-            sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_report_comments WHERE author_id = :id "
-                                       "AND created_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR)");
-        countQuery->bindValue(":id", userInfo->id());
-        if (sqlInterface->execSqlQuery(countQuery) && countQuery->next() &&
-            countQuery->value(0).toInt() >= maxCommentsPerHour) {
-            return Response::RespTooManyRequests;
-        }
+    if (maxCommentsPerHour > 0 &&
+        databaseInterface->countReportCommentsInLastHour(userInfo->id()) >= maxCommentsPerHour) {
+        return Response::RespTooManyRequests;
     }
 
-    QSqlQuery *checkQuery = sqlInterface->prepareQuery(
-        "SELECT reporter_id, reporter_name, assigned_to, status FROM {prefix}_reports WHERE id = :id");
-    checkQuery->bindValue(":id", reportId);
-
-    if (!sqlInterface->execSqlQuery(checkQuery)) {
+    Server_DatabaseInterface::ReportCommentTargetRecord target;
+    if (!databaseInterface->getReportCommentTarget(reportId, target)) {
         return Response::RespInternalError;
     }
 
-    if (!checkQuery->next()) {
+    if (!target.found) {
         return Response::RespNameNotFound;
     }
 
-    int reporterId = checkQuery->value(0).toInt();
-    QString reporterName = checkQuery->value(1).toString();
-    int assignedToId = checkQuery->value(2).toInt();
-
-    bool isMod = userInfo->user_level() & ServerInfo_User::IsModerator;
+    const bool isMod = userInfo->user_level() & ServerInfo_User::IsModerator;
 
     // Only the reporter (by id) or a moderator may comment on a report.
-    if (reporterId != userInfo->id() && !isMod) {
+    if (target.reporterId != userInfo->id() && !isMod) {
         return Response::RespAccessDenied;
     }
 
-    QString reportStatus = checkQuery->value(3).toString();
-    if (reportStatus == "resolved" || reportStatus == "dismissed") {
+    if (target.status == "resolved" || target.status == "dismissed") {
         return Response::RespInvalidData;
     }
 
-    QSqlQuery *insertQuery = sqlInterface->prepareQuery(
-        "INSERT INTO {prefix}_report_comments (report_id, author_name, author_id, comment_text, created_at, "
-        "is_moderator) "
-        "VALUES (:report_id, :author_name, :author_id, :comment_text, NOW(), :is_moderator)");
-    insertQuery->bindValue(":report_id", reportId);
-    insertQuery->bindValue(":author_name", QString::fromStdString(userInfo->name()));
-    insertQuery->bindValue(":author_id", userInfo->id());
-    insertQuery->bindValue(":comment_text", commentText);
-    insertQuery->bindValue(":is_moderator", isMod);
-
-    if (!sqlInterface->execSqlQuery(insertQuery)) {
+    qlonglong commentId = 0;
+    if (!databaseInterface->addReportComment(reportId, QString::fromStdString(userInfo->name()), userInfo->id(),
+                                             commentText, isMod, commentId)) {
         return Response::RespInternalError;
     }
-
-    const qlonglong commentId = insertQuery->lastInsertId().toLongLong();
 
     QStringList recipients;
     if (isMod) {
         // A moderator comment reaches both the reporter and (if assigned) the assigned moderator.
-        recipients.append(reporterName);
-        if (assignedToId > 0) {
-            QSqlQuery *modNameQuery = sqlInterface->prepareQuery("SELECT name FROM {prefix}_users WHERE id = :id");
-            modNameQuery->bindValue(":id", assignedToId);
-            if (sqlInterface->execSqlQuery(modNameQuery) && modNameQuery->next()) {
-                recipients.append(modNameQuery->value(0).toString());
-            }
-        }
-    } else if (assignedToId > 0) {
-        QSqlQuery *modNameQuery = sqlInterface->prepareQuery("SELECT name FROM {prefix}_users WHERE id = :id");
-        modNameQuery->bindValue(":id", assignedToId);
-        if (sqlInterface->execSqlQuery(modNameQuery) && modNameQuery->next()) {
-            recipients.append(modNameQuery->value(0).toString());
+        recipients.append(target.reporterName);
+    }
+    if (target.assignedToId > 0) {
+        QString modName;
+        if (databaseInterface->getUserNameById(target.assignedToId, modName)) {
+            recipients.append(modName);
         }
     }
 
@@ -3181,10 +2559,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportAddComment(const 
     }
 
     if (allNotified) {
-        QSqlQuery *notifiedQuery =
-            sqlInterface->prepareQuery("UPDATE {prefix}_report_comments SET notified = 1 WHERE id = :id");
-        notifiedQuery->bindValue(":id", commentId);
-        sqlInterface->execSqlQuery(notifiedQuery);
+        databaseInterface->markReportCommentNotified(commentId);
     }
 
     return Response::RespOk;
@@ -3198,24 +2573,21 @@ AbstractServerSocketInterface::cmdReplayDownloadByGameId(const Command_ReplayDow
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
-    QSqlQuery *query = sqlInterface->prepareQuery("SELECT r.id, r.replay FROM {prefix}_replays r "
-                                                  "WHERE r.id_game = :game_id ORDER BY r.id DESC LIMIT 1");
-    query->bindValue(":game_id", cmd.game_id());
-
-    if (!sqlInterface->execSqlQuery(query)) {
-        return Response::RespInternalError;
+    int replayId = 0;
+    QByteArray data;
+    switch (databaseInterface->getLatestReplayForGame(cmd.game_id(), replayId, data)) {
+        case Server_DatabaseInterface::ReplayAccessResult::Ok:
+            break;
+        case Server_DatabaseInterface::ReplayAccessResult::NotFound:
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::ReplayAccessResult::AccessDenied:
+        case Server_DatabaseInterface::ReplayAccessResult::Failed:
+            return Response::RespInternalError;
     }
-
-    if (!query->next()) {
-        return Response::RespNameNotFound;
-    }
-
-    int replayId = query->value(0).toInt();
-    QByteArray data = query->value(1).toByteArray();
 
     Response_ReplayDownloadByGameId *re = new Response_ReplayDownloadByGameId;
     re->set_replay_data(data.data(), data.size());
@@ -3235,8 +2607,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
     if (!registrationEnabled) {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Server functionality disabled", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "Server functionality disabled", false);
         }
 
         return Response::RespRegistrationDisabled;
@@ -3258,8 +2630,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     // If a whitelist exists, ensure the email address domain IS in the whitelist
     if (!emailWhiteListFilters.isEmpty() && !emailWhiteListFilters.contains(emailDomain, Qt::CaseInsensitive)) {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Email used is not whitelisted", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "Email used is not whitelisted", false);
         }
         auto *re = new Response_Register;
         re->set_denied_reason_str(
@@ -3271,8 +2643,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     // If a blacklist exists, ensure the email address domain is NOT in the blacklist
     if (!emailBlackListFilters.isEmpty() && emailBlackListFilters.contains(emailDomain, Qt::CaseInsensitive)) {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Email used is blacklisted", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "Email used is blacklisted", false);
         }
 
         return Response::RespEmailBlackListed;
@@ -3280,10 +2652,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     //! \todo Move this method outside of the db interface.
     QString errorString;
-    if (!sqlInterface->usernameIsValid(userName, errorString)) {
+    if (!databaseInterface->usernameIsValid(userName, errorString)) {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Username is invalid", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "Username is invalid", false);
         }
 
         Response_Register *re = new Response_Register;
@@ -3294,17 +2666,17 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     if (userName.toLower().simplified() == "servatrice") {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Username is invalid", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "Username is invalid", false);
         }
 
         return Response::RespUsernameInvalid;
     }
 
-    if (sqlInterface->userExists(userName)) {
+    if (databaseInterface->userExists(userName)) {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Username already exists", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "Username already exists", false);
         }
 
         return Response::RespUserAlreadyExists;
@@ -3312,11 +2684,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     const auto parsedEmailAddress = EmailParser::getParsedEmailAddress(parsedEmailParts);
     if (servatrice->getMaxAccountsPerEmail() > 0 &&
-        sqlInterface->checkNumberOfUserAccounts(parsedEmailAddress) >= servatrice->getMaxAccountsPerEmail()) {
+        databaseInterface->checkNumberOfUserAccounts(parsedEmailAddress) >= servatrice->getMaxAccountsPerEmail()) {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Too many usernames registered with this email address",
-                                         false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT",
+                                              "Too many usernames registered with this email address", false);
         }
 
         return Response::RespTooManyRequests;
@@ -3324,10 +2696,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     QString banReason;
     int banSecondsRemaining;
-    if (sqlInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banSecondsRemaining)) {
+    if (databaseInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banSecondsRemaining)) {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "User is banned", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "User is banned", false);
         }
 
         Response_Register *re = new Response_Register;
@@ -3341,9 +2713,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 
     if (tooManyRegistrationAttempts(this->getAddress())) {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Too many registration attempts from this ip address",
-                                         false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "Too many registration attempts from this ip address",
+                                              false);
         }
 
         Response_Register *re = new Response_Register;
@@ -3370,8 +2742,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         passwordNeedsHash = true;
         if (!isPasswordLongEnough(password.length())) {
             if (servatrice->getEnableRegistrationAudit()) {
-                sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                             "REGISTER_ACCOUNT", "Password is too short", false);
+                databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                                  "REGISTER_ACCOUNT", "Password is too short", false);
             }
             return Response::RespPasswordTooShort;
         }
@@ -3387,38 +2759,35 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
     }
 
     bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
-    bool regSucceeded = sqlInterface->registerUser(userName, realName, password, passwordNeedsHash, parsedEmailAddress,
-                                                   country, !requireEmailActivation);
+    bool regSucceeded = databaseInterface->registerUser(userName, realName, password, passwordNeedsHash,
+                                                        parsedEmailAddress, country, !requireEmailActivation);
 
     if (regSucceeded) {
         qCDebug(AbstractServerSocketInterfaceLog) << "Accepted register command for user:" << userName;
         if (requireEmailActivation) {
-            QSqlQuery *query =
-                sqlInterface->prepareQuery("insert into {prefix}_activation_emails (name) values(:name)");
-            query->bindValue(":name", userName);
-            if (!sqlInterface->execSqlQuery(query)) {
+            if (!databaseInterface->addActivationEmail(userName)) {
                 return Response::RespRegistrationFailed;
             }
 
             if (servatrice->getEnableRegistrationAudit()) {
-                sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                             "REGISTER_ACCOUNT", "", true);
+                databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                                  "REGISTER_ACCOUNT", "", true);
             }
 
             return Response::RespRegistrationAcceptedNeedsActivation;
         } else {
 
             if (servatrice->getEnableRegistrationAudit()) {
-                sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                             "REGISTER_ACCOUNT", "", true);
+                databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                                  "REGISTER_ACCOUNT", "", true);
             }
 
             return Response::RespRegistrationAccepted;
         }
     } else {
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "REGISTER_ACCOUNT", "Unknown reason for failure", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "REGISTER_ACCOUNT", "Unknown reason for failure", false);
         }
 
         return Response::RespRegistrationFailed;
@@ -3465,12 +2834,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdActivateAccount(const C
         clientId = "UNKNOWN";
     }
 
-    if (sqlInterface->activateUser(userName, token)) {
+    if (databaseInterface->activateUser(userName, token)) {
         qCDebug(AbstractServerSocketInterfaceLog) << "Accepted activation for user" << userName;
 
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "ACTIVATE_ACCOUNT", "", true);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "ACTIVATE_ACCOUNT", "", true);
         }
 
         return Response::RespActivationAccepted;
@@ -3478,9 +2847,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdActivateAccount(const C
         qCDebug(AbstractServerSocketInterfaceLog) << "Failed activation for user" << userName;
 
         if (servatrice->getEnableRegistrationAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "ACTIVATE_ACCOUNT", "Failed to activate account, incorrect activation token",
-                                         false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "ACTIVATE_ACCOUNT",
+                                              "Failed to activate account, incorrect activation token", false);
         }
 
         return Response::RespActivationFailed;
@@ -3518,43 +2887,26 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountEdit(const Comma
         }
     }
 
-    QStringList queryList({});
-    if (cmd.has_real_name()) {
-        queryList << "realname=:realName";
-    }
+    Server_DatabaseInterface::AccountUpdateRecord update;
+    update.hasRealName = cmd.has_real_name();
+    update.realName = realName;
+    update.hasCountry = cmd.has_country();
+    update.country = country;
     if (cmd.has_email()) {
         // a real password is required in order to change the email address
         if (usingRealPassword || checkedPassword) {
-            queryList << "email=:email";
+            update.hasEmail = true;
+            update.email = parsedEmailAddress;
         } else {
             return Response::RespFunctionNotAllowed;
         }
     }
-    if (cmd.has_country()) {
-        queryList << "country=:country";
-    }
 
-    if (queryList.isEmpty()) {
+    if (!update.hasRealName && !update.hasEmail && !update.hasCountry) {
         return Response::RespOk;
     }
 
-    QString queryText = QString("update {prefix}_users set %1 where name=:userName").arg(queryList.join(", "));
-    QSqlQuery *query = sqlInterface->prepareQuery(queryText);
-    if (cmd.has_real_name()) {
-        auto _realName = nameFromStdString(cmd.real_name());
-        query->bindValue(":realName", _realName);
-    }
-    if (cmd.has_email()) {
-        const auto _parsedEmailAddress = EmailParser::getParsedEmailAddress(nameFromStdString(cmd.email()));
-        query->bindValue(":email", _parsedEmailAddress);
-    }
-    if (cmd.has_country()) {
-        auto _country = nameFromStdString(cmd.country());
-        query->bindValue(":country", _country);
-    }
-    query->bindValue(":userName", userName);
-
-    if (!sqlInterface->execSqlQuery(query)) {
+    if (!databaseInterface->updateUserAccount(userName, update)) {
         return Response::RespInternalError;
     }
 
@@ -3582,10 +2934,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountImage(const Comm
     QByteArray image(cmd.image().c_str(), length);
     int id = userInfo->id();
 
-    QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_users set avatar_bmp=:image where id=:id");
-    query->bindValue(":image", image);
-    query->bindValue(":id", id);
-    if (!sqlInterface->execSqlQuery(query)) {
+    if (!databaseInterface->setUserAvatar(id, image)) {
         return Response::RespInternalError;
     }
 
@@ -3609,9 +2958,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const 
 
     if (cardName.isEmpty()) {
         // Removal path
-        QSqlQuery *q = sqlInterface->prepareQuery("UPDATE {prefix}_users SET card_art_params = NULL WHERE id = :id");
-        q->bindValue(":id", userInfo->id());
-        if (!sqlInterface->execSqlQuery(q)) {
+        if (!databaseInterface->clearCardArtParams(userInfo->id())) {
             return Response::RespInternalError;
         }
         userInfo->clear_card_art_params();
@@ -3619,7 +2966,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const 
         return Response::RespOk;
     }
 
-    if (!sqlInterface->isCardArtAllowed(cardName, cardProviderId)) {
+    if (!databaseInterface->isCardArtAllowed(cardName, cardProviderId)) {
         return Response::RespFunctionNotAllowed;
     }
 
@@ -3639,10 +2986,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const 
     obj["zoom"] = zoom;
     const QString json = QString::fromUtf8(QJsonDocument(obj).toJson(QJsonDocument::Compact));
 
-    QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_users set card_art_params=:params where id=:id");
-    query->bindValue(":params", json);
-    query->bindValue(":id", userInfo->id());
-    if (!sqlInterface->execSqlQuery(query)) {
+    if (!databaseInterface->setCardArtParams(userInfo->id(), json)) {
         return Response::RespInternalError;
     }
 
@@ -3675,20 +3019,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAddCardArtRule(const Co
         return Response::RespInvalidData;
     }
 
-    QSqlQuery *q = sqlInterface->prepareQuery("INSERT INTO {prefix}_card_art_name_rules "
-                                              "(card_name, card_provider_id, mode, reason, created_by) "
-                                              "VALUES (:name, :provider, :mode, :reason, :uid) "
-                                              "ON DUPLICATE KEY UPDATE mode=:mode2, reason=:reason2");
-
-    q->bindValue(":name", cardName);
-    q->bindValue(":provider", cardProviderId);
-    q->bindValue(":mode", mode);
-    q->bindValue(":mode2", mode);
-    q->bindValue(":reason", QString::fromStdString(cmd.reason()));
-    q->bindValue(":reason2", QString::fromStdString(cmd.reason()));
-    q->bindValue(":uid", userInfo->id());
-
-    if (!sqlInterface->execSqlQuery(q)) {
+    if (!databaseInterface->upsertCardArtRule(cardName, cardProviderId, mode, QString::fromStdString(cmd.reason()),
+                                              userInfo->id())) {
         return Response::RespInternalError;
     }
 
@@ -3703,13 +3035,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveCardArtRule(const
     if (cardName.length() > MAX_NAME_LENGTH || cardProviderId.length() > MAX_NAME_LENGTH) {
         return Response::RespInvalidData;
     }
-    QSqlQuery *q = sqlInterface->prepareQuery(
-        "DELETE FROM {prefix}_card_art_name_rules WHERE card_name=:name AND card_provider_id=:provider");
-
-    q->bindValue(":name", cardName);
-    q->bindValue(":provider", cardProviderId);
-
-    if (!sqlInterface->execSqlQuery(q)) {
+    if (!databaseInterface->removeCardArtRule(cardName, cardProviderId)) {
         return Response::RespInternalError;
     }
 
@@ -3719,21 +3045,19 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveCardArtRule(const
 Response::ResponseCode AbstractServerSocketInterface::cmdListCardArtRules(const Command_ListCardArtRules &,
                                                                           ResponseContainer &rc)
 {
-    QSqlQuery *q = sqlInterface->prepareQuery(
-        "SELECT card_name, card_provider_id, mode, reason FROM {prefix}_card_art_name_rules");
-
-    if (!sqlInterface->execSqlQuery(q)) {
+    QList<Server_DatabaseInterface::CardArtRuleRecord> rules;
+    if (!databaseInterface->getCardArtRules(rules)) {
         return Response::RespInternalError;
     }
 
     auto *re = new Response_ListCardArtRules;
 
-    while (q->next()) {
+    for (const Server_DatabaseInterface::CardArtRuleRecord &rule : rules) {
         auto *entry = re->add_entries();
-        entry->set_card_name(q->value(0).toString().toStdString());
-        entry->set_card_provider_id(q->value(1).toString().toStdString());
-        entry->set_mode(q->value(2).toString().toStdString());
-        entry->set_reason(q->value(3).toString().toStdString());
+        entry->set_card_name(rule.cardName.toStdString());
+        entry->set_card_provider_id(rule.cardProviderId.toStdString());
+        entry->set_mode(rule.mode.toStdString());
+        entry->set_reason(rule.reason.toStdString());
     }
 
     rc.setResponseExtension(re);
@@ -3779,6 +3103,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
     }
 
     databaseInterface->setForcePasswordChange(userName, false);
+    // The forced change is done, but this session never completed login (see
+    // Server_ProtocolHandler::cmdLogin). It stays restricted to ping and another password
+    // change; the client reconnects with the new password to actually enter the server.
 
     return Response::RespOk;
 }
@@ -3793,8 +3120,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
 
     if (servatrice->recordForgotPasswordAttempt(this->getAddress())) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_REQUEST", "Too many requests from this ip address", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_REQUEST", "Too many requests from this ip address",
+                                              false);
         }
 
         return Response::RespTooManyRequests;
@@ -3802,8 +3130,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
 
     if (!servatrice->getEnableForgotPassword()) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_REQUEST", "Server functionality disabled", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_REQUEST", "Server functionality disabled", false);
         }
 
         return Response::RespFunctionNotAllowed;
@@ -3816,10 +3144,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
         return Response::RespOk;
     }
 
-    if (!sqlInterface->userExists(userName)) {
+    if (!databaseInterface->userExists(userName)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_REQUEST", "User does not exist", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_REQUEST", "User does not exist", false);
         }
 
         return Response::RespFunctionNotAllowed;
@@ -3833,11 +3161,11 @@ Response::ResponseCode AbstractServerSocketInterface::continuePasswordRequest(co
                                                                               ResponseContainer &rc,
                                                                               bool challenged)
 {
-    if (sqlInterface->doesForgotPasswordExist(userName)) {
+    if (databaseInterface->doesForgotPasswordExist(userName)) {
 
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_REQUEST", "Request already exists", true);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_REQUEST", "Request already exists", true);
         }
 
         Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
@@ -3848,19 +3176,19 @@ Response::ResponseCode AbstractServerSocketInterface::continuePasswordRequest(co
 
     QString banReason;
     int banTimeRemaining;
-    if (sqlInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banTimeRemaining)) {
+    if (databaseInterface->checkUserIsBanned(this->getAddress(), userName, clientId, banReason, banTimeRemaining)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_REQUEST", "User is banned", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_REQUEST", "User is banned", false);
         }
 
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->addForgotPassword(userName)) {
+    if (!databaseInterface->addForgotPassword(userName)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_REQUEST", "Failed to create password reset", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_REQUEST", "Failed to create password reset", false);
         }
         return Response::RespFunctionNotAllowed;
     }
@@ -3868,8 +3196,8 @@ Response::ResponseCode AbstractServerSocketInterface::continuePasswordRequest(co
     if (servatrice->getEnableForgotPasswordAudit()) {
         QString details =
             challenged ? "Request does not exist, challenge passed" : "Request does not exist, challenge not requested";
-        sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                     "PASSWORD_RESET_REQUEST", details, true);
+        databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                          "PASSWORD_RESET_REQUEST", details, true);
     }
 
     Response_ForgotPasswordRequest *re = new Response_ForgotPasswordRequest;
@@ -3886,20 +3214,19 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
     QString clientId = nameFromStdString(cmd.clientid());
     qCDebug(AbstractServerSocketInterfaceLog) << "Received reset password reset from user:" << userName;
 
-    if (!sqlInterface->doesForgotPasswordExist(userName)) {
+    if (!databaseInterface->doesForgotPasswordExist(userName)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET", "Request does not exist for user", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET", "Request does not exist for user", false);
         }
 
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->validateTableColumnStringData("{prefix}_users", "token", userName,
-                                                     nameFromStdString(cmd.token()))) {
+    if (!databaseInterface->userTokenMatches(userName, nameFromStdString(cmd.token()))) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), userName.simplified(),
-                                         "PASSWORD_RESET", "Failed token validation", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), userName.simplified(),
+                                              "PASSWORD_RESET", "Failed token validation", false);
         }
 
         return Response::RespFunctionNotAllowed;
@@ -3924,14 +3251,14 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
         return Response::RespClientUpdateRequired;
     }
 
-    if (sqlInterface->changeUserPassword(nameFromStdString(cmd.user_name()), password, passwordNeedsHash)) {
+    if (databaseInterface->changeUserPassword(nameFromStdString(cmd.user_name()), password, passwordNeedsHash)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET", "", true);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET", "", true);
         }
 
-        sqlInterface->setForcePasswordChange(nameFromStdString(cmd.user_name()), false);
-        sqlInterface->removeForgotPassword(nameFromStdString(cmd.user_name()));
+        databaseInterface->setForcePasswordChange(nameFromStdString(cmd.user_name()), false);
+        databaseInterface->removeForgotPassword(nameFromStdString(cmd.user_name()));
         return Response::RespOk;
     }
 
@@ -3949,41 +3276,42 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
 
     if (servatrice->recordForgotPasswordAttempt(this->getAddress())) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_CHALLENGE", "Too many requests from this ip address", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_CHALLENGE", "Too many requests from this ip address",
+                                              false);
         }
         return Response::RespTooManyRequests;
     }
 
     if (!servatrice->getEnableForgotPasswordChallenge()) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_CHALLENGE", "Feature not enabled", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_CHALLENGE", "Feature not enabled", false);
         }
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->userExists(userName)) {
+    if (!databaseInterface->userExists(userName)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_CHALLENGE", "User does not exist", false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_CHALLENGE", "User does not exist", false);
         }
         return Response::RespFunctionNotAllowed;
     }
 
     const auto parsedEmailAddress = EmailParser::getParsedEmailAddress(nameFromStdString(cmd.email()));
-    if (!sqlInterface->validateTableColumnStringData("{prefix}_users", "email", userName, parsedEmailAddress)) {
+    if (!databaseInterface->userEmailMatches(userName, parsedEmailAddress)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
-            sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                         "PASSWORD_RESET_CHALLENGE", "Failed to answer email challenge question",
-                                         false);
+            databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                              "PASSWORD_RESET_CHALLENGE", "Failed to answer email challenge question",
+                                              false);
         }
         return Response::RespFunctionNotAllowed;
     }
 
     if (servatrice->getEnableForgotPasswordAudit()) {
-        sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
-                                     "PASSWORD_RESET_CHALLENGE", "", true);
+        databaseInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
+                                          "PASSWORD_RESET_CHALLENGE", "", true);
     }
     return continuePasswordRequest(userName, clientId, rc, true);
 }
@@ -3994,7 +3322,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(con
     // Simplified exactly like cmdLogin, so the nonce bound to userName here validates
     // against the same normalized name during the login's challenge-response check.
     const QString userName = nameFromStdString(cmd.user_name()).simplified();
-    const QString storedPasswordData = sqlInterface->getUserPasswordData(userName);
+    const QString storedPasswordData = databaseInterface->getUserPasswordData(userName);
     if (storedPasswordData.isEmpty()) {
         if (server->getRegOnlyServerEnabled()) {
             return Response::RespRegistrationRequired;
@@ -4033,7 +3361,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(con
         // encrypted legacy backup exists, serve its salt there so they can still log in;
         // challenge-response clients must use scrypt_salt, which always carries the
         // verifier salt.
-        const QString legacyBackup = sqlInterface->getUsableLegacyBackup(userName);
+        const QString legacyBackup = databaseInterface->getUsableLegacyBackup(userName);
         if (!legacyBackup.isEmpty()) {
             re->set_password_salt(legacyBackup.left(16).toStdString());
         }
@@ -4053,7 +3381,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReport(const Command_Re
         return Response::RespFunctionNotAllowed;
     }
 
-    if (!sqlInterface->checkSql()) {
+    if (!databaseInterface->checkSql()) {
         return Response::RespInternalError;
     }
 
@@ -4076,24 +3404,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReport(const Command_Re
     }
 
     const int maxReportsPerDay = settingsCache->value("reporting/max_reports_per_day", 10).toInt();
-    if (maxReportsPerDay > 0) {
-        QSqlQuery *countQuery =
-            sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_reports WHERE reporter_id = :id "
-                                       "AND created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)");
-        countQuery->bindValue(":id", userInfo->id());
-        if (sqlInterface->execSqlQuery(countQuery) && countQuery->next() &&
-            countQuery->value(0).toInt() >= maxReportsPerDay) {
-            return Response::RespTooManyRequests;
-        }
+    if (maxReportsPerDay > 0 && databaseInterface->countReportsSubmittedInLastDay(userInfo->id()) >= maxReportsPerDay) {
+        return Response::RespTooManyRequests;
     }
 
-    int reportedUserId = -1;
-    QSqlQuery *lookupQuery = sqlInterface->prepareQuery("SELECT id FROM {prefix}_users WHERE name = :name");
-    lookupQuery->bindValue(":name", reportedUser);
-    if (sqlInterface->execSqlQuery(lookupQuery) && lookupQuery->next()) {
-        reportedUserId = lookupQuery->value(0).toInt();
-    }
-
+    const int reportedUserId = databaseInterface->getReportedUserId(reportedUser);
     if (reportedUserId == -1) {
         return Response::RespNameNotFound;
     }
@@ -4112,28 +3427,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReport(const Command_Re
         }
     }
 
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("insert into {prefix}_reports "
-                                   "(reporter_id, reporter_name, reported_user_id, reported_user_name, "
-                                   "game_id, room_id, category, description, chat_log, created_at, status) "
-                                   "values "
-                                   "(:reporter_id, :reporter_name, :reported_user_id, :reported_user_name, "
-                                   ":game_id, :room_id, :category, :description, :chat_log, NOW(), 'open')");
-
-    query->bindValue(":reporter_id", userInfo->id());
-    query->bindValue(":reporter_name", reporterName);
-    query->bindValue(":reported_user_id", reportedUserId);
-    query->bindValue(":reported_user_name", reportedUser);
-
-    query->bindValue(":game_id", gameId > 0 ? gameId : QVariant());
-
-    query->bindValue(":room_id", roomId > 0 ? roomId : QVariant());
-
-    query->bindValue(":category", category);
-    query->bindValue(":description", description);
-    query->bindValue(":chat_log", chatLog.isEmpty() ? QVariant() : chatLog);
-
-    if (!sqlInterface->execSqlQuery(query)) {
+    if (!databaseInterface->addReport(userInfo->id(), reporterName, reportedUserId, reportedUser, gameId, roomId,
+                                      category, description, chatLog)) {
         return Response::RespInternalError;
     }
 
@@ -4164,7 +3459,7 @@ AbstractServerSocketInterface::cmdSubmitPasswordVerifier(const Command_SubmitPas
         return Response::RespContextError;
     }
 
-    if (!sqlInterface->submitPasswordVerifier(QString::fromStdString(userInfo->name()), passwordVerifier)) {
+    if (!databaseInterface->submitPasswordVerifier(QString::fromStdString(userInfo->name()), passwordVerifier)) {
         return Response::RespContextError;
     }
 
@@ -4180,15 +3475,15 @@ Response::ResponseCode
 AbstractServerSocketInterface::cmdUpdateServerMessage(const Command_UpdateServerMessage & /*cmd*/,
                                                       ResponseContainer & /*rc*/)
 {
-    QMetaObject::invokeMethod(server, "updateLoginMessage");
+    QMetaObject::invokeMethod(servatrice, [srv = servatrice] { srv->updateLoginMessage(); });
     return Response::RespOk;
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdShutdownServer(const Command_ShutdownServer &cmd,
                                                                         ResponseContainer & /*rc*/)
 {
-    QMetaObject::invokeMethod(server, "scheduleShutdown", Q_ARG(QString, textFromStdString(cmd.reason())),
-                              Q_ARG(int, cmd.minutes()));
+    QMetaObject::invokeMethod(servatrice, [srv = servatrice, reason = textFromStdString(cmd.reason()),
+                                           minutes = cmd.minutes()] { srv->scheduleShutdown(reason, minutes); });
     return Response::RespOk;
 }
 
@@ -4197,18 +3492,17 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReloadConfig(const Comm
 {
     logDebugMessage("Received admin command: reloading configuration");
     settingsCache->sync();
-    QMetaObject::invokeMethod(server, "setRequiredFeatures", Q_ARG(QString, server->getRequiredFeatures()));
+    QMetaObject::invokeMethod(servatrice, [srv = servatrice, features = servatrice->getRequiredFeatures()] {
+        srv->setRequiredFeatures(features);
+    });
     return Response::RespOk;
 }
 
 bool AbstractServerSocketInterface::addAdminFlagToUser(const QString &userName, int flag)
 {
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("update {prefix}_users set admin = (admin | :adminlevel) where name = :username");
-    query->bindValue(":adminlevel", flag);
-    query->bindValue(":username", userName);
-    if (!sqlInterface->execSqlQuery(query)) {
-        logger->logMessage(QString("Failed to promote user %1: %2").arg(userName).arg(query->lastError().text()));
+    const auto result = databaseInterface->setAdminFlag(userName, flag, true);
+    if (!result.success) {
+        logger->logMessage(QString("Failed to promote user %1: %2").arg(userName).arg(result.errorText));
         return false;
     }
 
@@ -4227,12 +3521,9 @@ bool AbstractServerSocketInterface::addAdminFlagToUser(const QString &userName, 
 
 bool AbstractServerSocketInterface::removeAdminFlagFromUser(const QString &userName, int flag)
 {
-    QSqlQuery *query =
-        sqlInterface->prepareQuery("update {prefix}_users set admin = (admin & ~ :adminlevel) where name = :username");
-    query->bindValue(":adminlevel", flag);
-    query->bindValue(":username", userName);
-    if (!sqlInterface->execSqlQuery(query)) {
-        logger->logMessage(QString("Failed to demote user %1: %2").arg(userName).arg(query->lastError().text()));
+    const auto result = databaseInterface->setAdminFlag(userName, flag, false);
+    if (!result.success) {
+        logger->logMessage(QString("Failed to demote user %1: %2").arg(userName).arg(result.errorText));
         return false;
     }
 
@@ -4249,7 +3540,7 @@ bool AbstractServerSocketInterface::removeAdminFlagFromUser(const QString &userN
         delete se;
     }
 
-    QMetaObject::invokeMethod(user, "prepareDestroy", Qt::QueuedConnection);
+    QMetaObject::invokeMethod(user, [user] { user->prepareDestroy(); }, Qt::QueuedConnection);
     return true;
 }
 
@@ -4301,69 +3592,37 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAdjustMod(const Command
 Response::ResponseCode AbstractServerSocketInterface::cmdGrantReplayAccess(const Command_GrantReplayAccess &cmd,
                                                                            ResponseContainer & /*rc*/)
 {
-    // Determine if the replay actually exists already
-    auto *replayExistsQuery =
-        sqlInterface->prepareQuery("select count(*) from {prefix}_replays_access where id_game = :idgame");
-    replayExistsQuery->bindValue(":idgame", cmd.replay_id());
-    if (!sqlInterface->execSqlQuery(replayExistsQuery)) {
-        return Response::RespInternalError;
+    switch (databaseInterface->grantReplayAccessByName(cmd.replay_id(), QString::fromStdString(cmd.moderator_name()))) {
+        case Server_DatabaseInterface::ReplayWriteResult::Ok:
+            return Response::RespOk;
+        case Server_DatabaseInterface::ReplayWriteResult::NotFound:
+            return Response::RespContextError;
+        case Server_DatabaseInterface::ReplayWriteResult::Failed:
+            return Response::RespInternalError;
     }
-    if (!replayExistsQuery->next()) {
-        return Response::RespInternalError;
-    }
-
-    const auto &replayExists = replayExistsQuery->value(0).toInt() > 0;
-    if (!replayExists) {
-        return Response::RespContextError;
-    }
-
-    // Determine the Moderator's User ID (As it's not apart of client, only username is)
-    auto *getModeratorUserIdQuery = sqlInterface->prepareQuery("select id from {prefix}_users WHERE name = :name");
-    getModeratorUserIdQuery->bindValue(":name", QString::fromStdString(cmd.moderator_name()));
-    if (!sqlInterface->execSqlQuery(getModeratorUserIdQuery)) {
-        return Response::RespInternalError;
-    }
-    if (!getModeratorUserIdQuery->next()) {
-        return Response::RespInternalError;
-    }
-
-    const auto &moderator_id = getModeratorUserIdQuery->value(0).toString();
-
-    // Grant the Moderator access to the replay
-    auto *grantReplayAccessQuery =
-        sqlInterface->prepareQuery("insert into {prefix}_replays_access (id_game, id_player, replay_name, do_not_hide) "
-                                   "values(:idgame, :idplayer, :replayname, 0)");
-    grantReplayAccessQuery->bindValue(":idgame", cmd.replay_id());
-    grantReplayAccessQuery->bindValue(":idplayer", moderator_id);
-    grantReplayAccessQuery->bindValue(":replayname", "Moderator Access Replay Grant");
-
-    if (!sqlInterface->execSqlQuery(grantReplayAccessQuery)) {
-        return Response::RespInternalError;
-    }
-
-    return Response::RespOk;
+    return Response::RespInternalError;
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdForceActivateUser(const Command_ForceActivateUser &cmd,
                                                                            ResponseContainer &rc)
 {
     // Determine if user exists
-    auto *getUserTokenQuery = sqlInterface->prepareQuery("select token from {prefix}_users WHERE name = :name");
-    getUserTokenQuery->bindValue(":name", QString::fromStdString(cmd.username_to_activate()));
-    if (!sqlInterface->execSqlQuery(getUserTokenQuery)) {
-        // Internal server error
-        return Response::RespInternalError;
+    QString token;
+    switch (databaseInterface->getUserToken(QString::fromStdString(cmd.username_to_activate()), token)) {
+        case Server_DatabaseInterface::UserFieldResult::Ok:
+            break;
+        case Server_DatabaseInterface::UserFieldResult::NotFound:
+            // User doesn't exist
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::UserFieldResult::Failed:
+            // Internal server error
+            return Response::RespInternalError;
     }
-    if (!getUserTokenQuery->next()) {
-        // User doesn't exist
-        return Response::RespNameNotFound;
-    }
-    const auto &token = getUserTokenQuery->value(0).toString();
 
     // Add audit log that Moderator activated account on behalf of user
     const auto &msg = QString("Attempt Force Activation by %1").arg(QString::fromStdString(cmd.moderator_name()));
-    sqlInterface->addAuditRecord(QString::fromStdString(cmd.username_to_activate()), this->getAddress(), "UNKNOWN",
-                                 "ACTIVATE_ACCOUNT", msg, true);
+    databaseInterface->addAuditRecord(QString::fromStdString(cmd.username_to_activate()), this->getAddress(), "UNKNOWN",
+                                      "ACTIVATE_ACCOUNT", msg, true);
 
     // Build up activation request
     Command_Activate cmdActivate;
@@ -4377,17 +3636,17 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForceActivateUser(const
 Response::ResponseCode AbstractServerSocketInterface::cmdGetAdminNotes(const Command_GetAdminNotes &cmd,
                                                                        ResponseContainer &rc)
 {
-    auto *getAdminNotesQuery = sqlInterface->prepareQuery("select adminnotes from {prefix}_users WHERE name = :name");
-    getAdminNotesQuery->bindValue(":name", QString::fromStdString(cmd.user_name()));
-    if (!sqlInterface->execSqlQuery(getAdminNotesQuery)) {
-        // Internal server error
-        return Response::RespInternalError;
+    QString adminNotes;
+    switch (databaseInterface->getAdminNotes(QString::fromStdString(cmd.user_name()), adminNotes)) {
+        case Server_DatabaseInterface::UserFieldResult::Ok:
+            break;
+        case Server_DatabaseInterface::UserFieldResult::NotFound:
+            // User doesn't exist
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::UserFieldResult::Failed:
+            // Internal server error
+            return Response::RespInternalError;
     }
-    if (!getAdminNotesQuery->next()) {
-        // User doesn't exist
-        return Response::RespNameNotFound;
-    }
-    const auto &adminNotes = getAdminNotesQuery->value(0).toString();
 
     Response_GetAdminNotes *re = new Response_GetAdminNotes;
     re->set_user_name(cmd.user_name());
@@ -4400,34 +3659,31 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetAdminNotes(const Com
 Response::ResponseCode AbstractServerSocketInterface::cmdUpdateAdminNotes(const Command_UpdateAdminNotes &cmd,
                                                                           ResponseContainer & /*rc*/)
 {
-    auto *updateAdminNotesQuery =
-        sqlInterface->prepareQuery("update {prefix}_users set adminnotes = :adminnotes where name = :name");
-    updateAdminNotesQuery->bindValue(":adminnotes", QString::fromStdString(cmd.notes()));
-    updateAdminNotesQuery->bindValue(":name", QString::fromStdString(cmd.user_name()));
-
-    if (!sqlInterface->execSqlQuery(updateAdminNotesQuery)) {
-        return Response::RespInternalError;
-    }
-
-    if (updateAdminNotesQuery->numRowsAffected() == 0) {
-        return Response::RespNameNotFound;
+    switch (databaseInterface->setAdminNotes(QString::fromStdString(cmd.user_name()),
+                                             QString::fromStdString(cmd.notes()))) {
+        case Server_DatabaseInterface::UserFieldResult::Ok:
+            break;
+        case Server_DatabaseInterface::UserFieldResult::NotFound:
+            return Response::RespNameNotFound;
+        case Server_DatabaseInterface::UserFieldResult::Failed:
+            return Response::RespInternalError;
     }
 
     return Response::RespOk;
 }
 
 TcpServerSocketInterface::TcpServerSocketInterface(Servatrice *_server,
-                                                   Servatrice_DatabaseInterface *_databaseInterface,
+                                                   Server_DatabaseInterface *_databaseInterface,
                                                    QObject *parent)
     : AbstractServerSocketInterface(_server, _databaseInterface, parent), messageInProgress(false),
       handshakeStarted(false)
 {
     socket = new QTcpSocket(this);
     socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readClient()));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
-    connect(socket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this,
-            SLOT(catchSocketError(QAbstractSocket::SocketError)));
+    connect(socket, &QTcpSocket::readyRead, this, [this] { readClient(); });
+    connect(socket, &QTcpSocket::disconnected, this, [this] { catchSocketDisconnected(); });
+    connect(socket, &QTcpSocket::errorOccurred, this,
+            [this](QAbstractSocket::SocketError error) { catchSocketError(error); });
 }
 
 TcpServerSocketInterface::~TcpServerSocketInterface()
@@ -4612,7 +3868,7 @@ bool TcpServerSocketInterface::initTcpSession()
 }
 
 WebsocketServerSocketInterface::WebsocketServerSocketInterface(Servatrice *_server,
-                                                               Servatrice_DatabaseInterface *_databaseInterface,
+                                                               Server_DatabaseInterface *_databaseInterface,
                                                                QObject *parent)
     : AbstractServerSocketInterface(_server, _databaseInterface, parent), socket(nullptr)
 {
@@ -4649,11 +3905,17 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
         }
     }
 
-    connect(socket, SIGNAL(binaryMessageReceived(const QByteArray &)), this,
-            SLOT(binaryMessageReceived(const QByteArray &)));
+    connect(socket, &QWebSocket::binaryMessageReceived, this, &WebsocketServerSocketInterface::binaryMessageReceived);
+    // QWebSocket::errorOccurred was added in Qt 6.5 (error() is deprecated from 6.5 on),
+    // so a typed connect cannot compile against the 6.4 floor.
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    connect(socket, &QWebSocket::errorOccurred, this,
+            [this](QAbstractSocket::SocketError error) { catchSocketError(error); });
+#else
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this,
             SLOT(catchSocketError(QAbstractSocket::SocketError)));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(catchSocketDisconnected()));
+#endif
+    connect(socket, &QWebSocket::disconnected, this, [this] { catchSocketDisconnected(); });
 
     // Add this object to the server's list of connections before it can receive socket events.
     // Otherwise, in case of a socket error, it could be removed from the list before it is added.

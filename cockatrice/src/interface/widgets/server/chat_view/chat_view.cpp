@@ -4,6 +4,7 @@
 #include "../../client/sound_engine.h"
 #include "../../interface/card_localization.h"
 #include "../../interface/pixel_map_generator.h"
+#include "../../interface/theme_manager.h"
 #include "../../tabs/tab_supervisor.h"
 #include "../user/user_context_menu.h"
 #include "../user/user_list_manager.h"
@@ -63,6 +64,9 @@ ChatView::ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _sho
 
     connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this, &ChatView::adjustColorsToPalette);
 
+    applyChatFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this, &ChatView::applyChatFont);
+
     userContextMenu = new UserContextMenu(tabSupervisor, this, game);
     connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
 
@@ -106,6 +110,16 @@ void ChatView::adjustColorsToPalette()
     }
 
     QTimer::singleShot(0, this, &ChatView::refreshBlockColors);
+}
+
+void ChatView::applyChatFont()
+{
+    // Family comes from the ChatLog theme role; the message char formats carry
+    // no family of their own, so they (and new content) follow the widget and
+    // document default fonts. Weights/italics stay caller-side as before.
+    const QFont chatFont = themeManager->appFont(AppFont::ChatLog);
+    setFont(chatFont);
+    document()->setDefaultFont(chatFont);
 }
 
 void ChatView::refreshBlockColors()

@@ -18,6 +18,7 @@ class QWidget;
 
 DlgViewLog::DlgViewLog(QWidget *parent) : QDialog(parent)
 {
+    setObjectName("viewLogDialog");
     logArea = new QPlainTextEdit;
     logArea->setReadOnly(true);
 

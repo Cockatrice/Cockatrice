@@ -1,0 +1,8 @@
+<events>
+  <!-- Open Help menu by activating it on the menu bar -->
+  <event widget="MainWindow/menubar" command="activate" arguments="helpMenu" />
+  <!-- Click About Cockatrice (opens modal QMessageBox) -->
+  <event widget="MainWindow/menubar/helpMenu" command="activate" arguments="&amp;About Cockatrice" />
+  <!-- Close the modal dialog by pressing Escape (Qt::Key_Escape = 16777216) -->
+  <event widget="MainWindow/aboutDialog" command="key" arguments="16777216" />
+</events>

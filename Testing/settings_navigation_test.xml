@@ -1,0 +1,33 @@
+<events>
+    <!--
+        Settings navigation (state assertions).
+
+        Navigates the settings page tree by label, checks that the page stack
+        followed, then filters with the search box and verifies the text landed
+        in the edit — then closes with the OK button.
+    -->
+    <event widget="MainWindow/menubar" command="activate" arguments="cockatriceMenu" />
+    <event widget="MainWindow/menubar/cockatriceMenu" command="activate" arguments="actionSettings" />
+    <event widget="MainWindow" command="pause" arguments="500" />
+
+    <!-- The dialog opens on the first page (General) -->
+    <event widget="MainWindow/settingsDialog/settingsView/pagesContainer/pagesWidget" command="expectProperty" arguments="currentIndex,0" />
+
+    <!-- Navigate to Shortcuts, the last page of the tree -->
+    <event widget="MainWindow/settingsDialog/settingsView/navTree" command="selectItem" arguments="Shortcuts" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+    <event widget="MainWindow/settingsDialog/settingsView/pagesContainer/pagesWidget" command="expectProperty" arguments="currentIndex,7" />
+
+    <!-- ... and back to General -->
+    <event widget="MainWindow/settingsDialog/settingsView/navTree" command="selectItem" arguments="General" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+    <event widget="MainWindow/settingsDialog/settingsView/pagesContainer/pagesWidget" command="expectProperty" arguments="currentIndex,0" />
+
+    <!-- Filters the settings by search term -->
+    <event widget="MainWindow/settingsDialog/settingsView/settingsSearchEdit" command="typeText" arguments="sound" />
+    <event widget="MainWindow" command="pause" arguments="300" />
+    <event widget="MainWindow/settingsDialog/settingsView/settingsSearchEdit" command="expectProperty" arguments="text,sound" />
+
+    <!-- Close -->
+    <event widget="MainWindow/settingsDialog/settingsOkButton" command="activate" arguments="" />
+</events>

@@ -3,6 +3,7 @@
 #include "../../client/settings/cache_settings.h"
 #include "pixel_map_generator.h"
 #include "theme_config.h"
+#include "theme_icon_ink.h"
 
 #include <QApplication>
 #include <QChar>
@@ -12,6 +13,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QFlags>
+#include <QFontDatabase>
 #include <QGuiApplication>
 #include <QIODevice>
 #include <QLatin1Char>
@@ -50,6 +52,10 @@ static const QColor TABLEZONE_BG_DEFAULT = QColor(70, 50, 100);
 static const QColor PLAYERZONE_BG_DEFAULT = QColor(200, 200, 200);
 static const QColor STACKZONE_BG_DEFAULT = QColor(113, 43, 43);
 static const QStringList DEFAULT_RESOURCE_PATHS = {":/resources"};
+
+// Defined below; forward-declared because isDarkMode() resolves the shipped
+// theme directory needed for the theme.cfg fallback.
+static QString systemThemesBasePath();
 
 struct PaletteColorInfo
 {
@@ -127,8 +133,10 @@ static QString usableDefaultStyle(const QString &style)
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
     defaultStyleName = usableDefaultStyle(qApp->style()->objectName());
-    // Capture the untouched application palette before any theme is applied.
+    // Capture the untouched application palette and font before any theme is
+    // applied.
     defaultPalette = qApp->palette();
+    defaultFont = qApp->font();
     ensureThemeDirectoryExists();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
     connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, [this] {
@@ -232,10 +240,19 @@ void ThemeManager::ensureThemeDirectoryExists()
 
 bool ThemeManager::isDarkMode(const QString &themeDirPath) const
 {
-    ThemeConfig themeConfig = ThemeConfig::fromThemeDir(themeDirPath);
+    // The theme directory is always named after the theme, so the shipped
+    // fallback for a user directory that carries no theme.cfg is the same-named
+    // directory under the system themes base path — mirroring the font and
+    // palette fallbacks. A resolved directory that does not exist yet is a stock
+    // theme (getAvailableThemes() maps System/Fusion to a user path that
+    // writableThemeDir() only creates on save), so it keeps following the OS
+    // instead of inheriting a shipped ColorScheme such as Dark.
+    const QString systemThemeDir = QDir(systemThemesBasePath()).absoluteFilePath(QFileInfo(themeDirPath).fileName());
+    const ThemeConfig themeConfig = loadColorSchemeConfig(themeDirPath, systemThemeDir);
     if (themeConfig.colorScheme.compare("Dark", Qt::CaseInsensitive) == 0) {
         return true;
-    } else if (themeConfig.colorScheme.compare("Light", Qt::CaseInsensitive) == 0) {
+    }
+    if (themeConfig.colorScheme.compare("Light", Qt::CaseInsensitive) == 0) {
         return false;
     } else {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
@@ -321,7 +338,7 @@ QString ThemeManager::writableThemeDir(const QString &themeName)
 static QString systemThemesBasePath()
 {
     QString base = qApp->applicationDirPath();
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     base += "/../Resources/themes";
 #elif defined(Q_OS_WIN)
     base += "/themes";
@@ -398,6 +415,60 @@ bool ThemeManager::saveGlobalConfig(const QString &themeDirPath, const ThemeConf
     return cfg.save(themeDirPath);
 }
 
+ThemeConfig ThemeManager::loadDefaultThemeConfig(const QString &themeDirPath, const QString &systemThemeDirPath)
+{
+    if (themeDirPath.isEmpty()) {
+        return {};
+    }
+
+    // The shipped theme.cfg may live in the system theme directory rather than
+    // the resolved (user) directory. A user directory that only holds a seeded
+    // fonts.toml (or a saved palette) must still inherit the shipped style and
+    // colour scheme instead of shadowing them with an empty config.
+    if (QFileInfo::exists(QDir(themeDirPath).absoluteFilePath("theme.cfg"))) {
+        return ThemeConfig::fromThemeDir(themeDirPath);
+    }
+    return ThemeConfig::fromThemeDir(systemThemeDirPath);
+}
+
+ThemeConfig ThemeManager::loadColorSchemeConfig(const QString &themeDirPath, const QString &systemThemeDirPath)
+{
+    // Only an existing user directory is layered on the shipped theme: it can
+    // hold seeded files (fonts.toml, a saved palette) without a theme.cfg of its
+    // own, so it inherits the shipped style and colour scheme. A directory that
+    // does not exist yet means the user has never customised this theme, and
+    // inheriting a shipped Dark scheme there would override the OS preference on
+    // a fresh profile.
+    if (themeDirPath.isEmpty() || !QFileInfo(themeDirPath).isDir()) {
+        return {};
+    }
+    return loadDefaultThemeConfig(themeDirPath, systemThemeDirPath);
+}
+
+QString ThemeManager::themeStyleSheetPath(const QString &themeDirPath, const QString &systemThemeDirPath, bool dark)
+{
+    const QString schemeCss = QFileInfo(QStringLiteral(STYLE_CSS_NAME)).completeBaseName() + QLatin1Char('-') +
+                              (dark ? QStringLiteral("dark") : QStringLiteral("light")) + QStringLiteral(".css");
+
+    // Scheme-qualified stylesheet first, plain style.css as the super fallback,
+    // both inside the resolved (user) directory before the shipped one. A user
+    // directory holding only fonts.toml therefore keeps the shipped styling.
+    const QStringList candidateDirs = {themeDirPath, systemThemeDirPath};
+    const QStringList candidateNames = {schemeCss, QString(STYLE_CSS_NAME)};
+    for (const QString &dirPath : candidateDirs) {
+        if (dirPath.isEmpty()) {
+            continue;
+        }
+        for (const QString &name : candidateNames) {
+            const QString path = QDir(dirPath).absoluteFilePath(name);
+            if (QFileInfo::exists(path)) {
+                return path;
+            }
+        }
+    }
+    return {};
+}
+
 PaletteConfig ThemeManager::loadPaletteConfig(const QString &themeDirPath, const QString &colorScheme)
 {
     if (themeDirPath.isEmpty()) {
@@ -438,6 +509,46 @@ PaletteConfig ThemeManager::loadDefaultPaletteConfig(const QString &themeDirPath
         cfg = PaletteConfig::fromDefault(QDir(systemThemesBasePath()).absoluteFilePath(themeName), colorScheme);
     }
     return cfg;
+}
+
+FontConfig ThemeManager::loadFontConfig(const QString &themeDirPath)
+{
+    if (themeDirPath.isEmpty()) {
+        return {};
+    }
+    return FontConfig::fromThemeDir(themeDirPath);
+}
+
+FontConfig ThemeManager::loadDefaultFontConfig(const QString &themeDirPath, const QString &themeName)
+{
+    FontConfig cfg = FontConfig::fromThemeDir(themeDirPath);
+    if (!cfg.hasFonts()) {
+        // The shipped fonts.toml may live in the system theme directory rather
+        // than the resolved (user) theme directory, so built-in themes still
+        // get their curated fonts.
+        cfg = FontConfig::fromThemeDir(QDir(systemThemesBasePath()).absoluteFilePath(themeName));
+    }
+    return cfg;
+}
+
+bool ThemeManager::saveFontConfig(const QString &themeDirPath, const FontConfig &cfg)
+{
+    if (themeDirPath.isEmpty()) {
+        return false;
+    }
+
+    QDir dir(themeDirPath);
+    if (!dir.exists()) {
+        dir.mkpath(".");
+    }
+
+    QFile f(dir.absoluteFilePath(FontConfig::fileName()));
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        return false;
+    }
+
+    QTextStream(&f) << cfg.toToml();
+    return true;
 }
 
 bool ThemeManager::commitPalette(const QString &themeDirPath, const QString &colorScheme, const PaletteConfig &cfg)
@@ -484,8 +595,29 @@ void ThemeManager::previewPalette(const PaletteConfig &cfg, const QString &schem
 {
     const QString themeName = SettingsCache::instance().getThemeName();
     const QString dirPath = getAvailableThemes().value(themeName);
-    const ThemeConfig themeCfg = ThemeConfig::fromThemeDir(dirPath);
+    // Same shipped fallback as themeChangedSlot(): a user directory that only
+    // holds seeded files must not preview the theme with its style reset.
+    const QString sysPath = QDir(systemThemesBasePath()).absoluteFilePath(themeName);
+    const ThemeConfig themeCfg = loadDefaultThemeConfig(dirPath, sysPath);
     applyStyleAndPalette(themeName, themeCfg, cfg, scheme);
+}
+
+void ThemeManager::previewFonts(const FontConfig &cfg)
+{
+    currentFonts = cfg;
+
+    // QApplication::setFont already sends a font change to every widget, so a
+    // repolish pass is not needed for fonts (unlike the palette path).
+    const auto it = cfg.fonts.constFind(AppFont::InterfaceDefault);
+    if (it != cfg.fonts.constEnd()) {
+        qApp->setFont(it.value());
+    } else {
+        // A config without InterfaceDefault means "no override": restore the
+        // startup font instead of leaving the last preview applied.
+        qApp->setFont(defaultFont);
+    }
+
+    emit fontsChanged();
 }
 
 void ThemeManager::applyStyleAndPalette(const QString &themeName,
@@ -578,17 +710,132 @@ QColor ThemeManager::appColor(AppColor::Role role) const
     // unconditionally keeps every Qt version rendering identically.
     const QColor accent = qApp->palette().color(QPalette::Active, QPalette::Highlight);
 
-    if (role == AppColor::AccentSoft) {
-        constexpr int SOFT_SATURATION_PERCENT = 70;
-        constexpr int SOFT_LIGHTNESS_OFFSET = 60;
+    switch (role) {
+        case AppColor::AccentStrong:
+            return accent;
+        case AppColor::AccentSoft: {
+            constexpr int SOFT_SATURATION_PERCENT = 70;
+            constexpr int SOFT_LIGHTNESS_OFFSET = 60;
 
-        // Light end of the gradient: same hue, softened and lightened
-        return QColor::fromHsl(qMax(0, accent.hslHue()),
-                               qBound(0, qRound(accent.hslSaturation() * SOFT_SATURATION_PERCENT / 100.0), 255),
-                               qBound(0, accent.lightness() + SOFT_LIGHTNESS_OFFSET, 255));
+            // Light end of the gradient: same hue, softened and lightened
+            return QColor::fromHsl(qMax(0, accent.hslHue()),
+                                   qBound(0, qRound(accent.hslSaturation() * SOFT_SATURATION_PERCENT / 100.0), 255),
+                                   qBound(0, accent.lightness() + SOFT_LIGHTNESS_OFFSET, 255));
+        }
+        case AppColor::Icon:
+        case AppColor::IconStrong:
+        case AppColor::IconSoft: {
+            // Legacy fallback for a theme written before the icon roles
+            // existed, or one that deliberately leaves the neutral family
+            // unauthored (System). No accent chroma is borrowed here: the
+            // palette file that would carry it cannot know the platform scheme,
+            // so neutral ink is the live WindowText held to the label floor.
+            // The three levels are the ink rule this series shipped, applied
+            // once here so authored roles never get recomputed at paint time.
+            const QPalette &palette = qApp->palette();
+            const QColor text = palette.color(QPalette::Active, QPalette::WindowText);
+            const QColor surface = ThemeIconInk::harderSurface(palette.color(QPalette::Active, QPalette::Window),
+                                                               palette.color(QPalette::Active, QPalette::Button), text);
+            const QColor ink = ThemeIconInk::glyphInk(text, surface, accent, 0.0);
+            switch (role) {
+                case AppColor::IconStrong:
+                    return ThemeIconInk::forEmphasis(ink, surface, IconEmphasis::Primary);
+                case AppColor::IconSoft:
+                    return ThemeIconInk::forEmphasis(ink, surface, IconEmphasis::Quiet);
+                case AppColor::Icon:
+                default:
+                    return ink;
+            }
+        }
+        case AppColor::Positive:
+        case AppColor::PositiveStrong:
+        case AppColor::PositiveSoft:
+        case AppColor::Negative:
+        case AppColor::NegativeStrong:
+        case AppColor::NegativeSoft:
+        case AppColor::Informational:
+        case AppColor::InformationalStrong:
+        case AppColor::InformationalSoft:
+        case AppColor::Hidden:
+        case AppColor::HiddenStrong:
+        case AppColor::HiddenSoft:
+        case AppColor::Marked:
+        case AppColor::MarkedStrong:
+        case AppColor::MarkedSoft:
+        case AppColor::Movement:
+        case AppColor::MovementStrong:
+        case AppColor::MovementSoft:
+            // Semantic colors are independent of the accent: a missing role must
+            // not silently paint "remove" in the theme's highlight color.
+            return defaultAppColor(role, isDarkModeActive());
     }
 
     return accent;
+}
+
+QFont ThemeManager::appFont(AppFont::Role role) const
+{
+    const auto it = currentFonts.fonts.constFind(role);
+    if (it != currentFonts.fonts.constEnd()) {
+        return it.value();
+    }
+
+    // Role fallbacks preserve the pre-theme defaults when no fonts.toml is
+    // present: an unset role resolves to the application font. Surfaces that
+    // hardcoded a different family ask for it explicitly: counter painters
+    // through cardTextFont(), the deck view headers and printed deck list
+    // through deckListFont(), the report dialogs through
+    // report_utils::reportLogFont(). Only the family basis is fixed there;
+    // sizes stay caller-side.
+    return qApp->font();
+}
+
+bool ThemeManager::hasAppFont(AppFont::Role role) const
+{
+    return currentFonts.fonts.contains(role);
+}
+
+QFont ThemeManager::cardTextFont() const
+{
+    if (hasAppFont(AppFont::CardText)) {
+        return appFont(AppFont::CardText);
+    }
+    QFont serifFont(QStringLiteral("Serif"));
+    serifFont.setStyleHint(QFont::Serif);
+    serifFont.setPointSize(12);
+    return serifFont;
+}
+
+QFont ThemeManager::deckListFont() const
+{
+    if (hasAppFont(AppFont::DeckList)) {
+        return appFont(AppFont::DeckList);
+    }
+    QFont serifFont(QStringLiteral("Serif"));
+    serifFont.setStyleHint(QFont::Serif);
+    return serifFont;
+}
+
+QFont ThemeManager::defaultAppFont(AppFont::Role /*role*/) const
+{
+    // No per-role scaling and no preview: an unset role resolves to the font
+    // captured at startup, which is what the theme falls back to once the
+    // editor closes.
+    return defaultFont;
+}
+
+int ThemeManager::cardTextMaxSize() const
+{
+    // Resolved through FontConfig so the board and the font editor share one
+    // representable range: a stored size the editor cannot show (e.g. a migrated
+    // appearance/maxFontSize of 100) renders at the editor's maximum instead of
+    // at a size the next save would silently rewrite.
+    return currentFonts.resolvedCardTextMaxSize();
+}
+
+int ThemeManager::cardTextMinSize() const
+{
+    return currentFonts.resolvedCardTextMinSize();
 }
 
 void ThemeManager::themeChangedSlot()
@@ -597,31 +844,24 @@ void ThemeManager::themeChangedSlot()
     QString dirPath = getAvailableThemes().value(themeName);
     currentThemePath = dirPath;
     QDir dir(dirPath);
+    const QString sysPath = QDir(systemThemesBasePath()).absoluteFilePath(themeName);
 
     // CSS — prefer the scheme-qualified stylesheet (style-dark.css /
     // style-light.css) when present, else the plain style.css as fallback.
-    if (!dirPath.isEmpty()) {
-        const QString scheme = isDarkMode(dirPath) ? QStringLiteral("dark") : QStringLiteral("light");
-        const QString schemeCss = QFileInfo(QStringLiteral(STYLE_CSS_NAME)).completeBaseName() + QLatin1Char('-') +
-                                  scheme + QStringLiteral(".css");
-        if (dir.exists(schemeCss)) {
-            qApp->setStyleSheet("file:///" + dir.absoluteFilePath(schemeCss));
-        } else if (dir.exists(STYLE_CSS_NAME)) {
-            qApp->setStyleSheet("file:///" + dir.absoluteFilePath(STYLE_CSS_NAME));
-        } else {
-            qApp->setStyleSheet("");
-        }
-    } else {
-        qApp->setStyleSheet("");
-    }
+    // A user theme directory that only carries seeded files falls back to the
+    // shipped stylesheet of the same theme.
+    const bool darkMode = isDarkMode(dirPath);
+    const QString styleSheetPath = themeStyleSheetPath(dirPath, sysPath, darkMode);
+    qApp->setStyleSheet(styleSheetPath.isEmpty() ? QString() : "file:///" + styleSheetPath);
 
-    // load theme.cfg for style + scheme preference
-    ThemeConfig themeCfg = ThemeConfig::fromThemeDir(dirPath);
+    // load theme.cfg for style + scheme preference, falling back to the shipped
+    // theme directory when the user copy does not carry one
+    ThemeConfig themeCfg = loadDefaultThemeConfig(dirPath, sysPath);
 
     // Resolve active scheme:
     // theme.cfg says Dark/Light → use that
     // theme.cfg says System or is absent → follow the OS
-    QString activeScheme = isDarkMode(dirPath) ? "Dark" : "Light";
+    QString activeScheme = darkMode ? "Dark" : "Light";
 
     // ── Load palette: custom first, then theme default ────────────────────
     PaletteConfig palette = PaletteConfig::fromScheme(dirPath, activeScheme);
@@ -642,6 +882,19 @@ void ThemeManager::themeChangedSlot()
 
     applyStyleAndPalette(themeName, themeCfg, palette, activeScheme);
 
+    // ── Load fonts: shared per theme, no light/dark split ───────────────────
+    FontConfig fonts = loadDefaultFontConfig(dirPath, themeName);
+    currentFonts = fonts;
+    const auto fontIt = currentFonts.fonts.constFind(AppFont::InterfaceDefault);
+    if (fontIt != currentFonts.fonts.constEnd()) {
+        qApp->setFont(fontIt.value());
+    } else {
+        // No theme font: restore the pristine application font captured at
+        // startup, so a reverted preview cannot leak into the live theme.
+        qApp->setFont(defaultFont);
+    }
+    emit fontsChanged();
+
     QStringList resources;
     if (!dirPath.isEmpty()) {
         resources << dir.absolutePath();
@@ -651,7 +904,6 @@ void ThemeManager::themeChangedSlot()
     // include the system theme dir as a fallback so shipped assets like
     // zones/*.png and style.css still resolve for themes that ship only
     // those files (e.g. Leather, Plasma, Fabric, VelvetMarble).
-    const QString sysPath = QDir(systemThemesBasePath()).absoluteFilePath(themeName);
     if (sysPath != dirPath && QDir(sysPath).exists()) {
         resources << sysPath;
     }

@@ -43,11 +43,6 @@
 #include <qlogging.h>
 #include <qnamespace.h>
 
-static constexpr qreal MTG_CARD_ASPECT_RATIO = 1.396;
-// static constexpr qreal YUGIOH_CARD_ASPECT_RATIO = 1.457;
-static constexpr qreal ASPECT_RATIO = MTG_CARD_ASPECT_RATIO;
-
-static constexpr int BASE_WIDTH = 200;
 static constexpr int BASE_HEIGHT = 200;
 
 static constexpr int ENLARGED_PIXMAP_OFFSET = 10;
@@ -162,12 +157,11 @@ void CardInfoPictureWidget::resizeEvent(QResizeEvent *event)
  */
 void CardInfoPictureWidget::setScaleFactor(const int scale)
 {
-    const int newWidth = BASE_WIDTH * scale / 100;
-    const int newHeight = static_cast<int>(newWidth * ASPECT_RATIO);
+    const QSize newSize = sizeForScaleFactor(scale);
 
     scaleFactor = scale;
 
-    setFixedSize(newWidth, newHeight);
+    setFixedSize(newSize);
     updatePixmap();
 
     emit cardScaleFactorChanged(scale);
@@ -181,6 +175,8 @@ void CardInfoPictureWidget::setScaleFactor(const int scale)
 void CardInfoPictureWidget::updatePixmap()
 {
     pixmapDirty = true;
+    // The artwork rect belongs to the pixmap that is about to be loaded.
+    artRectCache = QRect();
     update();
 }
 
@@ -258,6 +254,24 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
 
     // Draw the pre-scaled pixmap directly
     painter.drawPixmap(targetRect, finalPixmap);
+
+    if (targetRect != artRectCache) {
+        artRectCache = targetRect;
+        // Overlays anchored on the artwork (rather than the widget) re-position on this.
+        emit artRectChanged();
+    }
+}
+
+/**
+ * @brief Rect of the drawn artwork inside this widget.
+ *
+ * Mirrors the target rect paintEvent() computes: the pixmap scaled with KeepAspectRatio and
+ * centred, after the optional sideways-layout rotation. Falls back to rect() until the first
+ * paint, which is the right answer for the usual portrait card.
+ */
+QRect CardInfoPictureWidget::artRect() const
+{
+    return artRectCache.isEmpty() ? rect() : artRectCache;
 }
 
 /**
@@ -266,8 +280,13 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
  */
 QSize CardInfoPictureWidget::sizeHint() const
 {
-    return {static_cast<int>(BASE_WIDTH * scaleFactor / 100.0),
-            static_cast<int>(BASE_WIDTH * scaleFactor / 100.0 * ASPECT_RATIO)};
+    return sizeForScaleFactor(scaleFactor);
+}
+
+QSize CardInfoPictureWidget::sizeForScaleFactor(int scaleFactor)
+{
+    const int width = BASE_WIDTH * scaleFactor / 100;
+    return {width, static_cast<int>(width * ASPECT_RATIO)};
 }
 
 /**
@@ -396,10 +415,10 @@ QMenu *CardInfoPictureWidget::createViewRelatedCardsMenu()
 {
     auto viewRelatedCards = new QMenu(tr("View related cards"));
 
-    QList<CardRelation *> relatedCards = exactCard.getInfo().getAllRelatedCards();
+    QList<CardRelation> relatedCards = exactCard.getInfo().getAllRelatedCards();
 
-    auto relatedCardExists = [](const CardRelation *cardRelation) {
-        return CardDatabaseManager::query()->getCardInfo(cardRelation->getName()) != nullptr;
+    auto relatedCardExists = [](const CardRelation &cardRelation) {
+        return CardDatabaseManager::query()->getCardInfo(cardRelation.name) != nullptr;
     };
 
     bool atLeastOneGoodRelationFound = std::any_of(relatedCards.begin(), relatedCards.end(), relatedCardExists);
@@ -410,9 +429,9 @@ QMenu *CardInfoPictureWidget::createViewRelatedCardsMenu()
     }
 
     for (const auto &relatedCard : relatedCards) {
-        const auto &relatedCardName = relatedCard->getName();
+        const QString relatedCardName = relatedCard.name;
         QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
-        connect(viewCard, &QAction::triggered, this, [this, &relatedCardName] {
+        connect(viewCard, &QAction::triggered, this, [this, relatedCardName] {
             emit cardChanged(
                 CardDatabaseManager::query()->getCard({relatedCardName, exactCard.getPrinting().getUuid()}));
         });

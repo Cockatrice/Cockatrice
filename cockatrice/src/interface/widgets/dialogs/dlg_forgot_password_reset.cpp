@@ -56,6 +56,7 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent) : QDialog(parent
     playernameEdit->setMaxLength(MAX_NAME_LENGTH);
     playernameLabel->setBuddy(playernameEdit);
 
+    //: Code mailed to the player so they can reset their password. Not a game token.
     tokenLabel = new QLabel(tr("Token:"));
     tokenEdit = new QLineEdit();
     tokenEdit->setMaxLength(MAX_NAME_LENGTH);
@@ -132,7 +133,8 @@ void DlgForgotPasswordReset::actOk()
     if (newpasswordEdit->text().length() < 8) {
         QMessageBox::critical(this, tr("Error"), tr("Your password is too short."));
         return;
-    } else if (newpasswordEdit->text() != newpasswordverifyEdit->text()) {
+    }
+    if (newpasswordEdit->text() != newpasswordverifyEdit->text()) {
         QMessageBox::critical(this, tr("Reset Password Error"), tr("The passwords do not match."));
         return;
     }

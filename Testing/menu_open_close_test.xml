@@ -1,0 +1,19 @@
+<events>
+  <!-- Test 1: Open and close each top-level menu -->
+
+  <!-- Cockatrice menu -->
+  <event widget="MainWindow/menubar" command="activate" arguments="cockatriceMenu" />
+  <event widget="MainWindow" command="key" arguments="16777216" />
+
+  <!-- Database menu -->
+  <event widget="MainWindow/menubar" command="activate" arguments="dbMenu" />
+  <event widget="MainWindow" command="key" arguments="16777216" />
+
+  <!-- Tabs menu -->
+  <event widget="MainWindow/menubar" command="activate" arguments="tabsMenu" />
+  <event widget="MainWindow" command="key" arguments="16777216" />
+
+  <!-- Help menu -->
+  <event widget="MainWindow/menubar" command="activate" arguments="helpMenu" />
+  <event widget="MainWindow" command="key" arguments="16777216" />
+</events>

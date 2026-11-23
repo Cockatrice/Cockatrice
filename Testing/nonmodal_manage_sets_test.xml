@@ -1,0 +1,6 @@
+<events>
+  <!-- Test non-modal dialog lifecycle: open and close Manage Sets (QMainWindow) -->
+  <event widget="MainWindow/menubar" command="activate" arguments="dbMenu" />
+  <event widget="MainWindow/menubar/dbMenu" command="activate" arguments="&amp;Manage sets..." />
+  <event widget="MainWindow/manageSetsWindow" command="key" arguments="16777216" />
+</events>

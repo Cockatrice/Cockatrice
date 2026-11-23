@@ -75,19 +75,19 @@ public:
     virtual void setName(const QString &_name) = 0;
 
     /** @return The provider identifier for this card (e.g., UUID). */
-    [[nodiscard]] virtual QString getCardProviderId() const override = 0;
+    [[nodiscard]] QString getCardProviderId() const override = 0;
 
     /** @param _cardProviderId Set the provider identifier for this card. */
     virtual void setCardProviderId(const QString &_cardProviderId) = 0;
 
     /** @return The abbreviated set code (e.g., "NEO"). */
-    [[nodiscard]] virtual QString getCardSetShortName() const override = 0;
+    [[nodiscard]] QString getCardSetShortName() const override = 0;
 
     /** @param _cardSetShortName Set the abbreviated set code. */
     virtual void setCardSetShortName(const QString &_cardSetShortName) = 0;
 
     /** @return The collector number of the card within its set. */
-    [[nodiscard]] virtual QString getCardCollectorNumber() const override = 0;
+    [[nodiscard]] QString getCardCollectorNumber() const override = 0;
 
     /** @param _cardSetNumber Set the collector number. */
     virtual void setCardCollectorNumber(const QString &_cardSetNumber) = 0;

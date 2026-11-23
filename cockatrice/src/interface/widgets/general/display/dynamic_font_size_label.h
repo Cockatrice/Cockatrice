@@ -21,9 +21,9 @@ class DynamicFontSizeLabel : public QLabel
     Q_OBJECT
 
 public:
-    explicit DynamicFontSizeLabel(QWidget *parent = NULL, Qt::WindowFlags f = Qt::WindowFlags());
+    explicit DynamicFontSizeLabel(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
-    ~DynamicFontSizeLabel()
+    ~DynamicFontSizeLabel() override
     {
     }
 
@@ -37,17 +37,17 @@ signals:
     void clicked();
 
 protected:
-    void mousePressEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event) override;
     QColor textColor;
 
     // QWidget interface
 protected:
-    void paintEvent(QPaintEvent *event);
+    void paintEvent(QPaintEvent *event) override;
 
     // QWidget interface
 public:
-    QSize minimumSizeHint() const;
-    QSize sizeHint() const;
+    QSize minimumSizeHint() const override;
+    QSize sizeHint() const override;
 };
 
 #endif // DYNAMICFONTSIZELABEL_H

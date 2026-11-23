@@ -1,7 +1,3 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 set(HEADERS
     libcockatrice/interfaces/interface_cache_storage_settings_provider.h
     libcockatrice/interfaces/interface_card_database_path_provider.h
@@ -24,9 +20,7 @@ set(HEADERS
     libcockatrice/interfaces/noop_card_set_priority_controller.h
 )
 
-qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-
-add_library(libcockatrice_interfaces STATIC ${MOC_SOURCES})
+add_library(libcockatrice_interfaces STATIC ${HEADERS})
 
 target_include_directories(libcockatrice_interfaces PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

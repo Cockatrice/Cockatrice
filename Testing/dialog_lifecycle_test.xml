@@ -1,0 +1,11 @@
+<events>
+  <!-- Open and close Settings dialog (modal exec) -->
+  <event widget="MainWindow/menubar" command="activate" arguments="cockatriceMenu" />
+  <event widget="MainWindow/menubar/cockatriceMenu" command="activate" arguments="actionSettings" />
+  <event widget="MainWindow/settingsDialog" command="key" arguments="16777216" />
+
+  <!-- Open and close About dialog (modal exec) -->
+  <event widget="MainWindow/menubar" command="activate" arguments="helpMenu" />
+  <event widget="MainWindow/menubar/helpMenu" command="activate" arguments="&amp;About Cockatrice" />
+  <event widget="MainWindow/aboutDialog" command="key" arguments="16777216" />
+</events>

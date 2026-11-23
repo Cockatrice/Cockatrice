@@ -19,7 +19,6 @@ inline Q_LOGGING_CATEGORY(SettingsCacheLog, "settings_cache");
 
 class ReleaseChannel;
 
-#define DEFAULT_LANG_NAME "English"
 #define CLIENT_INFO_NOT_SET "notset"
 
 #define DEFAULT_FONT_SIZE 12
@@ -91,7 +90,12 @@ private:
     QString themeName;
 
     QList<ReleaseChannel *> releaseChannels;
+    bool shutdownHookInstalled = false;
     bool isPortableBuild;
+
+    // Connects the aboutToQuit handler that deletes the release channels while
+    // the application object is still alive; a no-op before it exists.
+    void installShutdownHook();
 
     [[nodiscard]] QString getSafeConfigPath(QString configEntry, QString defaultPath) const;
     [[nodiscard]] QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;

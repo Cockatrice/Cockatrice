@@ -1,9 +1,8 @@
 #include "player_target.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../game/player/player_info.h"
-#include "../../game/player/player_logic.h"
 #include "../../interface/pixel_map_generator.h"
+#include "../../interface/theme_manager.h"
 #include "../board/abstract_counter.h"
 #include "../board/abstract_graphics_item.h"
 #include "../board/arrow_target.h"
@@ -30,6 +29,8 @@
 #include <QTransform>
 #include <QtGlobal>
 #include <QtMath>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <qnamespace.h>
 #include <qnumeric.h>
@@ -76,7 +77,7 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
 
     QRectF translatedRect = path.controlPointRect();
     QSize translatedSize = translatedRect.size().toSize();
-    QFont font("Serif");
+    QFont font = themeManager->cardTextFont();
     font.setWeight(QFont::Bold);
     font.setPixelSize(qMax(qRound(translatedSize.height() / 1.3), 9));
     painter->setFont(font);
@@ -226,7 +227,7 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
         name = name.mid(0, 10) + "...";
     }
 
-    QFont font;
+    QFont font = themeManager->appFont(AppFont::CardText);
     font.setPixelSize(qMax(qRound(translatedNameRect.height() / 1.5), 9));
     painter->setFont(font);
     painter->setPen(Qt::white);

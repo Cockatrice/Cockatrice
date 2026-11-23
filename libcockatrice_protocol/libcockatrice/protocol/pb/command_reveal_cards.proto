@@ -10,3 +10,13 @@ message Command_RevealCards {
     optional bool grant_write_access = 4;
     optional sint32 top_cards = 5 [default = -1];
 }
+
+// Separate extension so older servers reject the operation without revealing any cards.
+message Command_RevealRandomCards {
+    extend GameCommand {
+        optional Command_RevealRandomCards ext = 1036;
+    }
+    optional string zone_name = 1;
+    optional sint32 number_of_cards = 2;
+    optional sint32 player_id = 3 [default = -1];
+}

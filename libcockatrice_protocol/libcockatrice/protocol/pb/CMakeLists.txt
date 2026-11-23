@@ -33,6 +33,7 @@ set(PROTO_FILES
     command_dump_zone.proto
     command_flip_card.proto
     command_game_say.proto
+    command_get_private_chat_history.proto
     command_get_server_stats.proto
     command_inc_card_counter.proto
     command_inc_counter.proto
@@ -66,6 +67,7 @@ set(PROTO_FILES
     command_set_card_attr.proto
     command_set_card_counter.proto
     command_set_counter.proto
+    command_set_player_order.proto
     command_set_playmat.proto
     command_set_sideboard_lock.proto
     command_set_sideboard_plan.proto
@@ -110,6 +112,7 @@ set(PROTO_FILES
     event_list_rooms.proto
     event_move_card.proto
     event_notify_user.proto
+    event_player_order_changed.proto
     event_player_properties_changed.proto
     event_remove_from_list.proto
     event_remove_messages.proto
@@ -162,6 +165,7 @@ set(PROTO_FILES
     response_list_users.proto
     response_login.proto
     response_password_salt.proto
+    response_private_chat_history.proto
     response_register.proto
     response_replay_download.proto
     response_replay_download_by_game_id.proto
@@ -200,6 +204,7 @@ set(PROTO_FILES
     serverinfo_player.proto
     serverinfo_playerping.proto
     serverinfo_playerproperties.proto
+    serverinfo_private_chat_message.proto
     serverinfo_replay.proto
     serverinfo_replay_match.proto
     serverinfo_report.proto

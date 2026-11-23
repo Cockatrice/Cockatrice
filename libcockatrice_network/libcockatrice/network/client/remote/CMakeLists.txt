@@ -1,14 +1,8 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 set(HEADERS remote_client.h)
 
 set(SOURCES remote_client.cpp)
 
-qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-
-add_library(libcockatrice_network_client_remote STATIC ${MOC_SOURCES} ${SOURCES})
+add_library(libcockatrice_network_client_remote STATIC ${HEADERS} ${SOURCES})
 
 add_dependencies(libcockatrice_network_client_remote libcockatrice_network_client_abstract libcockatrice_protocol)
 

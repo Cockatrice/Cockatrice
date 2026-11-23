@@ -177,8 +177,8 @@ private:
     ICardSetPriorityController *priorityController; /**< Controller for reconstructing set state. */
     QList<ICardDatabaseParser *> availableParsers;  /**< List of available parsers for different formats. */
 
-    QBasicMutex *loadFromFileMutex = new QBasicMutex();   /**< Mutex for single-file loading. */
-    QBasicMutex *reloadDatabaseMutex = new QBasicMutex(); /**< Mutex for reloading entire database. */
+    QBasicMutex loadFromFileMutex;   /**< Mutex for single-file loading. */
+    QBasicMutex reloadDatabaseMutex; /**< Mutex for reloading entire database. */
 };
 
 #endif // COCKATRICE_CARD_DATABASE_LOADER_H

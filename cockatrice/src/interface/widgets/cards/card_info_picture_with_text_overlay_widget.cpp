@@ -1,5 +1,7 @@
 #include "card_info_picture_with_text_overlay_widget.h"
 
+#include "../../theme_manager.h"
+
 #include <QBrush>
 #include <QChar>
 #include <QFont>
@@ -43,6 +45,7 @@ CardInfoPictureWithTextOverlayWidget::CardInfoPictureWithTextOverlayWidget(QWidg
       fontSize(fontSize), textAlignment(alignment), highlighted(false)
 {
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    connect(themeManager, &ThemeManager::fontsChanged, this, &CardInfoPictureWithTextOverlayWidget::applyCardTextFont);
 }
 
 /**
@@ -84,6 +87,7 @@ void CardInfoPictureWithTextOverlayWidget::setOutlineColor(const QColor &color)
 void CardInfoPictureWithTextOverlayWidget::setFontSize(const int size)
 {
     fontSize = size > 0 ? size : 1;
+    hasExplicitFontSize = true;
     update();
 }
 
@@ -94,6 +98,13 @@ void CardInfoPictureWithTextOverlayWidget::setFontSize(const int size)
 void CardInfoPictureWithTextOverlayWidget::setTextAlignment(const Qt::Alignment alignment)
 {
     textAlignment = alignment;
+    update();
+}
+
+void CardInfoPictureWithTextOverlayWidget::applyCardTextFont()
+{
+    // The overlay paint reads the CardText role font at paint time, so a
+    // theme font change only needs a repaint here.
     update();
 }
 
@@ -168,9 +179,13 @@ void CardInfoPictureWithTextOverlayWidget::paintEvent(QPaintEvent *event)
         return;
     }
 
-    // Calculate the optimal font size
-    QFont font = painter.font();
-    int optimalFontSize = fontSize; // Start with the user-defined font size
+    // Calculate the optimal font size. The family comes from the CardText
+    // theme role; the start size is the explicit size when set (e.g. deck
+    // preview 24), else the theme max, shrinking down to the theme min floor.
+    QFont font = themeManager->appFont(AppFont::CardText);
+    const int themeMin = std::max(1, themeManager->cardTextMinSize());
+    const int themeMax = std::max(themeMin, std::max(1, themeManager->cardTextMaxSize()));
+    int optimalFontSize = hasExplicitFontSize ? std::max(1, fontSize) : themeMax;
     const QFontMetrics baseMetrics(font);
     int textWidth = pixmapRect.width();
 
@@ -188,7 +203,7 @@ void CardInfoPictureWithTextOverlayWidget::paintEvent(QPaintEvent *event)
         }
 
         --optimalFontSize;
-    } while (optimalFontSize > 1);
+    } while (optimalFontSize > themeMin);
 
     // Apply the calculated font size
     painter.setFont(font);
@@ -215,7 +230,7 @@ void CardInfoPictureWithTextOverlayWidget::paintEvent(QPaintEvent *event)
     int totalTextHeight = wrappedText.count('\n') * fontMetrics.height() + fontMetrics.height();
 
     // Adjust font size if the total text height exceeds the pixmap height
-    while (totalTextHeight > pixmapRect.height() && optimalFontSize > 1) {
+    while (totalTextHeight > pixmapRect.height() && optimalFontSize > themeMin) {
         --optimalFontSize;
         font.setPointSize(optimalFontSize);
         painter.setFont(font);
@@ -284,8 +299,10 @@ QSize CardInfoPictureWithTextOverlayWidget::minimumSizeHint() const
     const QSize pixmapSize = pixmap.isNull() ? QSize(0, 0) : pixmap.size();
 
     // Get the font metrics for the overlay text
-    QFont font;
-    font.setPointSize(fontSize);
+    QFont font = themeManager->appFont(AppFont::CardText);
+    const int themeMin = std::max(1, themeManager->cardTextMinSize());
+    const int themeMax = std::max(themeMin, std::max(1, themeManager->cardTextMaxSize()));
+    font.setPointSize(hasExplicitFontSize ? std::max(1, fontSize) : themeMax);
     const QFontMetrics fontMetrics(font);
 
     // Calculate the height required for the text

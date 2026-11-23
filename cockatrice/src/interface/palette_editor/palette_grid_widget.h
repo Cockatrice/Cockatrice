@@ -31,9 +31,13 @@ signals:
 
 private:
     void buildGrid(QWidget *host);
-    void changeEvent(QEvent *e);
+    void changeEvent(QEvent *e) override;
     void refreshChromePalettes();
 
+private slots:
+    void applyInterfaceDefaultFont();
+
+private:
     QMap<QPalette::ColorGroup, QMap<QPalette::ColorRole, ColorButton *>> colorButtons;
     QMap<AppColor::Role, ColorButton *> appColorButtons;
     QScrollArea *scroll;

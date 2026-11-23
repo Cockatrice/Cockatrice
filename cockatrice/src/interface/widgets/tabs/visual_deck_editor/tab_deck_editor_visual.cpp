@@ -2,7 +2,6 @@
 
 #include "../../../../client/settings/cache_settings.h"
 #include "../../../../client/settings/shortcuts_settings.h"
-#include "../../../deck_loader/loaded_deck.h"
 #include "../../deck_editor/deck_editor_card_database_dock_widget.h"
 #include "../../deck_editor/deck_editor_card_info_dock_widget.h"
 #include "../../deck_editor/deck_editor_deck_dock_widget.h"
@@ -21,7 +20,6 @@
 #include "tab_deck_editor_visual_tab_widget.h"
 
 #include <QAction>
-#include <QApplication>
 #include <QByteArray>
 #include <QDebug>
 #include <QDockWidget>
@@ -44,6 +42,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <functional>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/layouts_settings.h>
@@ -61,8 +60,8 @@ TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : Abstra
 {
     setObjectName("TabDeckEditorVisual");
 
-    createCentralFrame();
     createMenus();
+    createCentralFrame();
 
     installEventFilter(this);
 
@@ -105,7 +104,6 @@ void TabDeckEditorVisual::createCentralFrame()
 
     centralFrame->addWidget(tabContainer);
     setCentralWidget(centralWidget);
-    setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
 }
 
 /** @brief Updates the visual deck, analytics, and sample hand after a deck change. */
@@ -262,17 +260,26 @@ void TabDeckEditorVisual::processMainboardCardClick(const QMouseEvent *event,
     }
 }
 
+/** @brief Get a zone name corresponding to keyboard modifiers. */
+static QString zoneForClickModifiers(const Qt::KeyboardModifiers &modifiers)
+{
+    if (modifiers.testFlag(Qt::ControlModifier)) {
+        return DECK_ZONE_SIDE;
+    }
+    if (modifiers.testFlag(Qt::ShiftModifier)) {
+        return DECK_ZONE_MAYBEBOARD;
+    } else {
+        return DECK_ZONE_MAIN;
+    }
+}
+
 /** @brief Handles clicks on cards in the database display. */
 void TabDeckEditorVisual::processDatabaseCardClick(const QMouseEvent *event, const ExactCard &card)
 {
     if (event->button() == Qt::LeftButton) {
-        if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
-            addCard(card, DECK_ZONE_SIDE);
-        } else {
-            addCard(card, DECK_ZONE_MAIN);
-        }
+        addCard(card, zoneForClickModifiers(event->modifiers()));
     } else if (event->button() == Qt::RightButton) {
-        decrementCard(card, DECK_ZONE_MAIN);
+        decrementCard(card, zoneForClickModifiers(event->modifiers()));
     } else if (event->button() == Qt::MiddleButton) {
         deckDockWidget->actRemoveCard();
     }

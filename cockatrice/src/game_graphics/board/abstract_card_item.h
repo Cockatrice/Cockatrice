@@ -16,35 +16,45 @@
 #include <QSizeF>
 #include <QString>
 #include <QtGlobal>
-#include <libcockatrice/card/printing/exact_card.h>
-#include <libcockatrice/utility/card_ref.h>
+#include <libcockatrice/game/board/card_state.h>
 #include <qtmetamacros.h>
 
 class PlayerLogic;
 class CardInfo;
 class QPainter;
 class QPoint;
+class QPropertyAnimation;
 
 class AbstractCardItem : public ArrowTarget, public IAnimatedItem
 {
     Q_OBJECT
+    Q_PROPERTY(qreal cardScale READ getCardScale WRITE setCardScale)
+    Q_PROPERTY(qreal cardOpacity READ getCardOpacity WRITE setCardOpacity)
 protected:
-    ExactCard exactCard;
-    int id;
-    CardRef cardRef;
-    bool tapped;
-    bool facedown;
+    CardState *state;
     int tapAngle;
-    QString color;
     QColor bgColor;
+    /**
+     * @brief Rotates the card about its centre and reports the move to the scene.
+     *
+     * Tapping changes the card's scene footprint without changing its scale, so the
+     * footprint signal that keeps cached zones in step has to be emitted here too.
+     */
+    void setTapAngle(int angle);
 
 private:
     bool isHovered;
+    bool isHoverZoomed;
     qreal realZValue;
     bool pendingSelectionCollapse;
     int selectionCollapseGeneration = 0; ///< Guards the deferred collapse timer against stale firings
+    QPropertyAnimation *hoverZoom = nullptr;
+    QPropertyAnimation *opacityAnim = nullptr;
 private slots:
     void pixmapUpdated();
+    void onCardInfoChanged();
+    void onCardRefChanged(const CardRef &oldCardRef, const CardRef &newCardRef);
+    void onTappedChanged(bool newTapped, bool canAnimate);
 
 public slots:
     void refreshCardInfo();
@@ -60,6 +70,19 @@ signals:
     void playSelectedFaceDown(AbstractCardItem *card);
     void hideSelected(AbstractCardItem *card);
     void selectionChanged(AbstractCardItem *card, bool selected);
+    void tappedChanged(bool tapped);
+    void faceDownChanged(bool faceDown);
+    /** @brief Emitted when the hover shrink-out animation runs to completion while unhovered. */
+    void hoverShrinkFinished(AbstractCardItem *card);
+    /**
+     * @brief Emitted when the hover zoom changes this card's scene footprint.
+     *
+     * Zones (and anything else that dodges the zoomed card) draw from the live footprint at
+     * paint time but are cached: they need this to invalidate, or a stale hole is left behind.
+     * Also emitted once when the hover ends, with both rects equal, because the hole
+     * disappears without the card changing size.
+     */
+    void hoverFootprintChanged(const QRectF &oldFootprint, const QRectF &newFootprint);
 
 public:
     enum
@@ -80,63 +103,93 @@ public:
     QSizeF getTranslatedSize(QPainter *painter) const;
     void paintPicture(QPainter *painter, const QSizeF &translatedSize, int angle);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    [[nodiscard]] CardState *getState() const
+    {
+        return state;
+    }
     ExactCard getCard() const
     {
-        return exactCard;
+        return state->getCard();
     }
     const CardInfo &getCardInfo() const;
     int getId() const
     {
-        return id;
+        return state->getId();
     }
     void setId(int _id)
     {
-        id = _id;
+        state->setId(_id);
     }
     QString getName() const
     {
-        return cardRef.name;
+        return state->getCardRef().name;
     }
     QString getProviderId() const
     {
-        return cardRef.providerId;
+        return state->getCardRef().providerId;
     }
-    void setCardRef(const CardRef &_cardRef);
+    void setCardRef(const CardRef &_cardRef)
+    {
+        state->setCardRef(_cardRef);
+    }
     CardRef getCardRef() const
     {
-        return cardRef;
+        return state->getCardRef();
     }
     qreal getRealZValue() const
     {
         return realZValue;
     }
     void setRealZValue(qreal _zValue);
+    /**
+     * @brief Shows the hover outline and stacking lift, plus the historical 1.1x hover
+     * scale whenever no zoom trigger is configured.
+     *
+     * The board zoom is trigger-gated; the hover feedback (card info, outline, raised
+     * stacking) still follows the cursor immediately on contact. With the zoom trigger
+     * off and the panel not on hover, the old 1.1x enlargement (gated by scaleCards)
+     * stays in effect so upgrading does not silently drop it.
+     */
     void setHovered(bool _hovered);
-    bool getIsHovered() const
+    void setHoverZoomed(bool _hoverZoomed);
+    qreal getCardScale() const;
+    void setCardScale(qreal scale);
+    qreal getCardOpacity() const;
+    void setCardOpacity(qreal opacity);
+    /** @brief Fades the card out under the hover panel, or back in when it closes. */
+    void fadeCardOut();
+    void fadeCardIn();
+    bool getIsHoverZoomed() const
     {
-        return isHovered;
+        return isHoverZoomed;
     }
-    QString getColor() const
+    [[nodiscard]] QString getColor() const
     {
-        return color;
+        return state->getColor();
     }
     void setColor(const QString &_color);
     bool getTapped() const
     {
-        return tapped;
+        return state->getTapped();
     }
-    void setTapped(bool _tapped, bool canAnimate = false);
+    void setTapped(bool _tapped, bool canAnimate = false)
+    {
+        state->setTapped(_tapped, canAnimate);
+    }
     bool getFaceDown() const
     {
-        return facedown;
+        return state->getFaceDown();
     }
-    void setFaceDown(bool _facedown);
+    void setFaceDown(bool _facedown)
+    {
+        state->setFaceDown(_facedown);
+    }
     void processHoverEvent();
     /** @brief Drop a pending collapse and disarm any deferred collapse timer. */
     void cancelPendingSelectionCollapse();
     void deleteCardInfoPopup()
     {
-        emit deleteCardInfoPopup(cardRef.name);
+        emit deleteCardInfoPopup(state->getCardRef().name);
     }
 
     /** @brief Default: no per-tick animation. Subclasses override to animate. */
@@ -144,6 +197,13 @@ public:
 
 protected:
     void transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle);
+    /**
+     * @brief Whether the card name is painted over its artwork.
+     *
+     * Follows the "Display card names on cards having a picture" setting. Views
+     * that already show the name elsewhere, such as the token preview, turn it off.
+     */
+    [[nodiscard]] virtual bool shouldPaintNameOverPicture() const;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;

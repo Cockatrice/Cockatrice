@@ -1,9 +1,7 @@
 #include "tab_deck_storage_visual.h"
 
 #include "../../../../client/settings/cache_settings.h"
-#include "../../../deck_loader/deck_file_format.h"
 #include "../../../deck_loader/deck_loader.h"
-#include "../../../deck_loader/loaded_deck.h"
 #include "../../cards/additional_info/deck_color_identity.h"
 #include "../../deck_share/deck_share_utils.h"
 #include "../../deck_share/share_bar_widget.h"
@@ -17,7 +15,9 @@
 #include <QWidget>
 #include <QtGlobal>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/deck_list/deck_file_format.h>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_deck_share_create.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>

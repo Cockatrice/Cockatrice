@@ -1,0 +1,171 @@
+/**
+ * @file theme_icon.h
+ * @ingroup Interface
+ */
+
+#ifndef THEME_ICON_H
+#define THEME_ICON_H
+
+#include "theme_config.h"
+
+#include <QColor>
+#include <QIcon>
+#include <QPalette>
+#include <QPixmap>
+#include <QSize>
+#include <QString>
+#include <QStringView>
+
+/**
+ * @brief Selects how a `currentColor` glyph is painted.
+ *
+ * The tint decides the tone. The style decides how much shape carries it.
+ *
+ * Line is the default and matches what every caller did before this axis
+ * existed: the recolored glyph alone, at the author's stroke weight. Use it for
+ * navigation, menu and toolbar glyphs, where a row of badges would compete with
+ * the content.
+ *
+ * Badge reproduces the pre-#7595 ready/not-ready art: a filled disc, a dark ring
+ * and a contrast glyph derived from the tone. A filled shape draws more
+ * attention than a line, so it is opt-in per call site. It was made for the
+ * ready/not-ready icons. The add/remove/delete icons were filled glyphs with an
+ * outline and no disc, so badging them would produce art the UI never had.
+ * Authored art that carries its own colors is never badged and falls back to the
+ * asset path. Disabled icons fall back to the line glyph too, because a filled
+ * disc at full mass does not read as unavailable.
+ *
+ * Sticker reproduces the other half of the pre-#7595 set: the filled add, remove
+ * and delete glyphs, painted with a tone gradient and a dark outline and no
+ * disc. It shares the disabled fallback for the same reason.
+ */
+enum class IconStyle
+{
+    Line,    ///< the recolored glyph alone
+    Badge,   ///< filled disc + dark ring + contrast glyph
+    Sticker, ///< filled glyph + dark outline, no disc
+};
+
+/**
+ * @brief Selects which authored level of a color family a glyph uses.
+ *
+ * Tint says which family, style says how much shape, emphasis says how loud.
+ * The three are independent: a primary action can be a line glyph in the
+ * theme's primary ink, and a quiet one can be a sticker in that family's quiet
+ * level.
+ *
+ * Each family (neutral icon, positive, negative) stores one color per level, so
+ * emphasis is a lookup rather than a computation: the palette editor's rows are
+ * the whole source of truth. Secondary is the default and the color every icon
+ * had before the axis existed, so existing call sites keep their look. Primary
+ * is for the one action a surface exists for. Quiet is for glyphs that label
+ * rather than act, such as the magnifier inside a search field: legible, but
+ * never competing with the buttons next to it.
+ */
+enum class IconEmphasis
+{
+    Quiet,     // labels rather than acts
+    Secondary, // the default action weight
+    Primary,   // the action the surface exists for
+};
+
+/**
+ * @brief Selects the color that replaces the `currentColor` sentinel.
+ *
+ * A palette role follows Qt's structural palette. An application color carries
+ * meaning that QPalette cannot express, such as positive and negative states.
+ * Callers pick the role by intent; the theme owns the concrete value. Emphasis
+ * is part of the same decision: both answer how the glyph is inked.
+ */
+class IconTint
+{
+public:
+    IconTint() = default;
+    IconTint(QPalette::ColorRole role, IconEmphasis emphasis = IconEmphasis::Secondary); // implicit for role callers
+    IconTint(AppColor::Role role, IconEmphasis emphasis = IconEmphasis::Secondary); // implicit for semantic callers
+
+    /** @brief A neutral glyph at the family's primary level, for the surface's primary action. */
+    static IconTint primary();
+
+    /** @brief A dimmed neutral glyph, for a control that labels rather than acts. */
+    static IconTint quiet();
+
+    /**
+     * @brief Resolves the concrete color for an icon mode.
+     *
+     * A disabled application color resolves to the derived disabled ink, the
+     * quiet level receded toward the surface, so an unavailable control does not
+     * keep its semantic color. A selected palette color keeps the
+     * WindowText -> HighlightedText swap.
+     *
+     * Application colors are returned verbatim: the theme author stores one
+     * value per emphasis level, so the paint path does not rewrite it. The
+     * filled treatments only shape that tone's value to give a shape depth; the
+     * hue and saturation stay the author's.
+     *
+     * Neutral label roles (WindowText, Text) resolve to icon ink rather than the
+     * raw palette color: an unauthored neutral family derives it from the live
+     * WindowText and holds the glyph to a contrast floor, because a 2px glyph in
+     * body-text ink reads thinner than the text beside it. A theme that authors
+     * the neutral icon roles overrides that derivation. Semantic roles keep the
+     * hue the call site asked for.
+     *
+     * Emphasis selects the family's authored variant, so the palette editor's
+     * rows are the whole source of truth. A caller that names a variant
+     * explicitly (a strong or soft role) pins that level at every emphasis.
+     */
+    QColor resolve(QIcon::Mode mode) const;
+
+private:
+    enum class Source
+    {
+        Palette,
+        AppColor,
+    };
+
+    Source source = Source::Palette;
+    QPalette::ColorRole paletteRole = QPalette::WindowText;
+    AppColor::Role appRole = AppColor::AccentStrong;
+    IconEmphasis emphasis = IconEmphasis::Secondary;
+};
+
+/**
+ * @brief Builds a palette-aware icon from a `theme:` asset.
+ *
+ * SVG glyphs may use the `currentColor` sentinel. A plain QPixmap snapshot
+ * cannot follow palette changes, so this returns a QIcon whose engine resolves
+ * the sentinel from the current palette every time it is asked for a pixmap.
+ * Icons therefore stay legible when the user switches between light and dark
+ * themes without recreating any actions or buttons.
+ *
+ * @param prefix Asset prefix relative to the `theme:` search path, with no file
+ *               extension (for example `icons/search`), matching themePixmap().
+ * @param tint Color that replaces the sentinel: a palette role or a semantic
+ *             application color. Defaults to WindowText.
+ * @param style Treatment of the glyph: Line, Badge or Sticker. Defaults to Line.
+ * @return An icon that follows the application palette.
+ */
+QIcon loadThemedIcon(QStringView prefix, IconTint tint = {}, IconStyle style = IconStyle::Line);
+
+/**
+ * @brief Renders a resolved theme SVG when it carries the `currentColor` sentinel.
+ *
+ * Non-SVG assets and SVGs without the sentinel return a null pixmap so callers
+ * can fall back to their usual loading path (including legacy inversion).
+ *
+ * @param resolvedPath Asset path relative to the `theme:` search path, as
+ *                     returned by ThemeManager::assetPath (includes extension).
+ * @param tint Color that replaces the sentinel: a palette role or a semantic
+ *             application color. Defaults to WindowText.
+ * @param size Pixel size to render at; an empty size uses the SVG's intrinsic size.
+ * @param style Treatment of the glyph: Line, Badge or Sticker. A treatment on a
+ *              non-sentinel asset stays null, like the line path.
+ * @return The recolored pixmap, or a null pixmap when the asset is not a
+ *         sentinel-carrying SVG.
+ */
+QPixmap loadSentinelSvgPixmap(const QString &resolvedPath,
+                              IconTint tint = {},
+                              const QSize &size = {},
+                              IconStyle style = IconStyle::Line);
+
+#endif // THEME_ICON_H

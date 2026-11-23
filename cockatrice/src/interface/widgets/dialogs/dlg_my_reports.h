@@ -29,6 +29,7 @@ private slots:
     void reportDetailsResponse(const Response &response);
     void addComment();
     void addCommentResponse(const Response &response);
+    void applyChatLogFont();
 
 private:
     void loadReportDetails(const ServerInfo_Report &report);

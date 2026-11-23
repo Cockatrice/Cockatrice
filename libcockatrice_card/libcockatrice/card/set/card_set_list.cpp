@@ -73,18 +73,15 @@ void CardSetList::enableAllUnknownBatched(ICardSetPriorityController *controller
             continue;
         }
 
-        bool changed = false;
-        if (!set->getIsKnown() && !set->getIsKnownIgnored()) {
-            set->setIsKnownInMemory(true);
+        if (!set->getIsKnown()) {
+            if (!set->getIsKnownIgnored()) {
+                set->setIsKnownInMemory(true);
+            }
             set->setEnabledInMemory(true);
-            changed = true;
-        } else if (set->getIsKnownIgnored() && !set->getEnabled()) {
-            set->setEnabledInMemory(true);
-            changed = true;
-        }
-        if (changed) {
-            saveData.append(
-                {set->getShortName(), static_cast<unsigned int>(set->getSortKey()), true, set->getIsKnown()});
+            saveData.append({.shortName = set->getShortName(),
+                             .sortKey = static_cast<unsigned int>(set->getSortKey()),
+                             .enabled = true,
+                             .isKnown = set->getIsKnown()});
         }
     }
 
@@ -128,18 +125,13 @@ void CardSetList::markAllAsKnownBatched(ICardSetPriorityController *controller)
             continue;
         }
 
-        bool changed = false;
-        if (!set->getIsKnown() && !set->getIsKnownIgnored()) {
+        if (!set->getIsKnown()) {
             set->setIsKnownInMemory(true);
-            set->setEnabledInMemory(false);
-            changed = true;
-        } else if (set->getIsKnownIgnored() && !set->getEnabled()) {
-            set->setEnabledInMemory(true);
-            changed = true;
-        }
-        if (changed) {
-            saveData.append({set->getShortName(), static_cast<unsigned int>(set->getSortKey()), set->getEnabled(),
-                             set->getIsKnown()});
+            set->setEnabledInMemory(set->getIsKnownIgnored());
+            saveData.append({.shortName = set->getShortName(),
+                             .sortKey = static_cast<unsigned int>(set->getSortKey()),
+                             .enabled = set->getEnabled(),
+                             .isKnown = set->getIsKnown()});
         }
     }
 
@@ -154,7 +146,8 @@ void CardSetList::defaultSort()
         // Sort by priority, then by release date, then by short name
         if (a->getPriority() != b->getPriority()) {
             return a->getPriority() < b->getPriority(); // lowest first
-        } else if (a->getReleaseDate() != b->getReleaseDate()) {
+        }
+        if (a->getReleaseDate() != b->getReleaseDate()) {
             return a->getReleaseDate() > b->getReleaseDate(); // most recent first
         } else {
             return a->getShortName() < b->getShortName(); // alphabetically

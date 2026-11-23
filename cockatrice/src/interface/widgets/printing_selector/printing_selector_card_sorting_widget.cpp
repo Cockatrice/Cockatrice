@@ -204,7 +204,7 @@ QList<PrintingInfo> PrintingSelectorCardSortingWidget::prependPrintingsInDeck(co
                                                                               const CardInfoPtr &selectedCard,
                                                                               const DeckListModel *deckModel)
 {
-    if (!selectedCard) {
+    if (!selectedCard || !deckModel) {
         return {};
     }
 

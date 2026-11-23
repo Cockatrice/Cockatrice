@@ -2,10 +2,6 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
-#include "../../../game/abstract_game.h"
-#include "../../../game/player/player_info.h"
-#include "../../../game/player/player_logic.h"
-#include "../../../game/player/player_manager.h"
 #include "../../../game_graphics/zones/hand_zone.h"
 #include "../../../game_graphics/zones/pile_zone.h"
 #include "../../../game_graphics/zones/table_zone.h"
@@ -26,6 +22,11 @@
 
 #include <QMenu>
 #include <QString>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/game_meta_info.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/player/player_manager.h>
 
 PlayerMenu::PlayerMenu(PlayerGraphicsItem *_player) : QObject(_player), player(_player)
 {
@@ -70,6 +71,11 @@ PlayerMenu::PlayerMenu(PlayerGraphicsItem *_player) : QObject(_player), player(_
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &PlayerMenu::refreshShortcuts);
+
+    // Re-evaluate shortcuts when the game starts or ends, so the lobby only exposes the roll-die shortcut.
+    connect(player->getLogic()->getGame()->getGameMetaInfo(), &GameMetaInfo::startedChanged, this,
+            &PlayerMenu::refreshShortcuts);
+
     refreshShortcuts();
 
     retranslateUi();
@@ -87,22 +93,24 @@ void PlayerMenu::setMenusForGraphicItems()
     }
 }
 
-QMenu *PlayerMenu::updateCardMenu(const CardItem *card)
+QMenu *PlayerMenu::updateCardMenu(CardState *card)
 {
     if (!card) {
         emit cardMenuUpdated(nullptr);
         return nullptr;
     }
 
+    auto *cardItem = qobject_cast<CardItem *>(card->parent());
+
     // If is spectator (as spectators don't need card menus), return
     // only update the menu if the card is actually selected
-    if ((player->getLogic()->getGame()->getPlayerManager()->isSpectator() &&
-         !player->getLogic()->getGame()->getPlayerManager()->isJudge()) ||
-        player->getLogic()->getGame()->getActiveCard() != card) {
+    const GameRoleInfo &roles = player->getLogic()->getGame()->getPlayerManager()->getLocalRoles();
+    if ((roles.isSpectator && !roles.isJudge) || cardItem == nullptr ||
+        player->getGameScene()->getActiveCard() != cardItem) {
         return nullptr;
     }
 
-    CardMenu *menu = new CardMenu(player, card, shortcutsActive);
+    CardMenu *menu = new CardMenu(player, cardItem, shortcutsActive);
     connect(menu, &CardMenu::cardInfoRequested, this, &PlayerMenu::cardInfoRequested);
     emit cardMenuUpdated(menu);
 
@@ -142,6 +150,12 @@ void PlayerMenu::refreshShortcuts()
 void PlayerMenu::setShortcutsActive()
 {
     shortcutsActive = true;
+
+    if (!isGameStarted()) {
+        applyLobbyShortcuts();
+        return;
+    }
+
     for (auto *c : managedComponents) {
         c->setShortcutsActive();
     }
@@ -154,5 +168,24 @@ void PlayerMenu::setShortcutsInactive()
     for (auto *c : managedComponents) {
         c->setShortcutsInactive();
     }
+    emit shortcutsDeactivated();
+}
+
+bool PlayerMenu::isGameStarted() const
+{
+    return player->getLogic()->getGame()->getGameMetaInfo()->started();
+}
+
+void PlayerMenu::applyLobbyShortcuts()
+{
+    // Everything stays unbound until the game starts; only the roll-die shortcut is usable in the lobby.
+    for (auto *c : managedComponents) {
+        c->setShortcutsInactive();
+    }
+
+    if (utilityMenu) {
+        utilityMenu->setLobbyShortcutsActive();
+    }
+
     emit shortcutsDeactivated();
 }

@@ -33,14 +33,16 @@ LocalClient::LocalClient(LocalServerInterface *_lsi,
     sendCommand(prepareSessionCommand(joinCmd));
 }
 
-LocalClient::~LocalClient()
-{
-}
-
 void LocalClient::sendCommandContainer(const CommandContainer &cont)
 {
     if (LocalClientLog().isDebugEnabled()) {
         qCDebug(LocalClientLog).noquote() << userName << "OUT" << getSafeDebugString(cont);
+    }
+
+    if (lsi.isNull()) {
+        qCWarning(LocalClientLog).noquote()
+            << userName << "dropping command, local server interface no longer exists:" << getSafeDebugString(cont);
+        return;
     }
 
     lsi->itemFromClient(cont);

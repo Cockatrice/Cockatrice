@@ -9,7 +9,7 @@ namespace peg
 {
 template <typename Annotation> struct AstBase;
 struct EmptyType;
-typedef AstBase<EmptyType> Ast;
+using Ast = AstBase<EmptyType>;
 } // namespace peg
 
 class Expression

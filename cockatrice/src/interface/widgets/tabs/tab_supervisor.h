@@ -34,6 +34,7 @@ class TabEdhRec;
 class TabEdhRecMain;
 class TabVisualDatabaseDisplay;
 struct LoadedDeck;
+struct GameRoleInfo;
 
 inline Q_LOGGING_CATEGORY(TabSupervisorLog, "tab_supervisor");
 
@@ -50,6 +51,7 @@ class TabAdmin;
 class TabMessage;
 class TabReport;
 class TabModeration;
+class TabAlts;
 class TabAccount;
 class TabDeckEditor;
 class TabDeveloper;
@@ -116,6 +118,7 @@ private:
     TabLog *tabLog;
     TabReport *tabReport;
     TabModeration *tabModeration;
+    TabAlts *tabAlts;
     TabDeveloper *tabDeveloper;
     QMap<int, TabRoom *> roomTabs;
     QMap<int, TabGame *> gameTabs;
@@ -135,7 +138,7 @@ private:
     static QString sanitizeHtml(QString dirty);
     void resetTabsMenu();
     /** Shared join/spectate driver behind the report tab and the profile hover card. */
-    void joinGameByIntent(int gameId, int roomId, bool asSpectator);
+    void joinGameByIntent(int gameId, int roomId, const GameRoleInfo &roles);
 
 public:
     explicit TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent = nullptr);
@@ -207,8 +210,9 @@ public slots:
     void openReplay(GameReplay *replay);
     void joinReportGame(int gameId, int roomId);
     /** Joins or spectates a game listed on a user's profile hover card. */
-    void joinGameFromUserCard(int gameId, int roomId, bool asSpectator);
+    void joinGameFromUserCard(int gameId, int roomId, const GameRoleInfo &roles);
     void openTabModeration(const QString &userName = {});
+    void openTabAlts(const QString &userName = {});
     void switchToFirstAvailableNetworkTab();
     void maximizeMainWindow();
     void actTabVisualDeckStorage(bool checked);

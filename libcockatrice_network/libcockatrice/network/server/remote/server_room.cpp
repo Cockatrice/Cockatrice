@@ -32,6 +32,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room_channel.pb.h>
+#include <libcockatrice/utility/game_role_info.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <qlogging.h>
 #include <qnamespace.h>
@@ -372,11 +373,11 @@ Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGam
 
     QMutexLocker gameLocker(&game->gameMutex);
 
-    Response::ResponseCode result =
-        game->checkJoin(userInterface->getUserInfo(), QString::fromStdString(cmd.password()), cmd.spectator(),
-                        cmd.override_restrictions(), cmd.join_as_judge());
+    GameRoleInfo roleInfo{.isJudge = cmd.join_as_judge(), .isSpectator = cmd.spectator()};
+    Response::ResponseCode result = game->checkJoin(
+        userInterface->getUserInfo(), QString::fromStdString(cmd.password()), roleInfo, cmd.override_restrictions());
     if (result == Response::RespOk) {
-        game->addPlayer(userInterface, rc, cmd.spectator(), cmd.join_as_judge());
+        game->addPlayer(userInterface, rc, roleInfo);
     }
 
     return result;
@@ -521,7 +522,7 @@ void Server_Room::removeGame(Server_Game *game)
     // No need to lock gamesLock or gameMutex. This method is only
     // called from ~Server_Game, which locks both mutexes anyway beforehand.
 
-    disconnect(game, 0, this, 0);
+    disconnect(game, nullptr, this, 0);
 
     ServerInfo_Game gameInfo;
     game->getInfo(gameInfo);

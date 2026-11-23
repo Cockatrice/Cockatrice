@@ -17,8 +17,8 @@ class ManaCurveTotalWidget : public QWidget
 
 public:
     explicit ManaCurveTotalWidget(QWidget *parent);
-    QSize sizeHint() const;
-    QSize minimumSizeHint() const;
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
     void updateDisplay(const QString &categoryName,
                        int minCmc,
                        int maxCmc,

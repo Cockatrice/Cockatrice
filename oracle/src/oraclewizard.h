@@ -4,6 +4,7 @@
 #include <QByteArray>
 #include <QString>
 #include <QWizard>
+#include <memory>
 #include <qtmetamacros.h>
 #include <utility>
 
@@ -11,6 +12,7 @@ class QNetworkAccessManager;
 class OracleImporter;
 class QLocalServer;
 class QSettings;
+class TagDatabase;
 class QWidget;
 
 class OracleWizard : public QWizard
@@ -68,6 +70,8 @@ public:
     OracleImporter *importer;
     QSettings *settings;
     QNetworkAccessManager *nam;
+    /** @brief Tag data loaded by the Tags page, consumed by the importer. */
+    std::shared_ptr<TagDatabase> tagDatabase;
     bool downloadedPlainXml = false;
     QByteArray xmlData;
     bool backgroundMode = false;

@@ -1,7 +1,7 @@
 #ifndef COCKATRICE_DECK_STATE_MANAGER_H
 #define COCKATRICE_DECK_STATE_MANAGER_H
 
-#include "../../deck_loader/loaded_deck.h"
+#include "deck_list_model.h"
 
 #include <QModelIndex>
 #include <QObject>
@@ -10,6 +10,7 @@
 #include <QStringList>
 #include <functional>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <qtmetamacros.h>
 
 class DeckListHistoryManager;
@@ -187,17 +188,18 @@ public:
     ///@}
 
     /**
-     * @brief Adds the given card to the given zone.
+     * @brief Adds the given card to the given zone. Tokens always go to DECK_ZONE_TOKENS, ignoring the given zone.
      * Saves the operation to history if successful.
      *
      * @param card The card to add
-     * @param zoneName The zone to add the card to
+     * @param zoneName The zone to add the card to if the card is not a token
      * @return The index of the added card
      */
     QModelIndex addCard(const ExactCard &card, const QString &zoneName);
 
     /**
      * @brief Removes 1 copy of the given card from the given zone.
+     * If the card is a token and is not in the given zone, then it is removed from DECK_ZONE_TOKENS instead.
      * Saves the operation to history if successful.
      *
      * @param card The card to remove

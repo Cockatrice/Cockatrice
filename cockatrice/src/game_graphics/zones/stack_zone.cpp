@@ -1,11 +1,5 @@
 #include "stack_zone.h"
 
-#include "../../game/board/card_list.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_info.h"
-#include "../../game/player/player_logic.h"
-#include "../../game/zones/card_zone_logic.h"
-#include "../../game/zones/stack_zone_logic.h"
 #include "../../interface/theme_manager.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
@@ -19,7 +13,12 @@
 #include <QPoint>
 #include <QRectF>
 #include <QString>
-#include <libcockatrice/protocol/pb/command_move_card.pb.h>
+#include <libcockatrice/game/board/card_list.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
+#include <libcockatrice/game/zones/stack_zone_logic.h>
 #include <qnumeric.h>
 #include <string>
 
@@ -73,31 +72,21 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
     int index = calcDropIndexFromY(dropPoint.y(), !sameZone, MIN_CARD_VISIBLE);
     if (sameZone) {
         // Same-zone no-op: don't move a card onto itself
-        const auto &cards = getLogic()->getCards();
+        const auto &cards = cardItems();
         if (!cards.isEmpty() && cards.at(index)->getId() == dragItems.at(0)->getId()) {
             return;
         }
     }
 
-    Command_MoveCard cmd;
-    cmd.set_start_player_id(startZone->getPlayer()->getPlayerInfo()->getId());
-    cmd.set_start_zone(startZone->getName().toStdString());
-    cmd.set_target_player_id(getLogic()->getPlayer()->getPlayerInfo()->getId());
-    cmd.set_target_zone(getLogic()->getName().toStdString());
-    cmd.set_x(index);
-    cmd.set_y(0);
-
+    QList<CardMoveRequest> cards;
+    cards.reserve(dragItems.size());
     for (const CardDragItem *item : dragItems) {
         if (item) {
-            auto *cardToMove = cmd.mutable_cards_to_move()->add_card();
-            cardToMove->set_card_id(item->getId());
-            if (item->isForceFaceDown()) {
-                cardToMove->set_face_down(true);
-            }
+            cards.append(CardMoveRequest{item->getId(), item->isForceFaceDown()});
         }
     }
 
-    getLogic()->getPlayer()->getPlayerActions()->sendGameCommand(cmd);
+    getLogic()->getPlayer()->getPlayerActions()->moveCards(startZone, getLogic(), index, 0, cards);
 }
 
 void StackZone::setHeight(qreal newHeight)
@@ -113,7 +102,7 @@ void StackZone::setHeight(qreal newHeight)
 
 void StackZone::reorganizeCards()
 {
-    if (!getLogic()->getCards().isEmpty()) {
+    if (!cardItems().isEmpty()) {
         const auto params = buildStackParams(MIN_CARD_VISIBLE);
         layoutCardsVertically(params);
     }

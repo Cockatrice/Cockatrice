@@ -6,6 +6,7 @@
 
 #include <QMutex>
 #include <libcockatrice/protocol/pb/response.pb.h>
+#include <libcockatrice/utility/game_role_info.h>
 #include <qtmetamacros.h>
 
 class Server_Game;
@@ -45,6 +46,7 @@ class Command_NextTurn;
 class Command_SetActivePhase;
 class Command_DumpZone;
 class Command_RevealCards;
+class Command_RevealRandomCards;
 class Command_ReverseTurn;
 class Command_MoveCard;
 class Command_SetSideboardPlan;
@@ -52,6 +54,7 @@ class Command_DeckSelect;
 class Command_SetSideboardLock;
 class Command_ChangeZoneProperties;
 class Command_SetPlaymat;
+class Command_SetPlayerOrder;
 
 class Server_AbstractParticipant : public Server_ArrowTarget, public ServerInfo_User_Container
 {
@@ -61,8 +64,7 @@ protected:
     Server_AbstractUserInterface *userInterface;
     int pingTime;
     int playerId;
-    bool spectator;
-    bool judge;
+    GameRoleInfo roleInfo;
     virtual void getPlayerProperties(ServerInfo_PlayerProperties &result);
     mutable QMutex playerMutex;
 
@@ -70,7 +72,7 @@ public:
     Server_AbstractParticipant(Server_Game *_game,
                                int _playerId,
                                const ServerInfo_User &_userInfo,
-                               bool _judge,
+                               const GameRoleInfo &_roleInfo,
                                Server_AbstractUserInterface *_handler);
     ~Server_AbstractParticipant() override;
     virtual void prepareDestroy()
@@ -89,13 +91,17 @@ public:
     {
         return playerId;
     }
+    void setPlayerId(int _playerId)
+    {
+        playerId = _playerId;
+    }
     bool isSpectator() const
     {
-        return spectator;
+        return roleInfo.isSpectator;
     }
     bool isJudge() const
     {
-        return judge;
+        return roleInfo.isJudge;
     }
     Server_Game *getGame() const
     {
@@ -171,7 +177,11 @@ public:
     virtual Response::ResponseCode
     cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode
+    cmdRevealRandomCards(const Command_RevealRandomCards &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    virtual Response::ResponseCode
     cmdReverseTurn(const Command_ReverseTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges);
+    virtual Response::ResponseCode
+    cmdSetPlayerOrder(const Command_SetPlayerOrder &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode
     cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd, ResponseContainer &rc, GameEventStorage &ges);
 

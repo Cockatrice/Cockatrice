@@ -6,6 +6,7 @@
 
 #include <QApplication>
 #include <QColor>
+#include <QCoreApplication>
 #include <QEvent>
 #include <QFont>
 #include <QFrame>
@@ -60,8 +61,39 @@ static const QMap<QPalette::ColorRole, const char *> ROLE_DESCRIPTIONS = {
 };
 
 static const QMap<AppColor::Role, const char *> APP_ROLE_DESCRIPTIONS = {
-    {AppColor::AccentStrong, QT_TR_NOOP("Vivid primary accent (e.g. home-tab button gradient start)")},
-    {AppColor::AccentSoft, QT_TR_NOOP("Lightened, desaturated accent (e.g. home-tab button gradient end)")},
+    {AppColor::AccentStrong,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Vivid primary accent (e.g. home-tab button gradient start)")},
+    {AppColor::AccentSoft,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Lightened, desaturated accent (e.g. home-tab button gradient end)")},
+    {AppColor::Icon, QT_TRANSLATE_NOOP("PaletteGridWidget", "Neutral icon ink at the default action weight")},
+    {AppColor::IconStrong,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Neutral icon ink for the one action a surface exists for")},
+    {AppColor::IconSoft,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Neutral icon ink for a glyph that labels rather than acts")},
+    {AppColor::Positive,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Positive state and additive actions (ready, add, increment)")},
+    {AppColor::PositiveStrong, QT_TRANSLATE_NOOP("PaletteGridWidget", "Positive state at primary emphasis")},
+    {AppColor::PositiveSoft, QT_TRANSLATE_NOOP("PaletteGridWidget", "Positive state at quiet emphasis")},
+    {AppColor::Negative,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Negative state and removal actions (not ready, remove, decrement)")},
+    {AppColor::NegativeStrong, QT_TRANSLATE_NOOP("PaletteGridWidget", "Negative state at primary emphasis")},
+    {AppColor::NegativeSoft, QT_TRANSLATE_NOOP("PaletteGridWidget", "Negative state at quiet emphasis")},
+    {AppColor::Informational,
+     QT_TRANSLATE_NOOP("PaletteGridWidget",
+                       "Informational state that is neither a gain nor a loss (face-down, exile)")},
+    {AppColor::InformationalStrong, QT_TRANSLATE_NOOP("PaletteGridWidget", "Informational state at primary emphasis")},
+    {AppColor::InformationalSoft, QT_TRANSLATE_NOOP("PaletteGridWidget", "Informational state at quiet emphasis")},
+    {AppColor::Hidden,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Hidden information (face-down play, peek at the card face)")},
+    {AppColor::HiddenStrong, QT_TRANSLATE_NOOP("PaletteGridWidget", "Hidden information at primary emphasis")},
+    {AppColor::HiddenSoft, QT_TRANSLATE_NOOP("PaletteGridWidget", "Hidden information at quiet emphasis")},
+    {AppColor::Marked, QT_TRANSLATE_NOOP("PaletteGridWidget", "Marks left on a card (annotation, draw arrow)")},
+    {AppColor::MarkedStrong, QT_TRANSLATE_NOOP("PaletteGridWidget", "Marks on a card at primary emphasis")},
+    {AppColor::MarkedSoft, QT_TRANSLATE_NOOP("PaletteGridWidget", "Marks on a card at quiet emphasis")},
+    {AppColor::Movement,
+     QT_TRANSLATE_NOOP("PaletteGridWidget", "Cards moving without a gain or a loss (library placements)")},
+    {AppColor::MovementStrong, QT_TRANSLATE_NOOP("PaletteGridWidget", "Movement at primary emphasis")},
+    {AppColor::MovementSoft, QT_TRANSLATE_NOOP("PaletteGridWidget", "Movement at quiet emphasis")},
 };
 
 PaletteGridWidget::PaletteGridWidget(QWidget *parent) : QWidget(parent)
@@ -76,6 +108,18 @@ PaletteGridWidget::PaletteGridWidget(QWidget *parent) : QWidget(parent)
 
     layout = QtUtils::makeLayout<QVBoxLayout>(this);
     layout->addWidget(scroll);
+
+    connect(themeManager, &ThemeManager::fontsChanged, this, &PaletteGridWidget::applyInterfaceDefaultFont);
+}
+
+void PaletteGridWidget::applyInterfaceDefaultFont()
+{
+    // The editor's own chrome follows the InterfaceDefault theme role; bold stays caller-side.
+    for (auto *label : headerLabels) {
+        QFont headerFont = themeManager->appFont(AppFont::InterfaceDefault);
+        headerFont.setBold(true);
+        label->setFont(headerFont);
+    }
 }
 
 void PaletteGridWidget::buildGrid(QWidget *host)
@@ -101,7 +145,8 @@ void PaletteGridWidget::buildGrid(QWidget *host)
         auto *label = new QLabel(groupHeaders[col], host);
         label->setAlignment(Qt::AlignCenter);
         label->setToolTip(groupTips[col]);
-        label->setFont(QtUtils::boldFont(label->font()));
+        // Family comes from the InterfaceDefault theme role; bold stays caller-side.
+        label->setFont(QtUtils::boldFont(themeManager->appFont(AppFont::InterfaceDefault)));
         label->setAutoFillBackground(true);
         label->setContentsMargins(4, 4, 4, 4);
         grid->addWidget(label, 0, col + 1);
@@ -146,7 +191,7 @@ void PaletteGridWidget::buildGrid(QWidget *host)
 
     auto *appHeader = new QLabel(tr("App colors"), host);
     appHeader->setToolTip(tr("Application-specific colors layered on top of the Qt palette"));
-    appHeader->setFont(QtUtils::boldFont(appHeader->font()));
+    appHeader->setFont(QtUtils::boldFont(themeManager->appFont(AppFont::InterfaceDefault)));
     appHeader->setAutoFillBackground(true);
     appHeader->setContentsMargins(4, 4, 4, 4);
     grid->addWidget(appHeader, appHeaderRow, 0, 1, 4);
@@ -166,7 +211,7 @@ void PaletteGridWidget::buildGrid(QWidget *host)
         }
 
         auto *label = new QLabel(QString(appEnum.valueToKey(role)), host);
-        label->setToolTip(APP_ROLE_DESCRIPTIONS.value(role, {}));
+        label->setToolTip(QCoreApplication::translate("PaletteGridWidget", APP_ROLE_DESCRIPTIONS.value(role, {})));
         label->setContentsMargins(4, 2, 8, 2);
         grid->addWidget(label, row, 0);
 

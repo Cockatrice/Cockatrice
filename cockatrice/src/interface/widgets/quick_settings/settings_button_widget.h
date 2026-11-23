@@ -13,7 +13,7 @@
 #include <qtmetamacros.h>
 
 class QHBoxLayout;
-class QPixmap;
+class QIcon;
 class QToolButton;
 class SettingsPopupWidget;
 
@@ -28,7 +28,7 @@ public:
 
     void addSettingsWidget(QWidget *toAdd) const;
     void removeSettingsWidget(QWidget *toRemove) const;
-    void setButtonIcon(QPixmap iconMap);
+    void setButtonIcon(const QIcon &icon);
     void setButtonText(const QString &buttonText);
     void setCompact(bool compact);
     bool isCompact() const

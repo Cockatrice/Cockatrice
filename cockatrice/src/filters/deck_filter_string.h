@@ -11,6 +11,7 @@
 #include <QString>
 #include <functional>
 #include <libcockatrice/card/card_localization.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 
 struct CardSearchLanguage;
 struct LoadedDeck;
@@ -31,7 +32,7 @@ struct DeckSearchData
     QString relativeFilePath;         ///< File path relative to the deck folder.
 };
 
-typedef std::function<bool(const DeckSearchData &data)> DeckFilter;
+using DeckFilter = std::function<bool(const DeckSearchData &data)>;
 
 class DeckFilterString
 {

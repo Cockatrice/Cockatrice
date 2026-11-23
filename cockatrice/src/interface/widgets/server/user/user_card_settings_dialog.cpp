@@ -2,6 +2,7 @@
 
 #include "../../../card_picture_loader/card_picture_loader.h"
 #include "../../cards/art_crop_attribution.h"
+#include "../../cards/card_art_utils.h"
 #include "../../utility/completer_utils.h"
 #include "card_database_display_model.h"
 #include "card_database_model.h"
@@ -10,7 +11,6 @@
 #include "libcockatrice/card/printing/exact_card.h"
 #include "libcockatrice/card/printing/printing_info.h"
 #include "libcockatrice/card/set/card_set.h"
-#include "user_card_art_provider.h"
 #include "user_list_painter.h"
 
 #include <QBrush>
@@ -580,7 +580,7 @@ void UserCardArtSettingsDialog::reloadPreview()
         return;
     }
 
-    currentPixmap = UserCardArtProvider::cropCardArt(fullRes, card);
+    currentPixmap = CardArtUtils::cropCardArt(fullRes, card);
     preview->setPixmap(currentPixmap);
     preview->setParams(currentParams);
 

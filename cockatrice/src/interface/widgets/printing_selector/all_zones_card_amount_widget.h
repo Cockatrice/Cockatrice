@@ -36,6 +36,9 @@ public slots:
     void adjustFontSize(int scalePercentage);
     void setAmounts(int mainboardAmount, int sideboardAmount, int tokensboardAmount);
 
+private slots:
+    void applyCardTextFont();
+
 private:
     QVBoxLayout *layout;
     QSlider *cardSizeSlider;

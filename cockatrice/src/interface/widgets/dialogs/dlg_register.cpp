@@ -1,7 +1,7 @@
 #include "dlg_register.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../pixel_map_generator.h"
+#include "../../theme_icon.h"
 #include "../server/handle_public_servers.h"
 #include "../server/user/user_info_connection.h"
 
@@ -34,7 +34,8 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
     previousHosts = new QComboBox(this);
 
     btnDeleteServer = new QPushButton(this);
-    btnDeleteServer->setIcon(themePixmap(QStringLiteral("icons/remove_row")));
+    btnDeleteServer->setIcon(
+        loadThemedIcon(QStringLiteral("icons/remove_row"), AppColor::Negative, IconStyle::Sticker));
     btnDeleteServer->setToolTip(tr("Delete the currently selected saved server"));
     btnDeleteServer->setFixedWidth(30);
 
@@ -42,7 +43,7 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 
     hps = new HandlePublicServers(this);
     btnRefreshServers = new QPushButton(this);
-    btnRefreshServers->setIcon(themePixmap(QStringLiteral("icons/sync")));
+    btnRefreshServers->setIcon(loadThemedIcon(QStringLiteral("icons/sync")));
     btnRefreshServers->setToolTip(tr("Refresh the server list with known public servers"));
     btnRefreshServers->setFixedWidth(30);
 
@@ -520,7 +521,8 @@ void DlgRegister::actOk()
     if (passwordEdit->text().length() < 8) {
         QMessageBox::critical(this, tr("Registration Warning"), tr("Your password is too short."));
         return;
-    } else if (passwordEdit->text() != passwordConfirmationEdit->text()) {
+    }
+    if (passwordEdit->text() != passwordConfirmationEdit->text()) {
         QMessageBox::critical(this, tr("Registration Warning"), tr("Your passwords do not match, please try again."));
         return;
     } else if (emailConfirmationEdit->text() != emailEdit->text()) {

@@ -1,6 +1,7 @@
 #ifndef REPORT_UTILS_H
 #define REPORT_UTILS_H
 
+#include <QFont>
 #include <QString>
 #include <QtGlobal>
 
@@ -11,8 +12,15 @@ class ServerInfo_Report;
 namespace report_utils
 {
 
+/** @brief Font for the report chat-log views: the theme's ChatLog role when it
+ *         sets one, otherwise the monospace font these views used before the
+ *         role existed. Shared by the three report surfaces so they cannot
+ *         drift apart. */
+QFont reportLogFont();
+
 QString formatReportCategory(const QString &category);
 QString formatReportTime(qint64 secondsSinceEpoch);
+QString formatReportStatus(const QString &status);
 
 void fillReportTableRow(QTableWidget *table,
                         int row,
@@ -23,7 +31,8 @@ void fillReportTableRow(QTableWidget *table,
                         int categoryColumn,
                         int gameIdColumn,
                         int statusColumn,
-                        int assignedColumn);
+                        int assignedColumn,
+                        bool colorizeStatus = true);
 
 void renderReportDetails(QTextEdit *chatLogEdit,
                          QTextEdit *commentsEdit,

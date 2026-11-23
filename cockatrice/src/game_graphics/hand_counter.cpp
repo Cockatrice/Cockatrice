@@ -1,7 +1,5 @@
 #include "hand_counter.h"
 
-#include "../game/board/card_list.h"
-#include "../game/zones/card_zone_logic.h"
 #include "../interface/pixel_map_generator.h"
 
 #include <QGraphicsSceneMouseEvent>
@@ -14,6 +12,8 @@
 #include <QString>
 #include <QStringLiteral>
 #include <QTransform>
+#include <libcockatrice/game/board/card_list.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
 #include <qnamespace.h>
 
 class QGraphicsItem;

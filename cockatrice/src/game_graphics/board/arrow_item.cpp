@@ -2,11 +2,6 @@
 #include "arrow_item.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../game/board/arrow_data.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_info.h"
-#include "../../game/player/player_logic.h"
-#include "../../game/zones/card_zone_logic.h"
 #include "../game_scene.h"
 #include "../player/player_target.h"
 #include "../z_values.h"
@@ -27,12 +22,12 @@
 #include <QTransform>
 #include <QtGlobal>
 #include <QtMath>
-#include <libcockatrice/card/card_info.h>
-#include <libcockatrice/protocol/pb/command_attach_card.pb.h>
-#include <libcockatrice/protocol/pb/command_create_arrow.pb.h>
+#include <libcockatrice/game/board/arrow_data.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
 #include <libcockatrice/settings/cards_display_settings.h>
-#include <libcockatrice/settings/interface_settings.h>
-#include <libcockatrice/utility/color.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <math.h>
 #include <qnamespace.h>
@@ -93,7 +88,7 @@ void ArrowItem::onTargetDestroyed()
         // Drag and attach arrows are never inserted into the arrow registry and
         // have no server-side counterpart, so no deletion event can clean them
         // up. Delete them locally when either endpoint is destroyed.
-        delArrow();
+        cancel();
         return;
     }
 
@@ -106,6 +101,12 @@ void ArrowItem::delArrow()
         targetItem->setBeingPointedAt(false);
     }
     deleteLater();
+}
+
+void ArrowItem::cancel()
+{
+    ungrabMouse();
+    delArrow();
 }
 
 void ArrowItem::updatePath()
@@ -355,6 +356,17 @@ void ArrowDragItem::addChildArrow(ArrowDragItem *child)
     childArrows.append(child);
 }
 
+void ArrowDragItem::cancel()
+{
+    for (const auto &child : childArrows) {
+        if (child) {
+            child->cancel();
+        }
+    }
+    childArrows.clear();
+    ArrowItem::cancel();
+}
+
 void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (targetLocked || !startItem) {
@@ -398,8 +410,10 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     targetItem ? updatePath() : updatePath(endPos);
     update();
 
-    for (auto *child : childArrows) {
-        child->mouseMoveEvent(event);
+    for (const auto &child : childArrows) {
+        if (child) {
+            child->mouseMoveEvent(event);
+        }
     }
 }
 
@@ -408,10 +422,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     if (!startItem) {
         // The source card was destroyed while the arrow was being drawn.
         // Clean up the arrow and its children instead of leaking them.
-        delArrow();
-        for (auto *child : childArrows) {
-            child->mouseReleaseEvent(event);
-        }
+        cancel();
         return;
     }
 
@@ -420,55 +431,45 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         // For now, we can safely assume that the start item is always a card.
         // The target item can be a player as well.
         if (!startCard) {
-            delArrow();
+            cancel();
             return;
         }
 
         CardZoneLogic *startZone = startCard->getZone();
 
-        Command_CreateArrow cmd;
-        cmd.mutable_arrow_color()->CopyFrom(convertQColorToColor(data->color));
-        cmd.set_start_player_id(startZone->getPlayer()->getPlayerInfo()->getId());
-        cmd.set_start_zone(startZone->getName().toStdString());
-        cmd.set_start_card_id(startCard->getId());
+        ArrowData arrow;
+        arrow.color = data->color;
+        arrow.startPlayerId = startZone->getPlayer()->getPlayerInfo()->getId();
+        arrow.startZone = startZone->getName();
+        arrow.startCardId = startCard->getId();
 
         if (auto *targetCard = qgraphicsitem_cast<CardItem *>(targetItem)) {
             CardZoneLogic *targetZone = targetCard->getZone();
-            cmd.set_target_player_id(targetZone->getPlayer()->getPlayerInfo()->getId());
-            cmd.set_target_zone(targetZone->getName().toStdString());
-            cmd.set_target_card_id(targetCard->getId());
+            arrow.targetPlayerId = targetZone->getPlayer()->getPlayerInfo()->getId();
+            arrow.targetZone = targetZone->getName();
+            arrow.targetCardId = targetCard->getId();
         } else if (auto *targetPlayer = qgraphicsitem_cast<PlayerTarget *>(targetItem)) {
-            cmd.set_target_player_id(targetPlayer->getOwner()->getPlayerInfo()->getId());
+            arrow.targetPlayerId = targetPlayer->getOwner()->getPlayerInfo()->getId();
         } else {
-            delArrow();
+            cancel();
             return;
         }
 
         // if the card is in hand then we will move the card to stack or table as part of drawing the arrow
         if (startZone->getName() == ZoneNames::HAND) {
             startCard->playCard(false);
-            CardInfoPtr ci = startCard->getCard().getCardPtr();
-            bool playToStack = SettingsCache::instance().userInterface().getPlayToStack();
-            if (ci && ((!playToStack && ci->getUiAttributes().tableRow == 3) ||
-                       (playToStack && ci->getUiAttributes().tableRow != 0 &&
-                        startCard->getZone()->getName() != ZoneNames::STACK))) {
-                cmd.set_start_zone(ZoneNames::STACK);
-            } else {
-                cmd.set_start_zone(playToStack ? ZoneNames::STACK : ZoneNames::TABLE);
-            }
         }
 
-        if (deleteInPhase != 0) {
-            cmd.set_delete_in_phase(deleteInPhase);
-        }
-
-        player->getPlayerActions()->sendGameCommand(cmd);
+        player->getPlayerActions()->createArrow(startCard->getState(), arrow, deleteInPhase);
     }
 
     delArrow();
-    for (auto *child : childArrows) {
-        child->mouseReleaseEvent(event);
+    for (const auto &child : childArrows) {
+        if (child) {
+            child->mouseReleaseEvent(event);
+        }
     }
+    childArrows.clear();
 }
 
 // ArrowAttachItem
@@ -487,6 +488,17 @@ ArrowAttachItem::ArrowAttachItem(ArrowTarget *_startItem)
 void ArrowAttachItem::addChildArrow(ArrowAttachItem *child)
 {
     childArrows.append(child);
+}
+
+void ArrowAttachItem::cancel()
+{
+    for (const auto &child : childArrows) {
+        if (child) {
+            child->cancel();
+        }
+    }
+    childArrows.clear();
+    ArrowItem::cancel();
 }
 
 void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -527,8 +539,10 @@ void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     targetItem ? updatePath() : updatePath(endPos);
     update();
 
-    for (auto *child : childArrows) {
-        child->mouseMoveEvent(event);
+    for (const auto &child : childArrows) {
+        if (child) {
+            child->mouseMoveEvent(event);
+        }
     }
 }
 
@@ -537,49 +551,31 @@ void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     if (!startItem) {
         // The source card was destroyed while the arrow was being drawn.
         // Clean up the arrow and its children instead of leaking them.
-        delArrow();
-        for (auto *child : childArrows) {
-            child->mouseReleaseEvent(event);
-        }
+        cancel();
         return;
     }
 
     // Attaching could move startItem under the current cursor position, causing all children to retarget to it right
     // before they are processed. Prevent that.
-    for (auto *child : childArrows) {
-        child->setTargetLocked(true);
+    for (const auto &child : childArrows) {
+        if (child) {
+            child->setTargetLocked(true);
+        }
     }
 
     if (targetItem && targetItem != startItem) {
         auto *startCard = qgraphicsitem_cast<CardItem *>(startItem);
         auto *targetCard = qgraphicsitem_cast<CardItem *>(targetItem);
         if (startCard && targetCard) {
-            attachCards(startCard, targetCard);
+            player->getPlayerActions()->attachCards(startCard->getState(), targetCard->getState());
         }
     }
 
     delArrow();
-    for (auto *child : childArrows) {
-        child->mouseReleaseEvent(event);
+    for (const auto &child : childArrows) {
+        if (child) {
+            child->mouseReleaseEvent(event);
+        }
     }
-}
-
-void ArrowAttachItem::attachCards(CardItem *startCard, const CardItem *targetCard)
-{
-    if (targetCard->getAttachedTo() || targetCard->getZone()->getName() != ZoneNames::TABLE) {
-        return;
-    }
-
-    // move card onto table first if attaching from some other zone
-    if (startCard->getZone()->getName() != ZoneNames::TABLE) {
-        player->getPlayerActions()->playCardToTable(startCard, false);
-    }
-
-    Command_AttachCard cmd;
-    cmd.set_start_zone(ZoneNames::TABLE);
-    cmd.set_card_id(startCard->getId());
-    cmd.set_target_player_id(targetCard->getZone()->getPlayer()->getPlayerInfo()->getId());
-    cmd.set_target_zone(targetCard->getZone()->getName().toStdString());
-    cmd.set_target_card_id(targetCard->getId());
-    player->getPlayerActions()->sendGameCommand(cmd);
+    childArrows.clear();
 }

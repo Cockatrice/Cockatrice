@@ -55,6 +55,7 @@ private slots:
     void goBack();
     void skip();
     void updateChrome();
+    void applyInterfaceDefaultFont();
 
 private:
     void addPage(FirstRunWizardPage *page);

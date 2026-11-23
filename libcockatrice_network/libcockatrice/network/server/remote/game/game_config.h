@@ -21,6 +21,7 @@ struct GameConfig
     bool spectatorsSeeEverything = true;
     int startingLifeTotal = 20;
     bool shareDecklistsOnLoad = true;
+    bool shufflePlayers = false;
 };
 
 #endif

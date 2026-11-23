@@ -57,6 +57,29 @@ try {
         }
     }
 
+    # --- What was holding the files, read from the log as well -------------------
+    # The guard and the close attempt each log one line naming every holder and what
+    # happened to it. Carrying the last of each as event data keeps an abort caused by
+    # a running instance actionable without opening the attachment. Kept out of the
+    # message so the issue still groups on the reason alone.
+    $Holders = ''
+    $CloseResult = ''
+    $EndResult = ''
+    if (Test-Path -LiteralPath $LogPath) {
+        $holderLine = Select-String -LiteralPath $LogPath -Pattern 'guard: still in use by (.*)$' | Select-Object -Last 1
+        if ($holderLine) {
+            $Holders = $holderLine.Matches[0].Groups[1].Value
+        }
+        $closeLine = Select-String -LiteralPath $LogPath -Pattern '(close-holders: .*)$' | Select-Object -Last 1
+        if ($closeLine) {
+            $CloseResult = $closeLine.Matches[0].Groups[1].Value
+        }
+        $endLine = Select-String -LiteralPath $LogPath -Pattern '(end-holders: .*)$' | Select-Object -Last 1
+        if ($endLine) {
+            $EndResult = $endLine.Matches[0].Groups[1].Value
+        }
+    }
+
     # --- Event ---------------------------------------------------------------
     $eventId = [guid]::NewGuid().ToString('N')
     $now = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
@@ -75,6 +98,9 @@ try {
         extra = @{
             reason = $Reason
             os = [System.Environment]::OSVersion.VersionString
+            holders = $Holders
+            close_result = $CloseResult
+            end_result = $EndResult
         }
     }
     $eventJson = $sentryEvent | ConvertTo-Json -Compress -Depth 6

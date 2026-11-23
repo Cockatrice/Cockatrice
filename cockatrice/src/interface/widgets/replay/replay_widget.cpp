@@ -19,6 +19,11 @@
 
 class GameReplay;
 
+int ReplayWidget::getLastProcessedEventIndex() const
+{
+    return replayManager->getLastProcessedEventIndex();
+}
+
 ReplayWidget::ReplayWidget(QWidget *parent, GameReplay *replay)
     : QWidget(parent), replayPlayButton(nullptr), replayFastForwardButton(nullptr), aReplaySkipForward(nullptr),
       aReplaySkipBackward(nullptr), aReplaySkipForwardBig(nullptr), aReplaySkipBackwardBig(nullptr)
@@ -28,6 +33,7 @@ ReplayWidget::ReplayWidget(QWidget *parent, GameReplay *replay)
     connect(replayManager, &ReplayManager::eventReplayed, this, &ReplayWidget::eventReplayed);
     connect(replayManager, &ReplayManager::replayFinished, this, &ReplayWidget::replayFinished);
     connect(replayManager, &ReplayManager::rewound, this, &ReplayWidget::rewound);
+    connect(replayManager, &ReplayManager::timeChanged, this, &ReplayWidget::timeChanged);
 
     // timeline widget
     timelineWidget = new ReplayTimelineWidget;
@@ -94,6 +100,16 @@ ReplayWidget::ReplayWidget(QWidget *parent, GameReplay *replay)
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &ReplayWidget::refreshShortcuts);
     refreshShortcuts();
+}
+
+const QList<int> &ReplayWidget::getReplayTimeline() const
+{
+    return replayManager->getReplayTimeline();
+}
+
+void ReplayWidget::seekToEvent(int eventIndex)
+{
+    replayManager->setTimeToEvent(eventIndex);
 }
 
 void ReplayWidget::replayFinished()

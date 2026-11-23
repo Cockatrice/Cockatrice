@@ -111,6 +111,7 @@ private slots:
     void openLink(const QUrl &link);
     void actMessageClicked();
     void adjustColorsToPalette();
+    void applyChatFont();
     void refreshBlockColors();
     void onScrollBarRangeChanged();
     void onScrollBarValueChanged(int value);

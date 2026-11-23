@@ -47,6 +47,7 @@ class Event_UserJoined;
 class Event_UserLeft;
 class Event_ServerMessage;
 class Event_ListRooms;
+class Command_AccountPassword;
 class Event_GameJoined;
 class Event_UserMessage;
 class Event_NotifyUser;
@@ -67,6 +68,9 @@ enum ClientStatus
     StatusSubmitForgotPasswordReset,
     StatusSubmitForgotPasswordChallenge,
     StatusGettingPasswordSalt,
+    //! The server accepted the credentials but keeps the session open until the account
+    //! password is replaced; the connection must survive for `Command_AccountPassword`.
+    StatusPasswordChangeRequired,
 };
 
 class AbstractClient : public QObject
@@ -171,6 +175,16 @@ public:
     {
         return serverSupportsChallengeResponse;
     }
+
+    /**
+     * @brief Builds the account-password command in the form this server understands.
+     *
+     * Challenge-response servers take a scrypt verifier; servers that only advertise
+     * SupportsPasswordHash take a salted SHA-512 hash; anything older gets the plaintext,
+     * which is the only form it understands. Both password-change paths go through here so
+     * the two cannot drift apart and hand a plaintext password to a server that can hash it.
+     */
+    Command_AccountPassword makeAccountPasswordCommand(const QString &oldPassword, const QString &newPassword) const;
     const QString &getUserName() const
     {
         return userName;

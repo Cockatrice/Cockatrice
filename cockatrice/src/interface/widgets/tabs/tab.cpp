@@ -14,7 +14,7 @@
 #include <qnamespace.h>
 
 Tab::Tab(TabSupervisor *_tabSupervisor)
-    : QMainWindow(_tabSupervisor), tabSupervisor(_tabSupervisor), contentsChanged(false), infoPopup(0)
+    : QMainWindow(_tabSupervisor), tabSupervisor(_tabSupervisor), contentsChanged(false), infoPopup(nullptr)
 {
     setAttribute(Qt::WA_DeleteOnClose);
 }
@@ -43,7 +43,7 @@ void Tab::deleteCardInfoPopup(const QString &cardName)
     if (infoPopup) {
         if (currentCard.name == cardName || cardName == "_") {
             infoPopup->deleteLater();
-            infoPopup = 0;
+            infoPopup = nullptr;
         }
     }
 }

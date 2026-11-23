@@ -18,6 +18,7 @@
 #include <QIODevice>
 #include <QList>
 #include <QMessageLogger>
+#include <QSaveFile>
 #include <QSharedPointer>
 #include <QStringView>
 #include <QXmlStreamAttributes>
@@ -32,7 +33,7 @@ class ICardSetPriorityController;
 #define COCKATRICE_XML3_TAGNAME "cockatrice_carddatabase"
 #define COCKATRICE_XML3_TAGVER 3
 #define COCKATRICE_XML3_SCHEMALOCATION                                                                                 \
-    "https://raw.githubusercontent.com/Cockatrice/Cockatrice/master/doc/carddatabase_v3/cards.xsd"
+    "https://raw.githubusercontent.com/Cockatrice/Cockatrice/master/docs/xsd/cards_v3.xsd"
 
 CockatriceXml3Parser::CockatriceXml3Parser(ICardSetPriorityController *_cardSetPriorityController)
     : ICardDatabaseParser(_cardSetPriorityController)
@@ -194,7 +195,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
             QString text = QString("");
             QHash<QString, QString> properties;
             QString colors = QString("");
-            QList<CardRelation *> relatedCards, reverseRelatedCards;
+            QList<CardRelation> relatedCards, reverseRelatedCards;
             auto _sets = SetToPrintingsMap();
             int tableRow = 0;
             bool cipt = false;
@@ -302,7 +303,11 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         exclude = true;
                     }
 
-                    auto *relation = new CardRelation(cardName, attach, exclude, variable, count);
+                    CardRelation relation{.name = cardName,
+                                          .attachType = attach,
+                                          .isCreateAllExclusion = exclude,
+                                          .isVariableCount = variable,
+                                          .defaultCount = count};
                     if (xmlName == "reverse-related") {
                         reverseRelatedCards << relation;
                     } else {
@@ -426,49 +431,49 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
     }
 
     // related cards
-    const QList<CardRelation *> related = info->getRelatedCards();
-    for (auto i : related) {
+    const QList<CardRelation> &related = info->getRelatedCards();
+    for (const auto &i : related) {
         xml.writeStartElement("related");
-        if (i->getDoesAttach()) {
+        if (i.doesAttach()) {
             xml.writeAttribute("attach", "attach");
         }
-        if (i->getIsCreateAllExclusion()) {
+        if (i.isCreateAllExclusion) {
             xml.writeAttribute("exclude", "exclude");
         }
 
-        if (i->getIsVariable()) {
-            if (1 == i->getDefaultCount()) {
+        if (i.isVariableCount) {
+            if (1 == i.defaultCount) {
                 xml.writeAttribute("count", "x");
             } else {
-                xml.writeAttribute("count", "x=" + QString::number(i->getDefaultCount()));
+                xml.writeAttribute("count", "x=" + QString::number(i.defaultCount));
             }
-        } else if (1 != i->getDefaultCount()) {
-            xml.writeAttribute("count", QString::number(i->getDefaultCount()));
+        } else if (1 != i.defaultCount) {
+            xml.writeAttribute("count", QString::number(i.defaultCount));
         }
-        xml.writeCharacters(i->getName());
+        xml.writeCharacters(i.name);
         xml.writeEndElement();
     }
-    const QList<CardRelation *> reverseRelated = info->getReverseRelatedCards();
-    for (auto i : reverseRelated) {
+    const QList<CardRelation> &reverseRelated = info->getReverseRelatedCards();
+    for (const auto &i : reverseRelated) {
         xml.writeStartElement("reverse-related");
-        if (i->getDoesAttach()) {
+        if (i.doesAttach()) {
             xml.writeAttribute("attach", "attach");
         }
 
-        if (i->getIsCreateAllExclusion()) {
+        if (i.isCreateAllExclusion) {
             xml.writeAttribute("exclude", "exclude");
         }
 
-        if (i->getIsVariable()) {
-            if (1 == i->getDefaultCount()) {
+        if (i.isVariableCount) {
+            if (1 == i.defaultCount) {
                 xml.writeAttribute("count", "x");
             } else {
-                xml.writeAttribute("count", "x=" + QString::number(i->getDefaultCount()));
+                xml.writeAttribute("count", "x=" + QString::number(i.defaultCount));
             }
-        } else if (1 != i->getDefaultCount()) {
-            xml.writeAttribute("count", QString::number(i->getDefaultCount()));
+        } else if (1 != i.defaultCount) {
+            xml.writeAttribute("count", QString::number(i.defaultCount));
         }
-        xml.writeCharacters(i->getName());
+        xml.writeCharacters(i.name);
         xml.writeEndElement();
     }
 
@@ -499,7 +504,7 @@ bool CockatriceXml3Parser::saveToFile(FormatRulesNameMap _formats,
 {
     Q_UNUSED(_formats);
 
-    QFile file(fileName);
+    QSaveFile file(fileName);
     if (!file.open(QIODevice::WriteOnly)) {
         return false;
     }
@@ -539,5 +544,5 @@ bool CockatriceXml3Parser::saveToFile(FormatRulesNameMap _formats,
     xml.writeEndElement(); // cockatrice_carddatabase
     xml.writeEndDocument();
 
-    return true;
+    return !xml.hasError() && file.commit();
 }

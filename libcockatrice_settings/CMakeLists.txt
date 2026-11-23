@@ -1,7 +1,3 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
 set(HEADERS
     libcockatrice/settings/appearance_settings.h
     libcockatrice/settings/cache_storage_settings.h
@@ -31,11 +27,9 @@ set(HEADERS
     libcockatrice/settings/visual_deck_storage_settings.h
 )
 
-qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-
 add_library(
   libcockatrice_settings STATIC
-  ${MOC_SOURCES}
+  ${HEADERS}
   libcockatrice/settings/appearance_settings.cpp
   libcockatrice/settings/cache_storage_settings.cpp
   libcockatrice/settings/card_database_settings.cpp

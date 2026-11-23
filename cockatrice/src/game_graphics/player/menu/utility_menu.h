@@ -32,6 +32,9 @@ public slots:
 public:
     explicit UtilityMenu(PlayerGraphicsItem *player, QMenu *playerMenu);
 
+    /** @brief Binds only the shortcuts that remain usable before the game starts. */
+    void setLobbyShortcutsActive();
+
     [[nodiscard]] bool createAnotherTokenActionExists() const
     {
         return aCreateAnotherToken != nullptr;

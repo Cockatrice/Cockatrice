@@ -1,11 +1,13 @@
 #include "dlg_my_reports.h"
 
+#include "../interface/theme_manager.h"
 #include "../utility/report_utils.h"
 #include "abstract_client.h"
 #include "libcockatrice/protocol/pb/response.pb.h"
 #include "libcockatrice/protocol/pb/serverinfo_report.pb.h"
 
 #include <QAbstractItemView>
+#include <QFont>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -24,7 +26,6 @@
 #include <libcockatrice/protocol/pb/response_report_details.pb.h>
 #include <libcockatrice/protocol/pb/response_report_my_list.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
 #include <string>
 
@@ -69,7 +70,8 @@ DlgMyReports::DlgMyReports(AbstractClient *_client, QWidget *parent)
     auto *chatGroup = new QGroupBox(tr("Chat Log Context"));
     chatLogEdit = new QTextEdit;
     chatLogEdit->setReadOnly(true);
-    chatLogEdit->setFont(QtUtils::monospaceFont());
+    applyChatLogFont();
+    connect(themeManager, &ThemeManager::fontsChanged, this, &DlgMyReports::applyChatLogFont);
     auto *chatLayout = new QVBoxLayout(chatGroup);
     chatLayout->setContentsMargins(4, 4, 4, 4);
     chatLayout->addWidget(chatLogEdit);
@@ -120,6 +122,11 @@ DlgMyReports::DlgMyReports(AbstractClient *_client, QWidget *parent)
 
     setActionsEnabled(false);
     refreshList();
+}
+
+void DlgMyReports::applyChatLogFont()
+{
+    chatLogEdit->setFont(report_utils::reportLogFont());
 }
 
 void DlgMyReports::refreshList()
@@ -223,7 +230,8 @@ void DlgMyReports::onSelectionChanged()
     connect(pend, &PendingCommand::finished, this, &DlgMyReports::reportDetailsResponse);
     client->sendCommand(pend);
 
-    QString status = table->item(row, COL_STATUS)->text();
+    // The cell text is the translated label; the raw status lives in UserRole.
+    const QString status = table->item(row, COL_STATUS)->data(Qt::UserRole).toString();
     bool canComment = (status == "open" || status == "assigned");
     commentButton->setEnabled(canComment);
     commentInput->setEnabled(canComment);

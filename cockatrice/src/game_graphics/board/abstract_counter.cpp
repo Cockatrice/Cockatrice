@@ -2,10 +2,6 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../client/settings/shortcuts_settings.h"
-#include "../../game/board/counter_state.h"
-#include "../../game/player/player_actions.h"
-#include "../../game/player/player_info.h"
-#include "../../game/player/player_logic.h"
 #include "../../game_graphics/board/translate_counter_name.h"
 #include "../../interface/widgets/menus/tearoff_menu.h"
 
@@ -23,8 +19,10 @@
 #include <QString>
 #include <QVariant>
 #include <QtGlobal>
-#include <libcockatrice/protocol/pb/command_inc_counter.pb.h>
-#include <libcockatrice/protocol/pb/command_set_counter.pb.h>
+#include <libcockatrice/game/board/counter_state.h>
+#include <libcockatrice/game/player/player_actions.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
 #include <libcockatrice/utility/expression.h>
 #include <qnamespace.h>
 
@@ -151,10 +149,7 @@ void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
             menu->exec(event->screenPos());
         }
     } else {
-        Command_IncCounter cmd;
-        cmd.set_counter_id(id);
-        cmd.set_delta(event->button() == Qt::LeftButton ? 1 : -1);
-        player->getPlayerActions()->sendGameCommand(cmd);
+        player->getPlayerActions()->actIncrementCounter(id, event->button() == Qt::LeftButton ? 1 : -1);
     }
     event->accept();
 }
@@ -172,10 +167,7 @@ void AbstractCounter::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 
 void AbstractCounter::incrementCounter()
 {
-    Command_IncCounter cmd;
-    cmd.set_counter_id(id);
-    cmd.set_delta(static_cast<QAction *>(sender())->data().toInt());
-    player->getPlayerActions()->sendGameCommand(cmd);
+    player->getPlayerActions()->actIncrementCounter(id, static_cast<QAction *>(sender())->data().toInt());
 }
 
 void AbstractCounter::setCounter()
@@ -199,10 +191,7 @@ void AbstractCounter::setCounter()
     }
 
     Expression exp(value);
-    Command_SetCounter cmd;
-    cmd.set_counter_id(id);
-    cmd.set_value(static_cast<int>(exp.parse(dlg.textValue())));
-    player->getPlayerActions()->sendGameCommand(cmd);
+    player->getPlayerActions()->actSetCounter(id, static_cast<int>(exp.parse(dlg.textValue())));
 }
 
 AbstractCounterDialog::AbstractCounterDialog(const QString &name, const QString &value, QWidget *parent)

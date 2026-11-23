@@ -5,8 +5,8 @@
 
 #include "libcockatrice/protocol/pb/response.pb.h"
 #include "libcockatrice/protocol/pb/server_message.pb.h"
+#include "libcockatrice/server/dev/servatrice_in_memory_database_interface.h"
 #include "server.h"
-#include "server_database_interface.h"
 #include "server_protocolhandler.h"
 #include "server_room.h"
 
@@ -32,60 +32,6 @@ RNG_Abstract *rng = nullptr; // referenced by the server_remote library
 
 namespace
 {
-
-class MockDatabaseInterface : public Server_DatabaseInterface
-{
-public:
-    struct LogEntry
-    {
-        QString senderName;
-        QString message;
-        LogMessage_TargetType targetType;
-        int targetId;
-        QString targetName;
-        QString channel;
-    };
-    QList<LogEntry> logEntries;
-
-    void logMessage(const int /* senderId */,
-                    const QString &senderName,
-                    const QString & /* senderIp */,
-                    const QString &message,
-                    LogMessage_TargetType targetType,
-                    const int targetId,
-                    const QString &targetName,
-                    const QString &channel = QString()) override
-    {
-        logEntries.append({senderName, message, targetType, targetId, targetName, channel});
-    }
-
-    AuthenticationResult checkUserPassword(Server_ProtocolHandler *,
-                                           const QString &,
-                                           const QString &,
-                                           const QString &,
-                                           QString &,
-                                           int &,
-                                           bool) override
-    {
-        return NotLoggedIn;
-    }
-    int getNextReplayId() override
-    {
-        return 1;
-    }
-    int getNextGameId() override
-    {
-        return 1;
-    }
-    int getActiveUserCount(QString) override
-    {
-        return 0;
-    }
-    ServerInfo_User getUserData(const QString &, bool) override
-    {
-        return ServerInfo_User();
-    }
-};
 
 class FakeServer : public Server
 {
@@ -149,7 +95,7 @@ protected:
 class RoomChannelTest : public ::testing::Test
 {
 protected:
-    MockDatabaseInterface db;
+    Servatrice_InMemoryDatabaseInterface db;
     FakeServer server{&db};
     QList<ServerInfo_RoomChannel> catalog;
     Server_Room *room = nullptr;
@@ -360,7 +306,7 @@ TEST_F(RoomChannelTest, UserBelowRequiredLevelCannotSendToChannel)
     EXPECT_TRUE(channelSayEvents(mod).isEmpty());
     EXPECT_TRUE(channelSayEvents(user).isEmpty());
     bool loggedAsChannel = false;
-    for (const MockDatabaseInterface::LogEntry &entry : db.logEntries) {
+    for (const Servatrice_InMemoryDatabaseInterface::LogEntry &entry : db.getLogEntries()) {
         loggedAsChannel |= entry.targetType == Server_DatabaseInterface::MessageTargetRoomChannel;
     }
     EXPECT_FALSE(loggedAsChannel);
@@ -406,7 +352,7 @@ TEST_F(RoomChannelTest, UnknownChannelIdIsRejected)
 
     EXPECT_EQ(user.lastResponseCode, Response::RespInvalidCommand);
     EXPECT_TRUE(channelSayEvents(user).isEmpty());
-    EXPECT_TRUE(db.logEntries.isEmpty());
+    EXPECT_TRUE(db.getLogEntries().isEmpty());
 }
 
 TEST_F(RoomChannelTest, MissingAccessLevelDefaultsToPublic)
@@ -515,13 +461,13 @@ TEST_F(RoomChannelTest, AuditLoggingTagsChannelMessages)
     sendMainSay(user, "main log line");
     sendChannelSay(user, "lobby", "channel log line");
 
-    ASSERT_EQ(db.logEntries.size(), 2);
-    EXPECT_EQ(db.logEntries.at(0).targetType, Server_DatabaseInterface::MessageTargetRoom);
-    EXPECT_TRUE(db.logEntries.at(0).channel.isEmpty());
-    EXPECT_EQ(db.logEntries.at(1).targetType, Server_DatabaseInterface::MessageTargetRoomChannel);
-    EXPECT_EQ(db.logEntries.at(1).channel, "lobby");
-    EXPECT_EQ(db.logEntries.at(1).senderName, "user");
-    EXPECT_EQ(db.logEntries.at(1).message, "channel log line");
+    ASSERT_EQ(db.getLogEntries().size(), 2);
+    EXPECT_EQ(db.getLogEntries().at(0).targetType, Server_DatabaseInterface::MessageTargetRoom);
+    EXPECT_TRUE(db.getLogEntries().at(0).channel.isEmpty());
+    EXPECT_EQ(db.getLogEntries().at(1).targetType, Server_DatabaseInterface::MessageTargetRoomChannel);
+    EXPECT_EQ(db.getLogEntries().at(1).channel, "lobby");
+    EXPECT_EQ(db.getLogEntries().at(1).senderName, "user");
+    EXPECT_EQ(db.getLogEntries().at(1).message, "channel log line");
 }
 
 TEST_F(RoomChannelTest, PublicChannelRelaysOverIslButRestrictedChannelsDoNot)

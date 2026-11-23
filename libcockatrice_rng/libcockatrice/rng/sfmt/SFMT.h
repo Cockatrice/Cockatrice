@@ -113,6 +113,14 @@ union W128_T {
 /** 128-bit data type */
 typedef union W128_T w128_t;
 
+#if defined(__AVX2__)
+/* The AVX2 state below names __m256i (and __m512i under AVX-512VL). The SIMD header
+   above is only pulled in for HAVE_SSE2, so a build that has __AVX2__ from the compiler
+   (e.g. -march=native) but not HAVE_SSE2 from the build system would otherwise not have
+   those types declared. */
+  #include <immintrin.h>
+#endif
+
 /**
  * SFMT internal state
  */

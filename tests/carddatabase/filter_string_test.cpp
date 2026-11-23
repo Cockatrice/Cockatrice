@@ -15,6 +15,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/printing/printing_info.h>
 #include <libcockatrice/filters/filter_string.h>
+#include <libcockatrice/filters/filter_tree.h>
 #include <libcockatrice/interfaces/noop_card_preference_provider.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
 #include <string>
@@ -123,6 +124,25 @@ CardInfoPtr greenIdentityCard()
     return CardInfo::newInstance("Identity Cat", "", false, {{"colors", "G"}, {"coloridentity", "G"}}, {}, {}, {}, {});
 }
 
+// A card whose color identity differs from its colors, so that a query reading the wrong one is visible.
+CardInfoPtr splitIdentityCard()
+{
+    return CardInfo::newInstance("Split Identity", "", false, {{"colors", "G"}, {"coloridentity", "W"}}, {}, {}, {},
+                                 {});
+}
+
+// "ci!" (exactly these color identities) used to read the camelCase "colorIdentity" property instead of the
+// lowercase "coloridentity" key, so it matched the empty string and rejected every card.
+TEST_F(CardQuery, ColorIdentityExactReadsTheColorIdentityProperty)
+{
+    const CardData card = splitIdentityCard();
+    ASSERT_TRUE(FilterString("ci!w").check(card));
+    ASSERT_FALSE(FilterString("ci!g").check(card));
+    // "c!" still reads colors, not identity.
+    ASSERT_TRUE(FilterString("c!g").check(card));
+    ASSERT_FALSE(FilterString("c!w").check(card));
+}
+
 // Whitespace belongs around the separator, never inside an operator token: "c i: g" must not
 // be read as the color-identity operator "ci" (it is a generic "c" AND a field query on "i").
 TEST_F(CardQuery, ColorIdentityOperatorIsNotSplitByWhitespace)
@@ -182,6 +202,64 @@ TEST_F(CardQuery, SearchLanguageIsBoundPerInstance)
     FilterString englishQuery("Kater", CardSearchLanguage{"", SearchLanguageMode::English});
     ASSERT_FALSE(englishQuery.check(localized));
     ASSERT_TRUE(germanQuery.check(localized));
+}
+
+CardInfoPtr taggedCard()
+{
+    return CardInfo::newInstance("Tagged Card", "text", false, {{"tags", "ramp removal"}}, {}, {}, {}, {});
+}
+
+TEST_F(CardQuery, TagsMatchWholeSlugs)
+{
+    const CardData tagged = taggedCard();
+    ASSERT_TRUE(FilterString("tags:ramp").check(tagged));
+    ASSERT_TRUE(FilterString("tags:removal").check(tagged));
+    ASSERT_TRUE(FilterString("tags:RAMP").check(tagged));
+    ASSERT_TRUE(FilterString("tag:ramp").check(tagged));
+    ASSERT_FALSE(FilterString("tags:squirrel").check(tagged));
+}
+
+TEST_F(CardQuery, TagQueryDoesNotMatchPartialSlugs)
+{
+    const CardData tagged = taggedCard();
+    ASSERT_FALSE(FilterString("tags:ram").check(tagged));
+    ASSERT_FALSE(FilterString("tags:mov").check(tagged));
+}
+
+TEST_F(CardQuery, TagQueryCombinesWithAnd)
+{
+    const CardData tagged = taggedCard();
+    ASSERT_TRUE(FilterString("tags:ramp tags:removal").check(tagged));
+    ASSERT_FALSE(FilterString("tags:ramp tags:squirrel").check(tagged));
+}
+
+TEST_F(CardQuery, TagQueryTreatsCommasAsPartOfTheSlug)
+{
+    // Tag lists are not a thing: `tags:draw` and `tags:ramp` are separate terms.
+    const CardData tagged = taggedCard();
+    ASSERT_FALSE(FilterString("tags:ramp,removal").check(tagged));
+}
+
+TEST_F(CardQuery, FilterTreeTagAttribute)
+{
+    const CardData tagged = taggedCard();
+
+    FilterTree matching;
+    matching.termNode(CardFilter::AttrTag, CardFilter::TypeAnd, "ramp");
+    ASSERT_TRUE(matching.acceptsCard(tagged, CardSearchLanguage{}));
+
+    FilterTree partial;
+    partial.termNode(CardFilter::AttrTag, CardFilter::TypeAnd, "ram");
+    ASSERT_FALSE(partial.acceptsCard(tagged, CardSearchLanguage{}));
+
+    FilterTree missing;
+    missing.termNode(CardFilter::AttrTag, CardFilter::TypeAnd, "squirrel");
+    ASSERT_FALSE(missing.acceptsCard(tagged, CardSearchLanguage{}));
+}
+
+TEST_F(CardQuery, TagQueryFalseWhenCardHasNoTags)
+{
+    ASSERT_FALSE(FilterString("tags:ramp").check(cat));
 }
 
 } // namespace
@@ -258,6 +336,22 @@ TEST_F(SetQuery, ComparisonMatchesByReleaseDate)
     EXPECT_FALSE(FilterString("set>EOE").check(onlyInOldSet));
     EXPECT_TRUE(FilterString("set>=EOE").check(inBothSets));
     EXPECT_FALSE(FilterString("set<EOE").check(inBothSets));
+}
+
+TEST(FilterStringError, InvalidExpressionIsInvalidAndReportsAPosition)
+{
+    const FilterString filter("t:(");
+
+    EXPECT_FALSE(filter.valid());
+    EXPECT_TRUE(filter.error().contains("position")) << "unexpected error text: " << filter.error().toStdString();
+}
+
+TEST(FilterStringError, ValidExpressionHasNoError)
+{
+    const FilterString filter("t:creature");
+
+    EXPECT_TRUE(filter.valid());
+    EXPECT_TRUE(filter.error().isEmpty());
 }
 
 int main(int argc, char **argv)

@@ -52,11 +52,12 @@ public:
     void enableAllBatched(ICardSetPriorityController *controller);
 
     /**
-     * @brief Enables all sets that are unknown or ignored, persisting in one flush.
+     * @brief Enables all sets that are unknown, persisting in one flush.
      *
      * Sets that are not marked as known and not ignored are marked as known
-     * and enabled. Ignored-known sets are also enabled, but remain ignored.
-     * Only changed sets are written, so the common case of a few new sets costs
+     * and enabled. Ignored sets that are not known are enabled, but stay
+     * ignored. Sets that are already known are left alone.
+     * Only unknown sets are written, so the common case of a few new sets costs
      * a single settings flush no matter how large the database is.
      * @param controller The set priority controller to persist the records with.
      */
@@ -65,8 +66,8 @@ public:
     /**
      * @brief Marks all sets as known and adjusts their enabled state, persisting in one flush.
      *
-     * Unknown, non-ignored sets become known and disabled.
-     * Ignored-known sets are enabled if they were previously disabled.
+     * Unknown, non-ignored sets become known and disabled. Ignored sets that
+     * are not known become known and enabled.
      * Only changed sets are written; when nothing is unknown no flush happens at all.
      * @param controller The set priority controller to persist the records with.
      */

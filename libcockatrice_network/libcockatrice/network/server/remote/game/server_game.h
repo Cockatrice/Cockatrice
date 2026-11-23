@@ -62,6 +62,7 @@ class Message;
 } // namespace protobuf
 } // namespace google
 struct GameConfig;
+struct GameRoleInfo;
 
 class Server_Game : public QObject
 {
@@ -73,6 +74,11 @@ private:
     int hostId;
     ServerInfo_User *creatorInfo;
     QMap<int, Server_AbstractParticipant *> participants;
+    // Seating/turn order as an ordered list of player ids. Player ids themselves
+    // are stable for the lifetime of the participant; shuffling or reordering
+    // only permutes this list so old clients, ISL routes and persistent
+    // references (all keyed by player id) keep working.
+    QList<int> seatOrder;
     QSet<QString> allPlayersEver, allSpectatorsEver;
     bool gameStarted;
     bool gameClosed;
@@ -89,6 +95,7 @@ private:
     bool spectatorsSeeEverything;
     int startingLifeTotal;
     bool shareDecklistsOnLoad;
+    bool shufflePlayers;
     int inactivityCounter;
     int startTimeOfThisGame, secondsElapsed;
     bool firstGameStarted;
@@ -104,11 +111,12 @@ private:
 
     QScopedPointer<Server_MatchResultStrategy> matchResultStrategy;
 
-    void createGameStateChangedEvent(Event_GameStateChanged *event,
-                                     Server_AbstractParticipant *recipient,
-                                     bool omniscient,
-                                     bool withUserInfo);
+    Event_GameStateChanged
+    createGameStateChangedEvent(Server_AbstractParticipant *recipient, bool omniscient, bool withUserInfo) const;
+    QList<Server_AbstractParticipant *> getParticipantsInSeatOrder() const;
+    void reseatPlayers(const QList<Server_AbstractParticipant *> &orderedParticipants, bool randomized);
     void storeGameInformation();
+    bool canSeePrivateEventsFor(const Server_AbstractParticipant *participant, int privatePlayerId) const;
 signals:
     void sigStartGameIfReady(bool override);
     void gameInfoChanged(ServerInfo_Game gameInfo);
@@ -146,6 +154,10 @@ public:
     const QMap<int, Server_AbstractParticipant *> &getParticipants() const
     {
         return participants;
+    }
+    QList<int> getSeatOrder() const
+    {
+        return seatOrder;
     }
     int getGameId() const
     {
@@ -187,13 +199,16 @@ public:
     {
         return shareDecklistsOnLoad;
     }
+    bool getShufflePlayers() const
+    {
+        return shufflePlayers;
+    }
     Response::ResponseCode
-    checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions, bool asJudge);
+    checkJoin(ServerInfo_User *user, const QString &_password, const GameRoleInfo &roleInfo, bool overrideRestrictions);
     bool containsUser(const QString &userName) const;
     void addPlayer(Server_AbstractUserInterface *userInterface,
                    ResponseContainer &rc,
-                   bool spectator,
-                   bool judge,
+                   const GameRoleInfo &roleInfo,
                    bool broadcastUpdate = true);
     void removeParticipant(Server_AbstractParticipant *participant, Event_Leave::LeaveReason reason);
     void removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_AbstractPlayer *player);
@@ -201,6 +216,8 @@ public:
     bool kickParticipant(int playerId);
     void startGameIfReady(bool forceStartGame);
     void stopGameIfFinished();
+    void shufflePlayerSeats();
+    void reorderPlayerSeats(const QList<QString> &orderedNames);
     int getActivePlayer() const
     {
         return activePlayer;
@@ -226,7 +243,7 @@ public:
     void createGameJoinedEvent(Server_AbstractParticipant *participant, ResponseContainer &rc, bool resuming);
 
     GameEventContainer *
-    prepareGameEvent(const ::google::protobuf::Message &gameEvent, int playerId, GameEventContext *context = 0);
+    prepareGameEvent(const ::google::protobuf::Message &gameEvent, int playerId, GameEventContext *context = nullptr);
     GameEventContext prepareGameEventContext(const ::google::protobuf::Message &gameEventContext);
 
     void sendGameStateToPlayers();

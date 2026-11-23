@@ -2,26 +2,29 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../card_picture_loader/card_picture_loader.h"
+#include "../../theme_icon.h"
+#include "../../theme_manager.h"
 #include "../cards/card_info_picture_widget.h"
-#include "../tabs/abstract_tab_deck_editor.h"
 #include "all_zones_card_amount_widget.h"
 #include "libcockatrice/card/card_info.h"
-#include "libcockatrice/card/database/card_database_querier.h"
 #include "libcockatrice/card/printing/printing_info.h"
 #include "libcockatrice/card/set/card_set.h"
+#include "printing_selector_host.h"
 
 #include <QAction>
 #include <QApplication>
-#include <QDebug>
+#include <QColor>
 #include <QFileDialog>
 #include <QGuiApplication>
 #include <QImage>
-#include <QImageReader>
 #include <QLabel>
 #include <QList>
 #include <QMenu>
 #include <QMessageBox>
 #include <QMouseEvent>
+#include <QPainter>
+#include <QPalette>
+#include <QPen>
 #include <QPixmap>
 #include <QPixmapCache>
 #include <QPoint>
@@ -36,14 +39,11 @@
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QtGlobal>
-#include <QtMath>
-#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/settings/card_override_settings.h>
+#include <libcockatrice/utility/card_ref.h>
 #include <libcockatrice/utility/qt_utils.h>
 #include <qnamespace.h>
-
-class DeckStateManager;
 
 namespace
 {
@@ -96,17 +96,15 @@ previewPositionNear(const QRect &actionRect, const QSize &labelSize, const QRect
  * as a widget that displays the card amounts in different zones (mainboard, sideboard, etc.).
  *
  * @param parent The parent widget for this overlay.
- * @param _deckEditor The TabDeckEditor instance for deck management.
- * @param deckStateManager The DeckStateManager instance providing deck data.
+ * @param _host The host supplying deck state and routing card activations.
  * @param cardSizeSlider The slider controlling the size of the card.
  * @param _rootCard The root card object that contains information about the card.
  */
 PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *parent,
-                                                                     AbstractTabDeckEditor *_deckEditor,
-                                                                     DeckStateManager *deckStateManager,
+                                                                     PrintingSelectorHost *_host,
                                                                      QSlider *cardSizeSlider,
                                                                      const ExactCard &_rootCard)
-    : QWidget(parent), deckEditor(_deckEditor), rootCard(_rootCard)
+    : QWidget(parent), host(_host), rootCard(_rootCard)
 {
     // Set up the main layout
     auto *mainLayout = QtUtils::makeLayout<QVBoxLayout>(this, 0);
@@ -119,7 +117,21 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     cardInfoPicture->setCard(_rootCard);
     mainLayout->addWidget(cardInfoPicture);
 
+    // A left click reports the printing; consumers that only want a pick connect to the signal.
+    connect(cardInfoPicture, &CardInfoPictureWidget::cardClicked, this,
+            [this](QMouseEvent *event, const ExactCard &card) {
+                if (event->button() == Qt::LeftButton) {
+                    emit printingSelected(card);
+                }
+            });
+
     initializePinBadge();
+    auto refreshPinBadge = [this] {
+        initializePinBadge();
+        updatePinBadgeVisibility();
+    };
+    connect(themeManager, &ThemeManager::paletteChanged, this, refreshPinBadge);
+    connect(themeManager, &ThemeManager::themeChanged, this, refreshPinBadge);
 
     // Parent the preview to this overlay so it is destroyed with it (Qt::ToolTip keeps
     // it a frameless, non-activating top-level window despite the parent).
@@ -153,10 +165,11 @@ PrintingSelectorCardOverlayWidget::PrintingSelectorCardOverlayWidget(QWidget *pa
     // initial state
     updatePinBadgeVisibility();
 
-    // Add AllZonesCardAmountWidget
-    allZonesCardAmountWidget = new AllZonesCardAmountWidget(this, deckStateManager, cardSizeSlider, _rootCard);
-
-    allZonesCardAmountWidget->raise(); // Ensure it's on top of the picture
+    // Amount controls are deck-only; a selection-only host has no deck to change.
+    if (DeckStateManager *deckStateManager = host->getDeckStateManager()) {
+        allZonesCardAmountWidget = new AllZonesCardAmountWidget(this, deckStateManager, cardSizeSlider, _rootCard);
+        allZonesCardAmountWidget->raise(); // Ensure it's on top of the picture
+    }
 
     connect(cardSizeSlider, &QSlider::valueChanged, cardInfoPicture, &CardInfoPictureWidget::setScaleFactor);
 }
@@ -206,7 +219,7 @@ void PrintingSelectorCardOverlayWidget::resizeEvent(QResizeEvent *event)
 void PrintingSelectorCardOverlayWidget::enterEvent(QEnterEvent *event)
 {
     QWidget::enterEvent(event);
-    deckEditor->updateCard(rootCard);
+    host->showCard(rootCard);
     updateVisibility();
 }
 
@@ -214,6 +227,9 @@ void PrintingSelectorCardOverlayWidget::updateCardAmounts(int mainboardAmount,
                                                           int sideboardAmount,
                                                           int tokensboardAmount)
 {
+    if (!allZonesCardAmountWidget) {
+        return;
+    }
     allZonesCardAmountWidget->setAmounts(mainboardAmount, sideboardAmount, tokensboardAmount);
     updateVisibility();
 }
@@ -223,6 +239,9 @@ void PrintingSelectorCardOverlayWidget::updateCardAmounts(int mainboardAmount,
  */
 void PrintingSelectorCardOverlayWidget::updateVisibility()
 {
+    if (!allZonesCardAmountWidget) {
+        return;
+    }
     if (allZonesCardAmountWidget->isNonZero() || underMouse()) {
         allZonesCardAmountWidget->setVisible(true);
     } else {
@@ -377,20 +396,20 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
 
     menu.addSeparator();
 
-    // filling out the related cards submenu
-    auto *relatedMenu = new QMenu(tr("Show Related cards"), &menu);
-    menu.addMenu(relatedMenu);
-    auto relatedCards = rootCard.getInfo().getAllRelatedCards();
-    if (relatedCards.isEmpty()) {
-        relatedMenu->setDisabled(true);
-    } else {
-        for (const CardRelation *rel : relatedCards) {
-            const QString &relatedCardName = rel->getName();
-            QAction *relatedCard = relatedMenu->addAction(relatedCardName);
-            connect(relatedCard, &QAction::triggered, deckEditor, [this, relatedCardName] {
-                deckEditor->updateCard(CardDatabaseManager::query()->getCard({relatedCardName}));
-                deckEditor->showPrintingSelector();
-            });
+    // Related cards open in the deck editor, which a selection-only host does not have.
+    if (!host->isSelectionOnly()) {
+        auto *relatedMenu = new QMenu(tr("Show Related cards"), &menu);
+        menu.addMenu(relatedMenu);
+        auto relatedCards = rootCard.getInfo().getAllRelatedCards();
+        if (relatedCards.isEmpty()) {
+            relatedMenu->setDisabled(true);
+        } else {
+            for (const CardRelation &rel : relatedCards) {
+                const QString &relatedCardName = rel.name;
+                QAction *relatedCard = relatedMenu->addAction(relatedCardName);
+                connect(relatedCard, &QAction::triggered, this,
+                        [this, relatedCardName] { host->showRelatedCard(relatedCardName); });
+            }
         }
     }
     // The preview anchors itself to this popup's global geometry while it is open, so the
@@ -401,10 +420,56 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
 }
 
 /**
- * @brief Initializes the pin badge overlay and loads its icon with DPI-aware rasterization.
+ * @brief Composes the pin badge: the glyph over a rounded palette backdrop.
  *
- * The icon is rasterized once using the label's device pixel ratio so it stays crisp on HiDPI
- * displays. The resulting pixmap is cached on the QLabel and simply shown/hidden when needed.
+ * The badge floats on card art rather than on a palette surface, so a bare glyph
+ * colored WindowText is not enough: a thin dark stroke disappears on dark art in a
+ * light palette, and a thin light stroke disappears on light art in a dark palette.
+ * A Window-filled rounded rect with a WindowText outline gives the glyph a solid
+ * backing, and the outline guarantees the badge edge contrasts with the art even when
+ * the fill matches it. Both roles follow the palette, like the glyph.
+ *
+ * @param logicalSize The badge's size in logical pixels.
+ * @param devicePixelRatio The label's device pixel ratio, applied to the pixmap so it
+ *                         stays crisp on HiDPI displays.
+ * @param palette The palette the glyph's WindowText resolves against.
+ */
+static QPixmap composePinBadgePixmap(const QSize &logicalSize, qreal devicePixelRatio, const QPalette &palette)
+{
+    // Inset the glyph so the backdrop reads as a badge around it, not as a border.
+    const int inset = qRound(logicalSize.width() * 0.16);
+    const QSize glyphSize = logicalSize - QSize(inset * 2, inset * 2);
+    const QPixmap glyph =
+        loadThemedIcon(QStringLiteral("icons/pin"), AppColor::Marked).pixmap(glyphSize, devicePixelRatio);
+    if (glyph.isNull()) {
+        // Let the caller fall back to the textual badge instead of drawing an empty panel.
+        return QPixmap();
+    }
+
+    QPixmap badge(logicalSize * devicePixelRatio);
+    badge.setDevicePixelRatio(devicePixelRatio);
+    badge.fill(Qt::transparent);
+
+    QPainter painter(&badge);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    // Half-pixel inset keeps the 1.5px outline inside the pixmap instead of clipping it.
+    const QRectF box(QPointF(0.5, 0.5), QSizeF(logicalSize) - QSizeF(1, 1));
+    painter.setPen(QPen(palette.color(QPalette::WindowText), 1.5));
+    painter.setBrush(palette.color(QPalette::Window));
+    painter.drawRoundedRect(box, 8, 8);
+    painter.drawPixmap(QPointF(inset, inset), glyph);
+
+    return badge;
+}
+
+/**
+ * @brief Initializes the pin badge overlay and loads a DPI-aware icon pixmap.
+ *
+ * The glyph is drawn onto a rounded palette backdrop so the badge stays readable on
+ * card art, and it is rasterized at the label's device pixel ratio so it stays crisp on
+ * HiDPI displays. It is re-rendered when the palette or theme changes so the badge
+ * follows the surrounding UI instead of freezing at its first colors.
  * If the SVG cannot be read, a textual fallback badge is created instead.
  */
 void PrintingSelectorCardOverlayWidget::initializePinBadge()
@@ -420,24 +485,13 @@ void PrintingSelectorCardOverlayWidget::initializePinBadge()
     }
 
     bool pinLoaded = false;
-    QImageReader pinReader(QStringLiteral("theme:icons/pin"));
-
-    if (pinReader.canRead()) {
-        // Rasterize a 64×64 logical icon so it has a consistent size regardless of card scaling.
-        const QSize targetSize(64, 64);
-        const qreal dpr = pinBadge->devicePixelRatioF();
-        const QSize rasterSize(qMax(1, qCeil(targetSize.width() * dpr)), qMax(1, qCeil(targetSize.height() * dpr)));
-        pinReader.setScaledSize(rasterSize);
-        const QImage pinImage = pinReader.read();
-        if (!pinImage.isNull()) {
-            // Tag the pixmap with the same DPR so Qt renders it at the correct physical size.
-            QPixmap pinPix = QPixmap::fromImage(pinImage);
-            pinPix.setDevicePixelRatio(dpr);
-            pinBadge->setPixmap(pinPix);
-            pinBadge->setFixedSize(targetSize);
-            pinBadge->setStyleSheet(QStringLiteral("background: transparent;"));
-            pinLoaded = true;
-        }
+    const QSize targetSize(64, 64);
+    const QPixmap pinPix = composePinBadgePixmap(targetSize, pinBadge->devicePixelRatioF(), pinBadge->palette());
+    if (!pinPix.isNull()) {
+        pinBadge->setPixmap(pinPix);
+        pinBadge->setFixedSize(targetSize);
+        pinBadge->setStyleSheet(QStringLiteral("background: transparent;"));
+        pinLoaded = true;
     }
 
     if (!pinLoaded) {

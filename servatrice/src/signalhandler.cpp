@@ -73,6 +73,8 @@ void SignalHandler::internalSigHupHandler()
     logger->rotateLogs();
 
     settingsCache->sync();
+    logger->reloadConfig(settingsCache->value("server/writelog", 1).toBool(),
+                         settingsCache->value("server/logfilters").toString());
 
     snHup->setEnabled(true);
 }

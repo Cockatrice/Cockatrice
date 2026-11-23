@@ -5,6 +5,7 @@
 
 #include <QCheckBox>
 #include <QLabel>
+#include <QPointer>
 #include <QPushButton>
 #include <QString>
 #include <qtmetamacros.h>
@@ -15,6 +16,7 @@ class QLineEdit;
 class QListWidget;
 class QListWidgetItem;
 class QModelIndex;
+class SpoilerBackgroundUpdater;
 
 class DeckEditorSettingsPage : public AbstractSettingsPage
 {
@@ -54,6 +56,7 @@ private:
     QLabel infoOnSpoilersLabel;
     QPushButton *mpSpoilerPathButton;
     QPushButton *updateNowButton;
+    QPointer<SpoilerBackgroundUpdater> spoilerUpdater;
 
     /** @brief Adds a list item for the given URL, storing the raw URL alongside its displayed label. */
     QListWidgetItem *addUrlItem(const QString &url);
@@ -66,6 +69,8 @@ private:
 
     /** @brief Refreshes the displayed label of every URL item after limits or settings change. */
     void refreshUrlItems();
+
+    void observeSpoilerUpdater(SpoilerBackgroundUpdater *updater);
 };
 
 #endif // COCKATRICE_DECK_EDITOR_SETTINGS_PAGE_H

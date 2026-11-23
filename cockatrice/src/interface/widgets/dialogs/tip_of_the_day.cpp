@@ -33,7 +33,8 @@ TipsOfTheDay::TipsOfTheDay(QString xmlPath, QObject *parent) : QAbstractListMode
     if (!QFile::exists(xmlPath)) {
         errorStream << tr("File does not exist.\n");
         return;
-    } else if (!xmlFile.open(QIODevice::ReadOnly)) {
+    }
+    if (!xmlFile.open(QIODevice::ReadOnly)) {
         errorStream << tr("Failed to open file.\n");
         return;
     }

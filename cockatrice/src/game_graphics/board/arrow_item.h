@@ -1,7 +1,6 @@
 #ifndef ARROWITEM_H
 #define ARROWITEM_H
 
-#include "../../game/board/arrow_data.h"
 #include "../animated_item.h"
 #include "arrow_target.h"
 #include "graphics_item_type.h"
@@ -18,6 +17,7 @@
 #include <QRectF>
 #include <QSharedPointer>
 #include <QtGlobal>
+#include <libcockatrice/game/board/arrow_data.h>
 #include <qtmetamacros.h>
 
 class CardItem;
@@ -70,6 +70,8 @@ public:
 
     void onTargetDestroyed();
     void delArrow();
+    /// Abandons an in-progress drag arrow, discarding any child arrows with it.
+    virtual void cancel();
     void updatePath();
     void updatePath(const QPointF &endPoint);
     void startDrawAnimation();
@@ -112,12 +114,13 @@ class ArrowDragItem : public ArrowItem
 private:
     PlayerLogic *player;
     int deleteInPhase;
-    QList<ArrowDragItem *> childArrows;
+    QList<QPointer<ArrowDragItem>> childArrows;
     QMetaObject::Connection positionConnection;
 
 public:
     ArrowDragItem(PlayerLogic *_owner, ArrowTarget *_startItem, const QColor &_color, int _deleteInPhase);
     void addChildArrow(ArrowDragItem *child);
+    void cancel() override;
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
@@ -129,13 +132,13 @@ class ArrowAttachItem : public ArrowItem
     Q_OBJECT
 private:
     PlayerLogic *player;
-    QList<ArrowAttachItem *> childArrows;
+    QList<QPointer<ArrowAttachItem>> childArrows;
     QMetaObject::Connection positionConnection;
-    void attachCards(CardItem *startCard, const CardItem *targetCard);
 
 public:
     explicit ArrowAttachItem(ArrowTarget *_startItem);
     void addChildArrow(ArrowAttachItem *child);
+    void cancel() override;
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;

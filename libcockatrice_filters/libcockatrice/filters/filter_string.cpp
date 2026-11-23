@@ -24,6 +24,7 @@
 #include <ctype.h>
 #include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/card/game_specific_terms.h>
 #include <libcockatrice/utility/peglib.h>
 #include <mutex>
 #include <qnamespace.h>
@@ -41,7 +42,7 @@ ComplexQueryPart <- SomewhatComplexQueryPart ws "OR" ws ComplexQueryPart / Somew
 
 SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 
-QueryPart <- NotQuery / SetQuery / RarityQuery / CMCQuery / FormatQuery / PowerQuery / ToughnessQuery / ColorQuery / TypeQuery / OracleQuery / FieldQuery / GenericQuery
+QueryPart <- NotQuery / SetQuery / RarityQuery / CMCQuery / FormatQuery / PowerQuery / ToughnessQuery / ColorQuery / TagQuery / TypeQuery / OracleQuery / FieldQuery / GenericQuery
 
 NotQuery <- ('NOT' ws/'-') SomewhatComplexQueryPart
 SetQuery <- ('e'/'set') ws? SetQueryValue
@@ -62,6 +63,8 @@ Legality <- [Ll] 'egal'? / [Bb] 'anned'? / [Rr] 'estricted'
 
 
 TypeQuery <- [tT] 'ype'? ws? [:] ws? StringValue
+
+TagQuery <- [tT]('ags'/'ag') [:] String
 
 Color <- < [Ww] 'hite'? / [Uu] / [Bb] 'lack'? / [Rr] 'ed'? / [Gg] 'reen'?  / [Bb] 'lue'? >
 ColorEx <- Color / [mc]
@@ -157,6 +160,19 @@ static void setupParserRules()
     search["TypeQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto matcher = std::any_cast<StringMatcher>(sv[0]);
         return [=](const CardData &x) -> bool { return matcher(x->getCardType()); };
+    };
+    search["TagQuery"] = [](const peg::SemanticValues &sv) -> Filter {
+        // Tags are stored space-separated, so matching whole tokens keeps
+        // `tags:ram` from matching `ramp`. Combine tags with AND:
+        // `tags:draw tags:ramp`.
+        const auto tag = std::any_cast<QString>(sv[0]).trimmed();
+        return [=](const CardData &x) -> bool {
+            const QString stored = x->getProperty(Mtg::Tags);
+            if (stored.isEmpty() || tag.isEmpty()) {
+                return false;
+            }
+            return stored.split(" ", Qt::SkipEmptyParts).contains(tag, Qt::CaseInsensitive);
+        };
     };
     search["SetQueryValue"] = [](const peg::SemanticValues &sv) -> Filter {
         if (sv.choice() == 0) {
@@ -409,7 +425,7 @@ static void setupParserRules()
         const bool identity = sv.tokens[0].empty() || sv.tokens[0][0] != 'i';
         if (sv.tokens[1][0] == ':') {
             return [=](const CardData &x) {
-                const QString match = identity ? x->getColors() : x->getProperty("coloridentity");
+                const QString match = identity ? x->getColors() : x->getColorIdentity();
                 if (parts.contains("m") && match.length() < 2) {
                     return false;
                 }
@@ -427,7 +443,7 @@ static void setupParserRules()
         }
 
         return [=](const CardData &x) {
-            const QString match = identity ? x->getColors() : x->getProperty("colorIdentity");
+            const QString match = identity ? x->getColors() : x->getColorIdentity();
             if (parts.contains("m") && match.length() < 2) {
                 return false;
             }
@@ -506,6 +522,14 @@ FilterString::FilterString()
     _error = "Not initialized";
 }
 
+QString FilterString::error() const
+{
+    if (_errorColumn == 0) {
+        return _error;
+    }
+    return tr("Error at position %1: %2").arg(_errorColumn).arg(_error);
+}
+
 FilterString::FilterString(const QString &expr, const CardSearchLanguage &searchLanguage)
 {
     QByteArray ba = expr.simplified().toUtf8();
@@ -522,7 +546,8 @@ FilterString::FilterString(const QString &expr, const CardSearchLanguage &search
     searchLanguageContext = searchLanguage;
 
     search.set_logger([&](size_t /*ln*/, size_t col, const std::string &msg) {
-        _error = QString("Error at position %1: %2").arg(col).arg(QString::fromStdString(msg));
+        _error = QString::fromStdString(msg);
+        _errorColumn = col;
     });
 
     if (!search.parse(ba.data(), result)) {

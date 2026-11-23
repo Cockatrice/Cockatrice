@@ -1,11 +1,17 @@
+#include "../../oracle/src/database_writer.h"
 #include "../../oracle/src/oracleimporter.h"
+#include "../../oracle/src/parsehelpers.h"
 #include "../../oracle/src/raw_json_scanner.h"
+#include "../../oracle/src/tag_database.h"
+#include "../support/scoped_file_size_limit.h"
 #include "libcockatrice/card/card_info.h"
 
 #include "gtest/gtest.h"
 #include <QByteArray>
 #include <QChar>
 #include <QDate>
+#include <QFile>
+#include <QIODevice>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -20,10 +26,13 @@
 #include <QRegularExpressionMatch>
 #include <QSharedPointer>
 #include <QString>
+#include <QTemporaryDir>
 #include <QUuid>
 #include <QVariant>
 #include <QVariantMap>
 #include <QtGlobal>
+#include <libcockatrice/card/database/card_database_data.h>
+#include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
 #include <libcockatrice/card/format/format_legality_rules.h>
 #include <libcockatrice/card/set/card_set.h>
 #include <libcockatrice/interfaces/noop_card_set_priority_controller.h>
@@ -318,6 +327,162 @@ TEST_F(OracleImporterTest, CreateDefaultMagicFormatsCaching)
     ASSERT_EQ(first.value("standard").data(), second.value("standard").data());
 }
 
+TEST(DeckCopyLimitParser, ReadsNamedAllowancesWithoutACardNameList)
+{
+    EXPECT_EQ(parseDeckCopyLimit("Seven Dwarves", "A deck can have up to seven cards named Seven Dwarves."), 7);
+    EXPECT_EQ(parseDeckCopyLimit("Nazgûl",
+                                 "Deathtouch\nA deck can have up to nine cards named Nazgûl.\nThe Ring tempts you."),
+              9);
+    EXPECT_EQ(parseDeckCopyLimit("Future Card", "A deck can have up to 17 cards named Future Card."), 17);
+    EXPECT_EQ(parseDeckCopyLimit("Future Card", "A deck can have up to twenty-three cards named Future Card."), 23);
+    EXPECT_EQ(parseDeckCopyLimit("Future Card", "A deck can have up to ninety nine cards named Future Card."), 99);
+    EXPECT_EQ(parseDeckCopyLimit("AEther's Ally", "A deck can have up to six cards named Æther’s Ally."), 6);
+}
+
+TEST(DeckCopyLimitParser, RejectsUnknownMalformedAndOtherCardRules)
+{
+    const QString name = "Example";
+    for (const QString &text :
+         {QString(), QString("A deck can have any number of cards named Example."),
+          QString("A deck can have up to seven cards named Other Card."),
+          QString("A deck can have up to seven cards named Example"),
+          QString("A deck can have up to many cards named Example."),
+          QString("A deck can have up to zero cards named Example."),
+          QString("A deck can have up to 0 cards named Example."),
+          QString("A deck can have up to -7 cards named Example."),
+          QString("A deck can have up to 99999999999999999999 cards named Example."),
+          QString("A deck can have up to twenty zero cards named Example."),
+          QString("If you control a Dragon, A deck can have up to seven cards named Example."),
+          QString(
+              "A deck can have up to seven cards named Example.\nA deck can have up to nine cards named Example.")}) {
+        EXPECT_FALSE(parseDeckCopyLimit(name, text).has_value()) << text.toStdString();
+    }
+}
+
+TEST_F(OracleImporterTest, CreateDefaultMagicFormatsDerivesFiniteLimitsFromCanonicalText)
+{
+    QVariantMap legalities;
+    const auto defaults = importer->createDefaultMagicFormats();
+    for (auto it = defaults.cbegin(); it != defaults.cend(); ++it) {
+        legalities.insert(it.key(), "Legal");
+    }
+    auto dwarves = makeCard("Seven Dwarves", "", "", legalities);
+    dwarves["text"] = "Seven Dwarves gets +1/+1 for each other creature named Seven Dwarves you control.\n"
+                      "A deck can have up to seven cards named Seven Dwarves.";
+    auto nazgul = makeCard("Nazgûl", "", "", legalities);
+    nazgul["text"] = "Deathtouch\nA deck can have up to nine cards named Nazgûl.";
+    auto unknown = makeCard("Unknown Card");
+    unknown["text"] = "A deck can have up to many cards named Unknown Card.";
+    auto otherCard = makeCard("Other Card");
+    otherCard["text"] = "A deck can have up to seven cards named Seven Dwarves.";
+    importer->importCardsFromSet(set, QJsonArray{dwarves, nazgul, unknown, otherCard, makeCard("Ordinary Card")});
+
+    const auto &formats = importer->createDefaultMagicFormats();
+    for (const auto &format : formats) {
+        ASSERT_EQ(format->exceptions.size(), 4);
+        EXPECT_EQ(format->exceptions[0].maxCopies, -1);
+        EXPECT_EQ(format->exceptions[1].maxCopies, -1);
+        for (const auto &expected : {qMakePair(QString("Seven Dwarves"), 7), qMakePair(QString("Nazgûl"), 9)}) {
+            bool found = false;
+            for (const auto &rule : format->exceptions) {
+                if (rule.maxCopies == expected.second) {
+                    ASSERT_EQ(rule.conditions.size(), 2);
+                    EXPECT_EQ(rule.conditions.last().field, "format-" + format->formatName.toLower());
+                    EXPECT_EQ(rule.conditions.last().matchType, "equals");
+                    EXPECT_EQ(rule.conditions.last().value, "legal");
+                    EXPECT_EQ(rule.conditions.first().field, "name");
+                    EXPECT_EQ(rule.conditions.first().matchType, "equals");
+                    EXPECT_EQ(rule.conditions.first().value, expected.first);
+                    EXPECT_TRUE(exceptionAppliesToCard(*importer->getCardList().value(expected.first), rule));
+                    EXPECT_FALSE(exceptionAppliesToCard(*importer->getCardList().value("Other Card"), rule));
+                    found = true;
+                }
+            }
+            EXPECT_TRUE(found);
+        }
+    }
+}
+
+TEST_F(OracleImporterTest, FiniteCopyAllowancesDoNotOverrideFormatEligibility)
+{
+    const QVariantMap legalities{
+        {"standard", "Legal"}, {"modern", "Banned"}, {"vintage", "Restricted"}, {"commander", "Not_Legal"}};
+    auto dwarves = makeCard("Seven Dwarves", "", "", legalities);
+    dwarves["text"] = "A deck can have up to seven cards named Seven Dwarves.";
+    importer->importCardsFromSet(set, QJsonArray{dwarves});
+    const auto &formats = importer->createDefaultMagicFormats();
+    const auto card = importer->getCardList().value("Seven Dwarves");
+    ASSERT_TRUE(card);
+    EXPECT_EQ(cardCopyLimitException(*card, *formats.value("standard")), 7);
+    for (const auto &format : {"modern", "vintage", "commander", "legacy"}) {
+        EXPECT_FALSE(cardCopyLimitException(*card, *formats.value(format)).has_value()) << format;
+    }
+}
+
+TEST_F(OracleImporterTest, DerivedFormatCacheRefreshesWithoutChangingSharedDefaults)
+{
+    OracleImporter otherImporter;
+    const auto defaults = otherImporter.createDefaultMagicFormats();
+    EXPECT_EQ(importer->createDefaultMagicFormats().value("standard"), defaults.value("standard"));
+
+    auto dwarves = makeCard("Seven Dwarves");
+    dwarves["text"] = "A deck can have up to seven cards named Seven Dwarves.";
+    importer->importCardsFromSet(set, QJsonArray{dwarves});
+    const auto first = importer->createDefaultMagicFormats();
+    EXPECT_NE(first.value("standard"), defaults.value("standard"));
+    EXPECT_EQ(first.value("standard"), importer->createDefaultMagicFormats().value("standard"));
+    ASSERT_EQ(first.value("standard")->exceptions.size(), 3);
+
+    auto nazgul = makeCard("Nazgûl");
+    nazgul["text"] = "A deck can have up to nine cards named Nazgûl.";
+    importer->importCardsFromSet(set, QJsonArray{nazgul});
+    const auto second = importer->createDefaultMagicFormats();
+    EXPECT_EQ(second.value("standard")->exceptions.size(), 4);
+    EXPECT_EQ(first.value("standard")->exceptions.size(), 3);
+    EXPECT_EQ(defaults.value("standard")->exceptions.size(), 2);
+    EXPECT_EQ(otherImporter.createDefaultMagicFormats().value("standard"), defaults.value("standard"));
+
+    importer->clear();
+    EXPECT_EQ(importer->createDefaultMagicFormats().value("standard"), defaults.value("standard"));
+}
+
+TEST_F(OracleImporterTest, FiniteCopyRulesSurviveImportSaveAndXmlReload)
+{
+    const QVariantMap legalities{{"commander", "Legal"}, {"modern", "Not_Legal"}};
+    auto dwarves = makeCard("Seven Dwarves", "", "", legalities);
+    dwarves["text"] = "A deck can have up to seven cards named Seven Dwarves.";
+    auto nazgul = makeCard("Nazgûl", "", "", legalities);
+    nazgul["text"] = "A deck can have up to nine cards named Nazgûl.";
+    const QJsonObject setData{{"code", "TST"},
+                              {"name", "Test Set"},
+                              {"type", "expansion"},
+                              {"releaseDate", "2024-01-01"},
+                              {"cards", QJsonArray{dwarves, nazgul}}};
+    const QJsonObject source{{"data", QJsonObject{{"TST", setData}}}};
+    ASSERT_TRUE(importer->readSetsFromByteArray(QJsonDocument(source).toJson()));
+    ASSERT_EQ(importer->startImport(), 1);
+
+    QTemporaryDir directory;
+    ASSERT_TRUE(directory.isValid());
+    const QString filename = directory.filePath("cards.xml");
+    ASSERT_TRUE(importer->saveToFile(filename, "fixture", "1"));
+    QFile file(filename);
+    ASSERT_TRUE(file.open(QIODevice::ReadOnly));
+    CardDatabaseData restored;
+    CockatriceXml4Parser parser(controller);
+    parser.parseFileInto(file, restored);
+    const auto commander = restored.formats.value("commander");
+    const auto modern = restored.formats.value("modern");
+    ASSERT_TRUE(commander);
+    ASSERT_TRUE(modern);
+    for (const auto &expected : {qMakePair(QString("Seven Dwarves"), 7), qMakePair(QString("Nazgûl"), 9)}) {
+        const auto card = restored.cards.value(expected.first);
+        ASSERT_TRUE(card);
+        EXPECT_EQ(cardCopyLimitException(*card, *commander), expected.second);
+        EXPECT_FALSE(cardCopyLimitException(*card, *modern).has_value());
+    }
+}
+
 // ============================================================================
 // readSetsFromByteArray tests
 // ============================================================================
@@ -540,6 +705,158 @@ TEST_F(OracleImporterTest, LegacyConvertedManaCostCoercedToCmc)
     auto result = importer->getCardList().value("Legacy Cmc Card");
     ASSERT_FALSE(result.isNull());
     ASSERT_EQ(result->getProperty("cmc"), "3");
+}
+
+// ============================================================================
+// Scryfall Tagger tag tests
+// ============================================================================
+
+TEST_F(OracleImporterTest, ImportsScryfallTags)
+{
+    QJsonObject card = makeCard("Ramp Card");
+    card["tags"] = QJsonArray{"ramp", "removal"};
+    QJsonArray cards{card};
+
+    importer->importCardsFromSet(set, cards);
+    auto result = importer->getCardList().value("Ramp Card");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getProperty("tags"), "ramp removal");
+}
+
+TEST_F(OracleImporterTest, TagsAreNormalizedDedupedAndSorted)
+{
+    QJsonObject card = makeCard("Messy Tags");
+    card["tags"] = QJsonArray{"Ramp", " removal ", "ramp", ""};
+    QJsonArray cards{card};
+
+    importer->importCardsFromSet(set, cards);
+    auto result = importer->getCardList().value("Messy Tags");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getProperty("tags"), "ramp removal");
+}
+
+TEST_F(OracleImporterTest, CardsWithoutTagsHaveNoTagsProperty)
+{
+    QJsonArray cards{makeCard("Untagged Card")};
+    importer->importCardsFromSet(set, cards);
+
+    auto result = importer->getCardList().value("Untagged Card");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_FALSE(result->hasProperty("tags"));
+}
+
+TEST_F(OracleImporterTest, SplitCardTagsAreUnioned)
+{
+    QJsonObject face1 = makeCard("Fire // Ice");
+    face1["layout"] = "split";
+    face1["side"] = "a";
+    face1["faceName"] = "Fire";
+    face1["tags"] = QJsonArray{"removal"};
+    QJsonObject face2 = makeCard("Fire // Ice");
+    face2["layout"] = "split";
+    face2["side"] = "b";
+    face2["faceName"] = "Ice";
+    face2["tags"] = QJsonArray{"card-advantage", "removal"};
+    QJsonArray cards{face1, face2};
+
+    importer->importCardsFromSet(set, cards);
+    auto result = importer->getCardList().value("Fire // Ice");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getProperty("tags"), "card-advantage removal");
+}
+
+// ============================================================================
+// Tag database join tests
+// ============================================================================
+
+TEST_F(OracleImporterTest, AppliesTagDatabaseByOracleId)
+{
+    QJsonObject card = makeCard("Tagged By Id");
+    QJsonObject identifiers = card["identifiers"].toObject();
+    identifiers["scryfallOracleId"] = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+    card["identifiers"] = identifiers;
+
+    QString error;
+    const auto database = TagDatabase::loadFromData(
+        R"json({"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa": ["removal", "ramp"]})json", TagDatabase::LoadOptions{}, &error);
+    ASSERT_TRUE(database) << error.toStdString();
+    importer->setTagDatabase(database);
+
+    importer->importCardsFromSet(set, QJsonArray{card});
+
+    auto result = importer->getCardList().value("Tagged By Id");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getProperty("tags"), "ramp removal");
+}
+
+TEST_F(OracleImporterTest, AppliesTagDatabaseByNameWhenOracleIdIsMissing)
+{
+    QJsonObject card = makeCard("Lightning Bolt");
+
+    QString error;
+    const auto database = TagDatabase::loadFromData(R"json({"Lightning Bolt": ["burn", "removal"]})json",
+                                                    TagDatabase::LoadOptions{}, &error);
+    ASSERT_TRUE(database) << error.toStdString();
+    importer->setTagDatabase(database);
+
+    importer->importCardsFromSet(set, QJsonArray{card});
+
+    auto result = importer->getCardList().value("Lightning Bolt");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getProperty("tags"), "burn removal");
+}
+
+TEST_F(OracleImporterTest, TagDatabaseUnionsWithSourceTags)
+{
+    QJsonObject card = makeCard("Union Card");
+    QJsonObject identifiers = card["identifiers"].toObject();
+    identifiers["scryfallOracleId"] = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+    card["identifiers"] = identifiers;
+    card["tags"] = QJsonArray{"ramp"};
+
+    QString error;
+    const auto database = TagDatabase::loadFromData(
+        R"json({"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa": ["removal", "ramp"]})json", TagDatabase::LoadOptions{}, &error);
+    ASSERT_TRUE(database) << error.toStdString();
+    importer->setTagDatabase(database);
+
+    importer->importCardsFromSet(set, QJsonArray{card});
+
+    auto result = importer->getCardList().value("Union Card");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getProperty("tags"), "ramp removal");
+}
+
+TEST_F(OracleImporterTest, TagDatabaseSplitFacesUnionTheirTags)
+{
+    QJsonObject face1 = makeCard("Fire // Ice");
+    face1["layout"] = "split";
+    face1["side"] = "a";
+    face1["faceName"] = "Fire";
+    QJsonObject identifiers1 = face1["identifiers"].toObject();
+    identifiers1["scryfallOracleId"] = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+    face1["identifiers"] = identifiers1;
+
+    QJsonObject face2 = makeCard("Fire // Ice");
+    face2["layout"] = "split";
+    face2["side"] = "b";
+    face2["faceName"] = "Ice";
+    QJsonObject identifiers2 = face2["identifiers"].toObject();
+    identifiers2["scryfallOracleId"] = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
+    face2["identifiers"] = identifiers2;
+
+    QString error;
+    const auto database = TagDatabase::loadFromData(
+        R"json({"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa": ["removal"], "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb": ["card-advantage"]})json",
+        TagDatabase::LoadOptions{}, &error);
+    ASSERT_TRUE(database) << error.toStdString();
+    importer->setTagDatabase(database);
+
+    importer->importCardsFromSet(set, QJsonArray{face1, face2});
+
+    auto result = importer->getCardList().value("Fire // Ice");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getProperty("tags"), "card-advantage removal");
 }
 
 // ============================================================================
@@ -1139,6 +1456,208 @@ TEST_F(OracleImporterTest, StartImportAppliesLocalizedData)
     ASSERT_EQ(result->getLocalizedName("pt"), "Raio");
     ASSERT_EQ(result->getLocalizedText("pt"), "Raio causa 3 de dano a qualquer alvo.");
 }
+
+namespace
+{
+QByteArray refreshSource(const QString &name = "New Card")
+{
+    QJsonObject card{{"name", name},       {"text", "Rules text."}, {"layout", "normal"},
+                     {"type", "Artifact"}, {"number", "1"},         {"rarity", "common"}};
+    QJsonObject set{{"code", "TST"}, {"name", "Test Set"}, {"type", "expansion"}, {"cards", QJsonArray{card}}};
+    return QJsonDocument(QJsonObject{{"data", QJsonObject{{"TST", set}}}}).toJson(QJsonDocument::Compact);
+}
+} // namespace
+
+TEST_F(OracleImporterTest, FailedLazyParseKeepsInstalledDatabase)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString path = dir.filePath("cards.xml");
+    QFile original(path);
+    ASSERT_TRUE(original.open(QIODevice::WriteOnly));
+    ASSERT_EQ(original.write("existing database"), 17);
+    original.close();
+
+    // The metadata scanner skips numeric values without converting them. Qt's
+    // per-set parser rejects an overflowing number after selection succeeds.
+    auto badSet = QJsonDocument::fromJson(refreshSource()).object().value("data").toObject().value("TST").toObject();
+    auto goodSet = badSet;
+    goodSet["code"] = "AAA";
+    goodSet["name"] = "A successful first set";
+    auto badCard = badSet.value("cards").toArray().first().toObject();
+    badCard["number"] = "overflow";
+    badSet["cards"] = QJsonArray{badCard};
+    QByteArray data = QJsonDocument(QJsonObject{{"data", QJsonObject{{"AAA", goodSet}, {"TST", badSet}}}})
+                          .toJson(QJsonDocument::Compact);
+    data.replace("\"number\":\"overflow\"", "\"number\":1e9999");
+    ASSERT_TRUE(importer->readSetsFromByteArray(data));
+    EXPECT_EQ(importer->startImport(), 0);
+    EXPECT_FALSE(importer->hasSuccessfulImport());
+    EXPECT_TRUE(importer->getImportError().contains("TST"));
+    EXPECT_TRUE(importer->getCardList().isEmpty());
+    EXPECT_FALSE(importer->saveToFile(path, {}, {}));
+    ASSERT_TRUE(original.open(QIODevice::ReadOnly));
+    EXPECT_EQ(original.readAll(), "existing database");
+}
+
+TEST_F(OracleImporterTest, EmptyImportCannotReplaceInstalledCards)
+{
+    const QByteArray source = R"({"data":{"TST":{"code":"TST","name":"Test","type":"expansion","cards":[]}}})";
+    ASSERT_TRUE(importer->readSetsFromByteArray(source));
+    EXPECT_EQ(importer->startImport(), 0);
+    EXPECT_FALSE(importer->hasSuccessfulImport());
+    EXPECT_FALSE(importer->getImportError().isEmpty());
+}
+
+TEST_F(OracleImporterTest, MissingSourceBytesCannotProduceSuccessfulImport)
+{
+    ASSERT_TRUE(importer->readSetsFromByteArray(refreshSource()));
+    const auto selected = importer->getSets();
+    importer->releaseSetData();
+    importer->getSets() = selected;
+    EXPECT_EQ(importer->startImport(), 0);
+    EXPECT_FALSE(importer->hasSuccessfulImport());
+    EXPECT_TRUE(importer->getImportError().contains("TST"));
+}
+
+TEST_F(OracleImporterTest, CancellationDuringFinalSetCannotSavePartialDatabase)
+{
+    ASSERT_TRUE(importer->readSetsFromByteArray(refreshSource()));
+    QObject::connect(
+        importer, &OracleImporter::setIndexChanged, importer,
+        [this](int, int, const QString &name) {
+            if (!name.isEmpty()) {
+                importer->cancelImport();
+            }
+        },
+        Qt::DirectConnection);
+    EXPECT_EQ(importer->startImport(), 0);
+    EXPECT_FALSE(importer->hasSuccessfulImport());
+    EXPECT_TRUE(importer->getCardList().isEmpty());
+}
+
+TEST_F(OracleImporterTest, CancellationBeforeWorkerStartsIsNotLost)
+{
+    ASSERT_TRUE(importer->readSetsFromByteArray(refreshSource()));
+    importer->prepareImport();
+    importer->cancelImport();
+    EXPECT_EQ(importer->startImport(), 0);
+    EXPECT_FALSE(importer->hasSuccessfulImport());
+    importer->prepareImport();
+    EXPECT_EQ(importer->startImport(), 1);
+    EXPECT_TRUE(importer->hasSuccessfulImport());
+}
+
+TEST_F(OracleImporterTest, NewImportReplacesPreviousInMemoryCards)
+{
+    ASSERT_TRUE(importer->readSetsFromByteArray(refreshSource("Old Card")));
+    ASSERT_EQ(importer->startImport(), 1);
+    ASSERT_TRUE(importer->readSetsFromByteArray(refreshSource("New Card")));
+    EXPECT_FALSE(importer->hasSuccessfulImport());
+    ASSERT_EQ(importer->startImport(), 1);
+    EXPECT_EQ(importer->getCardList().size(), 1);
+    EXPECT_FALSE(importer->getCardList().contains("Old Card"));
+    EXPECT_TRUE(importer->getCardList().contains("New Card"));
+}
+
+TEST_F(OracleImporterTest, FailedSourceLoadCannotReusePreviousSuccessfulImport)
+{
+    ASSERT_TRUE(importer->readSetsFromByteArray(refreshSource()));
+    ASSERT_EQ(importer->startImport(), 1);
+    ASSERT_FALSE(importer->readSetsFromByteArray("invalid JSON"));
+    EXPECT_FALSE(importer->hasSuccessfulImport());
+    EXPECT_EQ(importer->startImport(), 0);
+}
+
+TEST_F(OracleImporterTest, SuccessfulRefreshCommitsCompleteXml)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString path = dir.filePath("cards.xml");
+    ASSERT_TRUE(importer->readSetsFromByteArray(refreshSource()));
+    ASSERT_EQ(importer->startImport(), 1);
+    importer->releaseSetData();
+    ASSERT_TRUE(importer->saveToFile(path, "test-source", "v1"));
+    QFile file(path);
+    ASSERT_TRUE(file.open(QIODevice::ReadOnly));
+    const QByteArray xml = file.readAll();
+    EXPECT_TRUE(xml.contains("New Card"));
+    EXPECT_TRUE(xml.contains("test-source"));
+    EXPECT_TRUE(xml.contains("</cockatrice_carddatabase>"));
+}
+
+TEST(OracleDatabaseWriter, AcceptsCompleteSupportedVersions)
+{
+    EXPECT_TRUE(OracleDatabase::validateXml(
+                    "<?xml version=\"1.0\"?><cockatrice_carddatabase version=\"3\"><cards/></cockatrice_carddatabase>")
+                    .isEmpty());
+    EXPECT_TRUE(OracleDatabase::validateXml("<cockatrice_carddatabase version=\"4\"><cards/></cockatrice_carddatabase>")
+                    .isEmpty());
+    EXPECT_FALSE(
+        OracleDatabase::validateXml("<cockatrice_carddatabase version=\"5\"><cards/></cockatrice_carddatabase>")
+            .isEmpty());
+}
+
+TEST(OracleDatabaseWriter, InvalidDownloadPreservesInstalledBytes)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString path = dir.filePath("tokens.xml");
+    QFile original(path);
+    ASSERT_TRUE(original.open(QIODevice::WriteOnly));
+    ASSERT_EQ(original.write("installed tokens"), 16);
+    original.close();
+    for (const QByteArray &payload : {QByteArray("<html>server error</html>"),
+                                      QByteArray("<cockatrice_carddatabase version=\"4\"><cards>"), QByteArray()}) {
+        QString error;
+        EXPECT_FALSE(OracleDatabase::saveXml(path, payload, &error));
+        EXPECT_FALSE(error.isEmpty());
+        ASSERT_TRUE(original.open(QIODevice::ReadOnly));
+        EXPECT_EQ(original.readAll(), "installed tokens");
+        original.close();
+    }
+}
+
+TEST(OracleDatabaseWriter, CompleteDownloadReplacesInstalledBytes)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString path = dir.filePath("cards.xml");
+    const QByteArray data("<cockatrice_carddatabase version=\"4\"><cards/></cockatrice_carddatabase>");
+    QString error = "previous failure";
+    ASSERT_TRUE(OracleDatabase::saveXml(path, data, &error));
+    EXPECT_TRUE(error.isEmpty());
+    QFile file(path);
+    ASSERT_TRUE(file.open(QIODevice::ReadOnly));
+    EXPECT_EQ(file.readAll(), data);
+}
+
+#ifdef Q_OS_UNIX
+TEST(OracleDatabaseWriter, ShortWriteKeepsPreviouslyInstalledDatabase)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString path = dir.filePath("cards.xml");
+    QFile original(path);
+    ASSERT_TRUE(original.open(QIODevice::WriteOnly));
+    ASSERT_EQ(original.write("installed database"), 18);
+    original.close();
+    const QByteArray data = "<cockatrice_carddatabase version=\"4\"><!--" + QByteArray(16384, 'x') +
+                            "--><cards/></cockatrice_carddatabase>";
+    // A real filesystem write failure: the soft file-size cap makes the writer's own
+    // flush fail without filling a disk. The cap is scoped rather than forked, because a
+    // death-test child under RLIMIT_FSIZE is killed by SIGSEGV on macOS.
+    test_support::ScopedFileSizeLimit fileSizeCap(128);
+    ASSERT_TRUE(fileSizeCap.isValid());
+
+    QString error;
+    EXPECT_FALSE(OracleDatabase::saveXml(path, data, &error));
+    EXPECT_FALSE(error.isEmpty());
+
+    ASSERT_TRUE(original.open(QIODevice::ReadOnly));
+    EXPECT_EQ(original.readAll(), "installed database");
+}
+#endif
 
 int main(int argc, char **argv)
 {

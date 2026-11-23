@@ -1,7 +1,6 @@
 #include "visual_deck_storage_sort_filter_proxy_model.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../deck_loader/loaded_deck.h"
 #include "../../filters/deck_filter_string.h"
 #include "visual_deck_storage_model.h"
 
@@ -16,6 +15,7 @@
 #include <algorithm>
 #include <compare>
 #include <libcockatrice/card/card_localization.h>
+#include <libcockatrice/deck_list/loaded_deck.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 
 VisualDeckStorageSortFilterProxyModel::VisualDeckStorageSortFilterProxyModel(QObject *parent)

@@ -15,6 +15,7 @@ class QComboBox;
 class QDialogButtonBox;
 class QPushButton;
 class PaletteGridWidget;
+class FontGridWidget;
 class QuickSetupPanel;
 class QFrame;
 class QWidget;
@@ -25,6 +26,7 @@ class PaletteEditorDialog : public QDialog
 public:
     explicit PaletteEditorDialog(const QString &themeDirPath, const QString &themeName, QWidget *parent = nullptr);
     void loadSchemes();
+    void reject() override;
 
 private slots:
     void onSave();
@@ -38,8 +40,10 @@ private:
     void setupUi();
     void retranslateUi();
     void refreshChromePalettes();
+    void updateAdvancedHeight();
     void loadScheme(const QString &scheme); // snapshot current, switch, load
     void seedAccentFromScheme(const QString &scheme);
+    void loadFonts(); // shared per theme, not split by light/dark
 
     // Sub-widgets
     QWidget *header;
@@ -49,6 +53,11 @@ private:
     PaletteGridWidget *paletteGrid = nullptr;
     QPushButton *paletteGridToggleButton = nullptr;
     QFrame *paletteGridSeparator = nullptr;
+    FontGridWidget *fontGrid = nullptr;
+    QPushButton *fontToggleButton = nullptr;
+    QFrame *fontSeparator = nullptr;
+    QWidget *fontSection = nullptr;
+    QLabel *fontNoteLabel = nullptr;
     QWidget *footer;
     QComboBox *schemeComboBox = nullptr;
     QDialogButtonBox *buttonBox = nullptr;
@@ -67,6 +76,14 @@ private:
 
     QMap<QString, PaletteConfig> workingConfig;
     QMap<QString, PaletteConfig> savedConfig;
+
+    // Fonts are shared per theme (fonts.toml, not split by light/dark), so a
+    // single saved config suffices; the live edits are read from fontGrid.
+    FontConfig savedFontConfig;
+    // Set only by user-driven fontsChanged after the initial load completes.
+    // Gates both previewFonts and the fonts.toml write so a palette-only Save
+    // never materializes fallback fonts to disk.
+    bool fontsDirty = false;
 
     QTimer *autoApplyTimer = nullptr;
 

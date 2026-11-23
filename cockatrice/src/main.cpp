@@ -26,6 +26,7 @@
 #include "client/sound_engine.h"
 #include "client/url_scheme_event_filter.h"
 #include "database/interface/settings_card_preference_provider.h"
+#include "installer_close_server.h"
 #include "interface/intents/intent.h"
 #include "interface/intents/intent_open_local_deck.h"
 #include "interface/logger.h"
@@ -37,6 +38,10 @@
 #include "libcockatrice/rng/rng_abstract.h"
 #include "single_instance_manager.h"
 #include "version_string.h"
+
+#ifdef WITH_GUI_TEST
+#include "pqTestUtility.h"
+#endif
 
 #include <QApplication>
 #include <QByteArray>
@@ -61,10 +66,12 @@
 #include <QString>
 #include <QStringList>
 #include <QStringLiteral>
+#include <QThread>
 #include <QTranslator>
 #include <QUrl>
 #include <QtGlobal>
 #include <algorithm>
+#include <cstdlib>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/rng/rng_sfmt.h>
 #include <libcockatrice/settings/card_database_settings.h>
@@ -193,10 +200,10 @@ int main(int argc, char *argv[])
     // liability; unclean exits are detected via CrashReporter::beginSession below.)
 
     // Logging setup
-#ifdef Q_OS_APPLE
+#ifdef Q_OS_MACOS
     // <build>/cockatrice/cockatrice.app/Contents/MacOS/cockatrice
     const QByteArray configPath = "../../../qtlogging.ini";
-#elif defined(Q_OS_UNIX)
+#elif defined(Q_OS_LINUX)
     // <build>/cockatrice/cockatrice
     const QByteArray configPath = "./qtlogging.ini";
 #elif defined(Q_OS_WIN)
@@ -217,7 +224,7 @@ int main(int argc, char *argv[])
         "endif}%{if-fatal}\033[1;31mF%{endif}\033[0m] [%{function}] - %{message} [%{file}:%{line}]");
     QApplication app(argc, argv);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     UrlSchemeEventFilter cockatriceFilter(QStringList{QStringLiteral("cockatrice")});
 
     QStringList pendingMacUrls;
@@ -244,7 +251,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("Cockatrice");
     QCoreApplication::setApplicationVersion(VERSION_STRING);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     qApp->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 #endif
 
@@ -325,7 +332,7 @@ int main(int argc, char *argv[])
     }
 
     // Translations
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     translationPath = qApp->applicationDirPath() + "/../Resources/translations";
 #elif defined(Q_OS_WIN)
     translationPath = qApp->applicationDirPath() + "/translations";
@@ -342,9 +349,16 @@ int main(int argc, char *argv[])
     parser.addOptions(
         {{{"c", "connect"}, QCoreApplication::translate("main", "Connect on startup"), "user:pass@host:port"},
          {{"d", "debug-output"}, QCoreApplication::translate("main", "Debug to file")},
-         {"simulate-crash",
-          QCoreApplication::translate("main",
-                                      "Show the crash-report dialog (saves a mock file when no DSN is configured)")}});
+         {"simulate-crash", QCoreApplication::translate(
+                                "main", "Show the crash-report dialog (saves a mock file when no DSN is configured)")},
+         {"no-connect", QCoreApplication::translate("main", "Do not connect to any server on startup")}
+#ifdef WITH_GUI_TEST
+         ,
+         {{"t", "test"},
+          QCoreApplication::translate("main", "Play back a QtTesting XML test file and exit"),
+          "test-file.xml"}
+#endif
+        });
 
     parser.process(app);
 
@@ -413,6 +427,23 @@ int main(int argc, char *argv[])
     CardDatabaseManager::setCardDatabasePathProvider(&SettingsCache::instance());
     CardDatabaseManager::setCardSetPriorityController(&SettingsCache::instance().cardDatabase());
 
+    // Lifecycle breadcrumbs for native crash reports (see COCKATRICE-DESKTOP-1R): the live
+    // card maps are replaced wholesale on reset, so knowing whether a crash followed a reload
+    // narrows down which QMap was being read. Direct connections: the SDK call is thread-safe
+    // and loading signals may come from a QtConcurrent worker.
+    {
+        CardDatabase *crumbDb = CardDatabaseManager::getInstance();
+        QObject::connect(
+            crumbDb, &CardDatabase::cardDatabaseReset, crumbDb,
+            [] { CrashReporter::addBreadcrumb("card_db", "card database snapshot swapped in"); }, Qt::DirectConnection);
+        QObject::connect(
+            crumbDb, &CardDatabase::cardDatabaseLoadingFinished, crumbDb,
+            [] { CrashReporter::addBreadcrumb("card_db", "card database loading finished"); }, Qt::DirectConnection);
+        QObject::connect(
+            crumbDb, &CardDatabase::cardDatabaseLoadingFailed, crumbDb,
+            [] { CrashReporter::addBreadcrumb("card_db", "card database loading failed"); }, Qt::DirectConnection);
+    }
+
     qCInfo(MainLog) << "Starting main program";
 
     // Front-load the card database before constructing the main window. The
@@ -431,6 +462,15 @@ int main(int argc, char *argv[])
 
     MainWindow ui;
 
+    // The installer asks a running instance to close over this socket, which reaches a
+    // hidden window and one sitting on its own confirmation. Failure is not fatal: the
+    // installer falls back to WM_CLOSE for clients that have no socket.
+    InstallerCloseServer installerClose;
+    if (installerClose.listen()) {
+        QObject::connect(&installerClose, &InstallerCloseServer::closeRequested, &ui,
+                         &MainWindow::requestInstallerClose);
+    }
+
     // A URL launch must own the connection: the intent chain triggered by the
     // URL connects to the server named in the URL, so the window's own startup
     // auto-connect must not race against it (two connectToServer calls tear
@@ -438,7 +478,7 @@ int main(int argc, char *argv[])
     bool hasUrlActivation = std::any_of(startupFiles.begin(), startupFiles.end(), [](const QString &file) {
         return file.startsWith(QStringLiteral("cockatrice://"));
     });
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     // On macOS the launch can arrive through the URL scheme instead of as a
     // positional argument (captured in pendingMacUrls); count those too or the
     // window would auto-connect into the link's own connection attempt.
@@ -464,7 +504,7 @@ int main(int argc, char *argv[])
         }
     };
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     QObject::disconnect(cocoaBufferConn);
 
     QObject::connect(&cockatriceFilter, &UrlSchemeEventFilter::urlReceived,
@@ -472,6 +512,9 @@ int main(int argc, char *argv[])
 #endif
     if (parser.isSet("connect")) {
         ui.setConnectTo(parser.value("connect"));
+    }
+    if (parser.isSet("no-connect")) {
+        ui.setNoConnect(true);
     }
     qCInfo(MainLog) << "MainWindow constructor finished";
 
@@ -502,7 +545,7 @@ int main(int argc, char *argv[])
     qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus,
                        !SettingsCache::instance().userInterface().getShowShortcuts());
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     for (const QString &url : pendingMacUrls) {
         handleActivation(url);
     }
@@ -512,6 +555,27 @@ int main(int argc, char *argv[])
     for (const QString &file : startupFiles) {
         handleActivation(file);
     }
+
+#ifdef WITH_GUI_TEST
+    if (parser.isSet("test")) {
+        QString testFile = parser.value("test");
+        qCInfo(MainLog) << "Playing test file:" << testFile;
+        QTimer::singleShot(0, &ui, [&ui, testFile]() {
+            bool success = ui.getTestUtility()->playTests(testFile);
+            qCInfo(MainLog) << "Test playback" << (success ? "succeeded" : "FAILED");
+            qApp->exit(success ? 0 : 1);
+
+            // An event that fails while a modal dialog is open aborts the dispatcher,
+            // but the dialog's nested event loop can then keep the application alive
+            // forever. Hard-exit after a grace period so a red test always terminates.
+            auto *watchdog = QThread::create([success] {
+                QThread::sleep(10);
+                ::_Exit(success ? 0 : 1);
+            });
+            watchdog->start();
+        });
+    }
+#endif
 
     // Connect to future file/URL events from other instances
     QObject::connect(&instance, &SingleInstanceManager::filesReceived, [&handleActivation](const QStringList &files) {

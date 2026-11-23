@@ -3,17 +3,9 @@
 #include "../../client/settings/cache_settings.h"
 #include "../../client/settings/card_counter_settings.h"
 #include "../../client/sound_engine.h"
-#include "../../client/translation.h"
-#include "../../game/abstract_game.h"
-#include "../../game/board/card_list.h"
-#include "../../game/game_state.h"
-#include "../../game/phase.h"
-#include "../../game/player/player_event_handler.h"
-#include "../../game/player/player_info.h"
-#include "../../game/player/player_logic.h"
-#include "../../game/player/player_manager.h"
-#include "../../game/zones/card_zone_logic.h"
 #include "../../interface/card_localization.h"
+#include "../../interface/theme_icon.h"
+#include "../../interface/theme_manager.h"
 #include "../../interface/widgets/server/chat_view/chat_view.h"
 #include "../board/card_item.h"
 #include "../board/translate_counter_name.h"
@@ -22,8 +14,22 @@
 #include <QColor>
 #include <QDebug>
 #include <QList>
+#include <QPalette>
+#include <QPixmap>
 #include <QSharedPointer>
 #include <QStringList>
+#include <QTextDocument>
+#include <QUrl>
+#include <libcockatrice/game/abstract_game.h>
+#include <libcockatrice/game/board/card_list.h>
+#include <libcockatrice/game/game_state.h>
+#include <libcockatrice/game/phase.h>
+#include <libcockatrice/game/player/player_event_handler.h>
+#include <libcockatrice/game/player/player_info.h>
+#include <libcockatrice/game/player/player_logic.h>
+#include <libcockatrice/game/player/player_manager.h>
+#include <libcockatrice/game/translation.h>
+#include <libcockatrice/game/zones/card_zone_logic.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_mulligan.pb.h>
 #include <libcockatrice/settings/chat_settings.h>
@@ -58,13 +64,13 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
     QString zoneName = zone->getName();
 
     if (zoneName == ZoneNames::TABLE) {
-        fromStr = tr(" from play");
+        fromStr = tr("from play");
     } else if (zoneName == ZoneNames::GRAVE) {
-        fromStr = tr(" from their graveyard");
+        fromStr = tr("from their graveyard");
     } else if (zoneName == ZoneNames::EXILE) {
-        fromStr = tr(" from exile");
+        fromStr = tr("from exile");
     } else if (zoneName == ZoneNames::HAND) {
-        fromStr = tr(" from their hand");
+        fromStr = tr("from their hand");
     } else if (zoneName == ZoneNames::DECK) {
         if (position == 0) {
             if (cardName.isEmpty()) {
@@ -76,9 +82,9 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
                 cardNameContainsStartZone = true;
             } else {
                 if (ownerChange) {
-                    fromStr = tr(" from the top of %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
+                    fromStr = tr("from the top of %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
                 } else {
-                    fromStr = tr(" from the top of their library");
+                    fromStr = tr("from the top of their library");
                 }
             }
         } else if (position == zone->getCards().size()) {
@@ -91,28 +97,33 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
                 cardNameContainsStartZone = true;
             } else {
                 if (ownerChange) {
-                    fromStr = tr(" from the bottom of %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
+                    fromStr = tr("from the bottom of %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
                 } else {
-                    fromStr = tr(" from the bottom of their library");
+                    fromStr = tr("from the bottom of their library");
                 }
             }
         } else {
             if (ownerChange) {
-                fromStr = tr(" from %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
+                fromStr = tr("from %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());
             } else {
-                fromStr = tr(" from their library");
+                fromStr = tr("from their library");
             }
         }
     } else if (zoneName == ZoneNames::SIDEBOARD) {
-        fromStr = tr(" from sideboard");
+        fromStr = tr("from sideboard");
     } else if (zoneName == ZoneNames::STACK) {
-        fromStr = tr(" from the stack");
+        fromStr = tr("from the stack");
     } else {
-        fromStr = tr(" from custom zone '%1'").arg(zoneName);
+        fromStr = tr("from custom zone '%1'").arg(zoneName);
     }
 
     if (!cardNameContainsStartZone) {
         cardName.clear();
+    }
+    // The separator space is added here rather than stored in the tr() string so
+    // translators never have to preserve an invisible leading blank.
+    if (!fromStr.isEmpty()) {
+        fromStr.prepend(' ');
     }
     return {cardName, fromStr};
 }
@@ -120,6 +131,7 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
 void MessageLogWidget::containerProcessingDone()
 {
     currentContext = MessageContext_None;
+    contextJudgeName.clear();
     messageSuffix = messagePrefix = QString();
 }
 
@@ -283,7 +295,7 @@ void MessageLogWidget::logDestroyCard(PlayerLogic *player, QString cardName)
 }
 
 void MessageLogWidget::logMoveCard(PlayerLogic *player,
-                                   CardItem *card,
+                                   CardState *card,
                                    CardZoneLogic *startZone,
                                    int oldX,
                                    CardZoneLogic *targetZone,
@@ -605,6 +617,20 @@ void MessageLogWidget::logReverseTurn(PlayerLogic *player, bool reversed)
                                 .arg(reversed ? tr("reversed") : tr("normal")));
 }
 
+void MessageLogWidget::logTurnOrderChanged(QStringList playerNames, bool randomized)
+{
+    QStringList sanitizedNames;
+    for (const QString &name : playerNames) {
+        sanitizedNames.append(sanitizeHtml(name));
+    }
+    const QString order = sanitizedNames.join(" -> ");
+    if (randomized) {
+        appendHtmlServerMessage(tr("Randomized turn order: %1.").arg(order));
+    } else {
+        appendHtmlServerMessage(tr("New turn order set: %1.").arg(order));
+    }
+}
+
 void MessageLogWidget::logRollDie(PlayerLogic *player, int sides, const QList<uint> &rolls)
 {
     if (rolls.length() == 1) {
@@ -662,7 +688,7 @@ void MessageLogWidget::logSetActivePlayer(PlayerLogic *player)
                QString(tr("%1's turn.")).arg(player->getPlayerInfo()->getName()) + "</b></font><br>");
 }
 
-void MessageLogWidget::logSetAnnotation(PlayerLogic *player, CardItem *card, QString newAnnotation)
+void MessageLogWidget::logSetAnnotation(PlayerLogic *player, CardState *card, QString newAnnotation)
 {
     appendHtmlServerMessage(
         QString(tr("%1 sets annotation of %2 to %3."))
@@ -706,7 +732,7 @@ void MessageLogWidget::logSetCounter(PlayerLogic *player, QString counterName, i
                                 .arg(value - oldValue));
 }
 
-void MessageLogWidget::logSetDoesntUntap(PlayerLogic *player, CardItem *card, bool doesntUntap)
+void MessageLogWidget::logSetDoesntUntap(PlayerLogic *player, CardState *card, bool doesntUntap)
 {
     QString str;
     if (doesntUntap) {
@@ -717,7 +743,7 @@ void MessageLogWidget::logSetDoesntUntap(PlayerLogic *player, CardItem *card, bo
     appendHtmlServerMessage(str.arg(sanitizeHtml(player->getPlayerInfo()->getName())).arg(cardLink(card->getName())));
 }
 
-void MessageLogWidget::logSetPT(PlayerLogic *player, CardItem *card, QString newPT)
+void MessageLogWidget::logSetPT(PlayerLogic *player, CardState *card, QString newPT)
 {
     if (currentContext == MessageContext_MoveCard) {
         return;
@@ -755,7 +781,7 @@ void MessageLogWidget::logSetSideboardLock(PlayerLogic *player, bool locked)
     }
 }
 
-void MessageLogWidget::logSetTapped(PlayerLogic *player, CardItem *card, bool tapped)
+void MessageLogWidget::logSetTapped(PlayerLogic *player, CardState *card, bool tapped)
 {
     if (currentContext == MessageContext_MoveCard) {
         return;
@@ -841,8 +867,27 @@ void MessageLogWidget::logUndoDrawFailed(PlayerLogic *player)
 
 void MessageLogWidget::setContextJudgeName(QString name)
 {
-    messagePrefix = QString("<span style=\"color:black\">");
-    messageSuffix = QString("</span> [<img height=12 src=\"theme:icons/scales\"> %1]").arg(sanitizeHtml(name));
+    contextJudgeName = std::move(name);
+    refreshJudgeSuffix();
+}
+
+void MessageLogWidget::refreshJudgeSuffix()
+{
+    const QPixmap pixmap = loadThemedIcon(QStringLiteral("icons/scales")).pixmap(QSize(24, 24));
+    if (!pixmap.isNull()) {
+        // Rich text cannot resolve `currentColor`; register a palette-rendered
+        // image so already-appended judge tags repaint on a theme switch.
+        document()->addResource(QTextDocument::ImageResource, QUrl(QStringLiteral("cockatrice:scales")), pixmap);
+        document()->markContentsDirty(0, document()->characterCount());
+    }
+
+    if (contextJudgeName.isEmpty()) {
+        return;
+    }
+
+    messagePrefix = QStringLiteral("<span style=\"color:%1\">").arg(palette().color(QPalette::WindowText).name());
+    messageSuffix =
+        QStringLiteral("</span> [<img height=12 src=\"cockatrice:scales\"> %1]").arg(sanitizeHtml(contextJudgeName));
 }
 
 void MessageLogWidget::appendHtmlServerMessage(const QString &html, bool optionalIsBold, QString optionalFontColor)
@@ -891,4 +936,6 @@ void MessageLogWidget::connectToPlayerEventHandler(PlayerEventHandler *playerEve
 MessageLogWidget::MessageLogWidget(TabSupervisor *_tabSupervisor, AbstractGame *_game, QWidget *parent)
     : ChatView(_tabSupervisor, _game, true, parent), currentContext(MessageContext_None)
 {
+    connect(themeManager, &ThemeManager::paletteChanged, this, &MessageLogWidget::refreshJudgeSuffix);
+    connect(themeManager, &ThemeManager::themeChanged, this, &MessageLogWidget::refreshJudgeSuffix);
 }

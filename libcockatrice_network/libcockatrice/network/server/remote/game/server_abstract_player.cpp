@@ -81,10 +81,9 @@ Server_AbstractPlayer::Server_AbstractPlayer(Server_Game *_game,
                                              const ServerInfo_User &_userInfo,
                                              bool _judge,
                                              Server_AbstractUserInterface *_userInterface)
-    : Server_AbstractParticipant(_game, _playerId, _userInfo, _judge, _userInterface), conceded(false), deck(nullptr),
-      sideboardLocked(true), readyStart(false), nextCardId(0)
+    : Server_AbstractParticipant(_game, _playerId, _userInfo, {.isJudge = _judge}, _userInterface), conceded(false),
+      deck(nullptr), sideboardLocked(true), readyStart(false), nextCardId(0)
 {
-    spectator = false;
 }
 
 Server_AbstractPlayer::~Server_AbstractPlayer() = default;
@@ -283,6 +282,23 @@ static bool shouldBeFromTheBottom(const Server_CardZone *startZone, const std::s
     return true;
 }
 
+/**
+ * @brief Whether the attachment rules forbid moving this card to the given target.
+ *
+ * A card attached to a host on the table must move together with that host, and a card that
+ * itself has attachments must not be stacked onto another card.
+ */
+static bool violatesAttachmentRules(const Server_Card *card, const Server_CardZone *targetZone, int xCoord, int yCoord)
+{
+    // do not allow attached cards to move around on the table
+    if (card->getParentCard() && targetZone->getName() == ZoneNames::TABLE) {
+        return true;
+    }
+
+    // do not allow cards with attachments to stack with other cards
+    return !card->getAttachedCards().isEmpty() && !targetZone->isColumnEmpty(xCoord, yCoord);
+}
+
 Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
                                                        Server_CardZone *startzone,
                                                        const QList<const CardToMove *> &_cards,
@@ -293,9 +309,10 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
                                                        bool undoingDraw,
                                                        bool isReversed)
 {
-    // Disallow controller change to other zones than the table.
-    if (((targetzone->getType() != ServerInfo_Zone::PublicZone) || !targetzone->hasCoords()) &&
-        (startzone->getPlayer() != targetzone->getPlayer()) && !judge) {
+    // A move that changes the controller is only allowed onto the table, unless a judge does it.
+    const bool changesController = startzone->getPlayer() != targetzone->getPlayer();
+    const bool targetIsTable = targetzone->getType() == ServerInfo_Zone::PublicZone && targetzone->hasCoords();
+    if (changesController && !targetIsTable && !isJudge()) {
         return Response::RespContextError;
     }
 
@@ -308,31 +325,25 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
 
     std::set<MoveCardStruct> cardsToMove;
     QSet<int> cardIdsToMove;
-    for (auto _card : _cards) {
+    for (const CardToMove *cardToMove : _cards) {
         // The same card being moved twice would lead to undefined behaviour.
-        if (cardIdsToMove.contains(_card->card_id())) {
+        if (cardIdsToMove.contains(cardToMove->card_id())) {
             continue;
         }
-        cardIdsToMove.insert(_card->card_id());
+        cardIdsToMove.insert(cardToMove->card_id());
 
         // Consistency checks. In case the command contains illegal moves, try to resolve the legal ones still.
         int position;
-        Server_Card *card = startzone->getCard(_card->card_id(), &position);
+        Server_Card *card = startzone->getCard(cardToMove->card_id(), &position);
         if (!card) {
             return Response::RespNameNotFound;
         }
 
-        // do not allow attached cards to move around on the table
-        if (card->getParentCard() && targetzone->getName() == ZoneNames::TABLE) {
+        if (violatesAttachmentRules(card, targetzone, xCoord, yCoord)) {
             continue;
         }
 
-        // do not allow cards with attachments to stack with other cards
-        if (!card->getAttachedCards().isEmpty() && !targetzone->isColumnEmpty(xCoord, yCoord)) {
-            continue;
-        }
-
-        cardsToMove.insert(MoveCardStruct{card, position, _card});
+        cardsToMove.insert(MoveCardStruct{card, position, cardToMove});
     }
     // In case all moves were filtered out, abort.
     if (cardsToMove.empty()) {
@@ -808,7 +819,7 @@ Server_AbstractPlayer::cmdMoveCard(const Command_MoveCard &cmd, ResponseContaine
         return Response::RespNameNotFound;
     }
 
-    if ((startPlayer != this) && (!startZone->getPlayersWithWritePermission().contains(playerId)) && !judge) {
+    if ((startPlayer != this) && (!startZone->getPlayersWithWritePermission().contains(playerId)) && !isJudge()) {
         return Response::RespContextError;
     }
 
@@ -821,7 +832,7 @@ Server_AbstractPlayer::cmdMoveCard(const Command_MoveCard &cmd, ResponseContaine
         return Response::RespNameNotFound;
     }
 
-    if ((startPlayer != this) && (targetPlayer != this) && !judge) {
+    if ((startPlayer != this) && (targetPlayer != this) && !isJudge()) {
         return Response::RespContextError;
     }
 
@@ -1495,8 +1506,10 @@ Server_AbstractPlayer::cmdDumpZone(const Command_DumpZone &cmd, ResponseContaine
     return Response::RespOk;
 }
 
-Response::ResponseCode
-Server_AbstractPlayer::cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+Response::ResponseCode Server_AbstractPlayer::resolveRevealZone(const std::string &zoneName,
+                                                                bool hasRecipient,
+                                                                int recipientId,
+                                                                Server_CardZone *&zone)
 {
     if (!game->getGameStarted()) {
         return Response::RespGameNotStarted;
@@ -1505,15 +1518,59 @@ Server_AbstractPlayer::cmdRevealCards(const Command_RevealCards &cmd, ResponseCo
         return Response::RespContextError;
     }
 
-    if (cmd.has_player_id()) {
-        Server_AbstractPlayer *otherPlayer = game->getPlayer(cmd.player_id());
-        if (!otherPlayer) {
-            return Response::RespNameNotFound;
-        }
+    if (hasRecipient && !game->getPlayer(recipientId)) {
+        return Response::RespNameNotFound;
     }
-    Server_CardZone *zone = zones.value(nameFromStdString(cmd.zone_name()));
+
+    zone = zones.value(nameFromStdString(zoneName));
     if (!zone) {
         return Response::RespNameNotFound;
+    }
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode Server_AbstractPlayer::cmdRevealRandomCards(const Command_RevealRandomCards &cmd,
+                                                                   ResponseContainer & /*rc*/,
+                                                                   GameEventStorage &ges)
+{
+    if (cmd.number_of_cards() <= 0) {
+        return Response::RespInvalidData;
+    }
+
+    Server_CardZone *zone = nullptr;
+    const Response::ResponseCode result =
+        resolveRevealZone(cmd.zone_name(), cmd.has_player_id(), cmd.player_id(), zone);
+    if (result != Response::RespOk) {
+        return result;
+    }
+
+    auto candidates = zone->getCards();
+    if (cmd.number_of_cards() > candidates.size()) {
+        return Response::RespContextError;
+    }
+
+    // Partial Fisher-Yates on a copy: each physical card can appear only once,
+    // and the hand's order and contents stay unchanged.
+    QList<Server_Card *> cardsToReveal;
+    for (int i = 0; i < cmd.number_of_cards(); ++i) {
+        const int selected = rng->rand(i, candidates.size() - 1);
+        candidates.swapItemsAt(i, selected);
+        cardsToReveal.append(candidates.at(i));
+    }
+
+    // -2 in the public event tells other participants only how many cards were revealed.
+    return revealCards(zone, cardsToReveal, {-2}, cmd.has_player_id(), cmd.player_id(), false, ges);
+}
+
+Response::ResponseCode
+Server_AbstractPlayer::cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+{
+    Server_CardZone *zone = nullptr;
+    const Response::ResponseCode result =
+        resolveRevealZone(cmd.zone_name(), cmd.has_player_id(), cmd.player_id(), zone);
+    if (result != Response::RespOk) {
+        return result;
     }
 
     QList<Server_Card *> cardsToReveal;
@@ -1548,15 +1605,28 @@ Server_AbstractPlayer::cmdRevealCards(const Command_RevealCards &cmd, ResponseCo
         }
     }
 
+    const QList<int> cardIdsForOthers(cmd.card_id().begin(), cmd.card_id().end());
+    return revealCards(zone, cardsToReveal, cardIdsForOthers, cmd.has_player_id(), cmd.player_id(),
+                       cmd.grant_write_access(), ges);
+}
+
+Response::ResponseCode Server_AbstractPlayer::revealCards(Server_CardZone *zone,
+                                                          const QList<Server_Card *> &cardsToReveal,
+                                                          const QList<int> &cardIdsForOthers,
+                                                          bool hasRecipient,
+                                                          int recipientId,
+                                                          bool grantWriteAccess,
+                                                          GameEventStorage &ges)
+{
     Event_RevealCards eventOthers;
-    eventOthers.set_grant_write_access(cmd.grant_write_access());
+    eventOthers.set_grant_write_access(grantWriteAccess);
     eventOthers.set_zone_name(zone->getName().toStdString());
     eventOthers.set_number_of_cards(cardsToReveal.size());
-    for (auto cardId : cmd.card_id()) {
+    for (int cardId : cardIdsForOthers) {
         eventOthers.add_card_id(cardId);
     }
-    if (cmd.has_player_id()) {
-        eventOthers.set_other_player_id(cmd.player_id());
+    if (hasRecipient) {
+        eventOthers.set_other_player_id(recipientId);
     }
 
     Event_RevealCards eventPrivate(eventOthers);
@@ -1593,19 +1663,19 @@ Server_AbstractPlayer::cmdRevealCards(const Command_RevealCards &cmd, ResponseCo
         }
     }
 
-    if (cmd.has_player_id()) {
-        if (cmd.grant_write_access()) {
-            zone->addWritePermission(cmd.player_id());
+    if (hasRecipient) {
+        if (grantWriteAccess) {
+            zone->addWritePermission(recipientId);
         }
 
-        if (judge) {
+        if (isJudge()) {
             ges.setOverwriteOwnership(true);
         }
 
-        ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, cmd.player_id());
+        ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, recipientId);
         ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
     } else {
-        if (cmd.grant_write_access()) {
+        if (grantWriteAccess) {
             const QList<int> &participantIds = game->getParticipants().keys();
             for (int anyParticipantId : participantIds) {
                 zone->addWritePermission(anyParticipantId);

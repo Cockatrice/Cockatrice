@@ -3,7 +3,11 @@
 #include <gtest/gtest.h>
 #include <initializer_list>
 #include <libcockatrice/network/client/abstract/latency_tracker.h>
+#include <libcockatrice/rng/rng_abstract.h>
 #include <string>
+
+// Referenced by other translation units in the server_remote library.
+RNG_Abstract *rng = nullptr;
 
 TEST(LatencyTrackerTest, EmptyTrackerYieldsZeroedStats)
 {

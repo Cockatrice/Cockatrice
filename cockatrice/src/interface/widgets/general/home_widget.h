@@ -16,7 +16,6 @@
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <qtmetamacros.h>
 
-class QGridLayout;
 class QLabel;
 class CardInfoPictureArtCropWidget;
 class ExactCard;
@@ -46,7 +45,6 @@ public slots:
     void updateConnectButton(const ClientStatus status);
 
 private:
-    QGridLayout *layout;
     QTimer *cardChangeTimer;
     TabSupervisor *tabSupervisor;
     QPixmap background;

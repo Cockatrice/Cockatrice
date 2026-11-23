@@ -17,14 +17,6 @@
 class QAction;
 class QTimer;
 
-namespace google
-{
-namespace protobuf
-{
-class Message;
-}
-} // namespace google
-
 class PhaseButton : public QObject, public QGraphicsItem
 {
     Q_OBJECT
@@ -95,11 +87,16 @@ public slots:
     void triggerPhaseAction(int phase);
 private slots:
     void phaseButtonClicked();
-    void actNextTurn();
-    void actUntapAll();
-    void actDrawCard();
 signals:
-    void sendGameCommand(const ::google::protobuf::Message &command, int playerId);
+    /** @name Intent signals
+     *  The view reports what the user asked for; GameEventHandler builds the commands.
+     *  @{
+     */
+    void setActivePhaseRequested(int phase);
+    void nextTurnRequested();
+    void untapAllRequested();
+    void drawCardRequested();
+    /** @} */
 
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) override;

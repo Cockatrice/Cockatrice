@@ -17,12 +17,14 @@
 #include <QString>
 #include <QStringList>
 #include <libcockatrice/card/card_info.h>
+#include <libcockatrice/card/relation/card_relation.h>
+#include <memory>
 #include <qnamespace.h>
 #include <qtmetamacros.h>
 #include <utility>
 
-class CardRelation;
 class QRegularExpression;
+class TagDatabase;
 
 // many users prefer not to see these sets with non english arts
 // they will given priority PriorityLowest
@@ -170,6 +172,10 @@ private:
      */
     CardNameMap cards;
 
+    // Shared defaults are immutable; card-specific copy limits belong to this import.
+    FormatRulesNameMap magicFormats;
+    bool magicFormatsDirty = true;
+
     /**
      * The sets, indexed by short name.
      */
@@ -198,6 +204,11 @@ private:
      * the whole import (or racing it).
      */
     QAtomicInt importCancelled;
+    bool importSuccessful = false;
+    QString importError;
+
+    // Discard the incomplete in-memory database; the installed file is untouched.
+    int failImport(const QString &message);
 
     /**
      * The ISO-639 language code whose foreignData is imported; "en" by default.
@@ -209,6 +220,12 @@ private:
      * foreignData scanning can be skipped entirely when disabled.
      */
     bool localizationEnabled = false;
+
+    /**
+     * Optional tag lookup applied to every imported card. Owned by the wizard
+     * so it outlives the import worker; null when tags are disabled.
+     */
+    std::shared_ptr<const TagDatabase> tagDatabase;
 
     /**
      * Localized name/text collected per imported card key while parsing sets,
@@ -230,7 +247,7 @@ private:
                         const QString &text,
                         bool isToken,
                         QHash<QString, QString> properties,
-                        const QList<CardRelation *> &relatedCards,
+                        const QList<CardRelation> &relatedCards,
                         const PrintingInfo &printingInfo);
 
     /**
@@ -265,6 +282,16 @@ public:
         progressReporting = enabled;
     }
     /**
+     * @brief Supplies the tag database applied to every imported card.
+     *
+     * Pass nullptr to import without tags. The wizard keeps the database alive
+     * for the whole import, so the worker sees a stable pointer.
+     */
+    void setTagDatabase(std::shared_ptr<const TagDatabase> database)
+    {
+        tagDatabase = std::move(database);
+    }
+    /**
      * Selects the ISO-639 language code whose foreignData is imported.
      * English (the default) and unsupported codes disable localization.
      */
@@ -278,7 +305,24 @@ public:
      * the wizard can hand over its decompressed buffer without copying it.
      */
     bool readSetsFromByteArray(QByteArray data);
+    // Returns the complete selected-set count on success, zero on failure or cancellation.
     int startImport();
+    bool hasSuccessfulImport() const
+    {
+        return importSuccessful;
+    }
+    const QString &getImportError() const
+    {
+        return importError;
+    }
+    // Call on the owning thread before scheduling a worker, so a cancellation
+    // arriving before that worker starts is not lost.
+    void prepareImport()
+    {
+        importCancelled.storeRelease(0);
+        importSuccessful = false;
+        importError.clear();
+    }
     /**
      * @brief Requests an in-flight startImport() to stop at the next set boundary.
      *
@@ -299,7 +343,8 @@ public:
     bool saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion);
     int importCardsFromSet(const CardSetPtr &currentSet, const QJsonArray &cardsList);
     /**
-     * @brief Returns the default format rules. The result is memoized on first use and must be treated as immutable.
+     * @brief Returns format rules including finite copy allowances from imported cards.
+     * The result is cached until cards are added or cleared and must be treated as immutable.
      */
     const FormatRulesNameMap &createDefaultMagicFormats();
     const CardNameMap &getCardList() const

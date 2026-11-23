@@ -27,6 +27,7 @@ public:
     [[nodiscard]] bool getCreateGameAsSpectator() const override;
     [[nodiscard]] int getDefaultStartingLifeTotal() const override;
     [[nodiscard]] bool getShareDecklistsOnLoad() const override;
+    [[nodiscard]] bool getShufflePlayers() const override;
     [[nodiscard]] bool getRememberGameSettings() const override;
     [[nodiscard]] bool getLocalGameRememberSettings() const override;
     [[nodiscard]] int getLocalGameMaxPlayers() const override;
@@ -44,6 +45,7 @@ public:
     void setCreateGameAsSpectator(bool _createGameAsSpectator);
     void setDefaultStartingLifeTotal(int _defaultStartingLifeTotal);
     void setShareDecklistsOnLoad(bool _shareDecklistsOnLoad);
+    void setShufflePlayers(bool _shufflePlayers);
     void setRememberGameSettings(bool _rememberGameSettings);
     void setLocalGameRememberSettings(bool value);
     void setLocalGameMaxPlayers(int value);

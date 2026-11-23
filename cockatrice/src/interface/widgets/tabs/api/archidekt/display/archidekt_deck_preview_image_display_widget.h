@@ -60,6 +60,9 @@ protected:
      */
     void resizeEvent(QResizeEvent *event) override;
 
+private slots:
+    void applyCardTextFont();
+
 private:
     float aspectRatio = 1.0f; ///< Aspect ratio to maintain for the preview image
 };
