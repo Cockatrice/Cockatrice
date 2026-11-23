@@ -18,6 +18,14 @@ set(cockatrice_SOURCES
     src/client/network/update/card_spoiler/spoiler_background_updater.cpp
     src/client/network/update/card_spoiler/spoiler_file.cpp
     src/client/crash/crash_reporter.cpp
+    src/client/features/feature_intro.h
+    src/client/features/feature_intro_actions.cpp
+    src/client/features/feature_intro_actions.h
+    src/client/features/feature_intro_catalog.cpp
+    src/client/features/feature_intro_planner.cpp
+    src/client/features/feature_intro_planner.h
+    src/client/features/feature_intro_service.cpp
+    src/client/features/feature_intro_service.h
     src/client/latency_graph_widget.cpp
     src/client/latency_status_widget.cpp
     src/client/lag_monitor.cpp
@@ -61,6 +69,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_turn_order.cpp
     src/interface/widgets/dialogs/dlg_update.cpp
     src/interface/widgets/dialogs/dlg_view_log.cpp
+    src/interface/widgets/dialogs/dlg_whats_new.cpp
+    src/interface/widgets/dialogs/dlg_whats_new.h
     src/interface/widgets/dialogs/override_printing_warning.cpp
     src/interface/widgets/dialogs/path_safety_warning.cpp
     src/interface/widgets/dialogs/settings_view.cpp
@@ -224,6 +234,10 @@ set(cockatrice_SOURCES
     src/interface/widgets/deck_editor/deck_state_manager.cpp
     src/interface/widgets/deck_editor/deck_zone_dialog.cpp
     src/interface/widgets/deck_editor/printing_disabled_info_widget.cpp
+    src/interface/widgets/feature_intro/feature_intro_badge.cpp
+    src/interface/widgets/feature_intro/feature_intro_badge.h
+    src/interface/widgets/feature_intro/feature_intro_banner.cpp
+    src/interface/widgets/feature_intro/feature_intro_banner.h
     src/interface/widgets/game_hosting/create_game_form_widget.cpp
     src/interface/widgets/game_hosting/game_creation_options.cpp
     src/interface/widgets/general/background_sources.cpp

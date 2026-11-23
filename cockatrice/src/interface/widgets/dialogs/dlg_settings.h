@@ -14,6 +14,7 @@
 
 class QPushButton;
 class AbstractSettingsPage;
+class FeatureIntroService;
 
 inline Q_LOGGING_CATEGORY(DlgSettingsLog, "dlg_settings");
 
@@ -42,15 +43,32 @@ public:
 
     explicit DlgSettings(QWidget *parent = nullptr);
     void setTab(int index);
+    /**
+     * @brief Opens the page named by @a pageKey with @a query in the search field.
+     *
+     * @a pageKey is the stable catalog key (`user-interface`, `sound`, …), not a
+     * translated title, so an introduction keeps working in every language.
+     */
+    void openSetting(const QString &pageKey, const QString &query);
+    /**
+     * @brief Connects the "What's new…" entry points inside the pages.
+     *
+     * The dialog can be opened from the main window and from a game tab; passing the
+     * service here keeps both paths able to show the index without a back-reference
+     * from the pages to the main window.
+     */
+    void setFeatureIntroService(FeatureIntroService *service);
     AbstractSettingsPage *page(SettingsPage which) const;
 
 private slots:
     void updateLanguage();
 
 private:
-    SettingsView *settingsView; ///< Shared settings content
-    QPushButton *okButton;      ///< Button to close the dialog
+    SettingsView *settingsView;                   ///< Shared settings content
+    QPushButton *okButton;                        ///< Button to close the dialog
+    FeatureIntroService *featureIntros = nullptr; ///< Set by the owner that can show What's New
 
+    void openWhatsNew();
     void retranslateUi();
 
 protected:

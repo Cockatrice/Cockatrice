@@ -102,6 +102,7 @@ private slots:
     void actSettings();
     void actAbout();
     void actTips();
+    void actWhatsNew();
     void actUpdate();
     void actOpenPendingClientUpdate();
     void actViewLog();
@@ -204,7 +205,7 @@ private:
     QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet,
         *aReloadCardDatabase;
     QAction *aTips, *aUpdate, *aCheckCardUpdates, *aCheckCardUpdatesBackground, *aFirstRunWizard, *aStatusBar,
-        *aViewLog, *aOpenSettingsFolder;
+        *aViewLog, *aOpenSettingsFolder, *aWhatsNew;
 #ifdef WITH_GUI_TEST
     QAction *aRecord, *aPlayRecording;
 #endif

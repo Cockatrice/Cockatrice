@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "window_main.h"
 
+#include "../client/features/feature_intro_service.h"
 #include "../client/latency_status_widget.h"
 #include "../client/network/update/client/client_update_checker.h"
 #include "../client/settings/cache_settings.h"
@@ -31,6 +32,7 @@
 #include "../interface/widgets/dialogs/dlg_tip_of_the_day.h"
 #include "../interface/widgets/dialogs/dlg_update.h"
 #include "../interface/widgets/dialogs/dlg_view_log.h"
+#include "../interface/widgets/dialogs/dlg_whats_new.h"
 #include "../interface/widgets/onboarding/first_run_wizard.h"
 #include "../interface/widgets/settings_page/general_settings_page.h"
 #include "../interface/widgets/tabs/tab_server.h"
@@ -306,11 +308,24 @@ void MainWindow::actFullScreen(bool checked)
 void MainWindow::actSettings()
 {
     DlgSettings dlg(this);
+    dlg.setFeatureIntroService(tabSupervisor->getFeatureIntroService());
     auto *generalPage = qobject_cast<GeneralSettingsPage *>(dlg.page(DlgSettings::GeneralPage));
     connect(generalPage, &GeneralSettingsPage::cardDatabaseUpdateRequested, this, &MainWindow::actCheckCardUpdates);
     dlg.exec();
     // The channel may have changed while the dialog was up.
     syncPendingClientUpdateChannel();
+}
+
+void MainWindow::actWhatsNew()
+{
+    DlgWhatsNew dlg(tabSupervisor->getFeatureIntroService(), this);
+    connect(&dlg, &DlgWhatsNew::settingsRequested, this, [this](const QString &pageKey, const QString &query) {
+        DlgSettings settings(this);
+        settings.setFeatureIntroService(tabSupervisor->getFeatureIntroService());
+        settings.openSetting(pageKey, query);
+        settings.exec();
+    });
+    dlg.exec();
 }
 
 void MainWindow::actExit()
@@ -451,6 +466,7 @@ void MainWindow::retranslateUi()
 
     helpMenu->setTitle(tr("&Help"));
     aAbout->setText(tr("&About Cockatrice"));
+    aWhatsNew->setText(tr("What's &New"));
     aTips->setText(tr("&Tip of the Day"));
     aCheckCardUpdates->setText(tr("Check for Card Updates..."));
     aCheckCardUpdatesBackground->setText(tr("Check for Card Updates (Automatic)"));
@@ -515,6 +531,9 @@ void MainWindow::createActions()
 
     aAbout = new QAction(this);
     connect(aAbout, &QAction::triggered, this, &MainWindow::actAbout);
+    aWhatsNew = new QAction(this);
+    aWhatsNew->setObjectName("actionWhatsNew");
+    connect(aWhatsNew, &QAction::triggered, this, &MainWindow::actWhatsNew);
     aTips = new QAction(this);
     connect(aTips, &QAction::triggered, this, &MainWindow::actTips);
     aUpdate = new QAction(this);
@@ -614,6 +633,7 @@ void MainWindow::createMenus()
     helpMenu = menuBar()->addMenu(QString());
     helpMenu->setObjectName("helpMenu");
     helpMenu->addAction(aAbout);
+    helpMenu->addAction(aWhatsNew);
     helpMenu->addAction(aTips);
     helpMenu->addSeparator();
     helpMenu->addAction(aUpdate);
@@ -741,6 +761,13 @@ void MainWindow::startupConfigCheck()
     AtRiskDataWarning::warnAboutDataPathsInProgramDir(this);
 
     const bool isCleanInstall = SettingsCache::instance().network().getClientVersion() == CLIENT_INFO_NOT_SET;
+
+    // Seed the feature introductions before setClientVersion() below overwrites the
+    // version this install ran before: that comparison is what decides whether a
+    // feature is genuinely new to this user. TabSupervisor owns the service, and it
+    // already exists here.
+    tabSupervisor->getFeatureIntroService()->seed(SettingsCache::instance().network().getClientVersion(),
+                                                  VERSION_STRING);
 
     // The loader never runs checkUnknownSets() itself (see main.cpp): the
     // front-loaded parse runs before MainWindow exists, so

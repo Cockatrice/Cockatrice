@@ -1,6 +1,7 @@
 #ifndef COCKATRICE_USER_INTERFACE_SETTINGS_PAGE_H
 #define COCKATRICE_USER_INTERFACE_SETTINGS_PAGE_H
 
+#include "../feature_intro/feature_intro_badge.h"
 #include "abstract_settings_page.h"
 
 #include <QCheckBox>
@@ -17,6 +18,10 @@ class QGroupBox;
 class UserInterfaceSettingsPage : public AbstractSettingsPage
 {
     Q_OBJECT
+signals:
+    /// The "New" badge was activated; the owner opens that feature's What's New entry.
+    void featureIntroRequested(const QString &featureId);
+
 private slots:
     void setNotificationEnabled(QT_STATE_CHANGED_T);
     void enableAllAnimations();
@@ -58,6 +63,8 @@ private:
     QLabel hoverPanelDelayLabel;
     QSpinBox hoverPanelDelayBox;
     QLabel hoverWheelNoteLabel;
+    /// "New" marker for the hover group while the #7700 rework is unannounced.
+    FeatureIntroBadge hoverPanelNewBadge;
 
     QCheckBox openDeckInNewTabCheckBox;
     QLabel visualDeckStoragePromptForConversionLabel;

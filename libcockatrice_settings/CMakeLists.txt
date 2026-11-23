@@ -9,6 +9,7 @@ set(HEADERS
     libcockatrice/settings/debug_settings.h
     libcockatrice/settings/deck_editor_settings.h
     libcockatrice/settings/download_settings.h
+    libcockatrice/settings/feature_intro_settings.h
     libcockatrice/settings/game_filters_settings.h
     libcockatrice/settings/game_settings.h
     libcockatrice/settings/interface_settings.h
@@ -40,6 +41,7 @@ add_library(
   libcockatrice/settings/debug_settings.cpp
   libcockatrice/settings/deck_editor_settings.cpp
   libcockatrice/settings/download_settings.cpp
+  libcockatrice/settings/feature_intro_settings.cpp
   libcockatrice/settings/game_filters_settings.cpp
   libcockatrice/settings/game_settings.cpp
   libcockatrice/settings/interface_settings.cpp

@@ -142,6 +142,62 @@ Record the tree in the same playback that clicks, and copy paths from that dump:
 less build/screenshots/widget-tree.txt
 ```
 
+The dialog instance matters too, not just the events before it: in
+`feature_intro_test.xml` the settings dialog opened through the *What's New* deep link
+numbers the user-interface scroll area `0QScrollArea5` while the one opened from the menu
+numbers it `1QScrollArea0`, in the same process. A failed lookup prints a
+`Possible match:` line with the path it found, so read that before editing the test.
+
+Capture a widget that is scrolled out of view by addressing the widget itself rather than
+the viewport (`.../0UserInterfaceSettingsPage0/0QGroupBox3`), not the scroll area it sits
+in; a `grab()` renders the subtree even when the viewport would clip it.
+
+### A prepared HOME for upgrade-state tests
+
+A test that depends on what the install looked like *before* this run — a feature
+introduction for someone updating from 3.1, a settings migration — cannot use the
+developer's real settings, and a clean install is not enough either: on a clean install
+the feature-intro planner baselines everything it has never seen, so nothing is due.
+
+Give the client its own HOME. Four files are enough for the "3.1.0, one homemade card"
+case:
+
+| File | Contents |
+|---|---|
+| `network.ini` | `[network] clientVersion=3.1.0` — older than the version that introduces the feature |
+| `updates.ini` | `startupUpdateCheck=false`, `newVersionNotification=false`, `startupCardUpdateCheckPromptForUpdate=false`, `alwaysEnableNewSets=false` |
+| `paths.ini` | `cardDatabase=` an XML you control, plus the deck/pics/replay dirs under the same HOME |
+| `cardDatabase.ini` | every set of that XML enabled **and** known: `[sets]` then `FI\enabled=true`, `FI\isKnown=true`, `FI\sortKey=1` |
+
+The last row is not optional. `MainWindow::startupConfigCheck()` calls
+`CardDatabase::checkUnknownSets()` on every non-clean install: enabled-but-unknown sets
+raise the modal "new sets found" question, and *no* enabled set enables everything and
+raises the modal "Welcome, all sets have been enabled" box followed by Manage Sets. Either
+one opens before the first event and the playback never starts — the run exits on the
+timeout with no failing event in the log, which reads like a hang in the harness. When a
+whole playback produces no event output, attach a debugger instead of guessing:
+
+```bash
+gdb -p "$(pgrep -f 'cockatrice --no-connect --test')" -batch -ex "thread apply all bt"
+# QDialog::exec ← showNewMessageBox ← MainWindow::cardDatabaseAllNewSetsEnabled is the
+# startup modal, not your test
+```
+
+Run the playback directly, because `run_test.sh` deliberately does not set `HOME` and
+always keeps the developer's settings. A fresh HOME per attempt: a killed run leaves the
+crash-session lock and the next launch stops in the crash-report flow.
+
+```bash
+bash /tmp/opencode/fi-reset.sh   # writes the four files above
+HOME=/tmp/opencode/feature-intro-home \
+COCKATRICE_SCREENSHOT_DIR=/tmp/opencode/fi-shots \
+QT_QPA_PLATFORM=offscreen \
+timeout --foreground 120 build/test/cockatrice/cockatrice \
+    --no-connect --test Testing/feature_intro_test.xml
+```
+
+The test file documents the same recipe in its header comment; keep the two in step.
+
 ### Selecting a row
 
 QtTesting's own `currentChanged` takes `row|column`. `0:0` reaches `OldGetIndex`, which
