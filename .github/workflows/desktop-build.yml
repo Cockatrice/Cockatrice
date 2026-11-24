@@ -657,7 +657,7 @@ jobs:
             make_package: 1
             override_target: 14
             package_suffix: "-macOS14"
-            qt_version: 6.11.*
+            qt_version: 6.12.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
             type: Release
@@ -676,7 +676,7 @@ jobs:
             make_package: 1
             override_target: 15
             package_suffix: "-macOS15"
-            qt_version: 6.11.*
+            qt_version: 6.12.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
             type: Release
@@ -691,7 +691,7 @@ jobs:
             ccache_eviction_age: 7d
             ccache_size: 700M    # Debug + suite: ~0.5 GB at level 0
             cmake_generator: Ninja
-            qt_version: 6.11.*
+            qt_version: 6.12.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Apple
             type: Debug
@@ -711,7 +711,7 @@ jobs:
             cmake_generator: Ninja
             make_package: 1
             package_suffix: "-Win10"
-            qt_version: 6.11.*
+            qt_version: 6.12.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             type: Release
             ccache_eviction_age: 7d
@@ -833,7 +833,7 @@ jobs:
         if: matrix.os == 'Windows'
         uses: jurplel/install-qt-action@b344308e4483fc892e0d27b3cd1b173ebdd95f06 # v4.5.0
         with:
-          # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
+          # Qt 6.11 and newer only works with aqtinstall directly from git until aqtinstall 3.4 is released
           aqtsource: git+https://github.com/miurahr/aqtinstall.git
           archives: ${{ env.QT_ARCHIVES }}
           cache: ${{ github.ref == 'refs/heads/master' }}
@@ -1298,7 +1298,7 @@ jobs:
             make_package: 1
             override_target: 13
             package_suffix: "-macOS13_Intel"
-            qt_version: 6.11.*
+            qt_version: 6.12.*
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Intel
             type: Release
