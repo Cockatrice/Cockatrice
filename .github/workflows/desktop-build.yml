@@ -663,7 +663,7 @@ jobs:
             type: Release
             use_ccache: 1
             vcpkg_deployment_target: 14
-            vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
+            vcpkg_scope: 'vcpkg/macos14-arm64-xcode27/'
             vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
 
           - os: macOS
@@ -682,7 +682,7 @@ jobs:
             type: Release
             use_ccache: 1
             vcpkg_deployment_target: 14
-            vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
+            vcpkg_scope: 'vcpkg/macos14-arm64-xcode27/'
 
           - os: macOS
             target: 27
@@ -697,7 +697,7 @@ jobs:
             type: Debug
             use_ccache: 1
             vcpkg_deployment_target: 14
-            vcpkg_scope: 'vcpkg/macos14-arm64-xcode26.6/'
+            vcpkg_scope: 'vcpkg/macos14-arm64-xcode27/'
 
           - os: Windows
             target: 10
@@ -1302,7 +1302,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtshadertools qtwebsockets
             soc: Intel
             type: Release
-            vcpkg_scope: 'vcpkg/macos13-x64-xcode26.3/'
+            vcpkg_scope: 'vcpkg/macos13-x64-xcode26/'
             vcpkg_upload: 1    # only one leg per vcpkg_scope hands its archives over
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
@@ -1356,7 +1356,7 @@ jobs:
           # Must list every vcpkg_scope of the build-vcpkg and build-vcpkg-nightly
           # matrices above, or the entries of a scope that is still in use get deleted
           # on the next run.
-          LIVE_VCPKG_SCOPES: 'vcpkg/macos13-x64-xcode26.3/ vcpkg/macos14-arm64-xcode26.6/ vcpkg/windows10-x64-vs2026/'
+          LIVE_VCPKG_SCOPES: 'vcpkg/macos13-x64-xcode26/ vcpkg/macos14-arm64-xcode27/ vcpkg/windows10-x64-vs2026/'
           # Must list the ccache key of every leg that keeps a compiler cache
           # (PERSIST_CCACHE in build-linux and build-vcpkg), or a live entry is deleted.
           # The nightly legs and the pull-request legs that finish under the Windows leg
